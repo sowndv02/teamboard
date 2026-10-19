@@ -1,0 +1,11 @@
+services:
+  teamboard-api:
+    image: teamboard-api
+    build:
+      context: .
+      dockerfile: teamboard-api/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:7070
+    ports:
+      - "6060:7070"
+    restart: unless-stopped
