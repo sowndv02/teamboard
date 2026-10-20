@@ -39,6 +39,7 @@ docs:
   infraRoot: document/infra                # lựa chọn dịch vụ AWS theo service (chi phí đi đầu)
   plansRoot: document/plans                # plan theo issue: TB-NNN-<slug>.md
   workflowStateRoot: document/workflow     # state file của workflow: <id>.yaml
+  lessonsRoot: document/lessons            # bài học kinh nghiệm: LL-NNN-<slug>.md
   architectureIndex: document/architecture/README.md
   required:                                # tier: R0 luôn đọc · R1 đọc khi vào phạm vi · R2 đọc khi có điều kiện
     - { id: agent-rules,  path: AGENTS.md,                        tier: R0 }

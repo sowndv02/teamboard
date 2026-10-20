@@ -108,6 +108,13 @@ Không chắc đang ở đâu (trạng thái mâu thuẫn, artifact thiếu) →
 | "Chỉ chạy review ..." | Chạy riêng skill review đó với vòng lặp |
 | "Quay lại sửa spec/design" | Sửa artifact, chạy lại review của nó, rồi đánh dấu các bước sau cần kiểm lại |
 
+## Bài học (lessons learned) trong workflow
+
+- **Trước khi làm** (`plan-init`, `coding-start`): tra `document/lessons/README.md` theo tag của vùng/service đang làm; đưa lesson liên quan vào plan/test/code (skill `lesson-learned`, chế độ `search`).
+- **Trong khi làm:** finding review P0–P2 có nguyên nhân hệ thống, người dùng sửa cách làm của agent, test/gate fail do giả định sai → đề xuất ghi bài học ngay (bản nháp ngắn).
+- **Sau `create-pr` (tổng kết):** hỏi "có gì sai/đáng nhớ trong lát này không?"; nếu có, chạy `lesson-learned` `capture`; nếu không, ghi sự kiện `lessons_recorded: none` vào state. Biện pháp phòng ngừa chạm rule/skill/gate là thay đổi thật: đề xuất cho người dùng, làm trong issue/commit rõ ràng.
+- Lesson lặp lại → nâng cấp biện pháp (ưu tiên tự động hoá), không chỉ ghi thêm.
+
 ## Phối hợp với rule dự án
 
 - Một issue một branch (`feature/TB-NNN-<slug>`); bước 5 trở đi cần issue và branch (tạo theo `git-workflow.md`, không `push` khi chưa được yêu cầu).

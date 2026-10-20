@@ -34,6 +34,7 @@ Rule liên quan: `task-workflow.md`, `testing.md`, `test-review.md`, `architectu
 - Quyết định kỹ thuật trong plan phải có **bằng chứng** (đường dẫn spec/ADR/code); không có thì là Câu hỏi mở, không ghi như đã quyết.
 - Mỗi bước tuân cỡ bước (`generation-principles.md` mục 5): không khổng lồ; nếu bước cần nhiều test thực thi, nêu cách sinh (một lần hay theo từng bước).
 - Không tuyên bố "sẵn sàng code" ở bước này; đó là kết quả của `plan-review` PASS.
+- **Tra bài học** (`document/lessons/README.md`, theo tag của vùng/service): lesson liên quan phải được phản ánh trong plan (bước kiểm, kịch bản, rủi ro). Ghi tên lesson đã dùng vào mục Rủi ro.
 
 ## Hoàn thành khi
 - [ ] Plan đủ mục mẫu, đặt đúng chỗ/tên, có trong `document/plans/README.md`

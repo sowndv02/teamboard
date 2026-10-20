@@ -24,7 +24,7 @@ Chuỗi skill thực thi quy trình này: `requirements-discovery` → `spec-rev
 | 9 | **Sửa finding** | Sửa theo lô nhỏ, có test; chạy lại gate | `code-review.md` (mục sửa finding) | Finding `resolved` |
 | 10 | **Review delta** | Review lại phần thay đổi; đóng finding | `code-review.md` (vòng 2+) | `Sẵn sàng merge`; không P0–P2 mở, không P3 `open` |
 | 11 | **PR** | Mở PR (chỉ khi người dùng yêu cầu); issue → `review` | `git-workflow.md` | PR mở, mô tả có link issue + cách kiểm chứng |
-| 12 | **Merge & đóng** | Người dùng merge; cập nhật issue → `done`, mục lục issue, `PROJECT.md` (nếu xong giai đoạn), runbook/ADR nếu phát sinh | `docs-update-specs.md`, `git-workflow.md` | Issue `done`; tài liệu khớp |
+| 12 | **Merge & đóng** | Người dùng merge; cập nhật issue → `done`, mục lục issue, `PROJECT.md` (nếu xong giai đoạn), runbook/ADR nếu phát sinh; **tổng kết bài học** (skill `lesson-learned`: có gì sai/đáng nhớ không?) | `docs-update-specs.md`, `git-workflow.md` | Issue `done`; tài liệu khớp |
 
 Thứ tự mặc định: 0 → 1 → 2 → (3) → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12. Giai đoạn 8–10 lặp đến khi hết finding chặn. Không nhảy cóc; không bắt đầu giai đoạn sau khi cổng ra của giai đoạn trước chưa đạt (trừ khi người dùng duyệt tường minh, và ghi lý do vào issue).
 

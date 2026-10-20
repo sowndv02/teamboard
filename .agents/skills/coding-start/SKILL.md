@@ -42,6 +42,9 @@ Dừng và **hỏi người dùng** (công cụ hỏi, kèm lựa chọn và ng�
 
 Hành vi chốt xong → cập nhật **spec** (và plan/`.feature`/test nếu đổi) **trước**, rồi mới code (`docs-update-specs.md`). Test cần đổi vì hành vi đổi: sửa theo spec mới và chạy lại để thấy đỏ đúng lý do rồi mới xanh.
 
+## Bài học liên quan
+Trước khi code, tra `document/lessons/README.md` theo tag của vùng đang làm (service, `security`, `api`, `database`...) và áp dụng các biện pháp phòng ngừa đã ghi (ví dụ chạy quét secret, thêm test đường lỗi). Gặp lỗi lặp lại với lesson đã có → báo `recurred` và đề xuất nâng cấp biện pháp (skill `lesson-learned`).
+
 ## Commit
 - Chỉ commit khi người dùng cho phép; nếu chưa được hỏi trong phiên này thì **hỏi một lần** ("cho phép tôi commit cục bộ trên branch này theo từng lát?"). Được phép → commit nhỏ theo `git-commit.md` (tiếng Anh, `type(TB-NNN): summary` + body), mỗi commit build được và test xanh. **Không push.**
 - Không commit file sinh ra, secret, `local/`.

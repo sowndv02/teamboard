@@ -142,3 +142,7 @@ Sau báo cáo: cập nhật bảng "Review rounds" trong issue (vòng, commit, v
 - Finding về validation, policy, contract hoặc test coverage chỉ đóng khi có **test mới/mở rộng**, không chỉ sửa code production.
 - Chạy lại gate, rồi review delta (vòng kế tiếp). Chỉ đóng finding sau khi delta review pass.
 - Finding mà fix là hoàn tác thay đổi người dùng đã yêu cầu → hỏi lại người dùng trước khi sửa.
+
+## Bài học từ review
+
+Finding P0–P2 có nguyên nhân hệ thống (quy trình/mẫu/công cụ để lỗi lọt qua, không phải một lần gõ nhầm) → ghi vào báo cáo mục "Bài học đề xuất" và chạy skill `lesson-learned` `capture`; ghi fingerprint finding làm bằng chứng. Finding trùng với lesson đã có và biện pháp phòng ngừa đã `prevented` → đánh dấu `recurred` (biện pháp chưa đủ hiệu quả). Không hỏi lại điều đã có trong `document/lessons/`.

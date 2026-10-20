@@ -10,6 +10,7 @@
 | ADR | `document/architecture/adr/` | `NNNN-ten-ngan-gon.md` (4 chữ số, tăng dần, không tái sử dụng) |
 | Lựa chọn dịch vụ AWS theo service | `document/infra/` | `<service>.md` (khớp tên trong `config/services.yaml`); mẫu `_template.md` |
 | Kiến thức bảo mật (kịch bản tấn công/phòng thủ) | `document/security/` | `<chu-de>.md` (kebab-case) |
+| Bài học kinh nghiệm | `document/lessons/` | `LL-NNN-<slug>.md`; mẫu `_template.md`; mục lục `README.md` |
 | Trạng thái workflow | `document/workflow/` | `<id>.yaml` (`TB-NNN` hoặc `feature-<ten>`); mẫu `_template.yaml` |
 | Plan triển khai | `document/plans/` | `TB-NNN-<slug>.md` (khớp tên issue); mẫu `_template.md` |
 | Thiết kế hệ thống (design doc) | `document/design/` | `<tinh-nang>.md` (cùng tên spec tương ứng); mẫu `_template.md` |

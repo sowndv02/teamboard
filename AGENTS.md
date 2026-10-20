@@ -7,8 +7,9 @@ Các rule dưới đây áp dụng cho mọi dự án. Thông tin riêng của t
 1. Đọc `PROJECT.md` và `config/project.yaml`.
 2. Đọc các tài liệu tier R0 trong `docs.required` của `config/project.yaml`; tier R1 khi vào phạm vi liên quan; tier R2 chỉ khi điều kiện `when` đúng. Không quét toàn bộ tài liệu.
 3. Đọc `.agents/rules/INDEX.md` và chỉ các rule khớp với việc đang làm (bảng "hoạt động → rule"); luôn đọc `agent-conduct.md` và (khi nhận task) `task-workflow.md`. Trước khi báo xong, commit hoặc mở PR cho bất kỳ thay đổi nào, bắt buộc qua `code-change-gate.md`. Rule trong `.agents/rules/` thắng convention mặc định của agent.
-4. Chạy các lệnh kiểm tra đầu phiên trong file lệnh của dự án (`COMMANDS.md`).
-5. Giá trị `TODO` trong config nghĩa là chưa quyết định: hỏi người dùng, không tự điền.
+4. Tra bài học liên quan: đọc mục lục `document/lessons/README.md`, chỉ mở lesson có tag khớp vùng đang làm (rule `lessons-learned.md`).
+5. Chạy các lệnh kiểm tra đầu phiên trong file lệnh của dự án (`COMMANDS.md`).
+6. Giá trị `TODO` trong config nghĩa là chưa quyết định: hỏi người dùng, không tự điền.
 
 ## Quy trình làm việc
 
@@ -19,6 +20,7 @@ Các rule dưới đây áp dụng cho mọi dự án. Thông tin riêng của t
 - Chia thành các lát nhỏ chạy được end-to-end; không làm nhiều phần lớn cùng lúc.
 - Mỗi lát có tiêu chí kiểm chứng cụ thể. Tự chạy build, test hoặc lệnh kiểm chứng trước khi báo xong; nếu không chạy được thì nói rõ.
 - Chỉ làm đúng phạm vi được yêu cầu. Thấy vấn đề ngoài phạm vi thì báo lại, không tự sửa.
+- Khi mắc lỗi, bị người dùng sửa, hoặc review tìm ra lỗi có nguyên nhân hệ thống: ghi bài học và biện pháp phòng ngừa (skill `lesson-learned`), đừng chỉ sửa rồi bỏ qua.
 
 ## Chất lượng code
 

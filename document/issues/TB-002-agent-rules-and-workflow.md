@@ -36,3 +36,10 @@ Chuẩn bị nền để làm việc với AI agent theo quy trình thống nh�
 ## Ghi chú / Nhật ký
 - Các giá trị chưa quyết định để `TODO`: `quality.monthlyBudgetUsd`, `quality.compliance`, region/account AWS, phiên bản Node/Angular/Terraform, BDD runner.
 - Mật khẩu trong `src/.env.develop` và `src/.env.stg` từng được commit; cần xoay nếu là thật.
+
+## Bài học (lessons learned)
+
+Liên kết lesson sinh ra từ issue này (`document/lessons/LL-NNN-*.md`), hoặc ghi "không có". Skill `lesson-learned`.
+
+- [LL-001](../lessons/LL-001-secrets-committed-in-env-files.md): không commit file `.env` chứa mật khẩu
+- [LL-002](../lessons/LL-002-tool-license-assumed-before-checking.md): kiểm tra giấy phép công cụ trước khi đưa vào thiết kế

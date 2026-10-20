@@ -18,6 +18,7 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | Code review | Người dùng yêu cầu review diff/PR/branch, hoặc trước khi merge | `code-review.md` |
 | Quality gate local (analyzer, lint, secret, severity, phạm vi test) | Đổi code .NET/Angular/infra; chọn test targeted hay full; đổi cấu hình analyzer/lint | `quality-gate.md` |
 | Pipeline lifecycle (thứ tự giai đoạn, cổng chuyển, làn nhẹ/hạ tầng) | Nhận một issue từ đầu đến cuối; không chắc đang ở giai đoạn nào hoặc có được bỏ bước không | `pipeline-lifecycle.md` |
+| Bài học kinh nghiệm (ghi khi lỗi/sai sót, tra theo tag trước khi làm, phòng ngừa phải mã hoá) | Đầu task trong một vùng (tra tag); sau lỗi/sự cố/người dùng sửa agent; khi đóng issue/PR | `lessons-learned.md` + `document/lessons/` |
 | Quy trình làm task | Mọi task (vibe code, sửa nhỏ, tính năng) | `task-workflow.md` |
 | Kiến trúc & ranh giới service | Tạo/đổi ranh giới service, chọn kiến trúc, thêm service | `architecture.md` |
 | API endpoint | Thêm/sửa/xoá endpoint HTTP (mọi service), đổi request/response/lỗi/phân trang, sửa OpenAPI | `api-endpoints.md` |
@@ -32,6 +33,7 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | Testing | Viết hoặc sửa test; trước khi báo xong | `testing.md` |
 | Docker & compose | Dockerfile, docker-compose, chạy local | `docker.md` |
 | Terraform & AWS (vibe code hạ tầng: an toàn/phê duyệt, IAM, chi phí, state, bằng chứng, mô phỏng tấn công) | Sửa `infra/**`, Terraform, AWS, CI/CD, hoặc học kịch bản tấn công hạ tầng (`document/security/infra-attack-scenarios.md`) | `terraform.md` |
+| Phụ thuộc bên thứ ba (hạn chế thư viện, giấy phép, hạng T0–T3, tự viết thay thư viện) | Thêm/đổi/nâng cấp NuGet, npm, provider Terraform, image, công cụ CLI; chọn thư viện cho tính năng mới; review thay đổi có phụ thuộc | `dependency-policy.md` + `config/dependencies.yaml` |
 | Pin dependency | Sửa `*.csproj`, `Directory.Packages.props`, `package.json`, provider Terraform, base image Docker | `dependency-pinning.md` |
 | Git commit message | Soạn commit (tay hoặc agent), sửa message, revert | `git-commit.md` |
 | Git workflow | Tạo branch, commit, PR, đổi trạng thái issue | `git-workflow.md` |
@@ -54,6 +56,7 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | `coding-start` | Code theo Đỏ → Xanh → Refactor đến khi mọi test pass | `.agents/skills/coding-start/SKILL.md` |
 | `coding-review` | Review code sau khi test xanh hết | `.agents/skills/coding-review/SKILL.md` |
 | `create-pr` | Soạn và mở PR sau khi người dùng xác nhận | `.agents/skills/create-pr/SKILL.md` |
+| `lesson-learned` | Ghi bài học sau lỗi/sự cố (nguyên nhân gốc, phòng ngừa mã hoá), tra bài học theo tag, rà định kỳ | `.agents/skills/lesson-learned/SKILL.md` |
 | `aws-service-selection` | Quyết định dịch vụ AWS cho một service (chi phí đi đầu, 7 tiêu chí); so sánh hai dịch vụ AWS; ước tính chi phí; review stack AWS trước khi viết Terraform | `.agents/skills/aws-service-selection/SKILL.md` |
 | `system-design` | Có spec đã rõ cần thiết kế hệ thống có giải thích đánh đổi; so sánh phương án; review thiết kế; giải thích pattern; phân tích khi tải tăng | `.agents/skills/system-design/SKILL.md` |
 
