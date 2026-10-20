@@ -29,3 +29,7 @@ Cần: issue, mục trong `config/services.yaml`, cập nhật bảng trong `PRO
 ## API
 
 Quy ước endpoint thống nhất cho mọi service nằm ở `api-endpoints.md` (URL, status, lỗi `problem+json`, phân trang, header, bảo mật). Service không tự đặt quy ước riêng.
+
+## Tham khảo
+
+Danh mục kiến trúc/pattern và đối chiếu với từng service: `document/architecture/patterns-catalog.md`. Identity tự xây: `document/architecture/identity-learning.md` (ADR 0006).

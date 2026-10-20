@@ -7,6 +7,7 @@ Nơi agent (và người) tra cứu **cấu hình không bí mật** của dự 
 | `project.yaml` | Workflow: issue (prefix, đường dẫn), branch, commit, PR, danh sách tài liệu bắt buộc theo tier R0/R1/R2 | Đầu phiên; tạo branch/commit/PR; tìm tài liệu cần đọc |
 | `services.yaml` | Danh sách service: cổng, health path, DB, kiến trúc, trạng thái | Thêm/sửa service, viết compose/Terraform, gọi service-to-service |
 | `environments.yaml` | Môi trường local/dev/stg: region, tên resource, cách deploy | Làm infra, CI/CD, đổi cấu hình theo môi trường |
+| `dependencies.yaml` | Danh bạ phụ thuộc bên thứ ba đã xét: hạng T0–T3, giấy phép, nguồn kiểm, lối thoát | Thêm/đổi/nâng cấp phụ thuộc; chọn thư viện; review |
 | `tool-versions.yaml` | Phiên bản công cụ yêu cầu (.NET, Terraform, Docker...) | Setup máy, viết CI, kiểm tra phiên bản |
 
 ## Quy tắc

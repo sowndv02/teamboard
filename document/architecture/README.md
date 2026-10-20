@@ -93,3 +93,13 @@ document/
 - [0003 Runtime: ECS Fargate thay vì EKS](adr/0003-ecs-fargate.md)
 - [0004 Terraform layout & state](adr/0004-terraform-layout.md)
 - [0005 Tech stack chính: ASP.NET Core + Angular](adr/0005-techstack-aspnet-angular.md)
+- [0006 Tự xây identity-service (không dùng framework identity)](adr/0006-identity-self-built.md)
+- [0007 Chính sách phụ thuộc bên thứ ba](adr/0007-dependency-policy.md)
+
+## Tài liệu kiến trúc chi tiết
+
+- [patterns-catalog.md](patterns-catalog.md): danh mục kiến trúc/pattern hay dùng trong dự án thực tế, đối chiếu với TeamBoard
+- [identity-learning.md](identity-learning.md): lộ trình tự xây `identity-service` (JWT, OAuth 2.0, OIDC)
+- [observability.md](observability.md): log, metric, trace, health; stack local và AWS (CloudWatch, ADOT/X-Ray)
+- [resilience.md](resilience.md): retry, circuit breaker, bulkhead, timeout, chịu lỗi trên AWS
+- [references.md](references.md): nguồn tham khảo (slide, chuẩn, sách) và cách dùng

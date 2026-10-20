@@ -88,3 +88,7 @@ Ngoại lệ chấp nhận được: số `0`, `1`, `-1`, chuỗi rỗng, và li
 - [ ] Truy vấn không N+1, có phân trang; migration an toàn
 - [ ] Call ra ngoài có timeout/retry/breaker; mang `correlationId`
 - [ ] Gate đã chạy (`code-change-gate.md`, `quality-gate.md`)
+
+## Thư viện bên thứ ba
+
+Phụ thuộc mới: theo `dependency-policy.md` (nền tảng trước; T3 cấm; T2 phải bọc sau interface). Không dùng MediatR/AutoMapper/MassTransit/FluentAssertions bản thương mại; xem bảng thay thế ở mục 5 của policy.

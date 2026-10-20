@@ -31,3 +31,7 @@ Lý do: build tái lập được, tránh lỗi "hôm qua chạy, hôm nay hỏn
 ## Quy trình đổi phiên bản
 
 Nâng phiên bản là một thay đổi riêng (commit/issue riêng), có build + test xanh, không trộn với thay đổi tính năng.
+
+## Chính sách phụ thuộc
+
+Hạn chế thư viện bên thứ ba và tránh rủi ro giấy phép: `dependency-policy.md` (ADR 0007, danh bạ `config/dependencies.yaml`). Thêm/đổi phụ thuộc phải qua kiểm tra giấy phép trước khi ghim phiên bản.

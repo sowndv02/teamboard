@@ -139,3 +139,7 @@ Phạm vi test (`*Tests*`, `*.spec.ts`) được nới các rule về trùng l�
 - `testing.md`: loại test và cách viết.
 - `dependency-pinning.md`: pin phiên bản công cụ và analyzer.
 - `code-review.md`: gate là điều kiện trước khi review.
+
+## Giấy phép phụ thuộc
+
+Gate cần có quét giấy phép và lỗ hổng cho phụ thuộc (đề xuất, xem `dependency-policy.md` mục 8). Gói thuộc hạng T3 hoặc giấy phép ngoài danh sách cho phép là BLOCKER.

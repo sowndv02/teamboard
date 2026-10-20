@@ -17,3 +17,7 @@
 ## Fault injection (debug lab)
 
 Chỉ qua cờ `FAULT_*` bật bằng env, mặc định tắt, không bao giờ bật ở stg/prod. Không để code fault chạy khi cờ tắt.
+
+## Tài liệu kiến trúc liên quan
+
+Kiến trúc đầy đủ (stack local và AWS, SLO, cảnh báo, chi phí quan sát): `document/architecture/observability.md`. Chịu lỗi: `document/architecture/resilience.md`.
