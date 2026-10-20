@@ -1,0 +1,69 @@
+# Cấu hình workflow của dự án (issue, branch, commit, PR, tài liệu bắt buộc).
+# Không chứa secret. Giá trị TODO = chưa quyết định, hỏi người dùng.
+
+issueTracker:
+  provider: markdown            # issue là file .md trong repo, không dùng tool ngoài
+  prefix: TB                    # TeamBoard
+  keyPattern: '^TB-\d{3,}$'     # TB-001, TB-002, ...
+  root: document/issues
+  index: document/issues/README.md
+  filePattern: '{issueKey}-{slug}.md'
+  statuses: [todo, in-progress, review, done, dropped]
+
+branch:
+  baseBranch: main
+  pattern: 'feature/{issueKey}-{slug}'     # ví dụ: feature/TB-001-servicedefaults
+  # fix/chore dùng cùng mẫu với tiền tố fix/ hoặc chore/
+
+commit:
+  language: en                  # tiếng Anh
+  format: '{type}({issueKey}): {summary}\n\n{body}'   # body bắt buộc (body-empty: never)
+  headerMaxLength: 72
+  bodyRequired: true
+  types: [feat, fix, refactor, perf, test, docs, infra, build, ci, chore, revert]
+  rules: .agents/rules/git-commit.md
+
+pullRequest:
+  platform: github
+  cli: gh
+  repository: sowndv02/teamboard   # từ git remote origin
+  defaultTarget: main
+  title: '{issueKey}: {summary}'
+  body: link tới file issue + cách kiểm chứng
+
+docs:
+  adrRoot: document/architecture/adr
+  runbooksRoot: document/runbooks
+  specsRoot: document/spec                 # spec từng tính năng/service
+  designRoot: document/design              # design doc (system design)
+  infraRoot: document/infra                # lựa chọn dịch vụ AWS theo service (chi phí đi đầu)
+  plansRoot: document/plans                # plan theo issue: TB-NNN-<slug>.md
+  workflowStateRoot: document/workflow     # state file của workflow: <id>.yaml
+  architectureIndex: document/architecture/README.md
+  required:                                # tier: R0 luôn đọc · R1 đọc khi vào phạm vi · R2 đọc khi có điều kiện
+    - { id: agent-rules,  path: AGENTS.md,                        tier: R0 }
+    - { id: project,      path: PROJECT.md,                       tier: R0 }
+    - { id: commands,     path: COMMANDS.md,                      tier: R0 }
+    - { id: rules-index,  path: .agents/rules/INDEX.md,           tier: R0 }
+    - { id: agent-conduct, path: .agents/rules/agent-conduct.md,  tier: R0 }
+    - { id: code-gate,    path: .agents/rules/code-change-gate.md, tier: R0 }
+    - { id: task-workflow, path: .agents/rules/task-workflow.md,  tier: R0 }
+    - { id: issues-index, path: document/issues/README.md,        tier: R1 }
+    - { id: architecture, path: document/architecture/README.md,  tier: R1 }
+  recommended:
+    - { id: adr,      glob: 'document/architecture/adr/*.md', tier: R2, when: đổi quyết định kiến trúc }
+    - { id: runbooks, glob: 'document/runbooks/*.md',         tier: R2, when: debug sự cố }
+    - { id: services, path: config/services.yaml,             tier: R2, when: đụng cổng/tên service }
+    - { id: envs,     path: config/environments.yaml,         tier: R2, when: đụng infra hoặc CI/CD }
+
+quality:                        # dùng cho lăng kính Chất lượng/Bảo mật/Chi phí trong các bước review
+  monthlyBudgetUsd: TODO        # trần chi phí AWS/tháng (cả dự án); TODO → design-review yêu cầu chốt
+  compliance: TODO              # ví dụ: none | GDPR | PCI-DSS ...; TODO → spec-review hỏi
+  securityBaseline: [OWASP Top 10, OWASP ASVS, STRIDE]
+  costBaseline: [AWS Well-Architected Cost Optimization, FinOps cơ bản]
+
+paths:
+  src: src
+  infra: infra                  # chưa tạo
+  services:
+    boardService: src/teamboard-api   # sẽ đổi tên thành src/board-service

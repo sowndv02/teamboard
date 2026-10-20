@@ -1,0 +1,59 @@
+# Danh sách service. status: existing | planned
+# Kiến trúc và lưu trữ: xem document/architecture/README.md §1
+
+services:
+  web:
+    status: planned
+    path: src/web
+    architecture: angular-feature-based (standalone + signals)   # ADR 0005
+    datastore: none
+    local_port: TODO            # ng serve mặc định 4200
+    talks_to: gateway           # chỉ gọi /api/v1 qua gateway
+
+  gateway:
+    status: planned
+    architecture: api-gateway-bff (YARP)
+    datastore: none
+    local_port: TODO
+    health: { live: /health/live, ready: /health/ready }
+
+  identity-service:
+    status: planned
+    architecture: vertical-slice
+    datastore: postgresql
+    local_port: TODO
+    health: { live: /health/live, ready: /health/ready }
+
+  board-service:
+    status: existing            # hiện là src/teamboard-api, sẽ đổi tên
+    path: src/teamboard-api
+    architecture: clean-architecture
+    datastore: sqlserver
+    local_port: 6060            # host; container nghe 7070 (docker-compose.yml)
+    container_port: 7070
+    health: { live: /health/live, ready: /health/ready }   # chưa implement
+
+  task-service:
+    status: planned
+    architecture: cqrs-event-sourcing + outbox
+    datastore: postgresql
+    local_port: TODO
+    health: { live: /health/live, ready: /health/ready }
+
+  notification-service:
+    status: planned
+    architecture: hexagonal
+    datastore: dynamodb
+    local_port: TODO
+    health: { live: /health/live, ready: /health/ready }
+
+  activity-service:
+    status: planned
+    architecture: serverless-event-driven
+    datastore: dynamodb
+    local_port: TODO
+    health: { live: /health/live, ready: /health/ready }
+
+messaging:
+  topic: teamboard-events       # SNS; mỗi consumer một SQS queue + DLQ
+  event_fields: [eventId, type, occurredAt, correlationId, version]

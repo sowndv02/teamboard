@@ -1,0 +1,29 @@
+# Môi trường. Không ghi secret; chỉ ghi tên/đường dẫn secret.
+
+environments:
+  local:
+    runtime: docker-compose
+    compose_files: [src/docker-compose.yml]
+    aws: localstack              # SNS/SQS/DynamoDB giả lập (giai đoạn 2+)
+    secrets: local/ hoặc src/.env.develop (gitignore; mẫu src/.env.develop.example)
+
+  dev:
+    runtime: ecs-fargate         # xem ADR 0003
+    compose_files: [src/docker-compose.yml, src/docker-compose.develop.yml]
+    aws_region: TODO
+    aws_account_id: TODO
+    terraform_dir: infra/envs/dev          # chưa tạo
+    secrets: ssm:/teamboard/dev/*          # dự kiến
+
+  stg:
+    runtime: ecs-fargate
+    compose_files: [src/docker-compose.yml, src/docker-compose.stg.yml]
+    aws_region: TODO
+    aws_account_id: TODO
+    terraform_dir: infra/envs/stg          # chưa tạo
+    secrets: ssm:/teamboard/stg/*          # dự kiến; env var hiện dùng: STG_CONNECTION_STRING
+
+terraform:
+  state_backend: s3             # TODO: tên bucket, tạo ở infra/bootstrap
+  state_per_env: true           # xem ADR 0004
+  ci_auth: github-oidc
