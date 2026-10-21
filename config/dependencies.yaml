@@ -18,6 +18,7 @@ packages:
   - { name: Microsoft.Extensions.* (Logging, Options, DependencyInjection, Http.Resilience, Diagnostics.HealthChecks), ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false }
   - { name: Microsoft.AspNetCore.OpenApi, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false }
   - { name: AWSSDK.* (AWS SDK for .NET), ecosystem: nuget, tier: T0, status: approved, license: Apache-2.0, verified: false, note: "AWS first-party" }
+  - { name: Angular (framework, CLI, router, forms), RxJS, TypeScript, ecosystem: npm, tier: T0, status: approved, license: MIT, verified: false, note: "ADR 0009; first-party Google/Microsoft; kiểm giấy phép từng gói phụ" }
 
   # ---- T1: quỹ/tổ chức trung lập ----
   - { name: OpenTelemetry .NET, ecosystem: nuget, tier: T1, status: approved, license: Apache-2.0, verified: false, note: "CNCF" }

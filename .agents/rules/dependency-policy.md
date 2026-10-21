@@ -6,8 +6,8 @@ Bổ sung cho: `dependency-pinning.md` (ghim phiên bản), `quality-gate.md` (q
 
 ## 1. Thuật ngữ
 
-- **Thư viện / gói / phụ thuộc bên thứ ba (third-party library, package, dependency):** code do người/tổ chức khác viết, đưa vào qua NuGet/provider/image. Rủi ro đi kèm: *license risk* (đổi giấy phép), *supply-chain risk* (mã độc, bị bỏ rơi), *vendor lock-in*.
-- **Nền tảng / first-party:** thành phần đi cùng nền tảng và do nhà cung cấp nền tảng duy trì: **.NET BCL (`System.*`), ASP.NET Core, Entity Framework Core, `Microsoft.Extensions.*`** (Microsoft), **AWS SDK** (AWS). EF Core thuộc nhóm này: được xem là an toàn để dùng (không phải "thư viện bên thứ ba").
+- **Thư viện / gói / phụ thuộc bên thứ ba (third-party library, package, dependency):** code do người/tổ chức khác viết, đưa vào qua NuGet/npm/provider/image. Rủi ro đi kèm: *license risk* (đổi giấy phép), *supply-chain risk* (mã độc, bị bỏ rơi), *vendor lock-in*.
+- **Nền tảng / first-party:** thành phần đi cùng nền tảng và do nhà cung cấp nền tảng duy trì: **.NET BCL (`System.*`), ASP.NET Core, Entity Framework Core, `Microsoft.Extensions.*`** (Microsoft), **Angular, RxJS, TypeScript** (Google/Microsoft; ADR 0009), **AWS SDK** (AWS). EF Core thuộc nhóm này: được xem là an toàn để dùng (không phải "thư viện bên thứ ba").
 - **Giấy phép permissive:** MIT, Apache-2.0, BSD, ISC: dùng, sửa, thương mại hoá thoải mái. **Copyleft mạnh** (GPL/AGPL), **source-available** (BUSL/BSL, SSPL, RSAL), và **thương mại** thì có hạn chế hoặc phải trả phí.
 
 ## 2. Bằng chứng: chuyện đã xảy ra
@@ -32,7 +32,7 @@ Bài học chung: **dự án do một công ty/một người duy trì, kể c�
 
 | Hạng | Định nghĩa | Ví dụ (tham khảo, kiểm tra hiện hành) | Quy tắc |
 |---|---|---|---|
-| **T0 Nền tảng** | First-party đi cùng nền tảng/nhà cung cấp | `System.*`, ASP.NET Core, **EF Core**, `Microsoft.Extensions.*` (Logging, Options, Http.Resilience, DependencyInjection), AWS SDK for .NET | Dùng tự do; vẫn ghim phiên bản |
+| **T0 Nền tảng** | First-party đi cùng nền tảng/nhà cung cấp | `System.*`, ASP.NET Core, **EF Core**, `Microsoft.Extensions.*` (Logging, Options, Http.Resilience, DependencyInjection), Angular, RxJS, TypeScript, AWS SDK for .NET | Dùng tự do; vẫn ghim phiên bản |
 | **T1 Quỹ/tổ chức trung lập, permissive, nhiều người đóng góp** | Quản trị mở, khó đổi điều khoản đột ngột | OpenTelemetry (CNCF), Polly (.NET Foundation), xUnit, Npgsql, YARP (Microsoft) | Cho phép sau kiểm tra nhanh; ghi vào `config/dependencies.yaml` |
 | **T2 Công ty đơn lẻ hoặc ít người duy trì, hiện permissive** | Có thể đổi điều khoản/bỏ rơi | Serilog, FluentValidation, Mapster, Carter, Marten, Refit, Swashbuckle, Reqnroll, NSubstitute, Testcontainers | **Cần phê duyệt**; đặt **sau interface của mình**, một project; có kế hoạch thay thế; ghi "lối thoát" |
 | **T3 Đã/đang thương mại, source-available, hết vòng đời** | Điều khoản không phù hợp hoặc rủi ro cao | MediatR ≥ 13, AutoMapper (bản thương mại), MassTransit ≥ 9, FluentAssertions ≥ 8, SpecFlow, Duende/IdentityServer, Hangfire Pro, Redis (RSAL/SSPL/AGPL) | **Cấm**, trừ khi người dùng duyệt tường minh và ghi ADR (kèm chi phí giấy phép) |
@@ -41,12 +41,12 @@ Ghi chú: nhóm công cụ (không phải thư viện) cũng có rủi ro giấy
 
 ## 4. Quy trình thêm một phụ thuộc
 
-Trước khi thêm (NuGet, provider Terraform, Docker image, công cụ CLI):
+Trước khi thêm (NuGet, npm, provider Terraform, Docker image, công cụ CLI):
 
 1. **Có thật sự cần?** Nền tảng (T0) làm được không? Viết phần nhỏ tự làm được không (mục 5)? Không có lý do rõ → không thêm.
 2. **Giấy phép:** lấy từ nguồn chính thức (trang package/repo, `LICENSE`). Cho phép: MIT, Apache-2.0, BSD-2/3, ISC, Unlicense. **Cần phê duyệt:** MPL-2.0, LGPL, EPL, giấy phép tuỳ chỉnh. **Cấm mặc định:** GPL, AGPL, SSPL, BUSL/BSL, RSAL, "source-available", thương mại, không có giấy phép. Kiểm cả **phụ thuộc bắc cầu** (transitive).
 3. **Quản trị và sức khoẻ:** ai duy trì (quỹ, công ty, cá nhân)? bao nhiêu người đóng góp? phát hành gần đây? có cơ chế tài trợ bền vững? lịch sử đổi giấy phép? có nhánh cộng đồng dự phòng?
-4. **Bảo mật:** lỗ hổng đã biết (`dotnet list package --vulnerable`), cách báo cáo lỗ hổng, kích thước/độ phức tạp.
+4. **Bảo mật:** lỗ hổng đã biết (`dotnet list package --vulnerable`, `npm audit`), cách báo cáo lỗ hổng, kích thước/độ phức tạp.
 5. **Lối thoát (exit plan):** thay bằng gì nếu đổi giấy phép/bỏ rơi? Chi phí gỡ bao nhiêu? Đã đặt sau interface chưa (mục 6)?
 6. **Ghi nhận:** thêm vào `config/dependencies.yaml` (hạng, giấy phép, nguồn kiểm, ngày kiểm, lý do, lối thoát); lựa chọn đáng kể thì viết ADR.
 7. **Ghim phiên bản** (`dependency-pinning.md`); với phụ thuộc T2 có nguy cơ đổi giấy phép, **ghim ở bản cuối cùng còn permissive** khi biết.
@@ -100,7 +100,8 @@ dotnet list src/teamboard.slnx package --include-transitive            # danh s�
 dotnet list src/teamboard.slnx package --vulnerable --include-transitive
 dotnet list src/teamboard.slnx package --deprecated
 # Quét giấy phép (chọn một công cụ, kiểm tra hiện hành): ví dụ nuget-license, dotnet-project-licenses
-# SBOM: CycloneDX (dotnet) để có danh sách thành phần
+# npm: `npm ls --all`; quét giấy phép npm (ví dụ license-checker)
+# SBOM: CycloneDX (dotnet và npm) để có danh sách thành phần
 ```
 
 - Lệnh quét giấy phép phải **fail** khi gặp giấy phép ngoài danh sách cho phép (mục 4) hoặc gói thuộc hạng T3.

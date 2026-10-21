@@ -78,6 +78,7 @@ Với mỗi quyết định lớn, nêu 2–3 bài toán có cấu trúc giống
 ### 6. Thiết kế chi tiết (khớp ngữ cảnh dự án)
 Điền design doc (`document/design/_template.md`):
 - Service sở hữu gì (dữ liệu, trách nhiệm), tuân kiến trúc bắt buộc của service (`architecture.md`); ranh giới nhất quán (transaction trong một service, eventual consistency giữa các service).
+- **Frontend (khi có UI, ADR 0009):** chiến lược render (SPA mặc định, SSR/hydration chỉ khi có lý do và ADR), **nơi lưu token phía client** (bộ nhớ + refresh cookie `HttpOnly`, hay BFF; nêu đánh đổi XSS/CSRF), CSP/CORS, cache và triển khai tĩnh; không quyết ở đây nếu ADR chưa có, ghi thành câu hỏi mở.
 - Hợp đồng: API (theo `api-endpoints.md`), sự kiện (`messaging.md`: outbox, idempotent consumer, DLQ).
 - Mô hình dữ liệu mức khái niệm, chỉ mục chính, vòng đời dữ liệu.
 - **Sơ đồ Mermaid**: bối cảnh/thành phần và ít nhất một sequence cho luồng chính (theo `docs-conventions.md`), và một cho luồng lỗi quan trọng.

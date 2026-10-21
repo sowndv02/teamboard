@@ -9,6 +9,15 @@ services:
     local_port: TODO
     health: { live: /health/live, ready: /health/ready }
 
+  web:
+    status: planned            # theo ADR 0009; chưa scaffold
+    path: src/web
+    architecture: angular-feature-based (standalone + signals, zoneless)
+    datastore: none
+    local_port: TODO            # ng serve mặc định 4200
+    talks_to: gateway           # chỉ gọi /api/v1 qua gateway
+    health: none                # tĩnh; kiểm bằng smoke e2e
+
   identity-service:
     status: planned
     architecture: vertical-slice

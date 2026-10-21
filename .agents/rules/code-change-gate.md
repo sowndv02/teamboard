@@ -9,6 +9,7 @@ Công cụ, ngưỡng, quy ước severity và phạm vi test (targeted/full) n�
 | Đổi ở | Gate bắt buộc |
 |---|---|
 | `src/**/*.cs`, `*.csproj`, `*.slnx` | **.NET**: build (warning = lỗi), test liên quan, format |
+| `src/web/**` (Angular, ADR 0009) | **Angular** 🚧: lint (0 warning), format, typecheck, build có budgets, test liên quan, policy test, axe; e2e smoke trước PR; `openapi:check` nếu đụng API (lệnh: `COMMANDS.md` §2) |
 | `**/Dockerfile`, `docker-compose*.yml` | **Docker**: `docker compose config`; build image của service bị đổi |
 | `infra/**/*.tf` | **Terraform**: `fmt -check`, `validate`, `plan` (không apply) |
 | `config/**`, `document/**`, `.agents/**`, `*.md` | **Docs**: link không chết, số liệu khớp `config/`, bảng mục lục đã cập nhật |
@@ -21,7 +22,7 @@ Chạm nhiều vùng thì chạy gate của tất cả các vùng. Đổi contra
 - Build lỗi, test fail, lint/format fail, `terraform validate` lỗi.
 - Warning mới do thay đổi gây ra (nợ cũ thì báo, không sửa ngoài phạm vi).
 - Test bị skip/xoá/nới lỏng để qua gate; hook/lint bị tắt; `--no-verify`.
-- Có secret, file sinh ra (`bin`, `obj`, `*.tfstate`) hoặc nội dung `local/` trong diff.
+- Có secret, file sinh ra (`bin`, `obj`, `node_modules`, `dist`, `.angular`, `*.tfstate`) hoặc nội dung `local/` trong diff.
 - Contract (API/event) đổi nhưng chưa cập nhật test và tài liệu tương ứng.
 - Thay đổi vi phạm kiến trúc bắt buộc (`architecture.md`): truy cập DB service khác, logic nghiệp vụ trong `shared/`, đơn giản hoá về CRUD.
 
@@ -32,7 +33,7 @@ Gặp hard stop: tìm nguyên nhân gốc và sửa. Không workaround (`agent-c
 Chạy `git diff` (và `git status`) rồi tự trả lời:
 
 - [ ] Mọi file đổi đều thuộc phạm vi issue? Có đổi ngoài phạm vi thì tách ra hoặc báo.
-- [ ] Có code chết, `TODO` chưa ghi vào issue, `Console.WriteLine`/debug sót lại?
+- [ ] Có code chết, `TODO` chưa ghi vào issue, `Console.WriteLine`/`console.log`/debug sót lại?
 - [ ] Có giá trị hardcode (URL, cổng, connection string, tên môi trường) đáng lẽ lấy từ config?
 - [ ] Xử lý lỗi và trường hợp biên đã có test? Logic quan trọng (idempotency, outbox, auth) đã có test?
 - [ ] Log/response không lộ secret hay PII?
@@ -40,7 +41,8 @@ Chạy `git diff` (và `git status`) rồi tự trả lời:
 
 ## 4. Kiểm chứng hành vi (không chỉ build)
 
-- Chạy thật tiêu chí hoàn thành của issue (ví dụ `curl` health endpoint, xem trace trong Jaeger).
+- Chạy thật tiêu chí hoàn thành của issue (ví dụ `curl` health endpoint, xem trace trong Jaeger, mở màn hình Angular).
+- Sửa UI: chạy app và xem trên trình duyệt (golden path + một trường hợp lỗi + điều hướng bàn phím); không báo "UI đã xong" chỉ vì build xanh.
 - Sửa lỗi: có test tái hiện lỗi, fail trước khi sửa và pass sau.
 
 ## 5. Báo cáo kết quả gate
@@ -48,7 +50,7 @@ Chạy `git diff` (và `git status`) rồi tự trả lời:
 Cuối task ghi ngắn trong báo cáo (và nhật ký issue):
 
 ```
-Gate: .NET build ✅ · test 24/24 ✅ · format ✅
+Gate: .NET build ✅ · test 24/24 ✅ · format ✅ | Angular: lint ✅ · typecheck ✅ · test 18/18 ✅ · build (budgets) ✅ · axe ✅ (hoặc: chưa có project, bỏ qua)
 Chưa kiểm chứng: <phần nào, vì sao>
 ```
 

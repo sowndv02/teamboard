@@ -18,7 +18,7 @@ Domain giữ nhỏ (Board, Task, thông báo, thống kê) để thời gian dà
 | `notification-service` | Gửi email/webhook khi có event | **Hexagonal (Ports & Adapters)**, consumer idempotent, DLQ | DynamoDB (dedupe) | Consume SQS |
 | `activity-service` | Feed hoạt động + thống kê theo Board | **Serverless / Event-driven** (Lambda hoặc worker Go) | DynamoDB | Consume SNS→SQS |
 
-Ghi chú: tech stack chính là ASP.NET Core (.NET 10) (ADR 0005); frontend tạm hoãn ở giai đoạn này (ADR 0008); `activity-service` là ứng viên dùng Go để thử polyglot (không bắt buộc).
+Ghi chú: tech stack chính là ASP.NET Core (.NET 10) (ADR 0005); frontend Angular làm lại có giới hạn phạm vi (ADR 0009; thay ADR 0008); `activity-service` là ứng viên dùng Go để thử polyglot (không bắt buộc).
 
 ## 2. Giao tiếp
 
@@ -94,7 +94,8 @@ document/
 - [0005 Tech stack chính: ASP.NET Core + Angular](adr/0005-techstack-aspnet-angular.md) (phần Angular tạm hoãn bởi ADR 0008)
 - [0006 Tự xây identity-service (không dùng framework identity)](adr/0006-identity-self-built.md)
 - [0007 Chính sách phụ thuộc bên thứ ba](adr/0007-dependency-policy.md)
-- [0008 Tạm hoãn frontend ở giai đoạn hiện tại](adr/0008-defer-frontend.md)
+- [0008 Tạm hoãn frontend ở giai đoạn hiện tại](adr/0008-defer-frontend.md)  (bị thay bởi ADR 0009)
+- [0009 Làm lại frontend Angular, phạm vi giới hạn](adr/0009-resume-frontend-angular.md) (chấp nhận)
 
 ## Tài liệu kiến trúc chi tiết
 

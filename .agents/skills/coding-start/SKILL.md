@@ -20,6 +20,7 @@ Rule liên quan: `task-workflow.md`, `testing.md`, `quality-gate.md`, `code-chan
 3. **Xanh**: viết **code tối thiểu** để test pass; theo kiến trúc bắt buộc của service và rule kỹ thuật (lỗi qua registry, cấu hình qua Options, route theo `api-endpoints.md`, outbox/idempotent consumer...).
 4. **Refactor**: dọn code giữ xanh, không đổi hành vi, không thêm tính năng.
 5. **Gate nhanh** của bước: build, lint/format, test liên quan (targeted, `quality-gate.md`).
+5b. **Frontend (`src/web`):** gate nhanh gồm `lint` (`--max-warnings=0`), `format:check`, `typecheck`, test liên quan, dùng `npm ci` (không `npm install`); trước khi báo xong chạy thêm `build` (budgets), policy test, `openapi:check`, `npm audit --omit=dev --audit-level=high` và xem trên trình duyệt. Quy trình chi tiết: skill `angular-feature`.
 6. **Ghi nhật ký** vào issue (Kịch bản và TDD log: cột Xanh; Ghi chú nếu có điều đáng nhớ).
 7. Lặp đến hết plan.
 

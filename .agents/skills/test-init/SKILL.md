@@ -28,6 +28,7 @@ Rule liên quan: `test-review.md` (chuẩn `.feature`, tag, reconcile), `testing
 - **BDD chọn lọc:** `.feature` cho hành vi người dùng/nghiệp vụ nhìn thấy được (đã là chuẩn của dự án, `test-review.md`); logic nội bộ, thuật toán, mapper chỉ cần unit test thường, không ép thành kịch bản.
 - **Test migration:** thay đổi schema có test chạy migration trên DB container (lên và, nếu có đường lùi, xuống) và kiểm tương thích dữ liệu cũ.
 - **Không flaky:** cấm `Thread.Sleep`/chờ cố định; dùng chờ có điều kiện + timeout, clock/ID giả, dữ liệu độc lập từng test, không phụ thuộc thứ tự. Test flaky là lỗi phải sửa ngay, không retry cho qua.
+- **Frontend (`src/web`):** unit/component test bằng Vitest theo hành vi; kịch bản BDD cho luồng người dùng thấy chạy qua **Playwright** (e2e ít, luồng sống còn); kiểm axe cho màn hình mới (`frontend-testing.md`, skill `angular-feature`).
 - Làn nhỏ: chỉ test tái hiện lỗi (đỏ→xanh), không cần `.feature` mới trừ khi đổi hành vi nhìn thấy; làn vừa: `.feature` gọn cho hành vi mới (`../workflow/references/lanes.md`).
 
 ## Ngoài đời thực

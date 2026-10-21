@@ -47,6 +47,9 @@ P0–P2 không được bỏ qua trừ khi người dùng chấp nhận tường
 - Khi PR đã có comment của người thật: nhận mỗi comment là một finding (CONFIRM nếu cần quyết định, FIX nếu rõ), trả lời từng cái, không sửa im lặng; đề xuất kèm lý do khi không đồng ý nhưng quyết định thuộc về người dùng.
 - Làn nhỏ (`../workflow/references/lanes.md`): một vòng, chỉ probe liên quan diff. Làn hotfix: review tập trung đúng-sai của bản sửa và rollback; phần còn lại bù sau.
 
+## Diff có frontend
+Diff chạm `src/web/**`: chạy thêm checklist của skill `frontend-review` (Angular: reactivity, bảo mật client, a11y, i18n, bundle, test hành vi) và gate FE đầy đủ; verdict PASS cần cả hai. Xem `../frontend-review/SKILL.md`.
+
 ## Review độc lập
 Nên chạy review trong phiên/sub-agent khác với phiên đã viết code (`review-loop.md` mục 6): đưa diff, spec/design/plan và rule, không đưa lập luận của người viết; kết quả vẫn phải tự kiểm trước khi hỏi người dùng. Hỏi người dùng có cho dùng sub-agent không nếu chưa rõ.
 

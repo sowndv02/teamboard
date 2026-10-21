@@ -39,6 +39,9 @@ description: Review bộ test BDD/TDD (file .feature và test thực thi, trạn
 - [ ] BDD đúng chỗ: `.feature` cho hành vi nhìn thấy được; logic nội bộ không bị ép thành kịch bản.
 - [ ] Gate tĩnh của phần test (format/lint) xanh theo `quality-gate.md`.
 
+### D2. Frontend (`src/web`)
+- Test theo hành vi (selector role/label), không bám class CSS; không `sleep`; mock HTTP bám schema OpenAPI; luồng sống còn có kịch bản BDD Playwright; axe 0 vi phạm serious/critical cho màn hình mới (`frontend-testing.md`). Thiếu → FIX.
+
 ### E. Công cụ và phạm vi
 - [ ] Test/BDD runner đã chốt trong `config/tool-versions.yaml` (nếu còn `TODO` → CONFIRM `undecided`, blocker).
 - [ ] Phạm vi test (targeted/full) và lệnh chạy ghi rõ trong issue.

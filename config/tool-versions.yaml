@@ -9,3 +9,11 @@ aws_provider: TODO
 # Kiểm thử (TDD/BDD)
 dotnet_test_framework: TODO     # đề xuất xUnit
 bdd_runner_dotnet: TODO         # đề xuất Reqnroll
+
+# Frontend (ADR 0009). Giá trị TODO: chốt và xác minh tại https://angular.dev/reference/versions khi scaffold src/web
+node: TODO                      # chọn theo ma trận tương thích của version Angular; ghi vào .nvmrc và engines
+package_manager: npm            # mặc định (dùng npm ci trong gate); đổi thì cập nhật ADR
+angular: TODO                   # pin chính xác khi scaffold
+typescript: TODO                # theo ràng buộc của version Angular
+bdd_runner_web: TODO            # đề xuất Playwright (+ playwright-bdd) cho luồng người dùng thấy
+unit_test_web: TODO             # đề xuất Vitest (mặc định của Angular mới; xác minh)

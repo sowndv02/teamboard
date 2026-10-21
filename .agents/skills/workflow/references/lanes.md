@@ -37,6 +37,8 @@ Người dùng yêu cầu đủ quy trình thì luôn **Lớn**.
 
 Thêm dòng `Làn: nhỏ | vừa | lớn | hotfix` vào đầu mục Workflow của issue (cùng lý do nếu nâng làn). Bảng Workflow chỉ liệt kê bước thuộc làn đó; bước bỏ ghi `n/a (làn nhỏ)` thay vì để trống.
 
+**Frontend:** thay đổi `src/web/**` chạy gate FE ở mọi làn (skill `angular-feature`, review `frontend-review`). Đổi contract API, xác thực/token hoặc xuyên FE + API = làn **lớn**; sửa giao diện nhỏ không đổi hành vi (chữ, style, a11y) có thể làn **nhỏ**.
+
 ## 5. Điều không đổi ở mọi làn
 
 - Mọi thay đổi gắn issue và branch; commit theo `git-commit.md`.
