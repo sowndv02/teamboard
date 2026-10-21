@@ -26,7 +26,7 @@ Tóm tắt spec (link `spec`), vấn đề cần giải, phạm vi thiết kế 
 | NFR-001 | Độ trễ p95 | | |
 
 ### 2.3 Ràng buộc
-Stack (ADR 0005), AWS, ngân sách, quy mô đội, kiến trúc bắt buộc của service.
+Stack (ADR 0005), AWS, ngân sách, quy mô đội, kiến trúc bắt buộc của service. Ràng buộc không thay cho lý do: lý do ranh giới, DB và kiến trúc nội bộ nằm ở D0.
 
 ## 3. Ước lượng nhanh
 | Đại lượng | Giá trị | Công thức / giả định |
@@ -44,6 +44,37 @@ flowchart LR
 ```
 
 ## 5. Các quyết định chính
+
+### D0. Quyết định cấp service (bắt buộc cho service mới hoặc khi chạm lưu trữ/ranh giới)
+
+Làm cả khi đã bị ràng buộc bởi ADR/`PROJECT.md`. Mỗi mục ≥ 2 phương án thật, vì sao không chọn, nhãn, tín hiệu xem lại. Người dùng chọn hoặc xác nhận từng mục (ghi vào Confirm log); "Agent chọn theo uỷ quyền" chưa phải xác nhận.
+
+#### D0.1 Ranh giới (service riêng / module / managed)
+- Lý do kỹ thuật thật (cách ly dữ liệu/khoá, hồ sơ tải, độc lập triển khai) tách khỏi lý do để học:
+- **Nhãn:** `[Cần]` / `[Chọn để học]`
+
+| Phương án | Ưu | Nhược |
+|---|---|---|
+
+#### D0.2 Mức cô lập database
+- Mức (database/schema/instance riêng; chung instance ở dev?), lý do, rủi ro chung instance:
+
+| Phương án | Cô lập | Chi phí | Ghi chú |
+|---|---|---|---|
+
+#### D0.3 Loại database
+- Yêu cầu dữ liệu làm tiêu chí (unique, giao dịch/CAS, truy vấn, hết hạn, chi phí biên, chạy local, công cụ):
+
+| Tiêu chí | Loại A | Loại B | Loại C |
+|---|---|---|---|
+
+- Phần yếu / phương án thay thế nghiêm túc nhất và khi nào nó thắng (không dùng "đa dạng công nghệ" làm lý do kỹ thuật):
+
+#### D0.4 Kiến trúc nội bộ
+| Tiêu chí | Kiến trúc đã chọn | Phương án 2 | Phương án 3 |
+|---|---|---|---|
+
+- Điểm yếu cần giảm bằng thiết kế:
 
 ### D1. <Bài toán>
 - **Tiêu chí và trọng số:**
