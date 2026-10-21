@@ -1,7 +1,7 @@
 ---
 key: TB-009
 title: Commit file của từng bước workflow ngay khi bước đạt
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-009-commit-per-step
 estimate: S
@@ -31,6 +31,8 @@ Hiện quyền commit chỉ được hỏi ở `coding-start`, nên artifact c�
 
 ## Ghi chú / Nhật ký
 - 2026-10-22: làn nhỏ (tài liệu). Nhánh tách từ `origin/main` bằng git worktree để không lẫn với thay đổi dở của TB-007. Người dùng chọn phương án "commit tự động sau mỗi bước, hỏi quyền một lần ở đầu workflow".
+
+- 2026-10-22: mở PR https://github.com/sowndv02/teamboard/pull/5 (bằng `gh pr create`). Chờ người dùng review và merge.
 
 ## Bài học (lessons learned)
 
