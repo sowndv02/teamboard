@@ -55,7 +55,7 @@ Hành vi chốt xong → cập nhật **spec** (và plan/`.feature`/test nếu �
 Trước khi code, tra `document/lessons/README.md` theo tag của vùng đang làm (service, `security`, `api`, `database`...) và áp dụng các biện pháp phòng ngừa đã ghi (ví dụ chạy quét secret, thêm test đường lỗi). Gặp lỗi lặp lại với lesson đã có → báo `recurred` và đề xuất nâng cấp biện pháp (skill `lesson-learned`).
 
 ## Commit
-- Chỉ commit khi người dùng cho phép; nếu chưa được hỏi trong phiên này thì **hỏi một lần** ("cho phép tôi commit cục bộ trên branch này theo từng lát?"). Được phép → commit nhỏ theo `git-commit.md` (tiếng Anh, `type(TB-NNN): summary` + body), mỗi commit build được và test xanh. **Không push.**
+- Chỉ commit khi người dùng cho phép. Quyền thường đã được hỏi một lần ở đầu workflow (skill `workflow`, mục "Commit theo bước"); nếu chạy riêng skill này và chưa được hỏi trong phiên thì **hỏi một lần** ("cho phép tôi commit cục bộ trên branch này theo từng lát?"). Được phép → commit nhỏ theo `git-commit.md` (tiếng Anh, `type(TB-NNN): summary` + body), mỗi commit build được và test xanh. **Không push.**
 - Không commit file sinh ra, secret, `local/`.
 
 ## Ngoài đời thực

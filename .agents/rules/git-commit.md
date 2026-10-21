@@ -1,6 +1,6 @@
 # Git commit message
 
-Lý do tồn tại: lịch sử commit đọc được, truy ngược được về issue, và giải thích **vì sao** thay đổi. Áp dụng cho mọi commit (agent hay người). Chỉ commit khi người dùng yêu cầu (`git-workflow.md`).
+Lý do tồn tại: lịch sử commit đọc được, truy ngược được về issue, và giải thích **vì sao** thay đổi. Áp dụng cho mọi commit (agent hay người). Chỉ commit khi người dùng yêu cầu hoặc đã cho phép một lần trong workflow (`git-workflow.md`).
 
 ## Định dạng
 

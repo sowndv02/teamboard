@@ -39,7 +39,7 @@ Mặc định: bước 1–4b làm **theo tính năng** (một spec/design chia 
 
 - **Đơn vị:** spec/design theo tính năng; plan → PR theo từng issue (lát).
 - **Plan:** file riêng `document/plans/TB-NNN-<slug>.md`.
-- **Commit cục bộ:** hỏi người dùng một lần ở `coding-start` rồi nhớ trong phiên; không bao giờ push khi chưa được xác nhận (`create-pr`).
+- **Commit cục bộ:** hỏi người dùng một lần ở **đầu workflow** (bước Khởi động) rồi nhớ trong phiên; được phép thì commit file của từng bước ngay khi bước đạt (mục "Commit theo bước"). Không bao giờ push khi chưa được xác nhận (`create-pr`).
 - **Review độc lập:** chạy bước review lớn (design, plan, coding) trong sub-agent riêng; hỏi người dùng nếu chưa rõ; việc nhỏ có thể chạy trong phiên hiện tại.
 
 ## Sẵn sàng (DoR) và Xong (DoD)
@@ -108,12 +108,12 @@ Không chắc đang ở đâu (trạng thái mâu thuẫn, artifact thiếu) →
 
 ## Cách chạy
 
-1. **Khởi động:** xác định tính năng/issue (hỏi nếu mơ hồ), đọc trạng thái, báo ngắn: "Đang ở bước X; sẽ làm Y".
+1. **Khởi động:** xác định tính năng/issue (hỏi nếu mơ hồ), đọc trạng thái, báo ngắn: "Đang ở bước X; sẽ làm Y". Nếu chưa được hỏi trong phiên: hỏi **một lần** "cho phép tôi commit cục bộ file của từng bước khi bước đạt (không push)?" và ghi câu trả lời vào state/Ghi chú issue.
 2. **Chạy bước hiện tại** bằng skill tương ứng. Với bước review, chạy `references/review-loop.md` đến khi PASS hoặc cần hỏi người dùng.
-3. **Khi bước đạt:** ghi trạng thái, báo ngắn kết quả (artifact, số vòng, quyết định đã chốt), rồi **tự động sang bước kế** nếu không có điểm cần người dùng; dừng khi:
+3. **Khi bước đạt:** ghi trạng thái, **commit file của bước** (nếu được phép, xem "Commit theo bước"), báo ngắn kết quả (artifact, số vòng, quyết định đã chốt, commit), rồi **tự động sang bước kế** nếu không có điểm cần người dùng; dừng khi:
    - Có CONFIRM chờ người dùng.
    - Hết lô công việc theo yêu cầu của người dùng (ví dụ "chỉ làm đến design").
-   - Gặp hành động cần xác nhận (commit/push/PR, thao tác rủi ro).
+   - Gặp hành động cần xác nhận (push/PR, commit khi chưa được phép, thao tác rủi ro).
    - Gate cứng không đạt và không tự sửa được sau 2 lần thử khác nhau.
 4. **Báo cáo cuối lượt:** bước đang ở, việc đã làm, việc đang chờ người dùng.
 
@@ -134,10 +134,22 @@ Không chắc đang ở đâu (trạng thái mâu thuẫn, artifact thiếu) →
 - **Sau `create-pr` (tổng kết):** hỏi "có gì sai/đáng nhớ trong lát này không?"; nếu có, chạy `lesson-learned` `capture`; nếu không, ghi sự kiện `lessons_recorded: none` vào state. Biện pháp phòng ngừa chạm rule/skill/gate là thay đổi thật: đề xuất cho người dùng, làm trong issue/commit rõ ràng.
 - Lesson lặp lại → nâng cấp biện pháp (ưu tiên tự động hoá), không chỉ ghi thêm.
 
+## Commit theo bước
+
+Khi người dùng đã cho phép commit cục bộ (hỏi một lần ở Khởi động), commit **ngay khi một bước đạt** và **trước khi mở bước kế**, để mỗi bước có một mốc lịch sử riêng.
+
+- **Khi nào:** bước đạt `PASS`/`done` theo cổng xác nhận (không còn CONFIRM mở, không điểm chờ xác nhận). Bước chưa đạt thì chưa commit; không commit bản nháp đang chờ người dùng chốt.
+- **Gồm file nào:** chỉ file của bước đó: artifact (spec, design, plan, test, code), state file `document/workflow/*.yaml`, dòng trạng thái trong issue và mục lục liên quan. Không kéo theo file ngoài phạm vi bước hoặc thay đổi dở của việc khác (`git add` theo đường dẫn, không `git add -A` khi cây làm việc có file lạ).
+- **Message:** theo `git-commit.md`, scope là issue đang làm, body giải thích vì sao. Gợi ý: `docs(TB-NNN): confirm <tên spec>` (spec), `docs(TB-NNN): add design for <x>`, `docs(TB-NNN): approve plan for <x>`, `test(TB-NNN): add failing scenarios for <x>`; code theo lát của `coding-start`.
+- **Điều kiện:** có issue và branch `feature/TB-NNN-*` (bước 1–4b làm theo tính năng vẫn cần issue trước khi commit; chưa có thì tạo issue và branch trước, theo `git-workflow.md`). Không commit trên `main`. Bước có code: build, test và gate của vùng đã đổi phải xanh.
+- **Sửa lại bước đã commit** (quay lại sửa spec/design): commit mới ghi rõ lý do, không `--amend` hay rebase lịch sử.
+- **Không push.** Push và PR chỉ qua `create-pr` sau khi người dùng xác nhận.
+- Người dùng từ chối commit tự động: không commit, ghi vào state, và tiếp tục như cũ (artifact nằm trong working tree; nhắc ở báo cáo cuối lượt rằng chưa có commit).
+
 ## Phối hợp với rule dự án
 
 - Một issue một branch (`feature/TB-NNN-<slug>`); bước 5 trở đi cần issue và branch (tạo theo `git-workflow.md`, không `push` khi chưa được yêu cầu).
-- Commit chỉ khi người dùng cho phép (xem mục xác nhận ở `coding-start`); định dạng `git-commit.md`.
+- Commit chỉ khi người dùng đã cho phép (hỏi một lần ở Khởi động; xem "Commit theo bước"); định dạng `git-commit.md`.
 - Mỗi bước cập nhật file issue (Workflow, Kịch bản và TDD log, Review rounds) trong cùng thay đổi.
 - Vi phạm rule/ADR phát hiện giữa chừng → ghi finding, không lách.
 
