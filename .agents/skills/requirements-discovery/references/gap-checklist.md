@@ -21,6 +21,10 @@ Dùng ở bước 3 của skill. Với mỗi dòng đánh dấu **Biết / Giả
 | 15 | **Ràng buộc** | Hạn chót, ngân sách, quy định, công nghệ bắt buộc, môi trường triển khai? | Phương án không khả thi |
 | 16 | **Tiêu chí chấp nhận** | Với mỗi chức năng: tình huống mẫu nào chứng minh "đạt"? Ví dụ số liệu cụ thể? | Không kiểm chứng/nghiệm thu được |
 
+## Phân loại mỗi thông tin tìm được
+
+Ghi mỗi mục vào đúng một nhóm: **yêu cầu** (có nguồn từ khách), **giả định** (chưa xác nhận: cần owner + hạn + mặc định), **ràng buộc** (không thương lượng: hạn, ngân sách, quy định, công nghệ bắt buộc), hoặc **ngoài phạm vi** (khách có thể mong nhưng lần này không làm). Câu hỏi mở nào chặn estimate/thiết kế thì đặt hạn sớm nhất.
+
 ## Dấu hiệu yêu cầu còn mơ hồ
 
 - Từ định tính không có số đo: "nhanh", "dễ dùng", "linh hoạt", "thân thiện", "nhiều người".

@@ -42,7 +42,8 @@ Không cần gõ lệnh; suy ra chế độ từ lời người dùng, không r�
 ### 1. Trích yếu tố quyết định (drivers)
 Lập bảng từ spec:
 - **FR then chốt** (những FR tác động tới cấu trúc, không phải mọi FR).
-- **NFR có số đo**: số người dùng/đồng thời, request/giây, kích thước dữ liệu và tốc độ tăng, độ trễ (p95), độ sẵn sàng, mức nhất quán, độ bền dữ liệu, bảo mật, chi phí trần, thời gian khôi phục.
+- **NFR có số đo**: số người dùng/đồng thời, request/giây, kích thước dữ liệu và tốc độ tăng, độ trễ (p95), độ sẵn sàng, mức nhất quán, độ bền dữ liệu, bảo mật, chi phí trần, thời gian khôi phục (RTO/RPO).
+- **SLI/SLO**: với luồng chính, chọn SLI đo được (tỉ lệ thành công, độ trễ p95) và SLO mục tiêu (ví dụ 99,5%/30 ngày) → suy ra **error budget**; SLO là cơ sở cho cảnh báo và cho quyết định "đủ tốt chưa". Dự án học: đặt SLO khiêm tốn, ghi là giả định.
 - **Ràng buộc**: stack, AWS, ngân sách, quy mô đội (đây là dự án học), thời hạn.
 - NFR **thiếu số** → hỏi (`AskUserQuestion`, tối đa 4 câu/lô, kèm mặc định đề xuất). Người dùng không biết → đặt **giả định có ghi rõ** và đánh dấu để xác nhận.
 
@@ -82,7 +83,9 @@ Với mỗi quyết định lớn, nêu 2–3 bài toán có cấu trúc giống
 - **Sơ đồ Mermaid**: bối cảnh/thành phần và ít nhất một sequence cho luồng chính (theo `docs-conventions.md`), và một cho luồng lỗi quan trọng.
 - **Chế độ lỗi (failure modes)**: dịch vụ phụ thuộc chết, timeout, message trùng/mất/sai thứ tự, hỏng giữa chừng, dữ liệu xấu; mỗi cái có giải pháp (timeout/retry/circuit breaker, idempotency, DLQ, bồi hoàn/saga).
 - **Chọn dịch vụ AWS cụ thể cho từng service** (compute, DB, hàng đợi, mạng...) không làm trong design chung: dùng skill `aws-service-selection` (chi phí đi đầu, 7 tiêu chí); design chỉ nêu quyết định ở mức kiến trúc và trỏ tới `document/infra/<service>.md`.
-- Bảo mật (authN/authZ, IDOR, dữ liệu nhạy cảm), quan sát (trace, metric, log, cảnh báo), triển khai (ECS, cấu hình, migration), chi phí ước tính (AWS), chiến lược test (BDD/TDD, contract, tải).
+- Bảo mật (authN/authZ, IDOR, dữ liệu nhạy cảm) kèm **mô hình đe doạ nhẹ STRIDE** cho mỗi ranh giới tin cậy mới (internet → gateway, service → service, service → DB); quan sát (trace, metric, log, cảnh báo gắn SLO), triển khai (ECS, cấu hình), chi phí ước tính (AWS), chiến lược test (BDD/TDD, contract, tải).
+- **Thay đổi tương thích ngược**: API/event có versioning và chính sách bỏ dùng (thêm trường tuỳ chọn thay vì đổi nghĩa; consumer chịu được trường lạ); đổi schema DB theo **expand/contract** (thêm → ghi kép/backfill → chuyển đọc → gỡ cũ, mỗi pha deploy độc lập, quay lại được); thứ tự deploy producer/consumer.
+- **Rollout và rollback**: bật dần qua feature flag hoặc canary khi thay đổi rủi ro cao; điều kiện rollback (tín hiệu SLO nào) và cách quay lại; dữ liệu đã ghi bằng phiên bản mới có đọc được bởi phiên bản cũ không.
 
 ### 7. Lộ trình mở rộng
 Phiên bản 1 (đáp ứng spec) và bước nâng cấp khi tải tăng (10x, 100x): điểm nghẽn đầu tiên, cách xử lý, chi phí. Nêu rõ cái gì **đã chủ ý chưa làm** (và vì sao chưa cần).
@@ -101,6 +104,12 @@ Trước khi trình bày: "Giả sử 6 tháng sau thiết kế này thất bạ
 - Chờ người dùng xác nhận/phản biện. Phản biện hợp lý → cập nhật, ghi vào lịch sử.
 - Sau xác nhận, đề xuất (tạo khi được đồng ý): **ADR** cho từng quyết định lớn (dùng `document/architecture/adr/_template.md`, nêu phương án đã cân nhắc và vì sao không chọn), **issue** chia theo lát giao được, cập nhật `config/services.yaml` và `document/architecture/README.md` nếu thêm/đổi service.
 - Thêm design doc vào `document/design/README.md`.
+
+## Làn và cỡ thiết kế
+Chỉ làn **lớn** (và làn vừa khi chạm contract/quyết định đáng ghi ADR) mới cần design doc đầy đủ (`../workflow/references/lanes.md`). Làn vừa: mục tiêu là 1–2 quyết định + failure modes + rollout, đủ trong một trang; làn nhỏ không có design.
+
+## Ngoài đời thực
+Ở công ty, design doc/RFC thường 2–6 trang, được đồng đội và người sở hữu service liên quan góp ý bằng comment trước khi code, và kết thúc bằng ADR cho quyết định khó đảo ngược. Họ ít khi so sánh 3 phương án cho mọi thứ: chỉ làm kỹ chỗ đắt khi sai (dữ liệu, contract công khai, bảo mật). Tập cách đó: bỏ việc vặt, dồn công sức vào quyết định khó đảo ngược, luôn kèm cách rollout và rollback.
 
 ## Chế độ `compare`
 Chỉ làm bước 4 cho một quyết định: bài toán, tiêu chí (hỏi người dùng ưu tiên nếu chưa rõ), bảng so sánh, khuyến nghị, vì sao không chọn cái kia, điều kiện đảo ngược, use case tương tự. Hỏi 1–2 câu về ngữ cảnh nếu thiếu (tải, ràng buộc).

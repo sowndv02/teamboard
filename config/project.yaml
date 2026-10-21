@@ -29,6 +29,7 @@ pullRequest:
   cli: gh
   repository: sowndv02/teamboard   # từ git remote origin
   defaultTarget: main
+  mergeStrategy: TODO          # squash | merge | rebase; hỏi người dùng (đề xuất squash: lịch sử main gọn, mỗi PR một commit)
   title: '{issueKey}: {summary}'
   body: link tới file issue + cách kiểm chứng
 

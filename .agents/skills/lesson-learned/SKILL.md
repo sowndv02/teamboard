@@ -53,6 +53,9 @@ Ghi cách chứng minh biện pháp hiệu quả (viết test tái hiện, lện
 - Trạng thái: `prevented` chỉ khi biện pháp đã `done` **và** đã kiểm chứng; có việc dở → `partial`; chưa có → `open`.
 - Liên kết lesson trong mục "Bài học" của file issue (chỉ khi branch khớp issue, `docs-update-specs.md`).
 
+### 7b. Post-mortem (sự cố/hotfix, không đổ lỗi)
+Khi nguồn là sự cố production hoặc hotfix, lesson ghi thêm các mục sau (ngắn, từ dữ kiện): **timeline** (phát hiện → xử lý → ổn định, giờ cụ thể), **impact** (ai/cái gì bị ảnh hưởng, bao lâu), **phát hiện bằng gì** (alert/người dùng báo; nếu người dùng báo thì thiếu quan sát nào), **nguyên nhân gốc** và các yếu tố góp phần (quy trình/công cụ, không phải cá nhân), **cái gì may mắn giúp giảm nhẹ**, **hành động** mỗi cái có owner, hạn và cách kiểm chứng. Ưu tiên hành động tự động hoá (test, alert, gate) hơn nhắc nhở. Ngoài đời thực nhóm làm post-mortem trong vài ngày sau sự cố và chia sẻ cho cả đội.
+
 ### 8. Xác nhận với người dùng
 Trình bày ngắn: bài học một câu, nguyên nhân gốc, biện pháp đề xuất (và cái nào cần quyết định), trạng thái. Người dùng chỉnh/duyệt **trước khi** chốt trạng thái hoặc thay đổi rule/gate. Lỗi do chính agent gây ra: **nói thẳng và nhận**, không biện minh (`agent-conduct.md`).
 

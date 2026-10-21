@@ -19,6 +19,8 @@ Rule liên quan: `docs-conventions.md` (đặt tên, nội dung), `docs-update-s
 
 Người dùng không cần gõ lệnh; suy ra chế độ từ ngữ cảnh, không rõ thì hỏi.
 
+**Theo làn** (`../workflow/references/lanes.md`): làn **lớn** dùng đủ mẫu `document/spec/_template.md`. Làn **vừa** chỉ cần spec ngắn ngay trong issue (mục tiêu, phạm vi trong/ngoài, FR kèm tiêu chí Given/When/Then, giả định, câu hỏi mở), không bắt buộc file spec đủ mẫu; vẫn giữ nguyên văn yêu cầu gốc và ID. Làn nhỏ không cần bước này.
+
 ## Nguyên tắc
 
 1. **Không bịa.** Mọi yêu cầu trong spec phải truy được về lời khách/người dùng hoặc được đánh dấu là **giả định** cần xác nhận.
@@ -55,9 +57,16 @@ Người dùng không cần gõ lệnh; suy ra chế độ từ ngữ cảnh, kh
 - Copy `document/spec/_template.md` → `document/spec/<ten-kebab>.md` (đặt tên theo `docs-conventions.md`). Trạng thái `draft`.
 - Điền đủ các mục; mục không áp dụng ghi "Không áp dụng" + lý do, không xoá.
 - **ID ổn định** cho từng yêu cầu: `FR-001` (chức năng), `BR-001` (quy tắc nghiệp vụ), `NFR-001` (phi chức năng). Không đánh lại số khi sửa; yêu cầu bị bỏ thì đánh dấu "Đã bỏ", không tái sử dụng ID.
-- Mỗi `FR` có: mô tả một câu, ưu tiên (MoSCoW: Must/Should/Could/Won't), tiêu chí chấp nhận (có thể kiểm chứng), nguồn (lời khách / giả định).
+- Mỗi `FR` viết dạng **user story** "Là <vai trò>, tôi muốn <việc> để <giá trị>" (một câu), kèm: ưu tiên MoSCoW (Must/Should/Could/Won't; Must ≤ khoảng một nửa số FR, còn lại phải biện minh), nguồn (lời khách / giả định), và **tiêu chí chấp nhận** ngắn dạng Given/When/Then (1–3 ví dụ số liệu cụ thể, gồm một ca lỗi/biên):
+  ```
+  FR-003 Là thành viên board, tôi muốn gán task cho người khác để họ biết việc cần làm. [Must · nguồn: email khách 12/10]
+  - Given task chưa có người nhận, When tôi gán cho thành viên A, Then A thấy task trong danh sách của mình.
+  - Given A không thuộc board, When tôi gán, Then bị từ chối với lỗi rõ ràng.
+  ```
+- **Phân loại rõ** để không lẫn: **yêu cầu** (khách muốn, có nguồn), **giả định** (ta tin nhưng chưa xác nhận, có người xác nhận + mặc định), **ràng buộc** (hạn, ngân sách, quy định, công nghệ bắt buộc, không thương lượng). Mỗi mục thuộc đúng một nhóm.
+- Mục **Ngoài phạm vi** liệt kê tường minh những thứ khách có thể mong nhưng lần này không làm (kèm lý do/giai đoạn sau); yêu cầu "Won't" ghi ở đây.
 - Mô tả luồng chính, luồng thay thế, luồng lỗi theo từng use case chính.
-- Giả định và câu hỏi mở nằm trong mục riêng, mỗi mục có người xác nhận và mặc định.
+- Giả định và câu hỏi mở nằm trong mục riêng, mỗi mục có **owner** (người trả lời), **hạn** (ngày cần có câu trả lời để không trễ tiến độ), **mặc định** sẽ dùng nếu quá hạn, và **trạng thái** (`open`/`answered`/`deferred`). Câu hỏi quá hạn chưa trả lời → nhắc người dùng, không tự coi là đã chốt mặc định cho điều `blocker`.
 - Mermaid (nếu có) theo `docs-conventions.md`.
 - Dùng thuật ngữ nhất quán; mục "Thuật ngữ" cho từ nghiệp vụ.
 
@@ -89,6 +98,17 @@ Rà lại spec và ghi vào mục Rủi ro/Giả định:
 - Nhóm theo chủ đề; đánh số; câu quan trọng nhất đánh dấu ⭐ và đặt lên đầu; tối đa khoảng 10–15 câu mỗi lần.
 - Mỗi câu ghi (cho đội nội bộ, không gửi khách) lý do hỏi và spec mục nào bị ảnh hưởng.
 - Lưu bản câu hỏi trong `local/` (không commit) hoặc cuối spec mục "Câu hỏi mở" tuỳ người dùng.
+- **Mẫu email gửi khách** (soạn sẵn cho người dùng gửi, agent không tự gửi):
+  ```
+  Chủ đề: [Tên dự án] - Cần xác nhận một số điểm cho <tính năng> (trả lời trước <ngày>)
+  Chào <tên>,
+  Để bắt đầu <tính năng>, chúng tôi cần anh/chị xác nhận <N> điểm dưới đây. Điểm ⭐ ảnh hưởng trực tiếp tới tiến độ.
+  1. ⭐ <câu hỏi> (gợi ý: A / B)
+  2. ...
+  Nếu chưa nhận được phản hồi trước <ngày>, chúng tôi sẽ tạm làm theo phương án mặc định <...> và cập nhật lại khi có thông tin.
+  Cảm ơn anh/chị.
+  ```
+- **Biên bản họp với khách** (gửi lại sau họp trong ngày để chốt hiểu biết chung): ngày/người dự; **quyết định** đã chốt; **việc cần làm** (ai, hạn); **câu hỏi còn mở** (owner, hạn); **thay đổi so với yêu cầu trước** (nếu có, chuyển qua kiểm soát thay đổi của `project-manager`). Yêu cầu khách im lặng không có nghĩa là đồng ý: ghi là giả định cho tới khi xác nhận bằng chữ.
 
 ## Mẫu câu hỏi hay dùng
 - Ai dùng chức năng này, vào lúc nào, để làm gì? Họ đang làm việc đó bằng cách nào hiện nay?
@@ -100,6 +120,9 @@ Rà lại spec và ghi vào mục Rủi ro/Giả định:
 - Có hệ thống/quy định/thời hạn nào ràng buộc không?
 - Cho tôi một ví dụ thật của trường hợp phức tạp nhất.
 
+## Ngoài đời thực
+Business analyst/PO thật không hỏi một lần rồi xong: yêu cầu đổi liên tục, khách trả lời chậm, nhiều bên liên quan bất đồng. Thói quen cần tập: ghi nguyên văn, viết lại bằng user story + ví dụ cụ thể, đánh dấu giả định thay vì đoán, theo dõi câu hỏi mở có owner/hạn, gửi biên bản sau họp, và để mọi đổi yêu cầu đi qua spec (không qua lời nói). Ở dự án học tập, người dùng đóng vai khách/PO: hãy hỏi như thể bạn không thể hỏi lại ngay.
+
 ## Không làm
 - Không viết code, không tạo project/skeleton.
 - Không chốt công nghệ, không tự thêm tính năng khách không nhắc (ghi "đề xuất thêm" riêng, ưu tiên Could).
@@ -110,7 +133,8 @@ Rà lại spec và ghi vào mục Rủi ro/Giả định:
 ## Hoàn thành khi
 - [ ] "Yêu cầu gốc" lưu nguyên văn
 - [ ] Mọi mục Chưa biết mức cao đã được hỏi; phần còn lại là giả định/câu hỏi mở có người xác nhận
-- [ ] Mọi FR/BR/NFR có ID, ưu tiên, tiêu chí chấp nhận kiểm chứng được
+- [ ] Mọi FR/BR/NFR có ID, ưu tiên, tiêu chí chấp nhận kiểm chứng được (FR dạng user story + Given/When/Then)
+- [ ] Yêu cầu / giả định / ràng buộc tách bạch; câu hỏi mở có owner, hạn, mặc định
 - [ ] Có phạm vi trong và ngoài; có luồng lỗi/biên
 - [ ] Đã tự phản biện (mâu thuẫn, biên, phình phạm vi, tác động)
 - [ ] Spec nằm đúng chỗ, đúng tên, có trong `document/spec/README.md`

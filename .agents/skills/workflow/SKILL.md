@@ -1,15 +1,17 @@
 ---
 name: workflow
-description: Điều phối toàn bộ quy trình từ yêu cầu đến Pull Request - spec, review spec, system design, review design, plan, review plan, test (TDD/BDD), review test, coding, review code, tạo PR - với vòng lặp review/confirm/fix cho đến khi không còn điểm cần người dùng chốt. Dùng khi người dùng muốn làm một tính năng từ đầu đến cuối, tiếp tục workflow dở, hoặc hỏi đang ở bước nào.
+description: Điều phối quy trình từ yêu cầu đến Pull Request, chọn làn theo cỡ thay đổi (nhỏ/vừa/lớn/hotfix) - spec, review spec, system design, review design, plan, review plan, test (TDD/BDD), review test, coding, review code, tạo PR - với vòng lặp review/confirm/fix cho đến khi không còn điểm cần người dùng chốt. Dùng khi người dùng muốn làm một tính năng từ đầu đến cuối, tiếp tục workflow dở, hoặc hỏi đang ở bước nào.
 ---
 
 # Workflow: từ yêu cầu đến PR
 
 Orchestrator: xác định **đang ở bước nào**, chạy skill của bước đó, thực thi **cổng chuyển bước**, và đảm bảo mọi quyết định thuộc về **người dùng**. Không tự chốt, không tự đưa quyết định thay người dùng.
 
+**Bước 0 - phân làn:** trước mọi việc, chọn làn theo `references/lanes.md` (nhỏ/vừa/lớn/hotfix) và ghi vào issue. Bảng bước dưới đây là **làn lớn đầy đủ**; làn nhỏ/vừa bỏ hoặc gộp bước theo `lanes.md`, nhưng không bỏ TDD, gate và xác nhận của người dùng. Việc phình ra giữa chừng thì nâng làn.
+
 Rule liên quan: `pipeline-lifecycle.md` (bản đồ giai đoạn tổng quát), `agent-conduct.md`, `docs-update-specs.md`, `git-workflow.md`, `git-commit.md`. Giao thức review: `references/review-loop.md` (đọc trước khi chạy bất kỳ bước review nào); quan điểm review từng phase và lăng kính Chất lượng/Bảo mật/Chi phí: `references/review-philosophy.md`; nguyên tắc sinh artifact (plan of record, discovery, không bịa, cỡ bước): `references/generation-principles.md`.
 
-## Các bước
+## Các bước (làn lớn)
 
 | # | Bước | Skill | Phạm vi | Đầu ra | Điều kiện sang bước sau |
 |---|---|---|---|---|---|
@@ -24,6 +26,9 @@ Rule liên quan: `pipeline-lifecycle.md` (bản đồ giai đoạn tổng quát)
 | 9 | Coding start | `coding-start` | Theo issue | Code làm test **xanh toàn bộ** + gate xanh | **Mọi test pass** |
 | 10 | Review code | `coding-review` | Theo issue | Verdict merge-ready | **PASS** |
 | 11 | Create PR | `create-pr` | Theo issue | PR mở | Người dùng xác nhận trước khi push/mở PR |
+| 12 | Demo/UAT và bàn giao (tuỳ chọn: làn lớn có khách) | `project-manager` (`handover`) | Theo tính năng | Demo cho khách, UAT được duyệt, tài liệu bàn giao/runbook | Khách (hoặc người dùng thay mặt) chấp nhận |
+
+Làn **vừa**: gộp bước 1–2 thành spec ngắn trong issue, chỉ chạy 3–4 khi chạm contract/kiến trúc. Làn **nhỏ**: chỉ test tái hiện (nếu là bug) → code → gate → PR. Chi tiết và hotfix: `references/lanes.md`.
 
 Mặc định: bước 1–4 làm **theo tính năng** (một spec/design có thể chia nhiều issue), bước 5–11 làm **theo issue** (một lát giao được). Một tính năng nhỏ có thể chỉ có một issue.
 
@@ -33,6 +38,15 @@ Mặc định: bước 1–4 làm **theo tính năng** (một spec/design có th
 - **Plan:** file riêng `document/plans/TB-NNN-<slug>.md`.
 - **Commit cục bộ:** hỏi người dùng một lần ở `coding-start` rồi nhớ trong phiên; không bao giờ push khi chưa được xác nhận (`create-pr`).
 - **Review độc lập:** chạy bước review lớn (design, plan, coding) trong sub-agent riêng; hỏi người dùng nếu chưa rõ; việc nhỏ có thể chạy trong phiên hiện tại.
+
+## Sẵn sàng (DoR) và Xong (DoD)
+
+- **DoR** trước bước 5 (plan): spec `confirmed` có tiêu chí chấp nhận kiểm chứng được; phụ thuộc và rủi ro chính đã biết; ước lượng dạng khoảng kèm giả định (`project-manager`); không còn câu hỏi mở mức `blocker`. Chưa đạt → quay lại spec, không ép plan.
+- **DoD** của issue (sau merge, người dùng thực hiện hoặc xác nhận): CI xanh trên nhánh chính; deploy môi trường dev và smoke test (`/health/ready`, kịch bản chính); có log/trace/metric để quan sát; tài liệu, runbook, ADR cập nhật; issue `done`; tổng kết bài học. Chưa deploy được thì ghi rõ "chưa kiểm chứng trên môi trường chạy".
+
+## Tracker ngoài và người review thật
+
+Mặc định issue là file Markdown (`issueTracker.provider: markdown`). Dự án thật thường dùng Jira/GitHub Issues. Khi `provider` khác `markdown`: giữ key trong tên branch/commit/PR, đặt link tracker ở đầu file issue và cập nhật trạng thái ở tracker theo quy ước đội. Review của **người thật** (đồng đội, code owner) bổ sung hoặc thay review của agent; comment của họ xử lý như CONFIRM/FIX trong `coding-review`.
 
 ## Cổng cứng
 
@@ -56,7 +70,7 @@ Không lách plan. Quy trình:
 
 ## Lưu trạng thái (để agent khác và sub-agent theo dõi)
 
-Mỗi lần qua một bước, ghi state vào `document/workflow/<id>.yaml` (mẫu `_template.yaml`) theo `references/state-protocol.md`: trạng thái bước, vòng, `owner`, bằng chứng, `confirm_pending`, `subtasks`, `next_action`, và nhật ký sự kiện chỉ-thêm. Chỉ orchestrator ghi trạng thái bước; sub-agent ghi bản ghi subtask của mình và báo cáo theo định dạng bắt buộc, orchestrator **xác minh rồi mới tin**. Giao việc cho sub-agent dùng **gói giao việc** trong giao thức (mục tiêu, file đọc trước, `allowed_paths`, tiêu chí xong, nơi báo cáo). Artifact đổi thì các bước phía sau `invalidated` cho đến khi review lại.
+Bắt buộc ở làn lớn; tuỳ chọn ở làn vừa; làn nhỏ/hotfix ghi thẳng vào issue. Mỗi lần qua một bước, ghi state vào `document/workflow/<id>.yaml` (mẫu `_template.yaml`) theo `references/state-protocol.md`: trạng thái bước, vòng, `owner`, bằng chứng, `confirm_pending`, `subtasks`, `next_action`, và nhật ký sự kiện chỉ-thêm. Chỉ orchestrator ghi trạng thái bước; sub-agent ghi bản ghi subtask của mình và báo cáo theo định dạng bắt buộc, orchestrator **xác minh rồi mới tin**. Giao việc cho sub-agent dùng **gói giao việc** trong giao thức (mục tiêu, file đọc trước, `allowed_paths`, tiêu chí xong, nơi báo cáo). Artifact đổi thì các bước phía sau `invalidated` cho đến khi review lại.
 
 ## Xác định bước hiện tại (resume)
 
@@ -124,7 +138,7 @@ Không chắc đang ở đâu (trạng thái mâu thuẫn, artifact thiếu) →
 
 ## Không làm
 
-- Không bỏ bước, không đảo thứ tự, không gộp bước review vào bước làm.
+- Không bỏ bước **của làn đã chọn**, không đảo thứ tự, không gộp bước review vào bước làm. Không tự hạ làn để né bước; làn mơ hồ thì chốt với người dùng.
 - Không chốt thay người dùng; không áp dụng phương án "khuyến nghị" khi chưa được trả lời.
 - Không sửa artifact của bước trước một cách im lặng; mọi thay đổi ghi vào Confirm log/lịch sử.
 - Không sang bước 10 khi còn test fail; không tạo PR khi chưa được xác nhận.

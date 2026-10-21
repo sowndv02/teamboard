@@ -1,6 +1,6 @@
 # Giao thức lưu trạng thái workflow
 
-Mục đích: mỗi khi qua một bước, **trạng thái được ghi lại** để agent khác (phiên khác, sub-agent, người) tiếp tục, nhận việc hoặc kiểm tra mà không phải đoán. Mọi skill bước (`requirements-discovery`, `spec-review`, ..., `create-pr`) và `workflow` phải tuân giao thức này.
+Mục đích: mỗi khi qua một bước, **trạng thái được ghi lại** để agent khác (phiên khác, sub-agent, người) tiếp tục, nhận việc hoặc kiểm tra mà không phải đoán. Mọi skill bước (`requirements-discovery`, `spec-review`, ..., `create-pr`) và `workflow` phải tuân giao thức này **ở làn lớn** (bắt buộc), làn vừa (tuỳ chọn, khuyến nghị khi có sub-agent). Làn nhỏ và hotfix không cần state file: bảng Workflow trong issue là đủ (`workflow/references/lanes.md`).
 
 ## 1. Nguồn trạng thái (ai là nguồn sự thật cho cái gì)
 

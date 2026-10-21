@@ -28,6 +28,14 @@ Sau bước cuối:
 - Đối chiếu bảng kịch bản ↔ test (`test-review.md` mục 6): mọi kịch bản xanh.
 - **Tất cả test phải pass** thì mới đánh dấu xong (`coding-start: done, xanh N/N`). Còn test fail → tiếp tục sửa; không bàn giao review.
 
+## "Xong" theo chuẩn sản xuất (áp dụng cho mỗi bước)
+- **Quan sát là một phần của tính năng:** log có cấu trúc kèm `correlationId`, span/trace và metric cho luồng mới, theo `observability.md`; không log dữ liệu nhạy cảm.
+- **Lỗi:** không nuốt exception, không `catch` rồi bỏ qua; lỗi trả theo registry; call ngoài có timeout/retry hợp lý.
+- **Việc dở dang:** hành vi chưa sẵn sàng cho người dùng đặt sau feature flag/cấu hình tắt mặc định để merge sớm, thay vì giữ nhánh sống lâu.
+- **Thay đổi schema/contract:** theo expand/contract và thứ tự deploy trong plan; không đổi nghĩa trường đang có.
+- **Gate:** build, format, test, quét secret, phụ thuộc có lỗ hổng như `quality-gate.md`; công cụ phân tích tĩnh/SAST nâng cao chỉ chạy khi dự án đã có.
+- Làn nhỏ: chu kỳ đỏ→xanh→gate một vòng, không cần ghi TDD log chi tiết (`../workflow/references/lanes.md`).
+
 ## Plan of record và hợp đồng phạm vi (`../workflow/references/generation-principles.md` mục 4)
 - Plan `approved` và `.feature` `ready` là **neo**: không "nghĩ lại" tiêu chí chấp nhận; sinh code = điền hành vi để test xanh, **không** thêm tính năng ngoài plan/`.feature`.
 - Chỉ sửa đường dẫn/module có trong plan. **Cấm** sửa `.agents/**`, `.claude/**`, cấu hình CI/dùng chung hoặc file ngoài phạm vi trừ khi plan nêu rõ; cần chạm → dừng và hỏi người dùng.
@@ -48,6 +56,9 @@ Trước khi code, tra `document/lessons/README.md` theo tag của vùng đang l
 ## Commit
 - Chỉ commit khi người dùng cho phép; nếu chưa được hỏi trong phiên này thì **hỏi một lần** ("cho phép tôi commit cục bộ trên branch này theo từng lát?"). Được phép → commit nhỏ theo `git-commit.md` (tiếng Anh, `type(TB-NNN): summary` + body), mỗi commit build được và test xanh. **Không push.**
 - Không commit file sinh ra, secret, `local/`.
+
+## Ngoài đời thực
+Đội thật commit nhỏ, thường xuyên (mỗi commit build được), mở PR sớm, và CI xanh là điều kiện merge; không ai ôm một nhánh vài tuần. Một lát "xong" nghĩa là chạy được, quan sát được và tắt/bật được, không chỉ test xanh trên máy. Ở đây agent chỉ commit khi người dùng cho phép, nhưng vẫn giữ nhịp lát nhỏ để người dùng review dễ.
 
 ## Không làm
 - Không viết code cho hành vi chưa có test đỏ; không thêm tính năng ngoài plan.

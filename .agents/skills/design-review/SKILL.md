@@ -37,7 +37,10 @@ description: Review một design doc (system design) để tìm điểm chưa r�
 - [ ] Không có điểm lỗi đơn chưa được nêu; có retry/timeout/circuit breaker cho call ngoài.
 - [ ] Bảo mật: authN/authZ, IDOR, dữ liệu nhạy cảm, bí mật.
 - [ ] Quan sát (trace/metric/log/cảnh báo) cho luồng chính và lỗi; chỉ số cho từng revisit trigger.
+- [ ] NFR có SLI/SLO (và error budget) cho luồng chính; cảnh báo gắn SLO. Thiếu → CONFIRM `missing`.
 - [ ] Triển khai, migration, rollback; chi phí AWS ước tính và cách tắt khi không dùng.
+- [ ] **Tương thích ngược:** đổi API/event có versioning/chính sách bỏ dùng; đổi schema theo expand/contract (từng pha deploy độc lập, quay lại được); thứ tự deploy producer/consumer rõ.
+- [ ] **Rollout/rollback:** thay đổi rủi ro cao có feature flag/canary, điều kiện và cách rollback; phiên bản cũ đọc được dữ liệu mới.
 - [ ] Lộ trình mở rộng 10x/100x và những gì chủ ý chưa làm.
 
 ### E. Over/under-engineering và tính trung thực
@@ -54,6 +57,12 @@ Thiếu mục của `_template.md`, sơ đồ Mermaid lỗi cú pháp/thiếu ch
 - [ ] **Bảo mật:** có **mô hình đe doạ nhẹ (STRIDE)** theo ranh giới tin cậy; authN/authZ từng tầng; chống IDOR; quản lý bí mật; mã hoá truyền/lưu; least privilege IAM; thiếu → CONFIRM/FIX `blocker`.
 - [ ] **Chi phí:** có **ước tính chi phí AWS hằng tháng theo thành phần** kèm giả định và nguồn giá; tài nguyên 24/7 vs theo nhu cầu; cấu hình nhỏ cho dev/stg; cách tắt/`destroy`; chi phí của độ phức tạp; có phương án rẻ hơn đã cân nhắc; so với `quality.monthlyBudgetUsd` (nếu còn `TODO` → CONFIRM `missing`).
 - Đánh đổi bảo mật ↔ chi phí chưa được người dùng quyết → CONFIRM, không tự chọn.
+
+## Làn và độ sâu
+Làn vừa: chỉ kiểm A, B (quyết định thực sự có mặt), C, D (failure modes, tương thích ngược, rollout) trên phần design ngắn, tối đa 3 vòng; làn lớn: đủ A–G, tối đa 5 vòng (`../workflow/references/lanes.md`, `review-loop.md`).
+
+## Ngoài đời thực
+Review design ở công ty là một buổi đọc + comment của đồng đội và người sở hữu hệ thống bị ảnh hưởng; họ hỏi nhiều nhất "nếu cái này hỏng/đổi thì ai chịu, quay lại thế nào?". Giữ câu hỏi đó khi review; nhờ người thật đọc lại design lớn nếu có.
 
 ## Cách hỏi người dùng
 Gom CONFIRM theo lô ≤ 4 câu; ưu tiên quyết định khó đảo ngược (mô hình dữ liệu, ranh giới service, hợp đồng công khai, công nghệ lưu trữ). Mỗi câu nêu phương án, đánh đổi chính của từng phương án, và khuyến nghị (chỉ tham khảo). Người dùng muốn luyện thì có thể để họ **chọn trước** rồi mới đối chiếu (xem chế độ học của `system-design`).

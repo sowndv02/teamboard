@@ -33,6 +33,10 @@ description: Review bộ test BDD/TDD (file .feature và test thực thi, trạn
 - [ ] **Chạy lại test**: đỏ **đúng lý do** (assertion/hành vi chưa có), không đỏ vì lỗi biên dịch, thiếu cấu hình hay môi trường. Đỏ sai lý do → FIX.
 - [ ] Assert trạng thái thật (DB, thông điệp phát ra), không chỉ status code; integration dùng DB thật; mock chỉ ở biên ngoài; test độc lập, deterministic; không skip/ignore/assert rỗng.
 - [ ] Test không chứa logic production; stub rỗng không có hành vi.
+- [ ] **Cơ cấu kim tự tháp:** logic được phủ bằng unit test nhanh; integration chỉ cho biên thật; e2e tối thiểu; không đẩy mọi thứ lên integration/e2e → FIX hoặc CONFIRM nếu cần đánh đổi.
+- [ ] **Contract test/ví dụ payload chung** cho API/event giữa service khi lát đổi contract (công cụ contract chỉ khi dự án có); thiếu → CONFIRM `missing`.
+- [ ] **Test migration** khi lát đổi schema; **không flaky**: không `sleep` cố định, chờ có điều kiện, clock/ID giả, test độc lập thứ tự.
+- [ ] BDD đúng chỗ: `.feature` cho hành vi nhìn thấy được; logic nội bộ không bị ép thành kịch bản.
 - [ ] Gate tĩnh của phần test (format/lint) xanh theo `quality-gate.md`.
 
 ### E. Công cụ và phạm vi
@@ -43,6 +47,9 @@ description: Review bộ test BDD/TDD (file .feature và test thực thi, trạn
 - [ ] **Chất lượng:** assert trạng thái thật, đường lỗi/biên, test ổn định/độc lập, đỏ đúng lý do.
 - [ ] **Bảo mật:** có kịch bản/test cho authZ và IDOR, validation/biên đầu vào, không rò rỉ thông tin trong lỗi/log, quyền theo vai trò, token hết hạn/giả. Thiếu khi spec/design có yêu cầu bảo mật → FIX/CONFIRM `blocker`.
 - [ ] **Chi phí:** thời gian chạy test và chi phí hạ tầng test hợp lý; dùng LocalStack/container thay dịch vụ AWS thật khi đủ.
+
+## Làn và ngoài đời thực
+Làn vừa: kiểm A, B, D (đỏ đúng lý do, kim tự tháp, flaky) và E, tối đa 3 vòng; làn nhỏ: chỉ xác nhận test tái hiện đỏ đúng lý do; làn lớn: đủ A–F, tối đa 5 vòng (`../workflow/references/lanes.md`). Ngoài đời thực review test nằm chung trong review PR: người review hỏi "test này có thất bại nếu logic sai không?" và "có ổn định trên CI không?". Hỏi hai câu đó với từng test.
 
 ## Cách hỏi người dùng
 Gom CONFIRM theo lô ≤ 4 câu; ưu tiên câu về **hành vi mong đợi** và **công cụ**. Với mỗi câu: nêu kịch bản/spec liên quan, các hành vi có thể, khuyến nghị (chỉ tham khảo). Hành vi chốt xong → cập nhật **spec trước** (nguồn hiện hành; `docs-update-specs.md`), rồi `.feature`/test.

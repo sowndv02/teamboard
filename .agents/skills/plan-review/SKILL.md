@@ -21,6 +21,7 @@ description: Review kế hoạch triển khai (plan) để tìm điểm chưa r�
 ### B. Chất lượng bước
 - [ ] Mỗi bước nhỏ, có mục tiêu, kịch bản/test, file dự kiến, tiêu chí kiểm chứng **cụ thể** (lệnh/kết quả).
 - [ ] Thứ tự và phụ thuộc đúng; không vòng; khung đi trước, đường lỗi sau đường chính.
+- [ ] Chia theo **lát dọc** giao được giá trị (không chia theo lớp); mỗi bước có **tiêu chí hoàn thành** và đủ nhỏ để review/merge độc lập (gợi ý dưới ~400 dòng diff).
 - [ ] Bước mơ hồ ("hoàn thiện", "tối ưu", "xử lý lỗi") hoặc quá lớn → CONFIRM `ambiguity` nếu cần người dùng làm rõ hành vi, FIX nếu chỉ cần chia nhỏ/diễn đạt.
 - [ ] File/module dự kiến **tồn tại thật** và đúng vị trí theo kiến trúc service (kiểm bằng đọc code, `architecture.md`).
 
@@ -36,7 +37,7 @@ description: Review kế hoạch triển khai (plan) để tìm điểm chưa r�
 - [ ] Gate và DoD đầy đủ (`code-change-gate.md`, `quality-gate.md`).
 
 ### E. Rủi ro, an toàn, vận hành
-- [ ] Migration an toàn, có rollback; không phá consumer (service khác); thay đổi contract có kế hoạch.
+- [ ] Migration an toàn (expand/contract, từng pha deploy riêng), có rollback; không phá consumer (service khác); thay đổi contract có kế hoạch. Plan đổi DB/contract mà thiếu mục rollout & rollback + thứ tự deploy producer/consumer → FIX `blocker` (CONFIRM nếu phải chọn cách).
 - [ ] Bảo mật, cấu hình/secret, biến môi trường, quan sát được xét đến.
 - [ ] Tài liệu/ADR/config cần cập nhật được liệt kê.
 - [ ] Hạ tầng (nếu có): `plan` Terraform, chi phí; `apply` cần người dùng đồng ý.
@@ -53,6 +54,9 @@ Thiếu mục mẫu, bảng sai định dạng, link/tên file sai quy ước, t
 - [ ] **Bảo mật:** có bước bảo mật cụ thể (validate input, kiểm quyền theo tài nguyên, secret từ nguồn đúng) và test tương ứng; cấu hình không lộ.
 - [ ] **Chi phí:** môi trường dev/test cấu hình nhỏ; có bước dọn/`destroy`; không tạo tài nguyên tốn tiền ngoài Terraform; tag chi phí; thay đổi hạ tầng có ước tính (`terraform plan`).
 - Thiếu → FIX nếu chỉ chưa điền; CONFIRM nếu phải chọn đánh đổi.
+
+## Làn và ngoài đời thực
+Làn vừa: chỉ kiểm A, B, D, E và F trên plan ngắn, tối đa 3 vòng; làn lớn: đủ A–H, tối đa 5 vòng (`../workflow/references/lanes.md`). Ngoài đời thực plan được người thật (tech lead/đồng đội) đọc nhanh trước khi làm; câu họ hay hỏi: "lát đầu giao gì chạy được?", "deploy theo thứ tự nào?", "hỏng thì lùi sao?".
 
 ## Cách hỏi người dùng
 Gom CONFIRM theo lô ≤ 4 câu; câu chặn test-init/coding trước (công cụ, hành vi chưa rõ, phạm vi). Mỗi câu kèm lựa chọn và khuyến nghị (chỉ tham khảo). Nếu vấn đề thực chất thuộc spec/design → nêu rõ và hỏi người dùng có quay lại bước đó không (`workflow`, cổng quay lui).
