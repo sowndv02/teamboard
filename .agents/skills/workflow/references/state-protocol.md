@@ -23,7 +23,7 @@ Mục đích: mỗi khi qua một bước, **trạng thái được ghi lại** 
 | **Sau mỗi vòng review** | `round`, `verdict`, số CONFIRM/FIX mở, `confirm_pending` (nếu có), sự kiện `review_round` |
 | **Khi cần người dùng chốt** | `status: needs_confirm`, danh sách câu hỏi (fingerprint + câu hỏi ngắn), `next_action: người dùng trả lời`, sự kiện |
 | **Khi bị chặn** | `status: blocked`, `blocked_by` (lý do cụ thể, thiếu gì), `next_action` |
-| **Khi hoàn thành** | `status: done` (review: `verdict: PASS`), `finished`, `artifacts`, `evidence`, sự kiện `step_done`, cập nhật `current_step` và `next_action` |
+| **Khi hoàn thành** (chỉ khi qua cổng xác nhận, mục 3 quy tắc 8) | `status: done` (review: `verdict: PASS`), `finished`, `artifacts`, `evidence`, sự kiện `step_done`, cập nhật `current_step` và `next_action` |
 | **Khi giao/nhận/xong việc con** | bản ghi `subtasks[]` (xem mục 5) và sự kiện |
 | **Khi artifact phía trên đổi** | các bước phía dưới đã `done` → `status: invalidated`, sự kiện `invalidated` kèm nguyên nhân |
 | **Khi quay lui hoặc đổi phạm vi** | sự kiện `rewind`/`scope_change` kèm quyết định người dùng |
@@ -39,6 +39,12 @@ Sau mỗi lần ghi state file, **cập nhật bảng Workflow trong file issue*
 5. Ghi **bằng chứng**, không ghi lời hứa: lệnh đã chạy + kết quả (ví dụ `dotnet test: 24/24 pass`), đường dẫn artifact, hash.
 6. Không ghi secret, token, dữ liệu cá nhân.
 7. State file chỉ theo dõi quy trình; **quyết định** của người dùng ghi nguyên văn ở Confirm log của artifact (state file chỉ trỏ tới fingerprint).
+8. **Cổng xác nhận: bước còn điểm cần người dùng xác nhận thì không thể `done`.** Áp cho **mọi** bước (spec, design, plan, test, code, PR), không chỉ bước review. Trước khi ghi `status: done`, orchestrator phải **đọc lại artifact và state** và xác minh đồng thời:
+   - `confirm_pending` của bước rỗng;
+   - Confirm log không còn mục "chờ xác nhận" hay "Agent chọn theo uỷ quyền … chờ xác nhận";
+   - không còn giả định/câu hỏi mở do agent đặt (có "mặc định tạm dùng", trạng thái "chưa xác nhận") mà người dùng chưa xác nhận;
+   - mọi đề xuất cần duyệt (ADR, issue, thay đổi rule/skill/config) đã được duyệt hoặc đã bị người dùng bác.
+   Có điểm nào chưa đạt → `status: needs_confirm`, liệt kê vào `confirm_pending`, `next_action: người dùng trả lời`, hỏi người dùng; **không** ghi `done`, không đổi `current_step` sang bước sau. Không suy ra đồng ý từ im lặng hoặc từ một câu trả lời cho câu hỏi khác. Ngoại lệ duy nhất: người dùng nói rõ "hoãn/chấp nhận rủi ro" cho điểm đó (`review-loop.md` quy tắc 8); ghi `Hoãn` kèm người chịu trách nhiệm, đó vẫn là quyết định của người dùng. Phát hiện bước đã ghi `done` mà còn điểm chờ xác nhận → ghi sự kiện `reconciled`, đưa bước về `needs_confirm`.
 
 ## 4. Nhận việc và tránh giẫm chân
 
@@ -129,3 +135,4 @@ Bước `invalidated` cần **review lại phần thay đổi (delta)**; không 
 - [ ] `current_step` và `next_action` đúng và cụ thể (ai làm gì tiếp)
 - [ ] Bảng Workflow trong issue đã cập nhật khớp
 - [ ] Không secret; không chép nội dung artifact vào state
+- [ ] Nếu ghi `done`: `confirm_pending` rỗng, Confirm log không còn "chờ xác nhận", không còn giả định agent đặt chưa xác nhận, đề xuất cần duyệt đã được quyết (quy tắc 8)

@@ -60,6 +60,7 @@ Mặc định issue là file Markdown (`issueTracker.provider: markdown`). Dự 
 5. **Test sinh ra theo TDD/BDD**: kịch bản `.feature` và test đỏ có **trước** code production (bước 7–8 trước bước 9). Không viết code cho hành vi chưa có test đỏ.
 6. **Bước 11 cần người dùng xác nhận** trước khi push hay tạo PR (hành động ra ngoài); không tự làm.
 7. **Quay lui**: review phát hiện vấn đề thuộc artifact của bước trước (ví dụ coding-review thấy hành vi spec không nói) → ghi rõ, hỏi người dùng có quay lại bước đó không; artifact bước trước sửa xong thì chạy lại review của nó, rồi các bước sau bị ảnh hưởng.
+8. **Cổng xác nhận (áp cho mọi bước, không chỉ review): còn điểm cần người dùng xác nhận thì bước KHÔNG được `done`/PASS/`confirmed`/`approved`.** Điểm cần xác nhận gồm: mục `confirm_pending` của bước; mục Confirm log ghi "chờ xác nhận" (kể cả "Agent chọn theo uỷ quyền"); giả định hoặc câu hỏi mở do agent đặt mà người dùng chưa xác nhận; đề xuất cần người dùng duyệt (ADR, issue, đổi rule/skill) chưa được duyệt. Khi có: bước ở `needs_confirm`, hỏi người dùng (`AskUserQuestion`), ghi `next_action`; không "tạm giả định rồi đánh dấu xong", không coi im lặng là đồng ý. Ngoại lệ duy nhất: người dùng nói rõ "hoãn/chấp nhận rủi ro" cho điểm đó (`review-loop.md` quy tắc 8), ghi người chịu trách nhiệm. Chi tiết và cách kiểm trước khi ghi `done`: `references/state-protocol.md` mục 3 quy tắc 8.
 
 ## Khi người dùng đổi phạm vi giữa chừng
 

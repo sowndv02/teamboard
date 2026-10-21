@@ -29,7 +29,7 @@ Không cần gõ lệnh; suy ra chế độ từ lời người dùng, không r�
 3. **Không bịa số.** Giá lấy từ trang giá chính thức hoặc AWS Pricing Calculator; không lấy được thì để tham số (`<giá/giờ>`) và ghi `chưa xác minh`. Mọi con số có công thức, đơn vị, giả định, vùng (region), ngày.
 4. **Phù hợp quy mô thật.** Chọn theo tải trong spec/design, có dự phòng hợp lý; không thiết kế cho tải không có. Nêu tín hiệu để nâng cấp.
 5. **Tôn trọng ràng buộc đã chốt** (ADR: tech stack, ECS Fargate, AWS, kiến trúc từng service). Muốn phá → nêu thành đề xuất ADR, không tự phá.
-6. **Học và thực tế:** dự án này dùng nhiều kiểu kiến trúc để luyện. Dịch vụ chọn **vì mục tiêu học** mà đắt/phức tạp hơn mức cần phải gắn nhãn `[Chọn để học]` kèm "nếu làm thật, phương án rẻ/đơn giản hơn là …" và được duyệt về chi phí.
+6. **Học và thực tế:** dự án này dùng nhiều kiểu kiến trúc để luyện. Dịch vụ chọn **vì mục tiêu học** mà đắt/phức tạp hơn mức cần phải gắn nhãn `[Chọn để học]` kèm "nếu làm thật, phương án rẻ/đơn giản hơn là …" và được duyệt về chi phí. **Học không biện minh cho việc xa thực tế:** dịch vụ `[Chọn để học]` phải ghi cách dự án thật thường chọn và mức xa thực tế (Gần/Xa, định nghĩa ở `system-design` nguyên tắc 6); chọn dịch vụ lạ hoặc quá nặng so với tải chỉ để học (mức *Xa*) cần người dùng xác nhận rõ.
 7. **Bảo mật không bị hy sinh vì chi phí** khi chưa có quyết định tường minh của người dùng (`review-philosophy.md`).
 
 ## Quy trình `select`

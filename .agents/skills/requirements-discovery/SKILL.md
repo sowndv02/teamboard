@@ -50,7 +50,7 @@ Người dùng không cần gõ lệnh; suy ra chế độ từ ngữ cảnh, kh
 - Thứ tự ưu tiên: (1) mục tiêu/giá trị và người dùng, (2) phạm vi trong/ngoài, (3) quy tắc nghiệp vụ cốt lõi và trạng thái, (4) luồng lỗi/biên, (5) quyền và dữ liệu nhạy cảm, (6) phi chức năng.
 - Câu hỏi: cụ thể, một ý, tránh câu hỏi dẫn dắt, có ví dụ khi trừu tượng ("khi hai người cùng sửa một task thì ai thắng?").
 - Sau mỗi lô: cập nhật bảng Biết/Giả định/Chưa biết, quyết định có cần lô tiếp. **Dừng hỏi** khi không còn "Chưa biết" mức cao; phần còn lại thành giả định/câu hỏi mở.
-- Người dùng nói "không biết/hỏi khách sau" → ghi vào **Câu hỏi mở** (kèm giả định mặc định và người cần trả lời), không chặn việc viết spec.
+- Người dùng nói "không biết/hỏi khách sau" → ghi vào **Câu hỏi mở** (kèm giả định mặc định và người cần trả lời), không chặn việc viết spec. Câu hỏi mở ghi theo định dạng ở bước 5: có lựa chọn, khuyến nghị kèm lý do và hậu quả nếu chưa chốt.
 - Khi cần hỏi **khách hàng** thay vì người dùng này: chuyển sang chế độ `questions`.
 
 ### 5. Viết spec
@@ -67,6 +67,7 @@ Người dùng không cần gõ lệnh; suy ra chế độ từ ngữ cảnh, kh
 - Mục **Ngoài phạm vi** liệt kê tường minh những thứ khách có thể mong nhưng lần này không làm (kèm lý do/giai đoạn sau); yêu cầu "Won't" ghi ở đây.
 - Mô tả luồng chính, luồng thay thế, luồng lỗi theo từng use case chính.
 - Giả định và câu hỏi mở nằm trong mục riêng, mỗi mục có **owner** (người trả lời), **hạn** (ngày cần có câu trả lời để không trễ tiến độ), **mặc định** sẽ dùng nếu quá hạn, và **trạng thái** (`open`/`answered`/`deferred`). Câu hỏi quá hạn chưa trả lời → nhắc người dùng, không tự coi là đã chốt mặc định cho điều `blocker`.
+- **Mỗi câu hỏi mở phải có đủ:** (a) **2–4 lựa chọn**, mỗi cái kèm đánh đổi chính; (b) **khuyến nghị kèm lý do** nối về mục tiêu/ràng buộc cụ thể (chỉ để tham khảo, không áp dụng khi người dùng chưa trả lời); (c) **hậu quả nếu chưa chốt** (cái gì bị chặn hoặc phải đoán). Câu hỏi trần (chỉ có câu hỏi) là chưa đủ và không được đưa vào spec. Cùng chuẩn với khi hỏi trực tiếp bằng `AskUserQuestion`. Khi một câu hỏi mở đã được trả lời ở bước sau (design, ADR), cập nhật trạng thái `answered` và trỏ tới nơi chốt, không để câu hỏi cũ nằm đó.
 - Mermaid (nếu có) theo `docs-conventions.md`.
 - Dùng thuật ngữ nhất quán; mục "Thuật ngữ" cho từ nghiệp vụ.
 
@@ -134,7 +135,7 @@ Business analyst/PO thật không hỏi một lần rồi xong: yêu cầu đổ
 - [ ] "Yêu cầu gốc" lưu nguyên văn
 - [ ] Mọi mục Chưa biết mức cao đã được hỏi; phần còn lại là giả định/câu hỏi mở có người xác nhận
 - [ ] Mọi FR/BR/NFR có ID, ưu tiên, tiêu chí chấp nhận kiểm chứng được (FR dạng user story + Given/When/Then)
-- [ ] Yêu cầu / giả định / ràng buộc tách bạch; câu hỏi mở có owner, hạn, mặc định
+- [ ] Yêu cầu / giả định / ràng buộc tách bạch; câu hỏi mở có owner, hạn, mặc định, lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt
 - [ ] Có phạm vi trong và ngoài; có luồng lỗi/biên
 - [ ] Đã tự phản biện (mâu thuẫn, biên, phình phạm vi, tác động)
 - [ ] Spec nằm đúng chỗ, đúng tên, có trong `document/spec/README.md`

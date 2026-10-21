@@ -102,4 +102,7 @@ Với mỗi mục: *chọn A khi…*, *chọn B khi…*, *cạm bẫy*.
 ## 5. Nhãn `[Cần]` / `[Chọn để học]`
 
 - `[Cần]`: yêu cầu/NFR trong spec buộc phải có, hoặc ràng buộc đã chốt.
-- `[Chọn để học]`: không cần cho yêu cầu hiện tại nhưng chọn để luyện kiến trúc (khớp mục tiêu dự án). Luôn kèm "nếu làm sản phẩm thật, phương án đơn giản hơn là …".
+- `[Chọn để học]`: không cần cho yêu cầu hiện tại nhưng chọn để luyện kiến trúc (khớp mục tiêu dự án). Luôn kèm "nếu làm sản phẩm thật, phương án đơn giản hơn là …", **cách dự án thực tế thường làm** và **mức xa thực tế**.
+  - *Gần*: đúng cách thực tế dùng, hoặc bản thu nhỏ hợp lý (ví dụ tách identity thành service riêng, dùng thư viện JWT chuẩn và học qua test tấn công). Mặc định.
+  - *Xa*: khác hẳn thực tế (ví dụ tự viết mật mã/giao thức/JWT thay vì thư viện chuẩn, hạ tầng nặng hơn nhiều so với tải). Chỉ khi người dùng xác nhận rõ, nêu rủi ro, và giới hạn trong lab hoặc phạm vi ngoài đường chính; không thì đổi sang phương án *Gần*.
+  - Mục đích học không biện minh cho việc đi xa thực tế: học bằng cách làm giống thực tế (test, vận hành, quan sát, đọc mã nguồn, thử tấn công).

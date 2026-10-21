@@ -16,3 +16,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-001](TB-001-servicedefaults-and-rename.md) | Đổi tên board-service, thêm ServiceDefaults và Jaeger | 0 | todo |
 | [TB-002](TB-002-agent-rules-and-workflow.md) | Thiết lập quy tắc agent, workflow và tài liệu nền | 0 | in-progress |
 | [TB-003](TB-003-skills-real-world-practices.md) | Đưa skill, rule và gate workflow sát thực hành dự án thực tế (làn, chia lát, Angular) | 0 | review |
+| [TB-006](TB-006-agent-skills-rules.md) | Cải tiến skill, rule và template từ workflow identity-auth (D0, uỷ quyền, cổng xác nhận, thuật ngữ, câu hỏi mở) | 0 | review |

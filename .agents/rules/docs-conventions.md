@@ -36,6 +36,7 @@
 ## Nội dung
 
 - Viết tiếng Việt, câu ngắn; thuật ngữ kỹ thuật giữ nguyên tiếng Anh. Tên field, API key, enum giữ nguyên theo contract.
+- Thuật ngữ nâng cao hoặc ít gặp: giải thích ngắn ở lần đầu trong mỗi tài liệu (inline hoặc mục "Thuật ngữ"), không chỉ dán link (`explain-terms.md`).
 - Tài liệu quyết định ghi trạng thái và ngày ở đầu file (ADR: `Đề xuất | Chấp nhận | Thay thế bởi ADR-NNNN`).
 - Link tương đối giữa các tài liệu; không để link chết.
 - Không chép lại nội dung đã có nơi khác; link tới nguồn. Số liệu (cổng, tên service, phiên bản) lấy từ `config/`.

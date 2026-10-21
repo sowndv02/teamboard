@@ -22,8 +22,16 @@ description: Review một design doc (system design) để tìm điểm chưa r�
 - [ ] Mỗi quyết định lớn có **≥ 2 phương án thật** (gồm phương án đơn giản nhất) → thiếu: FIX nếu chỉ thiếu trình bày, CONFIRM nếu phương án thay thế có thể đổi hướng.
 - [ ] Có **bảng so sánh theo tiêu chí lấy từ NFR**, khuyến nghị, **"Vì sao không chọn B/C" và điều kiện B/C đúng**, đánh đổi, khả năng đảo ngược, **tín hiệu xem lại đo được**.
 - [ ] Nhãn `[Cần]`/`[Chọn để học]` trung thực; không biến lựa chọn "để học" thành lý do kỹ thuật giả (CONFIRM nếu không rõ).
+- [ ] **Bám thực tế:** mỗi mục `[Chọn để học]` ghi cách dự án thực tế thường làm và mức xa thực tế (Gần/Xa). Mức *Xa* (tự viết thứ đã có thư viện chuẩn như mật mã/giao thức/JWT, hạ tầng nặng hơn nhiều so với tải) mà chưa có xác nhận rõ của người dùng, hoặc nằm trên đường chính của sản phẩm → CONFIRM `scope` (đề xuất phương án *Gần*). Mục đích học không phải lý do chấp nhận phương án xa thực tế.
 - [ ] **Quyết định chưa được đưa ra** hoặc "tuỳ" ("có thể dùng A hoặc B") → CONFIRM `undecided`.
 - [ ] Lựa chọn phụ thuộc vào ưu tiên của người dùng (chi phí vs độ trễ, đơn giản vs mở rộng) chưa hỏi → CONFIRM.
+
+### B2. Quyết định cấp service (D0)
+- [ ] Có D0 (ranh giới, cô lập database, loại database, kiến trúc nội bộ) khi design service mới hoặc chạm lưu trữ/ranh giới; mỗi mục ≥ 2 phương án thật và "vì sao không chọn". Thiếu D0 → CONFIRM `missing` mức `blocker` (không phải FIX).
+- [ ] Ràng buộc kế thừa (ADR, `PROJECT.md`) **không thay cho lý do**. ADR chỉ ghi kết quả mà không có lý do → design ghi "ràng buộc chưa có lý do" và đề xuất bổ sung ADR; tự bịa lý do cho hợp thức hoá → CONFIRM.
+- [ ] Loại database: tiêu chí rút từ yêu cầu dữ liệu (unique, giao dịch/CAS, truy vấn, hết hạn, chi phí biên, chạy local); phần yếu và phương án thay thế nghiêm túc nhất được nêu; "đa dạng công nghệ" hay sở thích không được dùng làm lý do kỹ thuật (nếu là lý do học thì phải gắn `[Chọn để học]`).
+- [ ] Kiến trúc nội bộ: so với ≥ 2 kiến trúc khác, nêu điểm yếu và cách giảm.
+- [ ] Nhóm khó đảo ngược (loại DB, ranh giới service, kiến trúc nội bộ, hợp đồng công khai): Confirm log có **người dùng chọn hoặc xác nhận**. Mục ghi "Agent chọn theo uỷ quyền" mà chưa có xác nhận kết quả cụ thể → CONFIRM `assumption`; quyết định đó làm đổi ADR/spec đã chốt thì tạo đề xuất ADR.
 
 ### C. Nhất quán và ràng buộc (→ CONFIRM `conflict`)
 - [ ] Không mâu thuẫn ADR đã chấp nhận, kiến trúc bắt buộc từng service (`architecture.md`), tech stack đã chốt. Muốn phá ràng buộc → CONFIRM (đề xuất ADR mới).
@@ -50,7 +58,7 @@ description: Review một design doc (system design) để tìm điểm chưa r�
 - [ ] Có pre-mortem; rủi ro lớn có hướng giảm thiểu.
 
 ### F. Lỗi hình thức (FIX)
-Thiếu mục của `_template.md`, sơ đồ Mermaid lỗi cú pháp/thiếu chú thích, link chết, tên file sai quy ước, ADR dự kiến chưa liệt kê.
+Thiếu mục của `_template.md`, sơ đồ Mermaid lỗi cú pháp/thiếu chú thích, link chết, tên file sai quy ước, ADR dự kiến chưa liệt kê, thuật ngữ nâng cao xuất hiện lần đầu mà chưa giải thích (`.agents/rules/explain-terms.md`), câu hỏi mở thiếu lựa chọn/khuyến nghị kèm lý do/hậu quả nếu chưa chốt (agent bổ sung từ nguồn đã có; cần thông tin người dùng thì CONFIRM `missing`), câu hỏi đã được chốt ở D1…Dn hay Confirm log mà vẫn ghi `open`.
 
 ### G. Lăng kính Chất lượng / Bảo mật / Chi phí (`../workflow/references/review-philosophy.md` mục 4)
 - [ ] **Chất lượng:** chế độ lỗi, không điểm lỗi đơn, timeout/retry/circuit breaker, idempotency, nhất quán, quan sát, lộ trình mở rộng.
@@ -73,6 +81,7 @@ Ghi Confirm log → cập nhật design (quyết định, bảng so sánh, "vì 
 ## PASS khi
 - 0 CONFIRM mở, 0 FIX mở; checklist A–F đã kiểm chứng.
 - Mọi quyết định lớn đã chốt; mọi giả định đã được xác nhận hoặc `Hoãn` có người chịu trách nhiệm.
+- D0 đầy đủ và người dùng đã chọn/xác nhận từng mục; không còn mục "Agent chọn theo uỷ quyền" chờ xác nhận.
 - Design `status: confirmed`.
 - Đề xuất danh sách **ADR** cần ghi cho các quyết định lớn (tạo khi người dùng đồng ý) và chia **issue** theo lát giao được; báo `workflow` mở `plan-init`.
 

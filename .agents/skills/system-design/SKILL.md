@@ -5,7 +5,7 @@ description: Thiết kế hệ thống từ một spec đã rõ, kèm giải th�
 
 # System design có giải thích
 
-Từ **spec đã xác nhận** → **design doc** (`document/design/<ten>.md`) + **bản nháp ADR** cho mỗi quyết định lớn. Mục tiêu kép: ra thiết kế đủ tốt cho yêu cầu, **và** giúp người dùng hiểu *vì sao* (đánh đổi, phương án bị loại, khi nào đổi ý) để học system design.
+Từ **spec đã xác nhận** → **design doc** (`document/design/<ten>.md`) + **bản nháp ADR** cho mỗi quyết định lớn. Mục tiêu kép: ra thiết kế đủ tốt cho yêu cầu, **và** giúp người dùng hiểu *vì sao* (đánh đổi, phương án bị loại, khi nào đổi ý) để học system design. Thiết kế bám cách dự án thực tế làm; mục đích học không biện minh cho việc đi xa thực tế (nguyên tắc 6).
 
 Rule liên quan: `architecture.md` (kiến trúc bắt buộc từng service), `api-endpoints.md`, `messaging.md`, `observability.md`, `terraform.md`, `docs-conventions.md`, `docs-update-specs.md`, `agent-conduct.md` (trung thực, không bịa).
 
@@ -28,10 +28,12 @@ Không cần gõ lệnh; suy ra chế độ từ lời người dùng, không r�
 3. **Giải thích cả cái bị loại.** Mỗi quyết định phải có mục "Vì sao không chọn B/C", nói rõ điều kiện nào thì B/C lại đúng.
 4. **Đánh đổi nói thẳng**: lựa chọn nào cũng mất cái gì; ghi cái mất, ai chịu, khi nào thành vấn đề.
 5. **Đơn giản trước, có lộ trình mở rộng.** Chọn phương án đơn giản nhất đáp ứng NFR **có dự phòng hợp lý**, kèm tín hiệu cho biết khi nào phải nâng cấp (revisit trigger). Không thiết kế cho tải không có trong spec.
-6. **Tách "cần" và "chọn để luyện tập".** Dự án này cố ý bắt dùng nhiều kiến trúc để học (`architecture.md`). Khi một lựa chọn *không cần* cho yêu cầu nhưng *được chọn để luyện*, ghi rõ nhãn `[Chọn để học]` và nêu phương án đơn giản hơn nếu làm thật. Không giả vờ nó là bắt buộc kỹ thuật.
+6. **Tách "cần" và "chọn để luyện tập", và luôn bám thực tế.** Dự án này cố ý bắt dùng nhiều kiến trúc để học (`architecture.md`). Khi một lựa chọn *không cần* cho yêu cầu nhưng *được chọn để luyện*, ghi rõ nhãn `[Chọn để học]` và nêu phương án đơn giản hơn nếu làm thật. Không giả vờ nó là bắt buộc kỹ thuật. **Mục tiêu học không phải lý do để đi xa cách dự án thật làm.** Mọi lựa chọn `[Chọn để học]` phải ghi: (a) **cách dự án thực tế thường làm** cho bài toán này; (b) **mức xa thực tế**: *Gần* (đúng cách thực tế dùng, hoặc bản thu nhỏ hợp lý của nó) hoặc *Xa* (khác hẳn thực tế, ví dụ tự viết thứ đã có thư viện chuẩn như mật mã, giao thức, JWT; dựng hạ tầng nặng hơn nhiều so với tải; kiến trúc không ai dùng ở quy mô đó). Mặc định chọn *Gần*: việc học đạt được bằng cách **làm giống thực tế** (test, vận hành, quan sát, đọc mã nguồn thư viện, thử tấn công), không bằng cách làm khác thực tế. Lựa chọn *Xa* chỉ khi người dùng xác nhận rõ, rủi ro được nêu, và giới hạn trong lab hoặc phạm vi không nằm trên đường chính của sản phẩm; nếu không thì thay bằng phương án *Gần*.
 7. **Không bịa số liệu hay ví dụ.** Số ước lượng ghi rõ giả định; use case tương tự dựa trên pattern công khai, nói mức tin cậy, không bịa nội dung/số liệu cụ thể của công ty nào (xem bước 5).
-8. **Tôn trọng ràng buộc đã chốt**: tech stack (ADR 0005), AWS/Terraform, kiến trúc bắt buộc từng service. Muốn phá ràng buộc → nêu thành đề xuất ADR riêng, không tự phá.
+8. **Tôn trọng ràng buộc đã chốt**: tech stack (ADR 0005), AWS/Terraform, kiến trúc bắt buộc từng service. Muốn phá ràng buộc → nêu thành đề xuất ADR riêng, không tự phá. **Ràng buộc không phải lý do để bỏ qua phân tích:** với ranh giới service, loại lưu trữ và kiến trúc nội bộ, design vẫn phải nêu *vì sao* (mục D0, bước 3b). ADR hoặc `PROJECT.md` chỉ ghi kết quả mà không có lý do → ghi "ràng buộc chưa có lý do" và đề xuất bổ sung vào ADR; không tự bịa lý do cho hợp thức hoá.
 9. **Chỉ thiết kế, không code.** Trừ ví dụ ngắn minh hoạ trong tài liệu.
+10. **Quyết định khó đảo ngược do người dùng chọn hoặc xác nhận.** Gồm: loại lưu trữ/database, ranh giới service, kiến trúc nội bộ của service, hợp đồng công khai (API, sự kiện, claim token). Agent đưa phương án thật và khuyến nghị nhưng **không chốt**. Nhóm này mặc định theo chế độ học (bước 9): hỏi người dùng chọn trước, hoặc xác nhận lý do, trước khi design được `confirmed`.
+11. **Uỷ quyền không phải xác nhận.** Người dùng nói "tuỳ", "chọn cái thực tế" → agent chọn theo nguyên tắc nêu rõ, ghi "Agent chọn theo uỷ quyền" kèm lý do và phương án thay thế chính. **Kết quả cụ thể vẫn phải được người dùng xác nhận** trước khi PASS, đặc biệt khi nó đổi ADR hoặc spec đã chốt (khi đó đề xuất ADR, không tự coi là xong).
 
 ## Quy trình `design`
 
@@ -53,6 +55,17 @@ Tính tải, dữ liệu, băng thông từ NFR (xem `references/design-checklis
 ### 3. Liệt kê điểm quyết định
 Xác định các quyết định thực sự có nhiều lựa chọn hợp lý (ví dụ: ranh giới service, đồng bộ/bất đồng bộ, lưu trữ, nhất quán, bộ nhớ đệm, xử lý trùng lặp, phân trang/truy vấn, xác thực, triển khai). Tối đa ~5–7 quyết định lớn; việc vặt không phải quyết định. Dùng `references/decision-framework.md` làm danh mục và tiêu chí.
 
+### 3b. D0: quyết định cấp service (bắt buộc khi design service mới hoặc chạm lưu trữ/ranh giới)
+
+Làm đủ bốn mục sau theo định dạng bước 4, **kể cả khi đã bị ràng buộc** bởi ADR/`PROJECT.md` (nguyên tắc 8). Mục nào ràng buộc không có lý do thì ghi rõ và đề xuất bổ sung ADR.
+
+1. **Ranh giới:** service riêng, module trong service khác, hay dịch vụ managed. Tách lý do kỹ thuật thật (cách ly dữ liệu/khoá, hồ sơ tải, tốc độ đổi, độc lập triển khai) khỏi lý do để học.
+2. **Mức cô lập database:** mỗi service sở hữu DB (quy tắc dự án); nêu mức cô lập (database/schema/instance riêng; chung instance ở dev vì chi phí) và rủi ro của việc chung instance.
+3. **Loại database:** so sánh ≥ 2 loại thật theo **tiêu chí rút từ yêu cầu dữ liệu** (ràng buộc duy nhất, giao dịch/compare-and-set, kiểu truy vấn, hết hạn tự động, chi phí biên, chạy local, công cụ). Nói thẳng khi hai phương án khác nhau ít về kỹ thuật; nêu phương án thay thế nghiêm túc nhất và khi nào nó thắng. **Không dùng "đa dạng công nghệ" làm lý do kỹ thuật**; nếu đó là lý do thì gắn `[Chọn để học]`.
+4. **Kiến trúc nội bộ:** so với ít nhất hai kiến trúc khác theo độ phong phú của miền, nơi đặt logic giao dịch, khả năng test; nêu điểm yếu và cách giảm.
+
+Mỗi mục có nhãn, "vì sao không chọn", tín hiệu xem lại. Giá và giới hạn của sản phẩm bên ngoài ghi mức tin cậy, chưa xác minh thì nói. Cả bốn mục thuộc nguyên tắc 10: người dùng chọn hoặc xác nhận.
+
 ### 4. Phân tích từng quyết định (định dạng bắt buộc)
 
 Cho **mỗi** quyết định `D1..Dn`:
@@ -64,7 +77,7 @@ Cho **mỗi** quyết định `D1..Dn`:
 5. **Vì sao không chọn từng phương án còn lại** + **điều kiện để phương án đó trở nên đúng**.
 6. **Đánh đổi chấp nhận** và **rủi ro**; mức độ khó đảo ngược.
 7. **Tín hiệu xem lại (revisit trigger)**: chỉ số/sự kiện cụ thể buộc phải đổi (ví dụ "khi p95 ghi vượt 300 ms" / "khi cần quá 3 consumer").
-8. **Nhãn** `[Cần]` hoặc `[Chọn để học]` (nguyên tắc 6).
+8. **Nhãn** `[Cần]` hoặc `[Chọn để học]` (nguyên tắc 6); với `[Chọn để học]` ghi thêm cách dự án thực tế làm và mức xa thực tế (Gần/Xa).
 9. **Use case tương tự** (bước 5).
 
 ### 5. Use case tương tự
@@ -78,7 +91,7 @@ Với mỗi quyết định lớn, nêu 2–3 bài toán có cấu trúc giống
 ### 6. Thiết kế chi tiết (khớp ngữ cảnh dự án)
 Điền design doc (`document/design/_template.md`):
 - Service sở hữu gì (dữ liệu, trách nhiệm), tuân kiến trúc bắt buộc của service (`architecture.md`); ranh giới nhất quán (transaction trong một service, eventual consistency giữa các service).
-- **Frontend (khi có UI, ADR 0009):** chiến lược render (SPA mặc định, SSR/hydration chỉ khi có lý do và ADR), **nơi lưu token phía client** (bộ nhớ + refresh cookie `HttpOnly`, hay BFF; nêu đánh đổi XSS/CSRF), CSP/CORS, cache và triển khai tĩnh; không quyết ở đây nếu ADR chưa có, ghi thành câu hỏi mở.
+- **Frontend (khi có UI, ADR 0009):** chiến lược render (SPA mặc định, SSR/hydration chỉ khi có lý do và ADR), **nơi lưu token phía client** (bộ nhớ + refresh cookie `HttpOnly`, hay BFF; nêu đánh đổi XSS/CSRF), CSP/CORS, cache và triển khai tĩnh; không quyết ở đây nếu ADR chưa có, ghi thành câu hỏi mở (đủ lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt).
 - Hợp đồng: API (theo `api-endpoints.md`), sự kiện (`messaging.md`: outbox, idempotent consumer, DLQ).
 - Mô hình dữ liệu mức khái niệm, chỉ mục chính, vòng đời dữ liệu.
 - **Sơ đồ Mermaid**: bối cảnh/thành phần và ít nhất một sequence cho luồng chính (theo `docs-conventions.md`), và một cho luồng lỗi quan trọng.
@@ -96,7 +109,7 @@ Trước khi trình bày: "Giả sử 6 tháng sau thiết kế này thất bạ
 
 ### 9. Chế độ học
 - Mặc định, giải thích khái niệm ở mức người đã biết lập trình nhưng chưa chắc biết pattern; định nghĩa thuật ngữ lần đầu.
-- Nếu người dùng muốn **luyện chủ động** (hoặc nói "cho tôi thử chọn trước"): trước khi đưa khuyến nghị cho một quyết định, đưa bài toán + tiêu chí và **hỏi người dùng chọn phương án nào và vì sao**, rồi so với phân tích, chỉ ra điểm họ nhìn đúng/sót.
+- Với nhóm quyết định ở nguyên tắc 10 (D0, hợp đồng công khai), **mặc định** hỏi người dùng chọn trước, không chờ họ yêu cầu. Với quyết định còn lại, chỉ khi người dùng muốn **luyện chủ động** (hoặc nói "cho tôi thử chọn trước"): trước khi đưa khuyến nghị, đưa bài toán + tiêu chí và **hỏi người dùng chọn phương án nào và vì sao**, rồi so với phân tích, chỉ ra điểm họ nhìn đúng/sót.
 - Cuối thiết kế đưa 3–5 **câu hỏi thử thách** ("nếu message bị gửi hai lần thì sao?", "nếu DB chết 5 phút?", "tải tăng 10x thì hỏng chỗ nào trước?") để người dùng tự trả lời; trả lời khi họ yêu cầu.
 - Ghi vài **bài học chính** (mục "Ghi chú học tập") để tra lại sau.
 
@@ -130,12 +143,17 @@ Với thiết kế hiện tại và tải mục tiêu: liệt kê điểm nghẽ
 - Không bịa số liệu, benchmark, hay thông tin nội bộ của công ty.
 - Không tự phá ràng buộc đã chốt; không tự tạo ADR/issue khi chưa được đồng ý.
 - Không sửa ADR đã chấp nhận (`docs-update-specs.md`); đổi quyết định = ADR mới.
-- Không biến lựa chọn "để học" thành lý do kỹ thuật giả.
+- Không biến lựa chọn "để học" thành lý do kỹ thuật giả; không dùng "đa dạng công nghệ" làm lý do chọn database hay kiến trúc.
+- Không chọn phương án *Xa* thực tế chỉ vì mục đích học khi chưa có xác nhận rõ của người dùng (nguyên tắc 6).
+- Không coi "ADR/`PROJECT.md` đã bắt buộc" hay "người dùng uỷ quyền" là xác nhận cho quyết định khó đảo ngược (nguyên tắc 8, 10, 11).
+- Không để câu hỏi mở "trần" trong design: mỗi câu hỏi mở cần 2–4 lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt (mẫu ở `_template.md` mục 14). Câu đã được chốt (ở D1…Dn, Confirm log, ADR) thì chuyển `answered` kèm link, không để bản cũ.
 
 ## Hoàn thành khi
 - [ ] Spec đầu vào đã `confirmed` (hoặc câu hỏi mở không chặn)
+- [ ] Có D0 (ranh giới, cô lập DB, loại DB, kiến trúc nội bộ) với lý do, kể cả khi bị ràng buộc; người dùng đã chọn hoặc xác nhận từng mục
+- [ ] Mỗi câu hỏi mở có lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt; câu đã chốt đã chuyển `answered`
 - [ ] Drivers có số đo hoặc giả định ghi rõ; có ước lượng bậc độ lớn
-- [ ] Mỗi quyết định lớn: ≥ 2 phương án, bảng so sánh, khuyến nghị, **vì sao không chọn từng phương án còn lại**, đánh đổi, revisit trigger, nhãn `[Cần]/[Chọn để học]`
+- [ ] Mỗi quyết định lớn: ≥ 2 phương án, bảng so sánh, khuyến nghị, **vì sao không chọn từng phương án còn lại**, đánh đổi, revisit trigger, nhãn `[Cần]/[Chọn để học]`; mục `[Chọn để học]` có cách thực tế làm và mức xa thực tế, mức *Xa* có xác nhận của người dùng
 - [ ] Có use case tương tự kèm mức tin cậy; không có nội dung bịa
 - [ ] Có sơ đồ (bối cảnh + sequence luồng chính/lỗi), failure modes, bảo mật, quan sát, chi phí, lộ trình mở rộng
 - [ ] Đã pre-mortem; đã ghi điều chủ ý chưa làm

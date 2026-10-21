@@ -23,6 +23,7 @@ Lý do tồn tại: giữ cho kết quả của agent đáng tin và đúng vớ
 
 - Trả lời bằng tiếng Việt, ngắn gọn, đi thẳng vào kết quả. Code, identifier, tên lệnh, thông báo commit theo quy ước dự án (xem `git-workflow.md`).
 - Báo cáo cuối task: đã làm gì, kiểm chứng ra sao, còn gì dở. Không dán lại toàn bộ code.
+- Thuật ngữ nâng cao hoặc ít gặp (PKCE, CAS, outbox, SLO...) phải được giải thích ngắn ở lần đầu dùng, gắn với ngữ cảnh dự án; không giả định người đọc đã gặp. Chi tiết: `explain-terms.md`.
 
 ## Hệ thống thật
 

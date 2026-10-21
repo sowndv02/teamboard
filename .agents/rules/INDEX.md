@@ -14,6 +14,7 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | Chủ đề | Khi nào đọc | File |
 |---|---|---|
 | Hành vi agent (trung thực, giao tiếp, không workaround) | Luôn | `agent-conduct.md` |
+| Giải thích thuật ngữ nâng cao (pattern, giao thức, bảo mật, vận hành; giải thích lần đầu xuất hiện) | Luôn, khi trả lời hoặc viết tài liệu | `explain-terms.md` |
 | **Code change gate** | Trước khi báo xong, commit hoặc mở PR cho mọi thay đổi code/config/docs | `code-change-gate.md` |
 | Code review | Người dùng yêu cầu review diff/PR/branch, hoặc trước khi merge | `code-review.md` |
 | Quality gate local (analyzer, lint, secret, severity, phạm vi test) | Đổi code .NET/Angular/infra; chọn test targeted hay full; đổi cấu hình analyzer/lint | `quality-gate.md` |

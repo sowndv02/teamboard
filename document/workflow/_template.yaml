@@ -24,6 +24,7 @@ blocked_by: null                 # lý do cụ thể nếu đang bị chặn
 
 # Mỗi bước: pending | in_progress | needs_confirm | needs_fix | blocked | done | invalidated
 # Với bước review: done tương ứng verdict PASS.
+# Cổng xác nhận: còn confirm_pending / mục "chờ xác nhận" / giả định agent chưa được người dùng xác nhận thì bước KHÔNG được done (state-protocol.md mục 3 quy tắc 8).
 steps:
   requirements-discovery: { status: pending }
   spec-review:            { status: pending }
