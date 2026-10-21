@@ -40,7 +40,7 @@ description: Review một spec để tìm điểm chưa rõ, mơ hồ, mâu thu�
 - [ ] Mỗi yêu cầu truy được về lời khách/người dùng hoặc được đánh dấu giả định; yêu cầu "tự nhiên có" mà không có nguồn → CONFIRM `assumption`.
 - [ ] "Yêu cầu gốc" còn nguyên văn.
 - [ ] **Truy vết yêu cầu → test:** mỗi FR/BR/NFR `Must`/`Should` có tiêu chí Given/When/Then (ít nhất một ca chính và một ca lỗi/biên) đủ để thành `.feature`/test sau này; tiêu chí không có ví dụ số liệu cụ thể → CONFIRM `missing`. Ghi vào báo cáo bảng "yêu cầu → tiêu chí" (không cần tạo file mới).
-- [ ] Yêu cầu / giả định / ràng buộc tách bạch; mỗi câu hỏi mở và giả định có owner, hạn, mặc định (thiếu → CONFIRM `missing`).
+- [ ] Yêu cầu / giả định / ràng buộc tách bạch; mỗi câu hỏi mở và giả định có owner, hạn, mặc định (thiếu → CONFIRM `missing`). Mỗi câu hỏi mở còn phải có **2–4 lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt**: thiếu mà agent tự bổ sung được từ nguồn đã có (spec, ADR, design) → FIX; cần thông tin từ người dùng để có lựa chọn → CONFIRM `missing`. Câu hỏi đã được chốt ở bước sau mà vẫn ghi `open` → FIX (chuyển `answered` kèm link).
 
 ### D2. Sẵn sàng để ước lượng (DoR, `../workflow/SKILL.md` mục DoR/DoD)
 - [ ] Đủ rõ để người làm **ước lượng được dạng khoảng**: phạm vi trong/ngoài, FR Must có tiêu chí, phụ thuộc/ tích hợp đã biết, không còn câu hỏi mở `blocker` chưa có owner/hạn.

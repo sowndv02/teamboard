@@ -168,8 +168,22 @@ Chủ ý **chưa làm** (và vì sao chưa cần):
 |---|---|---|---|---|
 
 ## 14. Câu hỏi mở và giả định
-| # | Mục | Người xác nhận | Mặc định tạm dùng |
+
+Giả định:
+
+| # | Giả định | Người xác nhận | Trạng thái |
 |---|---|---|---|
+
+Câu hỏi mở: mỗi câu phải có **lựa chọn, khuyến nghị kèm lý do và hậu quả nếu chưa chốt**; câu hỏi trần là chưa đủ.
+
+| # | Câu hỏi | Người trả lời | Hạn | Trạng thái (`open`/`answered`/`deferred`) |
+|---|---|---|---|---|
+
+### Q-01 <tên ngắn>
+- **Lựa chọn:** A) … B) … (2–4 lựa chọn, mỗi cái kèm đánh đổi chính)
+- **Khuyến nghị:** A, vì … (chỉ để tham khảo, không áp dụng khi người dùng chưa trả lời)
+- **Hậu quả nếu chưa chốt:** …
+- **Mặc định nếu quá hạn:** …
 
 ## 15. Ghi chú học tập
 - Khái niệm chính:

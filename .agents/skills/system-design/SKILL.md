@@ -91,7 +91,7 @@ Với mỗi quyết định lớn, nêu 2–3 bài toán có cấu trúc giống
 ### 6. Thiết kế chi tiết (khớp ngữ cảnh dự án)
 Điền design doc (`document/design/_template.md`):
 - Service sở hữu gì (dữ liệu, trách nhiệm), tuân kiến trúc bắt buộc của service (`architecture.md`); ranh giới nhất quán (transaction trong một service, eventual consistency giữa các service).
-- **Frontend (khi có UI, ADR 0009):** chiến lược render (SPA mặc định, SSR/hydration chỉ khi có lý do và ADR), **nơi lưu token phía client** (bộ nhớ + refresh cookie `HttpOnly`, hay BFF; nêu đánh đổi XSS/CSRF), CSP/CORS, cache và triển khai tĩnh; không quyết ở đây nếu ADR chưa có, ghi thành câu hỏi mở.
+- **Frontend (khi có UI, ADR 0009):** chiến lược render (SPA mặc định, SSR/hydration chỉ khi có lý do và ADR), **nơi lưu token phía client** (bộ nhớ + refresh cookie `HttpOnly`, hay BFF; nêu đánh đổi XSS/CSRF), CSP/CORS, cache và triển khai tĩnh; không quyết ở đây nếu ADR chưa có, ghi thành câu hỏi mở (đủ lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt).
 - Hợp đồng: API (theo `api-endpoints.md`), sự kiện (`messaging.md`: outbox, idempotent consumer, DLQ).
 - Mô hình dữ liệu mức khái niệm, chỉ mục chính, vòng đời dữ liệu.
 - **Sơ đồ Mermaid**: bối cảnh/thành phần và ít nhất một sequence cho luồng chính (theo `docs-conventions.md`), và một cho luồng lỗi quan trọng.
@@ -146,10 +146,12 @@ Với thiết kế hiện tại và tải mục tiêu: liệt kê điểm nghẽ
 - Không biến lựa chọn "để học" thành lý do kỹ thuật giả; không dùng "đa dạng công nghệ" làm lý do chọn database hay kiến trúc.
 - Không chọn phương án *Xa* thực tế chỉ vì mục đích học khi chưa có xác nhận rõ của người dùng (nguyên tắc 6).
 - Không coi "ADR/`PROJECT.md` đã bắt buộc" hay "người dùng uỷ quyền" là xác nhận cho quyết định khó đảo ngược (nguyên tắc 8, 10, 11).
+- Không để câu hỏi mở "trần" trong design: mỗi câu hỏi mở cần 2–4 lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt (mẫu ở `_template.md` mục 14). Câu đã được chốt (ở D1…Dn, Confirm log, ADR) thì chuyển `answered` kèm link, không để bản cũ.
 
 ## Hoàn thành khi
 - [ ] Spec đầu vào đã `confirmed` (hoặc câu hỏi mở không chặn)
 - [ ] Có D0 (ranh giới, cô lập DB, loại DB, kiến trúc nội bộ) với lý do, kể cả khi bị ràng buộc; người dùng đã chọn hoặc xác nhận từng mục
+- [ ] Mỗi câu hỏi mở có lựa chọn, khuyến nghị kèm lý do, hậu quả nếu chưa chốt; câu đã chốt đã chuyển `answered`
 - [ ] Drivers có số đo hoặc giả định ghi rõ; có ước lượng bậc độ lớn
 - [ ] Mỗi quyết định lớn: ≥ 2 phương án, bảng so sánh, khuyến nghị, **vì sao không chọn từng phương án còn lại**, đánh đổi, revisit trigger, nhãn `[Cần]/[Chọn để học]`; mục `[Chọn để học]` có cách thực tế làm và mức xa thực tế, mức *Xa* có xác nhận của người dùng
 - [ ] Có use case tương tự kèm mức tin cậy; không có nội dung bịa

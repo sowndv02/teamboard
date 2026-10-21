@@ -95,9 +95,17 @@ Giai đoạn hiện tại không phát triển frontend (ADR 0008). Yêu cầu v
 
 ## 15. Câu hỏi mở
 
-| # | Câu hỏi | Ảnh hưởng tới | Người trả lời | Mặc định tạm dùng |
-|---|---|---|---|---|
-| Q-01 | | | | |
+Mỗi câu hỏi mở phải có **lựa chọn, khuyến nghị kèm lý do và hậu quả nếu chưa chốt**; câu hỏi trần (chỉ có câu hỏi) là chưa đủ. Bảng liệt kê, chi tiết ngay dưới.
+
+| # | Câu hỏi | Ảnh hưởng tới | Người trả lời | Hạn | Trạng thái (`open`/`answered`/`deferred`) |
+|---|---|---|---|---|---|
+| Q-01 | | | | | open |
+
+### Q-01 <tên ngắn>
+- **Lựa chọn:** A) … B) … (2–4 lựa chọn, mỗi cái kèm đánh đổi chính)
+- **Khuyến nghị:** A, vì … (lý do nối về mục tiêu hoặc ràng buộc cụ thể; chỉ để tham khảo, không áp dụng khi người dùng chưa trả lời)
+- **Hậu quả nếu chưa chốt:** … (cái gì bị chặn hoặc phải đoán)
+- **Mặc định nếu quá hạn:** … (không dùng mặc định cho điều `blocker`)
 
 ## 16. Rủi ro và quyết định cần ADR
 

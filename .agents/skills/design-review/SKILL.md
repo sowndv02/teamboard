@@ -58,7 +58,7 @@ description: Review một design doc (system design) để tìm điểm chưa r�
 - [ ] Có pre-mortem; rủi ro lớn có hướng giảm thiểu.
 
 ### F. Lỗi hình thức (FIX)
-Thiếu mục của `_template.md`, sơ đồ Mermaid lỗi cú pháp/thiếu chú thích, link chết, tên file sai quy ước, ADR dự kiến chưa liệt kê, thuật ngữ nâng cao xuất hiện lần đầu mà chưa giải thích (`.agents/rules/explain-terms.md`).
+Thiếu mục của `_template.md`, sơ đồ Mermaid lỗi cú pháp/thiếu chú thích, link chết, tên file sai quy ước, ADR dự kiến chưa liệt kê, thuật ngữ nâng cao xuất hiện lần đầu mà chưa giải thích (`.agents/rules/explain-terms.md`), câu hỏi mở thiếu lựa chọn/khuyến nghị kèm lý do/hậu quả nếu chưa chốt (agent bổ sung từ nguồn đã có; cần thông tin người dùng thì CONFIRM `missing`), câu hỏi đã được chốt ở D1…Dn hay Confirm log mà vẫn ghi `open`.
 
 ### G. Lăng kính Chất lượng / Bảo mật / Chi phí (`../workflow/references/review-philosophy.md` mục 4)
 - [ ] **Chất lượng:** chế độ lỗi, không điểm lỗi đơn, timeout/retry/circuit breaker, idempotency, nhất quán, quan sát, lộ trình mở rộng.
