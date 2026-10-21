@@ -46,4 +46,4 @@ Cập nhật bảng câu hỏi mở của spec và design `identity-auth`: đán
 Mọi spec và design (mục "Câu hỏi mở"), cũng đáng áp dụng cho plan và ADR có phần câu hỏi mở. Liên quan LL-004 (cùng họ: quy tắc có nhưng phạm vi hẹp hơn nơi nó cần áp dụng).
 
 ## Liên kết
-`document/spec/identity-auth.md` (mục 15), `document/design/identity-auth.md` (mục 14), `document/spec/_template.md`, `document/design/_template.md`, `.agents/skills/requirements-discovery/SKILL.md`, `.agents/skills/system-design/SKILL.md`, `.agents/skills/spec-review/SKILL.md`, `.agents/skills/design-review/SKILL.md`, `.agents/rules/agent-conduct.md`, LL-004.
+spec identity-auth (thuộc issue TB-004 đang tạm dừng, chưa có trong repo) (mục 15), design identity-auth (thuộc issue TB-004 đang tạm dừng, chưa có trong repo) (mục 14), `document/spec/_template.md`, `document/design/_template.md`, `.agents/skills/requirements-discovery/SKILL.md`, `.agents/skills/system-design/SKILL.md`, `.agents/skills/spec-review/SKILL.md`, `.agents/skills/design-review/SKILL.md`, `.agents/rules/agent-conduct.md`, LL-004.

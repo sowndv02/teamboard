@@ -28,7 +28,7 @@ Tiềm tàng: quyết định khó đảo ngược (DB, ranh giới, kiến trú
 **Nguyên nhân gốc:** quy trình không bắt buộc có lý do cho lựa chọn bị ràng buộc, không đặt người dùng làm người chọn mặc định cho nhóm quyết định khó đảo ngược, và không phân biệt uỷ quyền với xác nhận.
 
 ## Cách sửa tức thời
-Thêm D0 vào `document/design/identity-auth.md` (Confirm log #8–#11); mở lại D2 để người dùng xác nhận kết quả cụ thể.
+Thêm D0 vào design identity-auth (thuộc issue TB-004 đang tạm dừng, chưa có trong repo) (Confirm log #8–#11); mở lại D2 để người dùng xác nhận kết quả cụ thể.
 
 ## Biện pháp phòng ngừa
 
@@ -47,4 +47,4 @@ Khi design service mới kế tiếp (ví dụ `task-service`) chạy `design-re
 Mọi `system-design` và `design-review`, đặc biệt service mới hoặc khi chạm lưu trữ/ranh giới. Cũng áp dụng cho `spec-review`/`plan-review` ở khái niệm uỷ quyền (`review-loop.md` quy tắc 11).
 
 ## Liên kết
-`document/design/identity-auth.md` (D0, Confirm log #8–#11, #2); `.agents/skills/system-design/SKILL.md`; `.agents/skills/design-review/SKILL.md`; `.agents/skills/workflow/references/review-loop.md`; `document/design/_template.md`; ADR 0001, ADR 0006.
+design identity-auth (thuộc issue TB-004 đang tạm dừng, chưa có trong repo) (D0, Confirm log #8–#11, #2); `.agents/skills/system-design/SKILL.md`; `.agents/skills/design-review/SKILL.md`; `.agents/skills/workflow/references/review-loop.md`; `document/design/_template.md`; ADR 0001, ADR 0006.
