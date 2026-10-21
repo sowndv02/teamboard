@@ -22,3 +22,4 @@ Sổ ghi lại **lỗi/sự cố/sai sót đã xảy ra** và **cách ngăn nó 
 |---|---|---|---|---|---|
 | [LL-001](LL-001-secrets-committed-in-env-files.md) | Không commit file `.env` chứa mật khẩu; ignore và dùng `*.example` ngay từ đầu | `security` `git` | partial | `.gitignore`, `*.example`; chờ gate `gitleaks` và xoay mật khẩu | TB-002 |
 | [LL-002](LL-002-tool-license-assumed-before-checking.md) | Kiểm tra giấy phép/điều khoản của công cụ trước khi đưa vào thiết kế và tài liệu | `dependency` `docs` `process` | prevented | `dependency-policy.md`, `config/dependencies.yaml`, ADR 0007 | TB-002 |
+| [LL-003](LL-003-tool-default-trailer-overrode-project-preference.md) | Rule dự án im lặng về chi tiết ảnh hưởng lịch sử thì hỏi hoặc ghi rule; không mặc định theo công cụ | `git` `agent-behavior` `process` | prevented | `git-commit.md` cấm `Co-Authored-By`, `coAuthorTrailer: false` | TB-002 |

@@ -20,6 +20,7 @@ commit:
   format: '{type}({issueKey}): {summary}\n\n{body}'   # body bắt buộc (body-empty: never)
   headerMaxLength: 72
   bodyRequired: true
+  coAuthorTrailer: false        # không thêm Co-Authored-By hay dòng ghi công công cụ/AI
   types: [feat, fix, refactor, perf, test, docs, infra, build, ci, chore, revert]
   rules: .agents/rules/git-commit.md
 

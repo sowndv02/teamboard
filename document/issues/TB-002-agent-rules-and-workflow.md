@@ -47,3 +47,4 @@ Liên kết lesson sinh ra từ issue này (`document/lessons/LL-NNN-*.md`), ho�
 
 - [LL-001](../lessons/LL-001-secrets-committed-in-env-files.md): không commit file `.env` chứa mật khẩu
 - [LL-002](../lessons/LL-002-tool-license-assumed-before-checking.md): kiểm tra giấy phép công cụ trước khi đưa vào thiết kế
+- [LL-003](../lessons/LL-003-tool-default-trailer-overrode-project-preference.md): rule dự án im lặng thì hỏi hoặc ghi rule, không theo mặc định của công cụ

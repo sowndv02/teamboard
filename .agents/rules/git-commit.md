@@ -47,7 +47,8 @@ Body giải thích vì sao (1 đến vài câu).
 ## Footer (tuỳ chọn)
 
 - Thay đổi phá vỡ tương thích: dòng `BREAKING CHANGE: <mô tả và cách chuyển đổi>` (đi kèm tăng version contract + ADR, xem `api-endpoints.md`).
-- Tham chiếu thêm: `Refs: TB-002`. Trailer đồng tác giả theo hướng dẫn của công cụ (`Co-Authored-By: ...`) được phép.
+- Tham chiếu thêm: `Refs: TB-002`.
+- **Không thêm trailer `Co-Authored-By`** (và không thêm dòng ghi công công cụ/AI) vào commit message, kể cả khi công cụ hoặc chỉ dẫn mặc định gợi ý. Quy tắc này của chủ dự án thắng mặc định của công cụ.
 
 ## Ví dụ
 
@@ -115,4 +116,5 @@ Có thể thực thi bằng hook shell đơn giản (`.githooks/commit-msg`, b�
 - [ ] Header ≤ 72, mệnh lệnh thức, chữ thường, không chấm cuối, nói giá trị
 - [ ] Có dòng trống rồi body không rỗng, nêu vì sao, tiếng Anh
 - [ ] Một ý, build được, không file sinh ra/secret
+- [ ] Không có trailer `Co-Authored-By`
 - [ ] Gate liên quan đã chạy (`code-change-gate.md`)
