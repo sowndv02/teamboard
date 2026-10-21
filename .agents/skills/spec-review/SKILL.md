@@ -11,7 +11,9 @@ description: Review một spec để tìm điểm chưa rõ, mơ hồ, mâu thu�
 
 **Nguồn đối chiếu (đọc trước):** yêu cầu gốc trong spec, `references/gap-checklist.md` của `requirements-discovery`, các spec liên quan, `document/architecture/README.md` và ADR, `config/services.yaml`, `api-endpoints.md` / `architecture.md` nếu spec chạm API hay ranh giới service.
 
-## Checklist (vòng 1 chạy hết)
+**Theo làn** (`../workflow/references/lanes.md`): làn **lớn** review đủ checklist, tối đa 5 vòng. Làn **vừa**: spec ngắn trong issue là đủ (không bắt buộc đủ mẫu `_template.md`, mục F bỏ phần "đủ mục của mẫu"); chỉ kiểm A (mục tiêu, phạm vi trong/ngoài, luồng lỗi chính), B, D, D2 và phần bảo mật của G; tối đa 3 vòng. Làn nhỏ không có bước này.
+
+## Checklist (vòng 1 chạy hết, trừ khi làn vừa như trên)
 
 ### A. Đầy đủ (mỗi mục thiếu/không rõ → CONFIRM `missing`)
 - [ ] Đủ các mục của mẫu `document/spec/_template.md`; mục không áp dụng có lý do.
@@ -37,6 +39,12 @@ description: Review một spec để tìm điểm chưa rõ, mơ hồ, mâu thu�
 - [ ] Mỗi FR/BR/NFR có ID, ưu tiên và **tiêu chí chấp nhận kiểm chứng được** (có thể thành kịch bản Given/When/Then). Thiếu/không kiểm chứng được → CONFIRM `missing`.
 - [ ] Mỗi yêu cầu truy được về lời khách/người dùng hoặc được đánh dấu giả định; yêu cầu "tự nhiên có" mà không có nguồn → CONFIRM `assumption`.
 - [ ] "Yêu cầu gốc" còn nguyên văn.
+- [ ] **Truy vết yêu cầu → test:** mỗi FR/BR/NFR `Must`/`Should` có tiêu chí Given/When/Then (ít nhất một ca chính và một ca lỗi/biên) đủ để thành `.feature`/test sau này; tiêu chí không có ví dụ số liệu cụ thể → CONFIRM `missing`. Ghi vào báo cáo bảng "yêu cầu → tiêu chí" (không cần tạo file mới).
+- [ ] Yêu cầu / giả định / ràng buộc tách bạch; mỗi câu hỏi mở và giả định có owner, hạn, mặc định (thiếu → CONFIRM `missing`).
+
+### D2. Sẵn sàng để ước lượng (DoR, `../workflow/SKILL.md` mục DoR/DoD)
+- [ ] Đủ rõ để người làm **ước lượng được dạng khoảng**: phạm vi trong/ngoài, FR Must có tiêu chí, phụ thuộc/ tích hợp đã biết, không còn câu hỏi mở `blocker` chưa có owner/hạn.
+- [ ] Chưa đạt → CONFIRM `undecided`/`missing` nêu rõ cái gì cản trở estimate; không PASS chỉ để "có spec".
 
 ### E. Phạm vi và rủi ro
 - [ ] Không phình phạm vi so với yêu cầu gốc; phần "tiện thể thêm" → CONFIRM `scope`.
@@ -51,6 +59,9 @@ Thiếu mục bắt buộc của mẫu, ID trùng/nhảy, link chết, front mat
 - [ ] **Bảo mật:** vai trò/quyền, dữ liệu nhạy cảm/PII, yêu cầu audit và tuân thủ (`config/project.yaml` → `quality.compliance`), yêu cầu xác thực.
 - [ ] **Chi phí:** trần ngân sách (`quality.monthlyBudgetUsd`); yêu cầu có chi phí vận hành lớn (độ sẵn sàng cao, đa vùng, lưu trữ dài) có thật sự cần không.
 - Thiếu mục nào → CONFIRM `missing`; bảo mật mặc định `blocker`.
+
+## Ngoài đời thực
+Review spec trong dự án thật là buổi "backlog refinement"/three amigos (PO, dev, tester) trước khi đưa việc vào sprint: dev hỏi "làm sao biết xong?", tester hỏi "ca lỗi đâu?", cả nhóm kiểm "đủ để estimate chưa?". Skill này mô phỏng ba góc nhìn đó; câu nào agent không trả lời được từ spec thì là CONFIRM cho người dùng (đóng vai khách/PO).
 
 ## Cách hỏi người dùng
 Gom CONFIRM theo lô ≤ 4 câu. Mỗi câu: nêu bằng chứng ngắn (trích spec), câu hỏi cụ thể, 2–4 lựa chọn, khuyến nghị kèm lý do (chỉ tham khảo). Ưu tiên câu chặn thiết kế trước (mục tiêu, phạm vi, quy tắc cốt lõi, NFR), rồi mâu thuẫn, rồi chi tiết.

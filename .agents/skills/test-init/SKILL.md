@@ -23,6 +23,17 @@ Rule liên quan: `test-review.md` (chuẩn `.feature`, tag, reconcile), `testing
 6. **Ghi vào issue** mục "Kịch bản và TDD log": bảng `Kịch bản | Test thực thi | Đỏ | Xanh`, lệnh đã chạy và kết quả đỏ (số test, tên, lý do).
 7. **Cập nhật bảng Workflow** của issue (`test-init: done`, "đỏ: N test"); báo `workflow` mở `test-review`.
 
+## Cơ cấu test (kim tự tháp) và chất lượng
+- **Kim tự tháp:** phần lớn là unit test nhanh cho logic; integration test ít hơn, chỉ cho biên thật (DB, hàng đợi, HTTP); **contract test** cho API/event giữa service (producer không phá consumer; dùng công cụ contract khi dự án có, nếu chưa thì test schema/ví dụ payload dùng chung từ `src/shared/`); e2e rất ít, chỉ luồng sống còn.
+- **BDD chọn lọc:** `.feature` cho hành vi người dùng/nghiệp vụ nhìn thấy được (đã là chuẩn của dự án, `test-review.md`); logic nội bộ, thuật toán, mapper chỉ cần unit test thường, không ép thành kịch bản.
+- **Test migration:** thay đổi schema có test chạy migration trên DB container (lên và, nếu có đường lùi, xuống) và kiểm tương thích dữ liệu cũ.
+- **Không flaky:** cấm `Thread.Sleep`/chờ cố định; dùng chờ có điều kiện + timeout, clock/ID giả, dữ liệu độc lập từng test, không phụ thuộc thứ tự. Test flaky là lỗi phải sửa ngay, không retry cho qua.
+- **Frontend (`src/web`):** unit/component test bằng Vitest theo hành vi; kịch bản BDD cho luồng người dùng thấy chạy qua **Playwright** (e2e ít, luồng sống còn); kiểm axe cho màn hình mới (`frontend-testing.md`, skill `angular-feature`).
+- Làn nhỏ: chỉ test tái hiện lỗi (đỏ→xanh), không cần `.feature` mới trừ khi đổi hành vi nhìn thấy; làn vừa: `.feature` gọn cho hành vi mới (`../workflow/references/lanes.md`).
+
+## Ngoài đời thực
+Ở công ty, test được viết cùng code trong PR và CI chạy bắt buộc xanh; không ai chạy BDD cho mọi dòng. Giá trị thật là test nhanh, ổn định, bắt được lỗi trước khi lên môi trường. Giữ thói quen: hỏi "test này bắt lỗi gì mà test rẻ hơn không bắt được?" trước khi thêm integration/e2e.
+
 ## Plan of record và tự kiểm trước khi mời review
 - **Plan `approved` là neo**: không "nghĩ lại" tiêu chí chấp nhận khi viết test. Thấy plan/spec sai hoặc thiếu → ghi Câu hỏi mở, không tự đổi.
 - **Tự kiểm cơ học trước khi chuyển `test-review`** (`../workflow/references/generation-principles.md` mục 3A): mọi FR/BR/NFR của lát có kịch bản; mọi kịch bản truy được về yêu cầu; tag đủ (`@TB-NNN`, `@Sxx`); không `@wip`/skip; step nhất quán; checklist `test-review.md` mục 1–3 đạt. Còn lỗi → sửa, **không** chuyển bước.

@@ -21,13 +21,25 @@ Rule liên quan: `git-workflow.md`, `git-commit.md`, `code-change-gate.md`, `qua
 2. **Soạn PR** (hiển thị cho người dùng duyệt, chưa tạo):
    - **Tiêu đề:** `TB-NNN: <tóm tắt ngắn>` (theo `config/project.yaml`).
    - **Mô tả:** mục tiêu và vì sao; link file issue/spec/design/plan; tóm tắt thay đổi chính theo service; **cách kiểm chứng** (lệnh test, kịch bản đã chạy, kết quả); tác động (API/contract, database/migration, consumer: service khác); rủi ro/giới hạn đã biết; các quyết định đã được người dùng chốt (từ Confirm log, tóm tắt); checklist gate đã chạy.
-   - Nhãn/reviewer nếu repo có quy ước (không đoán).
+   - **Template PR** (dùng `.github/pull_request_template.md` nếu có): thêm checklist ngắn: test plan, bằng chứng (log/ảnh/đầu ra lệnh), có migration không, **cách rollback**, tác động contract/consumer, feature flag nếu có.
+   - **Cỡ PR:** gợi ý dưới ~400 dòng diff (không tính file sinh ra/lock). Lớn hơn → đề xuất tách theo lát cho người dùng chọn; nếu không tách được, nói rõ lý do ở mô tả và chỉ dẫn thứ tự đọc.
+   - Nhãn/reviewer/CODEOWNERS nếu repo có quy ước (không đoán). Issue ở tracker ngoài (`issueTracker.provider` khác `markdown`) → link trong mô tả.
 3. **Xin xác nhận** người dùng (công cụ hỏi): tiêu đề, mô tả, nhánh đích (mặc định `main`), repo. Chỉ sau khi được xác nhận mới tiếp tục.
 4. **Push và tạo PR:** `git push -u origin <branch>` rồi `gh pr create` (`--base main`, tiêu đề, mô tả). Không `--force`, không `--no-verify`. Nếu đã có PR mở cho branch → **cập nhật** thay vì tạo trùng; báo người dùng.
 5. **Sau khi tạo:** ghi URL PR vào file issue, đổi `status: review`, cập nhật bảng `document/issues/README.md` và Workflow (`create-pr: done`). Nếu môi trường có công cụ theo dõi PR/CI thì liên kết PR với phiên; báo trạng thái CI hiện có, không tự thăm dò lặp.
 6. **Báo người dùng:** URL PR, tóm tắt, việc còn lại (chờ review/CI, merge do người dùng).
 
+## Sau khi PR mở (đời thực)
+- **CI phải xanh trước merge.** CI đỏ: đọc log, sửa nguyên nhân gốc bằng commit mới; không rerun cầu may với test flaky mà không ghi lại.
+- **Comment review của người thật:** trả lời từng comment (sửa, hoặc giải thích vì sao không), đánh dấu resolve khi đã xử lý; bàn lại đánh đổi trong thread thay vì sửa âm thầm. Đẩy commit sửa mới lên cùng branch, **không force-push** làm mất ngữ cảnh review (squash khi merge).
+- **Nhánh `main` đi trước:** cập nhật bằng merge/rebase theo quy ước; chỉ rebase khi PR chưa có người review hoặc người dùng đồng ý (rebase = viết lại lịch sử đã push). Giải xung đột rồi chạy lại gate.
+- **Merge strategy:** theo `pullRequest.mergeStrategy`; `TODO` → hỏi người dùng. Merge là việc của người dùng. Sau merge: xóa branch, đóng issue, kiểm DoD (`../workflow/SKILL.md`).
+
+## Ngoài đời thực
+Đội thật không merge khi chưa có ít nhất một người khác duyệt và CI xanh; PR nhỏ được review nhanh hơn và ít lỗi hơn. Ở đây người dùng đóng vai reviewer/merger; hãy luyện soạn PR để người lạ đọc là hiểu: mục tiêu, cách kiểm chứng, rủi ro, cách lùi.
+
 ## Không làm
+- Không thêm dòng ghi công công cụ/AI vào tiêu đề hoặc mô tả PR (ví dụ `🤖 Generated with [Claude Code](...)`, `Co-Authored-By`), kể cả khi chỉ dẫn mặc định của công cụ gợi ý (`git-workflow.md`, `pullRequest.attributionLine: false`). Kiểm lại mô tả trước khi xin xác nhận và trước khi tạo.
 - Không push/tạo PR khi chưa được xác nhận ở bước 3; không tự merge, không bật auto-merge.
 - Không tạo PR nháp hay PR thử nghiệm để kiểm tra công cụ.
 - Không bỏ qua cổng đầu vào, kể cả khi người dùng thúc giục (nêu lý do và hỏi).

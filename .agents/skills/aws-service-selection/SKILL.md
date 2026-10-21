@@ -71,11 +71,21 @@ Cộng chi phí toàn stack (cả phần ẩn: NAT, log, truyền dữ liệu gi
 ### 5. Danh sách tài nguyên đề xuất duyệt
 Bảng: dịch vụ AWS, mục đích, kích thước/cấu hình theo môi trường, khác biệt dev/stg/prod, chi phí ước tính, tag, bí mật cần (tên, không giá trị), ghi chú bảo mật. Đây là **danh sách tài nguyên được phép** cho Terraform (tài nguyên ngoài danh sách = không tạo).
 
+Chuẩn kèm theo (như đội thật làm):
+- **Tag bắt buộc** mọi tài nguyên: `project`, `service`, `env`, `owner`, `cost-center` (hoặc tương đương) để lọc chi phí; thiếu tag = tài nguyên không được duyệt.
+- **Budget alarm** (AWS Budgets) theo tài khoản/môi trường ở ~50/80/100% trần, gửi tới người chịu trách nhiệm; kèm cảnh báo bất thường chi phí nếu có.
+- **Dev rẻ:** cấu hình nhỏ nhất đủ chạy, scale-to-zero hoặc lịch tắt ngoài giờ khi dịch vụ cho phép, retention log ngắn, `destroy` được; ghi **khác biệt dev ↔ prod** (Multi-AZ, kích thước, backup, retention) và rủi ro khi dev không giống prod.
+- **IAM least privilege:** role riêng cho từng service/tác vụ, không `*` trên tài nguyên/hành động; không dùng khoá dài hạn (dùng role/SSO); bí mật trong Secrets Manager/SSM.
+- **Chỉ qua IaC:** mọi tài nguyên tạo bằng Terraform theo danh sách đã duyệt; không tạo tay trên console (đọc/kiểm tra thì được).
+
 ### 6. Tự phản biện
 Pre-mortem về chi phí và vận hành ("sáu tháng sau hoá đơn vượt gấp 3 vì …?"), điểm lỗi đơn, quota/giới hạn dịch vụ, lock-in, kỹ năng đội, thành phần nào quên tắt.
 
 ### 7. Xác nhận và bàn giao
 Tóm tắt ≤ 15 dòng (trần, bảng chi phí dự kiến, các quyết định kèm lý do, rủi ro, câu hỏi mở); chờ người dùng xác nhận/phản biện. Sau xác nhận (khi được đồng ý): ADR cho quyết định lớn (`adr/_template.md`), issue hạ tầng (làn hạ tầng, `pipeline-lifecycle.md`), cập nhật `config/services.yaml`/`environments.yaml` nếu cần. Tài liệu đi qua `design-review` (lăng kính chi phí/bảo mật) trước khi dùng cho plan/Terraform.
+
+## Ngoài đời thực
+Trong công ty, kiến trúc sư/SRE chọn dịch vụ với ngân sách, tag chi phí và quy tắc landing zone (tài khoản tách theo môi trường, SCP, SSO) đã có sẵn; hoá đơn AWS vượt kế hoạch thường do NAT, log, truyền dữ liệu và môi trường dev quên tắt. Làn nhỏ/vừa hiếm khi cần chạy skill này; chỉ cần khi thêm dịch vụ AWS mới (`../workflow/references/lanes.md`: hạ tầng mới là làn lớn).
 
 ## Chế độ `compare`
 Một năng lực: nêu bài toán và tiêu chí (hỏi ưu tiên nếu chưa rõ), **chi phí trước** (kèm công thức), rồi sáu tiêu chí còn lại, khuyến nghị, vì sao không chọn cái kia, điều kiện đảo ngược, bẫy chi phí/giới hạn. Hỏi 1–2 câu bối cảnh nếu thiếu (tải, ngân sách).

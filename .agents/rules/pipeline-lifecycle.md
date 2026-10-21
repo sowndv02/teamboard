@@ -54,6 +54,10 @@ Không phải việc nào cũng cần đủ 12 bước. Việc thuộc nhóm sau
 
 **Không** vào làn nhẹ nếu: đổi hành vi hay contract (API, event), đổi kiến trúc/ranh giới service, đụng bảo mật, migration, hạ tầng, hoặc người dùng yêu cầu đủ quy trình. Không chắc → dùng làn đầy đủ.
 
+## Làn vừa và hotfix
+
+Giữa làn nhẹ và đủ 12 bước còn **làn vừa** (một tính năng trong một service, không đổi kiến trúc: spec ngắn trong issue → plan → test → code → review → PR; `system-design` chỉ khi chạm contract) và **hotfix** (sự cố production: sửa tối thiểu, test tái hiện, post-mortem sau). Cách chọn làn, giới hạn vòng review, ai cần state file: `.agents/skills/workflow/references/lanes.md`. Việc phình ra giữa chừng → nâng làn.
+
 ## Làn hạ tầng (Terraform / AWS)
 
 Thay giai đoạn 4–6 bằng: viết/sửa Terraform → `fmt`, `validate`, `plan` → trình bày kết quả `plan` (tài nguyên thay đổi, chi phí) cho người dùng. **`apply`/`destroy` chỉ khi người dùng đồng ý tại thời điểm đó** (`terraform.md`). Sau apply: kiểm chứng (health, truy cập) và ghi vào issue. Gate/review/PR giữ nguyên.

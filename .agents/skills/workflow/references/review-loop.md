@@ -42,7 +42,7 @@ review (vòng N)
 
 Quy tắc:
 
-1. **Vòng 1 phải đầy đủ**: chạy hết checklist của bước. Không để dành finding cho vòng sau (trừ khi nó phát sinh từ chính các thay đổi vừa sửa).
+1. **Vòng 1 phải đầy đủ** (làn vừa/lớn): chạy hết checklist của bước. Làn nhỏ: chạy phần checklist liên quan tới diff, một vòng. Không để dành finding cho vòng sau (trừ khi nó phát sinh từ chính các thay đổi vừa sửa).
 2. **Chỉ sang bước tiếp theo khi PASS.** Không được bắt đầu bước sau khi còn CONFIRM mở, kể cả khi "có vẻ nhỏ".
 3. **Hỏi người dùng theo lô**: gom tất cả CONFIRM của vòng, dùng công cụ hỏi có lựa chọn (`AskUserQuestion`), **tối đa 4 câu mỗi lô**, ưu tiên theo mức chặn. Nhiều hơn 4 thì chia lô, hỏi các câu chặn nhất trước, rồi lô kế.
 4. **Ghi quyết định** vào mục **Confirm log** của artifact ngay khi nhận (xem mục 5), rồi mới sửa. Sửa artifact đúng theo quyết định; không thêm điều người dùng không nói.
@@ -50,7 +50,7 @@ Quy tắc:
 6. **Không hỏi lại điều đã chốt.** Nếu nội dung mới mâu thuẫn quyết định cũ trong Confirm log → tạo CONFIRM mới nêu rõ mâu thuẫn và trích quyết định cũ.
 7. **Dedup**: cùng fingerprint không nâng mức giữa các vòng; một concern một finding.
 8. **Người dùng có thể trả lời "hoãn/để sau"** hoặc "chấp nhận rủi ro": ghi vào Confirm log là `Hoãn` (kèm người chịu trách nhiệm, rủi ro còn lại). Chỉ chấp nhận cho điểm **không** phải `blocker` kỹ thuật bất khả thi; điểm `blocker` mà người dùng hoãn → bước tiếp theo vẫn cần biết giả định dùng; ghi rõ giả định đó là của người dùng chọn.
-9. **Giới hạn vòng**: nếu sau 5 vòng vẫn còn phát sinh CONFIRM mới liên tục, **dừng**, báo mô thức (ví dụ yêu cầu đổi liên tục, spec chưa ổn định) và hỏi người dùng nên quay lại bước trước hay tiếp tục.
+9. **Giới hạn vòng theo làn** (`lanes.md`): nhỏ 1 vòng, vừa 3, lớn 5. Nếu sau số vòng đó vẫn còn phát sinh CONFIRM mới liên tục, **dừng**, báo mô thức (ví dụ yêu cầu đổi liên tục, spec chưa ổn định) và hỏi người dùng nên quay lại bước trước hay tiếp tục.
 10. **Không bịa lý do** để PASS: PASS chỉ khi mọi mục checklist áp dụng đã kiểm chứng.
 
 ## 4. Verdict

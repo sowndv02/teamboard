@@ -4,6 +4,8 @@ Lý do tồn tại: các service dùng kiến trúc nội bộ khác nhau, nhưn
 
 Kết hợp với: `architecture.md` (ranh giới service), `dotnet.md`, `testing.md`, `code-review.md` (probe B2).
 
+Client Angular (ADR 0009) tiêu thụ đúng hợp đồng này: kiểu TypeScript **sinh từ OpenAPI** (không viết tay), lỗi `problem+json` map qua `code` ổn định; xem `frontend-engineering.md`.
+
 ## 1. URL & versioning
 
 - Dạng: `/api/v{major}/{resource}[/{id}[/{subresource}...]]`, ví dụ `/api/v1/boards/{boardId}/tasks`.

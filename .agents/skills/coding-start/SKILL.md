@@ -20,6 +20,7 @@ Rule liên quan: `task-workflow.md`, `testing.md`, `quality-gate.md`, `code-chan
 3. **Xanh**: viết **code tối thiểu** để test pass; theo kiến trúc bắt buộc của service và rule kỹ thuật (lỗi qua registry, cấu hình qua Options, route theo `api-endpoints.md`, outbox/idempotent consumer...).
 4. **Refactor**: dọn code giữ xanh, không đổi hành vi, không thêm tính năng.
 5. **Gate nhanh** của bước: build, lint/format, test liên quan (targeted, `quality-gate.md`).
+5b. **Frontend (`src/web`):** gate nhanh gồm `lint` (`--max-warnings=0`), `format:check`, `typecheck`, test liên quan, dùng `npm ci` (không `npm install`); trước khi báo xong chạy thêm `build` (budgets), policy test, `openapi:check`, `npm audit --omit=dev --audit-level=high` và xem trên trình duyệt. Quy trình chi tiết: skill `angular-feature`.
 6. **Ghi nhật ký** vào issue (Kịch bản và TDD log: cột Xanh; Ghi chú nếu có điều đáng nhớ).
 7. Lặp đến hết plan.
 
@@ -27,6 +28,14 @@ Sau bước cuối:
 - Chạy **toàn bộ test** của mọi project đã đụng và **gate đầy đủ** theo `code-change-gate.md` + `quality-gate.md` (secret, phụ thuộc có lỗ hổng, format...).
 - Đối chiếu bảng kịch bản ↔ test (`test-review.md` mục 6): mọi kịch bản xanh.
 - **Tất cả test phải pass** thì mới đánh dấu xong (`coding-start: done, xanh N/N`). Còn test fail → tiếp tục sửa; không bàn giao review.
+
+## "Xong" theo chuẩn sản xuất (áp dụng cho mỗi bước)
+- **Quan sát là một phần của tính năng:** log có cấu trúc kèm `correlationId`, span/trace và metric cho luồng mới, theo `observability.md`; không log dữ liệu nhạy cảm.
+- **Lỗi:** không nuốt exception, không `catch` rồi bỏ qua; lỗi trả theo registry; call ngoài có timeout/retry hợp lý.
+- **Việc dở dang:** hành vi chưa sẵn sàng cho người dùng đặt sau feature flag/cấu hình tắt mặc định để merge sớm, thay vì giữ nhánh sống lâu.
+- **Thay đổi schema/contract:** theo expand/contract và thứ tự deploy trong plan; không đổi nghĩa trường đang có.
+- **Gate:** build, format, test, quét secret, phụ thuộc có lỗ hổng như `quality-gate.md`; công cụ phân tích tĩnh/SAST nâng cao chỉ chạy khi dự án đã có.
+- Làn nhỏ: chu kỳ đỏ→xanh→gate một vòng, không cần ghi TDD log chi tiết (`../workflow/references/lanes.md`).
 
 ## Plan of record và hợp đồng phạm vi (`../workflow/references/generation-principles.md` mục 4)
 - Plan `approved` và `.feature` `ready` là **neo**: không "nghĩ lại" tiêu chí chấp nhận; sinh code = điền hành vi để test xanh, **không** thêm tính năng ngoài plan/`.feature`.
@@ -48,6 +57,9 @@ Trước khi code, tra `document/lessons/README.md` theo tag của vùng đang l
 ## Commit
 - Chỉ commit khi người dùng cho phép; nếu chưa được hỏi trong phiên này thì **hỏi một lần** ("cho phép tôi commit cục bộ trên branch này theo từng lát?"). Được phép → commit nhỏ theo `git-commit.md` (tiếng Anh, `type(TB-NNN): summary` + body), mỗi commit build được và test xanh. **Không push.**
 - Không commit file sinh ra, secret, `local/`.
+
+## Ngoài đời thực
+Đội thật commit nhỏ, thường xuyên (mỗi commit build được), mở PR sớm, và CI xanh là điều kiện merge; không ai ôm một nhánh vài tuần. Một lát "xong" nghĩa là chạy được, quan sát được và tắt/bật được, không chỉ test xanh trên máy. Ở đây agent chỉ commit khi người dùng cho phép, nhưng vẫn giữ nhịp lát nhỏ để người dùng review dễ.
 
 ## Không làm
 - Không viết code cho hành vi chưa có test đỏ; không thêm tính năng ngoài plan.

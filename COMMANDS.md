@@ -9,6 +9,7 @@ Lệnh đánh dấu 🚧 chưa dùng được (thư mục/file chưa tạo); c�
 git status --short && git branch --show-current   # biết đang ở đâu, có thay đổi dở không
 git log --oneline -5
 dotnet --version                                  # cần .NET 10
+node --version && npm --version                   # 🚧 cần khi làm src/web (Angular, ADR 0009); phiên bản theo config/tool-versions.yaml
 docker --version && docker compose version
 terraform version                                 # 🚧 chỉ cần từ giai đoạn 4
 ```
@@ -24,6 +25,17 @@ Quy tắc đầy đủ: `.agents/rules/code-change-gate.md`. Chạy gate của t
 dotnet build src/teamboard.slnx -warnaserror
 dotnet test src/teamboard.slnx                    # 🚧 chưa có project test
 dotnet format src/teamboard.slnx --verify-no-changes
+
+# Angular (src/web), 🚧 chưa scaffold; dùng `npm ci` (không `npm install`) trong gate
+npm --prefix src/web ci
+npm --prefix src/web run lint -- --max-warnings=0
+npm --prefix src/web run format:check
+npm --prefix src/web run typecheck
+npm --prefix src/web test -- --watch=false         # gồm policy test, axe
+npm --prefix src/web run build                    # production, budgets
+npm --prefix src/web run openapi:check            # kiểu sinh từ OpenAPI khớp backend
+npm --prefix src/web run e2e                      # Playwright smoke, trước PR
+npm --prefix src/web audit --omit=dev --audit-level=high
 
 # Secret + phụ thuộc có lỗ hổng (quy tắc: .agents/rules/quality-gate.md)
 gitleaks protect --staged --redact                # 🚧 chưa cài

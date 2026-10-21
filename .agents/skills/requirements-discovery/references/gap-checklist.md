@@ -15,11 +15,15 @@ Dùng ở bước 3 của skill. Với mỗi dòng đánh dấu **Biết / Giả
 | 9 | **Phân quyền & bảo mật** | Ai xem/sửa/xoá? Dữ liệu nhạy cảm/PII? Cần ghi vết (audit)? | Lộ dữ liệu, vi phạm quy định |
 | 10 | **Tích hợp & sự kiện** | Hệ thống/dịch vụ nào liên quan? Cần thông báo (email, webhook)? Ai phát/nhận sự kiện? | Thiếu liên kết, sai ranh giới service |
 | 11 | **Phi chức năng** | Số người dùng, số bản ghi, độ trễ chấp nhận, sẵn sàng, khôi phục sự cố? | Không đạt hiệu năng/độ tin cậy |
-| 12 | **Giao diện & trải nghiệm** | Chưa áp dụng ở giai đoạn này (không có frontend, ADR 0008); nếu yêu cầu có phần giao diện, ghi vào Ngoài phạm vi hoặc Câu hỏi mở | Làm lại khi có frontend |
+| 12 | **Giao diện & trải nghiệm** | Có màn hình nào (Angular, ADR 0009)? Trạng thái tải/lỗi/rỗng, a11y (WCAG 2.2 AA), đa ngôn ngữ (i18n), thiết bị/trình duyệt hỗ trợ, nội dung thông báo lỗi? Nếu chưa có ADR cho FE, ghi vào Ngoài phạm vi hoặc Câu hỏi mở | Làm lại UI, thiếu a11y/i18n phải vá sau |
 | 13 | **Vận hành & quan sát** | Cần báo cáo, số liệu, cảnh báo? Ai hỗ trợ khi lỗi? | Không theo dõi được |
 | 14 | **Di chuyển & tương thích** | Dữ liệu cũ cần chuyển? Có hệ thống cũ chạy song song? | Mất dữ liệu, gián đoạn |
 | 15 | **Ràng buộc** | Hạn chót, ngân sách, quy định, công nghệ bắt buộc, môi trường triển khai? | Phương án không khả thi |
 | 16 | **Tiêu chí chấp nhận** | Với mỗi chức năng: tình huống mẫu nào chứng minh "đạt"? Ví dụ số liệu cụ thể? | Không kiểm chứng/nghiệm thu được |
+
+## Phân loại mỗi thông tin tìm được
+
+Ghi mỗi mục vào đúng một nhóm: **yêu cầu** (có nguồn từ khách), **giả định** (chưa xác nhận: cần owner + hạn + mặc định), **ràng buộc** (không thương lượng: hạn, ngân sách, quy định, công nghệ bắt buộc), hoặc **ngoài phạm vi** (khách có thể mong nhưng lần này không làm). Câu hỏi mở nào chặn estimate/thiết kế thì đặt hạn sớm nhất.
 
 ## Dấu hiệu yêu cầu còn mơ hồ
 

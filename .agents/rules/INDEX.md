@@ -16,7 +16,7 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | Hành vi agent (trung thực, giao tiếp, không workaround) | Luôn | `agent-conduct.md` |
 | **Code change gate** | Trước khi báo xong, commit hoặc mở PR cho mọi thay đổi code/config/docs | `code-change-gate.md` |
 | Code review | Người dùng yêu cầu review diff/PR/branch, hoặc trước khi merge | `code-review.md` |
-| Quality gate local (analyzer, lint, secret, severity, phạm vi test) | Đổi code .NET/infra; chọn test targeted hay full; đổi cấu hình analyzer/lint | `quality-gate.md` |
+| Quality gate local (analyzer, lint, secret, severity, phạm vi test) | Đổi code .NET/Angular/infra; chọn test targeted hay full; đổi cấu hình analyzer/lint | `quality-gate.md` |
 | Pipeline lifecycle (thứ tự giai đoạn, cổng chuyển, làn nhẹ/hạ tầng) | Nhận một issue từ đầu đến cuối; không chắc đang ở giai đoạn nào hoặc có được bỏ bước không | `pipeline-lifecycle.md` |
 | Bài học kinh nghiệm (ghi khi lỗi/sai sót, tra theo tag trước khi làm, phòng ngừa phải mã hoá) | Đầu task trong một vùng (tra tag); sau lỗi/sự cố/người dùng sửa agent; khi đóng issue/PR | `lessons-learned.md` + `document/lessons/` |
 | Quy trình làm task | Mọi task (vibe code, sửa nhỏ, tính năng) | `task-workflow.md` |
@@ -24,6 +24,10 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | API endpoint | Thêm/sửa/xoá endpoint HTTP (mọi service), đổi request/response/lỗi/phân trang, sửa OpenAPI | `api-endpoints.md` |
 | Backend engineering (mã lỗi, config/Options, hằng số, `Program.cs`, worker, data access, gọi ngoài) | Sửa code backend `src/**` (mọi service, `src/shared`) | `backend-engineering.md` |
 | C#/.NET | Viết hoặc sửa code C# | `dotnet.md` |
+| Angular (cấu trúc, TypeScript, template, router, form, a11y, hiệu năng) | Viết hoặc sửa code `src/web/**` (ADR 0009) | `angular.md` |
+| Angular reactivity (Signals, effect, RxJS, change detection) | Component/service dùng `signal`, `computed`, `effect`, `resource`, RxJS trong `src/web/**` | `angular-reactivity.md` |
+| Frontend engineering (hardcode, i18n, lỗi `AppError`, config runtime, RBAC, bảo mật client, OpenAPI, quan sát FE) | Sửa `src/web/**` | `frontend-engineering.md` |
+| Frontend testing (pyramid FE, component/e2e/a11y, mock HTTP) | Viết/sửa test FE; trước khi báo xong thay đổi `src/web/**` | `frontend-testing.md` |
 | Messaging | Event, SNS/SQS, outbox, consumer, saga | `messaging.md` |
 | Observability & debug | Log, trace, metric, health check, debug sự cố | `observability.md` |
 | Test review (TDD/BDD, `.feature`) | Viết/review file `.feature`, trước khi bắt đầu code production (đỏ → xanh), review test thực thi, đối chiếu kịch bản ↔ test | `test-review.md` |
@@ -57,6 +61,9 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | `lesson-learned` | Ghi bài học sau lỗi/sự cố (nguyên nhân gốc, phòng ngừa mã hoá), tra bài học theo tag, rà định kỳ | `.agents/skills/lesson-learned/SKILL.md` |
 | `aws-service-selection` | Quyết định dịch vụ AWS cho một service (chi phí đi đầu, 7 tiêu chí); so sánh hai dịch vụ AWS; ước tính chi phí; review stack AWS trước khi viết Terraform | `.agents/skills/aws-service-selection/SKILL.md` |
 | `system-design` | Có spec đã rõ cần thiết kế hệ thống có giải thích đánh đổi; so sánh phương án; review thiết kế; giải thích pattern; phân tích khi tải tăng | `.agents/skills/system-design/SKILL.md` |
+| `angular-feature` | Dựng một feature/màn hình Angular từ plan đã duyệt đến khi gate FE xanh (trong `coding-start`) | `.agents/skills/angular-feature/SKILL.md` |
+| `frontend-review` | Review diff Angular (signals/RxJS, bảo mật client, a11y, i18n, bundle, contract) | `.agents/skills/frontend-review/SKILL.md` |
+| `angular-learning` | Học Angular thực tế theo lộ trình A1–A7 gắn identity-auth; bài tập, review bài làm, tiến độ | `.agents/skills/angular-learning/SKILL.md` |
 
 Claude Code đọc skill từ `.claude/skills/<tên>/SKILL.md` (file trỏ về canonical). Thêm skill mới: viết ở `.agents/skills/` rồi tạo file trỏ ở `.claude/skills/`.
 

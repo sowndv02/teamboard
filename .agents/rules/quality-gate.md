@@ -12,8 +12,17 @@ Công cụ đánh dấu 🚧 là cấu hình đề xuất, chưa có trong repo;
 | .NET phân tích tĩnh | Roslyn analyzers (`AnalysisMode`) + `SonarAnalyzer.CSharp` 🚧, `dotnet build -warnaserror` | Agent, CI local, pre-push |
 | .NET định dạng | `dotnet format --verify-no-changes` | Agent, pre-commit |
 | Kiểu | Build .NET (nullable, analyzer) | Agent, CI |
+| Angular/TS phân tích tĩnh 🚧 | ESLint flat config: `angular-eslint`, `typescript-eslint` strict + stylistic, `eslint-plugin-sonarjs`, `eslint-plugin-rxjs-x`, `eslint-plugin-boundaries` (ranh giới feature), a11y của template, `--max-warnings=0` | Agent, CI local, pre-push |
+| Angular/TS định dạng 🚧 | Prettier `--check` | Agent, pre-commit |
+| Angular/TS kiểu 🚧 | `tsc --noEmit` (strict, `noUncheckedIndexedAccess`) + `ng build` (strictTemplates) | Agent, CI |
+| Angular chính sách 🚧 | Policy test: `no-hardcode-policy`, `error-code-policy`, `i18n-keys-complete`, `no-mock-in-prod-bundle` | Agent, CI |
+| Angular bundle 🚧 | `budgets` trong `angular.json` (initial, anyComponentStyle); vượt = lỗi | Agent, CI |
+| Angular a11y 🚧 | axe trong component/e2e test; 0 vi phạm serious/critical | Agent, CI |
+| Angular e2e 🚧 | Playwright smoke (đăng nhập, luồng chính) | Full gate, trước PR |
+| Angular hợp đồng API 🚧 | Sinh lại kiểu từ OpenAPI + `git diff --exit-code` (`openapi:check`) | Khi đổi API hoặc `src/web` |
+| Angular hiệu năng 🚧 | Lighthouse CI (LCP/CLS/TBT budget) trên build production | Khi có môi trường chạy |
 | Secret | `gitleaks` (staged + toàn repo) 🚧 | Agent, pre-commit, trước PR |
-| Phụ thuộc có lỗ hổng | `dotnet list package --vulnerable --include-transitive` | Trước PR, khi đổi dependency |
+| Phụ thuộc có lỗ hổng | `dotnet list package --vulnerable --include-transitive`; `npm audit --omit=dev --audit-level=high` 🚧 và kiểm giấy phép npm (license-checker/CycloneDX) 🚧 | Trước PR, khi đổi dependency |
 | Infra | `terraform fmt -check`, `validate`, `tflint` 🚧, `trivy config` 🚧 | Khi đổi `infra/**` |
 | Compose/Docker | `docker compose config -q`, `hadolint` 🚧 | Khi đổi Dockerfile/compose |
 | Gate đầy đủ | Tất cả lớp liên quan + full test | Trước merge |
@@ -27,6 +36,15 @@ Công cụ đánh dấu 🚧 là cấu hình đề xuất, chưa có trong repo;
 dotnet build src/teamboard.slnx -warnaserror
 dotnet format src/teamboard.slnx --verify-no-changes
 
+
+# Angular (src/web)  🚧 chưa scaffold; tên script chốt khi tạo project (hợp đồng tên: xem COMMANDS.md §2)
+npm --prefix src/web ci
+npm --prefix src/web run lint -- --max-warnings=0
+npm --prefix src/web run format:check
+npm --prefix src/web run typecheck
+npm --prefix src/web run build                    # production, có budgets
+npm --prefix src/web run openapi:check            # kiểu sinh từ OpenAPI khớp backend
+npm --prefix src/web audit --omit=dev --audit-level=high
 
 # Secret + phụ thuộc
 gitleaks protect --staged --redact                # 🚧 trước commit
@@ -45,6 +63,7 @@ trivy config infra/
 
 Vì gate chạy với `-warnaserror` và `--max-warnings=0`, mọi rule trong cấu hình phải là **`error`** hoặc **`none`/`off`**. Không dùng `warning`/`warn`: warning cũng làm fail gate và thành BLOCKER ngay.
 
+- Angular/TS: trong `eslint.config.*` chỉ `"error"` hoặc `"off"`; không `warn`.
 - .NET: đặt trong `.editorconfig` (`dotnet_diagnostic.<ID>.severity = error | none`), `Directory.Build.props` bật `TreatWarningsAsErrors`. Rule nào chưa muốn thi hành thì `none` kèm lý do trong bảng bên dưới, không để `warning`.
 
 | Mức | Ý nghĩa |
@@ -57,6 +76,7 @@ Vì gate chạy với `-warnaserror` và `--max-warnings=0`, mọi rule trong c�
 
 - Độ phức tạp nhận thức (cognitive complexity) mỗi hàm ≤ **15** (.NET: `S3776` mặc định; TS: `sonarjs/cognitive-complexity` = 15). Vượt thì tách hàm, không nới ngưỡng.
 - Không `#pragma warning disable`, `[SuppressMessage]`, `dynamic`/`!` (null-forgiving) lạm dụng mới. Nếu thật sự cần: ghi issue + comment lý do, phạm vi hẹp nhất có thể.
+- Angular/TS: không `eslint-disable`, `@ts-ignore`, `@ts-nocheck`, `any` mới ở code production (xem `angular-reactivity.md` mục 5); test được nới có điều kiện, kèm issue key và lý do.
 - Phụ thuộc có lỗ hổng mức High/Critical: BLOCKER, nâng bản vá hoặc ghi lý do chấp nhận trong issue.
 - Coverage: không đặt ngưỡng cứng toàn dự án (dự án học tập); logic quan trọng (idempotency, outbox, auth, domain) phải có test, và PR không được **giảm** coverage vùng đã có.
 
@@ -78,9 +98,10 @@ Chọn test liên quan (gộp, bỏ trùng):
 
 ```bash
 dotnet test src/<Service>.Tests --filter "FullyQualifiedName~<Namespace.Class>"
+npm --prefix src/web test -- --watch=false --include="<đường-dẫn-spec>"   # 🚧 web
 ```
 
-**Cấm khi đang code:** chạy `dotnet test` toàn solution, trừ khi có trigger "full" bên dưới.
+**Cấm khi đang code:** chạy `dotnet test` toàn solution hay toàn bộ test web, trừ khi có trigger "full" bên dưới.
 
 ### Full test (mốc)
 
@@ -91,11 +112,11 @@ dotnet test src/<Service>.Tests --filter "FullyQualifiedName~<Namespace.Class>"
 | Mở PR / tick checklist PR | Full test mỗi project đã đổi + gate đầy đủ |
 | Trước merge | Toàn bộ gate + toàn bộ test |
 
-**Trigger bắt buộc chạy full ngay** (kể cả khi đang code): người dùng yêu cầu rõ; đổi cấu hình dùng chung (`.editorconfig`, `Directory.Build.props`, test harness chung); diff chạm từ 2 vùng trở lên; refactor xuyên service (ghi lý do vào báo cáo).
+**Trigger bắt buộc chạy full ngay** (kể cả khi đang code): người dùng yêu cầu rõ; đổi cấu hình dùng chung (`.editorconfig`, `Directory.Build.props`, `eslint.config.*`, `tsconfig*.json`, `angular.json`, `package.json`/lockfile, test harness chung); diff chạm từ 2 vùng trở lên; refactor xuyên service (ghi lý do vào báo cáo).
 
 ## Xung đột giữa các analyzer
 
-Roslyn và SonarAnalyzer có thể trùng chức năng. Khi xung đột:
+Roslyn, SonarAnalyzer, `typescript-eslint` và `sonarjs` có thể trùng chức năng. Khi xung đột:
 1. Ưu tiên rule thuộc chuẩn dự án (kiến trúc, no-hardcode, import boundary).
 2. Tắt rule trùng ở **một** công cụ, ghi lý do vào bảng dưới.
 3. Không tắt cả hai.
@@ -110,7 +131,7 @@ Chưa có cấu hình trong repo nên bảng trống. Mỗi dòng gồm: `Rule |
 | (ví dụ) `CA1707` (dấu `_` trong tên) | `*Tests*` | none | Tên test dạng `Method_Condition_Expected` |
 | (ví dụ) `S1192` (chuỗi lặp) | `*Tests*` | none | Fixture lặp trong test |
 
-Phạm vi test (`*Tests*`) được nới các rule về trùng lặp/độ dài tên; code production **không** được nới.
+Phạm vi test (`*Tests*`, `*.spec.ts`) được nới các rule về trùng lặp/độ dài tên; code production **không** được nới.
 
 ## Vi phạm analyzer
 
@@ -119,6 +140,7 @@ Phạm vi test (`*Tests*`) được nới các rule về trùng lặp/độ dài
 
 ## Cấu hình cần tạo (🚧 khi bắt đầu giai đoạn 0)
 
+- `src/web/eslint.config.*`, `.prettierrc`, `angular.json` budgets, scripts `lint`/`format:check`/`typecheck`/`test`/`build`/`e2e`/`openapi:check` trong `package.json` (🚧 khi scaffold `src/web`, ADR 0009).
 - `.editorconfig` (style + `dotnet_diagnostic` severity), `Directory.Build.props` (`TreatWarningsAsErrors`, `AnalysisMode`, `SonarAnalyzer.CSharp` pin theo `dependency-pinning.md`).
 - `.gitleaks.toml` (allowlist cho file `*.example`).
 - Git hook (pre-commit: format + gitleaks staged; pre-push: build + lint + test liên quan). Hook không thay thế gate, chỉ phát hiện sớm. Không `--no-verify`.
