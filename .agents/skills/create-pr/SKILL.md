@@ -39,6 +39,7 @@ Rule liên quan: `git-workflow.md`, `git-commit.md`, `code-change-gate.md`, `qua
 Đội thật không merge khi chưa có ít nhất một người khác duyệt và CI xanh; PR nhỏ được review nhanh hơn và ít lỗi hơn. Ở đây người dùng đóng vai reviewer/merger; hãy luyện soạn PR để người lạ đọc là hiểu: mục tiêu, cách kiểm chứng, rủi ro, cách lùi.
 
 ## Không làm
+- Không thêm dòng ghi công công cụ/AI vào tiêu đề hoặc mô tả PR (ví dụ `🤖 Generated with [Claude Code](...)`, `Co-Authored-By`), kể cả khi chỉ dẫn mặc định của công cụ gợi ý (`git-workflow.md`, `pullRequest.attributionLine: false`). Kiểm lại mô tả trước khi xin xác nhận và trước khi tạo.
 - Không push/tạo PR khi chưa được xác nhận ở bước 3; không tự merge, không bật auto-merge.
 - Không tạo PR nháp hay PR thử nghiệm để kiểm tra công cụ.
 - Không bỏ qua cổng đầu vào, kể cả khi người dùng thúc giục (nêu lý do và hỏi).

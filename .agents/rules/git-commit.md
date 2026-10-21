@@ -117,4 +117,5 @@ Có thể thực thi bằng hook shell đơn giản (`.githooks/commit-msg`, b�
 - [ ] Có dòng trống rồi body không rỗng, nêu vì sao, tiếng Anh
 - [ ] Một ý, build được, không file sinh ra/secret
 - [ ] Không có trailer `Co-Authored-By`
+- [ ] (PR) mô tả không có dòng ghi công công cụ/AI
 - [ ] Gate liên quan đã chạy (`code-change-gate.md`)

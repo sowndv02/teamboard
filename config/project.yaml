@@ -32,6 +32,7 @@ pullRequest:
   mergeStrategy: TODO          # squash | merge | rebase; hỏi người dùng (đề xuất squash: lịch sử main gọn, mỗi PR một commit)
   title: '{issueKey}: {summary}'
   body: link tới file issue + cách kiểm chứng
+  attributionLine: false        # không thêm dòng ghi công công cụ/AI (ví dụ "Generated with Claude Code") vào mô tả PR
 
 docs:
   adrRoot: document/architecture/adr
