@@ -102,7 +102,7 @@ Trước khi trình bày: "Giả sử 6 tháng sau thiết kế này thất bạ
 ### 10. Xác nhận và bàn giao
 - Trình bày tóm tắt ≤ 15 dòng: bối cảnh, driver chính, các quyết định và lựa chọn kèm lý do một dòng, rủi ro lớn, câu hỏi mở. **Không dán cả design doc vào chat.** Đưa đường dẫn.
 - Chờ người dùng xác nhận/phản biện. Phản biện hợp lý → cập nhật, ghi vào lịch sử.
-- Sau xác nhận, đề xuất (tạo khi được đồng ý): **ADR** cho từng quyết định lớn (dùng `document/architecture/adr/_template.md`, nêu phương án đã cân nhắc và vì sao không chọn), **issue** chia theo lát giao được, cập nhật `config/services.yaml` và `document/architecture/README.md` nếu thêm/đổi service.
+- Sau xác nhận, đề xuất (tạo khi được đồng ý): **ADR** cho từng quyết định lớn (dùng `document/architecture/adr/_template.md`, nêu phương án đã cân nhắc và vì sao không chọn), **bảng lát** (`plan-init` chế độ `slices`, `../workflow/references/slicing.md`: chia thành lát nhỏ giao được rồi mới tạo issue; không tự chia ad hoc ở đây), cập nhật `config/services.yaml` và `document/architecture/README.md` nếu thêm/đổi service.
 - Thêm design doc vào `document/design/README.md`.
 
 ## Làn và cỡ thiết kế

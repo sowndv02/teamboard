@@ -65,7 +65,7 @@ Không cần gõ lệnh; suy ra chế độ từ lời người dùng, không r�
 1. **Mục tiêu và tiêu chí thành công** (nối `PROJECT.md`): kết quả học tập + kết quả giao hàng. Hỏi người dùng nếu chưa rõ (thời gian có thể dành mỗi tuần, hạn chót cứng, ưu tiên học gì trước).
 2. **Roadmap:** giai đoạn → mốc (milestone) có **tiêu chí hoàn thành kiểm chứng được** và **kết quả học tập**. Cập nhật `document/pm/roadmap.md`.
 3. **Backlog:** danh sách có thứ tự; mỗi mục có lý do (giá trị so với công sức), phụ thuộc, kích thước sơ bộ (S/M/L), ưu tiên (Must/Should/Could/Won't). Cập nhật `document/pm/backlog.md`. Kỹ thuật: `pm-toolkit.md` mục 1–2.
-4. **Chia lát (slicing):** đề xuất tách thành issue giao được trong một lượt (`pipeline-lifecycle.md`: một issue một lát), nêu phụ thuộc. **Chỉ đề xuất**; tạo issue khi người dùng đồng ý.
+4. **Chia lát (slicing):** dùng và cập nhật bảng lát `document/plans/<feature>-slices.md` (`../workflow/references/slicing.md`), không tạo danh sách thứ hai; nếu chưa có thì đề xuất chạy `plan-init` chế độ `slices`. Thêm ước lượng khoảng, ưu tiên, phụ thuộc; so sánh ước lượng với thực tế khi lát xong. **Chỉ đề xuất**; tạo issue khi người dùng đồng ý.
 5. **Đường găng và phụ thuộc:** mục nào chặn nhiều mục khác (ví dụ chốt BDD runner chặn `test-init`; ngân sách chặn `aws-service-selection`); đưa lên đầu.
 6. **Rủi ro của kế hoạch:** cập nhật RAID.
 

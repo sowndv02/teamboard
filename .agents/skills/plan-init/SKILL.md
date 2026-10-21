@@ -1,6 +1,6 @@
 ---
 name: plan-init
-description: Khởi tạo kế hoạch triển khai cho một issue (một lát giao được) từ spec và design đã xác nhận - chia bước theo TDD/BDD, ánh xạ yêu cầu sang việc, thứ tự, phụ thuộc, kiểm chứng, rủi ro, rollback. Dùng sau design-review PASS và trước plan-review.
+description: Chia spec/design lớn thành các lát nhỏ giao được (chế độ slices) rồi khởi tạo kế hoạch triển khai cho một issue (một lát giao được) từ spec và design đã xác nhận - chia bước theo TDD/BDD, ánh xạ yêu cầu sang việc, thứ tự, phụ thuộc, kiểm chứng, rủi ro, rollback. Dùng sau design-review PASS và trước plan-review.
 ---
 
 # Plan init
@@ -9,9 +9,15 @@ Tạo `document/plans/TB-NNN-<slug>.md` (mẫu `document/plans/_template.md`) ch
 
 Rule liên quan: `task-workflow.md`, `testing.md`, `test-review.md`, `architecture.md`, `api-endpoints.md`, `backend-engineering.md`, `quality-gate.md`, `docs-conventions.md`, `docs-update-specs.md`.
 
+## Hai chế độ
+
+- **`slices`** (bước 4b, theo tính năng): chia spec/design lớn thành bảng lát `document/plans/<feature>-slices.md` theo `../workflow/references/slicing.md` (tiêu chí lát, mẫu bảng, quy trình, hỏi người dùng duyệt). Không viết plan chi tiết ở chế độ này. Xong khi bảng `approved`.
+- **`plan`** (bước 5, theo issue): mô tả dưới đây; đầu vào là **một hàng của bảng lát**.
+
 ## Đầu vào và điều kiện
 - Spec `confirmed`, design `confirmed` (nếu tính năng có design). Chưa → quay lại bước trước; **không** lập plan trên spec/design chưa PASS.
-- Issue `TB-NNN` tồn tại và có tiêu chí hoàn thành. Chưa có → đề xuất chia issue từ spec/design (mỗi issue là một lát giao được, nêu phụ thuộc) và **chờ người dùng đồng ý** trước khi tạo; branch `feature/TB-NNN-<slug>` theo `git-workflow.md` (không push).
+- Tính năng lớn: bảng lát `approved` và lát này là **lát kế tiếp** (các lát trước `done` hoặc người dùng cho làm song song). Chưa có bảng → chạy chế độ `slices` trước; **không** lập một plan phủ cả spec. Plan vượt cỡ lát (nhiều hơn ~3 ngày hoặc ~5 kịch bản chính) → dừng, đề xuất chia lát lại và hỏi người dùng.
+- Issue `TB-NNN` tồn tại và có tiêu chí hoàn thành. Chưa có → tạo từ hàng của bảng lát (hoặc, với việc nhỏ không có bảng, đề xuất một issue) và **chờ người dùng đồng ý** trước khi tạo; branch `feature/TB-NNN-<slug>` theo `git-workflow.md` (không push).
 - Đọc spec, design, ADR liên quan, `config/services.yaml`, code hiện có trong vùng bị ảnh hưởng (không đoán cấu trúc).
 
 ## Quy trình

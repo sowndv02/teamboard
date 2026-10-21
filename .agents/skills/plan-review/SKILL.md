@@ -13,6 +13,10 @@ description: Review kế hoạch triển khai (plan) để tìm điểm chưa r�
 
 ## Checklist (vòng 1 chạy hết)
 
+### A0. Khớp bảng lát (tính năng lớn)
+- Plan thuộc đúng một hàng trong `<feature>-slices.md` `approved`; phạm vi plan không vượt hàng đó (FR/NFR, tiêu chí hoàn thành) và không lấn sang lát khác → lệch là CONFIRM `scope`.
+- Plan đủ nhỏ theo tiêu chí lát (`../workflow/references/slicing.md` mục 1); quá lớn → CONFIRM đề xuất chia lại bảng lát.
+
 ### A. Phủ và truy vết
 - [ ] Mọi FR/BR/NFR của lát có trong bảng truy vết → bước → kịch bản → test. Thiếu → FIX nếu chỉ chưa điền; CONFIRM `missing` nếu không rõ yêu cầu thuộc lát nào.
 - [ ] Không có bước nào không truy được về yêu cầu/quyết định design (việc "tự thêm") → CONFIRM `scope`.

@@ -82,7 +82,7 @@ Rà lại spec và ghi vào mục Rủi ro/Giả định:
 - Trình bày cho người dùng: tóm tắt ≤ 10 dòng (mục tiêu, phạm vi, FR Must, giả định lớn, câu hỏi mở quan trọng) và đường dẫn spec. **Không dán cả spec vào chat.**
 - Chờ xác nhận. Đã xác nhận → trạng thái `confirmed` (hoặc giữ `draft` nếu còn câu hỏi mở chặn).
 - Đề xuất (không tự tạo khi chưa được đồng ý):
-  - **Issue** `TB-NNN` chia theo lát giao được, mỗi issue trỏ về `FR-xxx` và có tiêu chí hoàn thành.
+  - **Chia lát** sau khi spec và design `confirmed` (`../workflow/references/slicing.md`): mỗi lát thành một issue `TB-NNN` trỏ về `FR-xxx` và có tiêu chí hoàn thành. Ở bước này chỉ gợi ý hướng chia thô, bảng lát chính thức do `plan-init` (`slices`) lập.
   - **ADR cần viết** cho quyết định kiến trúc/công nghệ phát sinh.
   - **Kịch bản `.feature`**: các tiêu chí chấp nhận là hạt giống (xem `test-review.md`).
 - Thêm spec vào `document/spec/README.md`.

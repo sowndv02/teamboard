@@ -19,6 +19,7 @@ Rule liên quan: `pipeline-lifecycle.md` (bản đồ giai đoạn tổng quát)
 | 2 | Review spec | `spec-review` | Theo tính năng | Spec `confirmed` | **PASS** (0 CONFIRM mở) |
 | 3 | System design | `system-design` | Theo tính năng | `document/design/<f>.md` (`draft`) | Design đầy đủ mẫu |
 | 4 | Review design | `design-review` | Theo tính năng | Design `confirmed` | **PASS** |
+| 4b | Chia lát (slicing) | `plan-init` (chế độ `slices`) | Theo tính năng | `document/plans/<f>-slices.md` (`approved`), issue cho lát đầu | Người dùng duyệt bảng lát; mọi FR/NFR Must/Should có lát (`references/slicing.md`) |
 | 5 | Plan init | `plan-init` | Theo issue (lát) | `document/plans/TB-NNN-*.md` (`draft`) | Plan đầy đủ mẫu |
 | 6 | Review plan | `plan-review` | Theo issue | Plan `approved` | **PASS** |
 | 7 | Test init | `test-init` | Theo issue | `.feature` + test thực thi, chạy ra **đỏ đúng lý do** | Test đỏ đúng lý do |
@@ -30,7 +31,9 @@ Rule liên quan: `pipeline-lifecycle.md` (bản đồ giai đoạn tổng quát)
 
 Làn **vừa**: gộp bước 1–2 thành spec ngắn trong issue, chỉ chạy 3–4 khi chạm contract/kiến trúc. Làn **nhỏ**: chỉ test tái hiện (nếu là bug) → code → gate → PR. Chi tiết và hotfix: `references/lanes.md`.
 
-Mặc định: bước 1–4 làm **theo tính năng** (một spec/design có thể chia nhiều issue), bước 5–11 làm **theo issue** (một lát giao được). Một tính năng nhỏ có thể chỉ có một issue.
+Mặc định: bước 1–4b làm **theo tính năng** (một spec/design chia thành nhiều lát/issue), bước 5–11 làm **theo issue** (một lát giao được). Một tính năng nhỏ có thể chỉ có một issue và bỏ 4b.
+
+**Spec lớn không implement một lần.** Sau bước 4, bước 4b chia thành các lát nhỏ (`references/slicing.md`), người dùng duyệt, rồi bước 5–11 chạy cho **từng lát một**; plan của lát N+1 chỉ lập sau khi lát N merge (hoặc khi người dùng cho làm song song lát độc lập). Hết lát này thì quay lại bước 5 cho lát kế, không quay lại bước 1.
 
 ## Quyết định đã chốt với người dùng (2026-10-21)
 
@@ -80,6 +83,7 @@ Bắt buộc ở làn lớn; tuỳ chọn ở làn vừa; làn nhỏ/hotfix ghi 
 |---|---|---|
 | 1–2 | `document/spec/<f>.md`, front matter `status` | `confirmed` |
 | 3–4 | `document/design/<f>.md`, `status` | `confirmed` |
+| 4b | `document/plans/<f>-slices.md`, `status` + cột Trạng thái (lát đầu tiên chưa `done` là lát hiện tại) | `approved` |
 | 5–6 | `document/plans/TB-NNN-*.md`, `status` | `approved` |
 | 7–8 | Issue `TB-NNN`, mục **Workflow** (bảng bước), và `.feature` + test | Bảng ghi `test-review: PASS` |
 | 9–10 | Issue, mục **Workflow** | `coding-start: tests xanh`, `coding-review: PASS` |
