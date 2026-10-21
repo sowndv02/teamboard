@@ -19,7 +19,7 @@ Mục tiêu học: tự xây các chức năng xác thực/ủy quyền thay vì
 |---|---|---|
 | **JWT** | Cấu trúc header.payload.signature (Base64URL), claim đăng ký (`iss`, `sub`, `aud`, `exp`, `nbf`, `iat`, `jti`), ký (JWS) so với mã hoá (JWE) | RFC 7519 (JWT), RFC 7515 (JWS), RFC 7517 (JWK) |
 | **OAuth 2.0** | Vai trò (resource owner, client, authorization server, resource server), loại client (confidential/public), scope, các grant | RFC 6749; **OAuth 2.0 Security Best Current Practice** (đọc bản mới nhất, kiểm số RFC); OAuth 2.1 (dự thảo) |
-| **Authorization Code + PKCE** | Luồng chuẩn cho SPA/mobile/web; PKCE chống chặn mã | RFC 7636 |
+| **Authorization Code + PKCE** | Luồng chuẩn cho ứng dụng có giao diện đăng nhập (web/mobile); PKCE chống chặn mã | RFC 7636 |
 | **Client Credentials** | Service-to-service (máy với máy) | RFC 6749 mục 4.4 |
 | **Refresh token** | Phiên dài hạn, xoay vòng (rotation), phát hiện tái sử dụng | RFC 6749; BCP |
 | **OpenID Connect** | Lớp xác thực trên OAuth 2.0: `id_token`, `userinfo`, scope `openid`, discovery, JWKS, `nonce` | OpenID Connect Core 1.0, Discovery 1.0 |
@@ -42,9 +42,9 @@ Mỗi giai đoạn là một lát (issue riêng, qua `workflow`, có spec và k�
 | **I6** | Client Credentials | Phát token cho service-to-service theo `client_id/secret`, scope theo service | HMAC/hash so sánh bí mật | Scope vượt quyền bị từ chối; token máy không dùng như token người |
 | **I7** | OpenID Connect | `id_token`, `nonce`, `/connect/userinfo`, `/.well-known/openid-configuration`, scope `openid/profile/email`, đăng xuất | – | Discovery khớp endpoint thật; `id_token` kiểm tra `aud/nonce`; claim theo scope |
 | **I8** | Ủy quyền | Role/claim/policy; thu hồi/introspection tối thiểu; kiểm quyền theo tài nguyên ở từng service | Policy của ASP.NET Core (được dùng) | IDOR không xảy ra; quyền đúng theo vai trò; token hết hiệu lực khi thu hồi |
-| **I9** | Tích hợp hệ thống | Gateway kiểm JWT (YARP) và chuyển tiếp; `web` (Angular) dùng Code + PKCE; service-to-service dùng Client Credentials | – | Luồng đầu-cuối: đăng nhập → gọi API qua gateway → service tự kiểm quyền |
+| **I9** | Tích hợp hệ thống | Gateway kiểm JWT (YARP) và chuyển tiếp; service-to-service dùng Client Credentials; thử bằng công cụ gọi API (Postman, curl), không có frontend | – | Luồng đầu-cuối: đăng nhập → gọi API qua gateway → service tự kiểm quyền |
 
-Màn hình đăng nhập/đồng ý do `identity-service` phục vụ (trang đơn giản, **chưa chốt**: server-rendered hay Angular riêng: `TODO`, ảnh hưởng nơi lưu token phía client: ADR 0005 mục "chưa quyết định").
+**Chưa có frontend ở giai đoạn này (ADR 0008).** `identity-service` chỉ cung cấp API. I1–I4, I6, I8 không cần giao diện. Authorization Code + PKCE (I5) và OIDC (I7) cần một "user agent" để người dùng đăng nhập; khi tới đó có hai lựa chọn: (a) làm một trang đăng nhập HTML tối giản do chính `identity-service` phục vụ, (b) hoãn I5 và I7 đến khi có frontend (cần quyết định riêng).
 
 ## 3. Điểm bảo mật phải làm đúng (mỗi điểm = một kịch bản BDD + một test tấn công)
 
@@ -72,7 +72,7 @@ Màn hình đăng nhập/đồng ý do `identity-service` phục vụ (trang đ�
 | JWT, OAuth2, OIDC (khái niệm) | Mục 1 và GĐ I2 đến I7 |
 | Authorization Code, Implicit, Hybrid, Client Credentials, ROPC | Code + PKCE và Client Credentials xây; Implicit/ROPC/Hybrid chỉ để hiểu và tấn công thử |
 | Protect API bằng JWT từ IS4 | GĐ I2, I9 (tự viết bộ kiểm tra token) |
-| MVC client OpenID Connect, HttpClientFactory gọi API có token | `web` Angular (Code + PKCE) và gọi qua interceptor (`frontend-engineering.md`) |
+| MVC client OpenID Connect, HttpClientFactory gọi API có token | Hoãn cùng frontend (ADR 0008); trước mắt gọi API có token bằng công cụ như Postman/curl hoặc test tích hợp |
 | Claim-based authorization | GĐ I8 |
 | Ocelot mang token qua gateway | YARP kiểm JWT và chuyển tiếp (GĐ I9) |
 | `TestUsers`, `DeveloperSigningCredential` (dữ liệu/khoá giả) | Chỉ dùng cho dev; khoá thật từ Secrets Manager, người dùng thật trong PostgreSQL |
@@ -83,7 +83,6 @@ Màn hình đăng nhập/đồng ý do `identity-service` phục vụ (trang đ�
 - Chi phí: tự xây trên Fargate + PostgreSQL có chi phí cố định; Cognito trả theo MAU. Ghi so sánh trong `document/infra/identity-service.md` (`aws-service-selection`).
 
 ## 6. Việc cần chốt
-- Trang đăng nhập: server-rendered hay Angular riêng (`TODO`).
-- Nơi lưu token ở `web` (ADR 0005 chưa chốt).
+- Khi tới I5/I7: làm trang đăng nhập HTML tối giản hay hoãn đến khi có frontend (`TODO`).
 - Thuật toán ký mặc định (RSA hay ECDSA) và chính sách xoay khoá.
 - Có làm hybrid/implicit để học hay chỉ đọc lý thuyết.

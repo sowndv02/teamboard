@@ -18,7 +18,7 @@ Chuỗi skill thực thi quy trình này: `requirements-discovery` → `spec-rev
 | 3 | **Thiết kế & kế hoạch** (khi việc lớn) | Spec đã rõ mà có quyết định kiến trúc lớn → skill `system-design` (design doc + ADR, giải thích đánh đổi); chọn dịch vụ AWS cho từng service → skill `aws-service-selection` (chi phí đi đầu, tài liệu `document/infra/<service>.md`). Kế hoạch ngắn, chờ người dùng duyệt (plan mode) | `task-workflow.md`, `architecture.md` | Kế hoạch được duyệt; ADR (nếu cần) |
 | 4 | **Spec & kịch bản** | Cập nhật spec/contract; viết `.feature` theo tiêu chí | `docs-update-specs.md`, `api-endpoints.md`, `test-review.md` | `.feature` + spec cập nhật |
 | 5 | **Test review** | Review `.feature` | `test-review.md` | Verdict `Sẵn sàng code` (không P0–P2, P3 đã xử lý) |
-| 6 | **Code (TDD/BDD)** | Đỏ → xanh → refactor từng kịch bản, theo lát nhỏ | `task-workflow.md`, `testing.md`, rule theo vùng (`dotnet.md`, `backend-engineering.md`, `angular.md`, …) | Mọi kịch bản xanh; nhật ký đỏ/xanh trong issue |
+| 6 | **Code (TDD/BDD)** | Đỏ → xanh → refactor từng kịch bản, theo lát nhỏ | `task-workflow.md`, `testing.md`, rule theo vùng (`dotnet.md`, `backend-engineering.md`, …) | Mọi kịch bản xanh; nhật ký đỏ/xanh trong issue |
 | 7 | **Gate** | Chạy gate theo vùng, đối chiếu kịch bản ↔ test, tự review diff | `code-change-gate.md`, `quality-gate.md`, `test-review.md` mục 6 | Gate xanh; `Sẵn sàng review` |
 | 8 | **Code review** | Review vòng 1 (đầy đủ) | `code-review.md` | Verdict + bảng findings; ghi vào issue |
 | 9 | **Sửa finding** | Sửa theo lô nhỏ, có test; chạy lại gate | `code-review.md` (mục sửa finding) | Finding `resolved` |

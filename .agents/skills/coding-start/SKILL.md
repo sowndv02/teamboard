@@ -7,7 +7,7 @@ description: Bắt đầu viết code theo plan và test đã duyệt - lặp Đ
 
 Viết code production để **làm test đỏ thành xanh**, từng lát nhỏ, theo plan. Kết thúc khi **toàn bộ test pass** và gate xanh; chỉ khi đó mới chuyển `coding-review`.
 
-Rule liên quan: `task-workflow.md`, `testing.md`, `quality-gate.md`, `code-change-gate.md`, `architecture.md`, `api-endpoints.md`, `backend-engineering.md`, `dotnet.md`, `frontend-engineering.md`, `angular.md`, `angular-reactivity.md`, `messaging.md`, `observability.md`, `dependency-pinning.md`, `agent-conduct.md`.
+Rule liên quan: `task-workflow.md`, `testing.md`, `quality-gate.md`, `code-change-gate.md`, `architecture.md`, `api-endpoints.md`, `backend-engineering.md`, `dotnet.md`, `messaging.md`, `observability.md`, `dependency-pinning.md`, `agent-conduct.md`.
 
 ## Đầu vào và điều kiện
 - `test-review: PASS` trong Workflow của issue; plan `approved`; spec/design `confirmed`.

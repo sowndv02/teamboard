@@ -7,11 +7,11 @@ description: Khởi tạo test theo BDD và TDD cho một issue đã có plan đ
 
 Sinh bộ test **trước** code production: kịch bản BDD (`.feature`) từ spec/plan, test thực thi (unit/integration/contract) theo TDD, rồi chạy để thấy **đỏ đúng lý do**. Không viết code production ngoài **khung tối thiểu để biên dịch** (stub ném `NotImplementedException`/trả giá trị rỗng không có logic).
 
-Rule liên quan: `test-review.md` (chuẩn `.feature`, tag, reconcile), `testing.md`, `quality-gate.md`, `api-endpoints.md` (test mỗi endpoint), `messaging.md` (test outbox/consumer), `angular.md` / `dotnet.md`.
+Rule liên quan: `test-review.md` (chuẩn `.feature`, tag, reconcile), `testing.md`, `quality-gate.md`, `api-endpoints.md` (test mỗi endpoint), `messaging.md` (test outbox/consumer), `dotnet.md`.
 
 ## Đầu vào và điều kiện
 - Plan `approved` (bước 6 PASS), issue `TB-NNN` và branch `feature/TB-NNN-*` đã có (kiểm `git branch --show-current`).
-- **Công cụ test/BDD đã chốt** trong `config/tool-versions.yaml` (`dotnet_test_framework`, `bdd_runner_dotnet`, `bdd_runner_web`). Còn `TODO` cho phần cần dùng → **dừng, báo người dùng chọn** (đề xuất kèm đánh đổi, nêu cần ADR); **không tự chọn** và không bắt đầu viết test.
+- **Công cụ test/BDD đã chốt** trong `config/tool-versions.yaml` (`dotnet_test_framework`, `bdd_runner_dotnet`). Còn `TODO` cho phần cần dùng → **dừng, báo người dùng chọn** (đề xuất kèm đánh đổi, nêu cần ADR); **không tự chọn** và không bắt đầu viết test.
 - Môi trường chạy được test (Docker cho Testcontainers/LocalStack, SDK...). Không chạy được → báo, không giả vờ.
 
 ## Quy trình

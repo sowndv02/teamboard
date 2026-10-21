@@ -47,7 +47,7 @@ Mục đích: bản đồ để học và để chọn kiến trúc nội bộ c
 | **3.2 gRPC** (nhị phân, hợp đồng Protobuf, HTTP/2) | Cao (nội bộ) | Giao tiếp nội bộ hiệu năng cao, hợp đồng chặt | Service-to-service tần suất cao, độ trễ thấp | API công khai cho trình duyệt (cần gRPC-Web) | Ít thân thiện debug, ràng buộc công cụ | Chưa dùng; **ứng viên bài tập** (kiểu Discount.Grpc của slide) |
 | **3.3 Pub/Sub (event-driven)** (SNS/SQS; slide: RabbitMQ + MassTransit) | Rất cao | Tách thời gian/độ sẵn sàng, fan-out | Sự kiện nghiệp vụ nhiều bên quan tâm | Cần phản hồi ngay | Nhất quán cuối cùng; idempotent | `teamboard-events` (`messaging.md`) |
 | **3.4 Saga** (choreography/orchestration) | Cao khi có quy trình nhiều bước | Nhất quán xuyên service không có giao dịch chung | Quy trình nhiều service có bồi hoàn | Quy trình trong một service | Phức tạp theo dõi/gỡ lỗi | "Xoá Board" (bài tập) |
-| **3.5 API Gateway / BFF** (YARP: reverse proxy, định tuyến, rate limit; BFF riêng cho từng loại client) | Rất cao | Điểm vào thống nhất, ẩn topology | Nhiều service/nhiều loại client | Một service đơn lẻ | Điểm lỗi tập trung nếu thiết kế kém | `gateway` (YARP) |
+| **3.5 API Gateway** (YARP: reverse proxy, định tuyến, rate limit; biến thể BFF cho từng loại client chỉ cần khi có client) | Rất cao | Điểm vào thống nhất, ẩn topology | Nhiều service | Một service đơn lẻ | Điểm lỗi tập trung nếu thiết kế kém | `gateway` (YARP) |
 | **3.6 Anti-Corruption Layer (ACL)** | Cao khi tích hợp hệ cũ/ngoài | Bảo vệ mô hình miền khỏi mô hình bên ngoài | Tích hợp hệ thống cũ/của người khác | Không có ranh giới ngoài | Thêm lớp dịch | Dùng khi tách khỏi `teamboard-api` cũ hoặc tích hợp bên thứ ba |
 | **3.7 Strangler Fig** (thay dần monolith bằng service mới sau một mặt tiền) | Cao (di chuyển hệ cũ) | Di chuyển từng phần an toàn | Có monolith đang chạy | Hệ mới hoàn toàn | Chạy song song, chi phí tạm thời | **`teamboard-api` hiện tại là monolith**: có thể coi việc tách thành `board-service`/`task-service` là một bài tập Strangler |
 
@@ -59,7 +59,6 @@ Mục đích: bản đồ để học và để chọn kiến trúc nội bộ c
 | Health checks (liveness/readiness) | Rất cao | Mọi service | `observability.md` |
 | Distributed tracing, structured logging, metrics (OpenTelemetry) | Rất cao | Mọi service | `observability.md` |
 | Idempotent consumer, DLQ, redelivery | Rất cao | Consumer SQS | `messaging.md` |
-| Feature flags, config theo môi trường | Cao | `web`, service | `frontend-engineering.md` |
 
 ## 5. Tính toán và triển khai
 
@@ -81,7 +80,7 @@ Mục đích: bản đồ để học và để chọn kiến trúc nội bộ c
 | Ordering | DDD + CQRS + Clean Architecture (EF Core, SQL Server); Domain Event vs Integration Event; EF interceptor để dispatch | `board-service`/`task-service`; chú ý **Domain Event (trong một service)** khác **Integration Event (giữa service, qua bus)** |
 | Giao tiếp bất đồng bộ | RabbitMQ + MassTransit (pub/sub, topic exchange); nêu Transactional Outbox | SNS → SQS + Outbox; **ta tự viết lớp nhắn tin mỏng** hay dùng thư viện là một quyết định (chưa chốt) |
 | API Gateway | YARP (route theo `/catalog`, `/shoppingcart`, `/ordering`), rate limiting | `gateway` YARP; lưu ý `api-endpoints.md` bắt buộc không có tên service trong path, nên khác slide ở điểm này |
-| Client | Shopping Web (Refit) | `web` Angular qua gateway |
+| Client | Shopping Web (Refit) | Chưa áp dụng: không có frontend ở giai đoạn này (ADR 0008) |
 
 ## 7. Gợi ý bổ sung cho lộ trình học (không bắt buộc)
 
@@ -90,7 +89,6 @@ Theo thứ tự giá trị học, kèm chi phí:
 2. **Strangler Fig** từ `teamboard-api` hiện có sang `board-service` (có thật, không cần dựng giả).
 3. **gRPC** cho một call đồng bộ nội bộ (so với REST: hợp đồng, hiệu năng, debug).
 4. **Cache-aside + Decorator** với Redis cho một truy vấn đọc nhiều (nhớ chi phí chạy rỗng của ElastiCache: `aws-service-selection`).
-5. **BFF riêng cho `web`** nếu gateway bắt đầu chứa logic riêng cho UI.
 
 Mỗi bài tập cần issue riêng và qua `workflow`; chọn dịch vụ AWS qua `aws-service-selection` (chi phí đi đầu).
 

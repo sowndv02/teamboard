@@ -20,7 +20,7 @@ Ký hiệu chi phí: **R** = chạy rỗng (tính giờ/cố định), **U** = t
 
 | Dịch vụ | Dùng khi | Tránh khi | Dạng chi phí | Bẫy |
 |---|---|---|---|---|
-| **S3** | Lưu tệp, tài nguyên tĩnh (Angular qua CloudFront), backup, log, state Terraform | Cần filesystem POSIX, truy vấn quan hệ | U (GB-tháng + request + truyền) | Public nhầm (Block Public Access); versioning phình; lifecycle; request nhỏ lẻ |
+| **S3** | Lưu tệp, tài nguyên tĩnh, backup, log, state Terraform | Cần filesystem POSIX, truy vấn quan hệ | U (GB-tháng + request + truyền) | Public nhầm (Block Public Access); versioning phình; lifecycle; request nhỏ lẻ |
 | **EFS** | Cần filesystem chia sẻ giữa nhiều tác vụ | Chỉ lưu tệp thường (S3 rẻ hơn) | U (GB-tháng, throughput) | Đắt hơn S3 theo GB |
 | **EBS** | Ổ đĩa cho EC2 | Chia sẻ nhiều instance | U (GB, IOPS) | Volume/snapshot mồ côi (H) |
 
@@ -55,7 +55,7 @@ Ký hiệu chi phí: **R** = chạy rỗng (tính giờ/cố định), **U** = t
 |---|---|---|---|---|
 | **ALB** | Điểm vào HTTP cho container, định tuyến theo host/path, dùng chung nhiều service | Chỉ dùng Lambda đơn giản | R (giờ) + U (LCU) | Một ALB dùng chung thay vì mỗi service một ALB |
 | **API Gateway (HTTP API / REST API)** | Điểm vào cho Lambda, cần throttling/authorizer/usage plan | Dịch vụ container sau ALB, tải rất lớn (đắt theo request) | U (request) | HTTP API thường rẻ hơn REST API (kiểm tra khác biệt tính năng) |
-| **CloudFront** | CDN, phục vụ SPA từ S3, giảm tải/độ trễ, nơi gắn WAF | Nội bộ thuần | U (truyền + request) | Cache invalidation; origin access control |
+| **CloudFront** | CDN, phục vụ nội dung tĩnh từ S3, giảm tải/độ trễ, nơi gắn WAF | Nội bộ thuần | U (truyền + request) | Cache invalidation; origin access control |
 | **WAF** | Lọc tấn công, rate limit, chặn bot ở biên | Dự án nội bộ chưa công khai | U + phí theo web ACL/rule | Chi phí theo rule và request |
 | **Route 53** | DNS, health check, định tuyến | – | U (hosted zone + query) | DNS treo (dangling) khi xoá tài nguyên |
 
@@ -101,7 +101,6 @@ Chỉ là điểm bắt đầu để skill đối chiếu với tải và ngân 
 
 | Service | Ứng viên đáng xét (rẻ đủ dùng trước) | Ghi chú |
 |---|---|---|
-| `web` (Angular) | **S3 + CloudFront** (tĩnh, trả theo dùng) so với container (Fargate/nginx, chạy rỗng) | ADR 0005 đang đề xuất S3 + CloudFront |
 | `gateway` (YARP) | Fargate sau một **ALB dùng chung**; hoặc API Gateway nếu chọn serverless | ALB và Fargate là chi phí chạy rỗng |
 | `identity-service` | Fargate + RDS PostgreSQL (tự xây `[Chọn để học]`) so với Cognito | Cognito rẻ hơn công, tự xây để học |
 | `board-service` | Fargate + RDS **SQL Server** (đang dùng EF Core) so với PostgreSQL | SQL Server tốn giấy phép: quyết định có đáng không |

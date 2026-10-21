@@ -4,6 +4,10 @@ title: Thiết lập quy tắc agent, workflow và tài liệu nền cho dự á
 status: in-progress
 phase: 0
 branch: feature/TB-002-agent-rules-and-workflow
+estimate: L
+created: 2026-10-21
+started: 2026-10-21
+closed: null
 ---
 
 # TB-002 — Thiết lập quy tắc agent, workflow và tài liệu nền cho dự án
@@ -34,7 +38,7 @@ Chuẩn bị nền để làm việc với AI agent theo quy trình thống nh�
 | create-pr | pending | – | | Chờ người dùng |
 
 ## Ghi chú / Nhật ký
-- Các giá trị chưa quyết định để `TODO`: `quality.monthlyBudgetUsd`, `quality.compliance`, region/account AWS, phiên bản Node/Angular/Terraform, BDD runner.
+- Các giá trị chưa quyết định để `TODO`: `quality.monthlyBudgetUsd`, `quality.compliance`, region/account AWS, phiên bản Terraform, BDD runner.
 - Mật khẩu trong `src/.env.develop` và `src/.env.stg` từng được commit; cần xoay nếu là thật.
 
 ## Bài học (lessons learned)

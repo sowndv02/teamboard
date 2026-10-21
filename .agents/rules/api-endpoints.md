@@ -1,6 +1,6 @@
 # API endpoint rules
 
-Lý do tồn tại: các service dùng kiến trúc nội bộ khác nhau, nhưng **bề mặt HTTP phải đồng nhất** để Angular, gateway và service khác dùng chung một cách hiểu. Áp dụng cho mọi endpoint của mọi service. Đổi quy ước ở đây = ADR mới.
+Lý do tồn tại: các service dùng kiến trúc nội bộ khác nhau, nhưng **bề mặt HTTP phải đồng nhất** để client, gateway và service khác dùng chung một cách hiểu. Áp dụng cho mọi endpoint của mọi service. Đổi quy ước ở đây = ADR mới.
 
 Kết hợp với: `architecture.md` (ranh giới service), `dotnet.md`, `testing.md`, `code-review.md` (probe B2).
 
@@ -78,7 +78,7 @@ Mọi lỗi của mọi service dùng cùng một dạng:
 }
 ```
 
-- `code`: mã **ổn định, UPPER_SNAKE** để client xử lý (Angular map sang thông báo); không đổi tuỳ tiện. `message`/`detail` cho người đọc, có thể đổi.
+- `code`: mã **ổn định, UPPER_SNAKE** để client xử lý (client map sang thông báo); không đổi tuỳ tiện. `message`/`detail` cho người đọc, có thể đổi.
 - Luôn có `traceId` và `correlationId`. **Không** lộ stack trace, SQL, đường dẫn, tên host nội bộ hay chi tiết framework.
 - Validation: `400` kèm `errors[]` theo từng field. Vi phạm quy tắc nghiệp vụ: `422` hoặc `409` kèm `code` riêng.
 - Lỗi chưa lường: `500` với `code: "INTERNAL_ERROR"`, chi tiết chỉ ở log (có `traceId` để tra).
@@ -108,7 +108,7 @@ Mọi lỗi của mọi service dùng cùng một dạng:
 
 - Mỗi service xuất **OpenAPI** (đã có Swagger UI ở dự án); mỗi endpoint có summary, mô tả tham số, mọi response (kể cả lỗi) và ví dụ. Chỉ bật Swagger UI ở môi trường không phải prod.
 - Dùng `ProducesResponseType`/`TypedResults` để schema khớp thực tế; không để OpenAPI lệch code.
-- Contract (request/response/error/phân trang) mô tả trong `document/spec/<service>.md` hoặc `document/contracts/`. **Đổi contract = cập nhật spec + test contract + consumer (Angular, service khác) cùng thay đổi.**
+- Contract (request/response/error/phân trang) mô tả trong `document/spec/<service>.md` hoặc `document/contracts/`. **Đổi contract = cập nhật spec + test contract + consumer (client, service khác) cùng thay đổi.**
 - Breaking change: tăng version, giữ bản cũ song song, ADR, và báo consumer.
 
 ## 9. Triển khai trong code (.NET)

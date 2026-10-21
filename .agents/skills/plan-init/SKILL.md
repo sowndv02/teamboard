@@ -7,7 +7,7 @@ description: Khởi tạo kế hoạch triển khai cho một issue (một lát 
 
 Tạo `document/plans/TB-NNN-<slug>.md` (mẫu `document/plans/_template.md`) cho **một issue**. Plan nói **làm gì, theo thứ tự nào, kiểm chứng ra sao**; **không** chốt lại quyết định kiến trúc (đã ở design/ADR) và **không** tự quyết điều chưa rõ: điểm chưa rõ ghi thành **Câu hỏi mở** để `plan-review` đưa cho người dùng.
 
-Rule liên quan: `task-workflow.md`, `testing.md`, `test-review.md`, `architecture.md`, `api-endpoints.md`, `backend-engineering.md`, `frontend-engineering.md`, `quality-gate.md`, `docs-conventions.md`, `docs-update-specs.md`.
+Rule liên quan: `task-workflow.md`, `testing.md`, `test-review.md`, `architecture.md`, `api-endpoints.md`, `backend-engineering.md`, `quality-gate.md`, `docs-conventions.md`, `docs-update-specs.md`.
 
 ## Đầu vào và điều kiện
 - Spec `confirmed`, design `confirmed` (nếu tính năng có design). Chưa → quay lại bước trước; **không** lập plan trên spec/design chưa PASS.
@@ -21,7 +21,7 @@ Rule liên quan: `task-workflow.md`, `testing.md`, `test-review.md`, `architectu
 3. **Chia bước theo TDD/BDD**, mỗi bước là một chu kỳ nhỏ (Đỏ → Xanh → Refactor) gắn với **kịch bản** cụ thể. Sắp xếp theo giá trị và phụ thuộc: khung đi trước (contract, schema), rồi đường chính, rồi đường lỗi/biên.
 4. **Với mỗi bước ghi:** mục tiêu, kịch bản/test sẽ viết, file/module dự kiến chạm (đọc code để xác định, không đoán), hợp đồng thay đổi (API/sự kiện), migration, cấu hình/biến môi trường, tài liệu cần cập nhật, tiêu chí **kiểm chứng** (lệnh/kết quả quan sát được).
 5. **Chiến lược test:** tầng nào (unit/integration/contract), dữ liệu/ môi trường (Testcontainers/LocalStack), cái gì mock/không mock, **công cụ BDD/test runner** (đọc `config/tool-versions.yaml`; nếu `TODO` → ghi vào Câu hỏi mở, không tự chọn).
-6. **Rủi ro và rollback:** rủi ro kỹ thuật, migration an toàn, cách quay lại, ảnh hưởng consumer (Angular, service khác).
+6. **Rủi ro và rollback:** rủi ro kỹ thuật, migration an toàn, cách quay lại, ảnh hưởng consumer (service khác).
 7. **Gate và Definition of Done:** gate nào (`code-change-gate.md`, `quality-gate.md`), tiêu chí hoàn thành của issue, tài liệu/ADR/config cập nhật.
 8. **Câu hỏi mở và giả định:** mọi điểm chưa rõ khi lập plan (hành vi không có trong spec, lựa chọn kỹ thuật chưa chốt, thiếu thông tin hạ tầng) → ghi vào bảng, **không tự điền**.
 9. Plan `status: draft`; cập nhật bảng Workflow trong issue (`plan-init: done`); báo `workflow` mở `plan-review`.

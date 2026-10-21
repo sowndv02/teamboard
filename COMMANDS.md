@@ -10,7 +10,6 @@ git status --short && git branch --show-current   # biết đang ở đâu, có 
 git log --oneline -5
 dotnet --version                                  # cần .NET 10
 docker --version && docker compose version
-node --version && npm --version                   # 🚧 cần khi làm src/web (Angular)
 terraform version                                 # 🚧 chỉ cần từ giai đoạn 4
 ```
 
@@ -26,16 +25,9 @@ dotnet build src/teamboard.slnx -warnaserror
 dotnet test src/teamboard.slnx                    # 🚧 chưa có project test
 dotnet format src/teamboard.slnx --verify-no-changes
 
-# Angular (src/web) — 🚧 chưa scaffold; script cụ thể chốt khi tạo project
-npm --prefix src/web run lint
-npm --prefix src/web run build
-npm --prefix src/web test -- --watch=false
-npx --prefix src/web prettier --check "src/web/src/**/*.{ts,html,scss}"
-
 # Secret + phụ thuộc có lỗ hổng (quy tắc: .agents/rules/quality-gate.md)
 gitleaks protect --staged --redact                # 🚧 chưa cài
 dotnet list src/teamboard.slnx package --vulnerable --include-transitive
-npm --prefix src/web audit --omit=dev             # 🚧
 
 # Docker
 docker compose -f src/docker-compose.yml config -q

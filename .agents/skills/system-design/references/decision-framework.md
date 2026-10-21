@@ -82,7 +82,6 @@ Với mỗi mục: *chọn A khi…*, *chọn B khi…*, *cạm bẫy*.
 - **Container (ECS Fargate)** khi: dịch vụ chạy liên tục, cần kiểm soát runtime, tải ổn định.
 - **Serverless (Lambda)** khi: tải thất thường/sự kiện, ít việc vận hành, chấp nhận giới hạn thời gian/khởi động nguội.
 - **Kubernetes** khi: cần hệ sinh thái/độ linh hoạt lớn và có người vận hành; thường quá nặng cho đội nhỏ.
-- Static frontend: **S3 + CloudFront** khi chỉ là SPA tĩnh.
 
 ### 2.12 Multi-tenancy và dữ liệu nhiều khách (nếu có)
 - DB riêng mỗi khách: cô lập mạnh, đắt. Schema riêng: trung gian. Chung bảng + `tenant_id`: rẻ, cần kỷ luật lọc dữ liệu (rủi ro rò rỉ).

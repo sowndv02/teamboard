@@ -83,11 +83,9 @@ Nguồn: <ai, khi nào, kênh nào>
 |---|---|
 | NFR-001 | |
 
-## 13. Giao diện và trải nghiệm
+## 13. Giao diện (chưa áp dụng)
 
-- Màn hình/luồng chính:
-- Thông báo và lỗi hiển thị:
-- Ngôn ngữ, truy cập được (a11y):
+Giai đoạn hiện tại không phát triển frontend (ADR 0008). Yêu cầu về giao diện nếu có thì ghi vào mục "Ngoài phạm vi" hoặc "Câu hỏi mở" để xử lý khi có frontend.
 
 ## 14. Giả định
 

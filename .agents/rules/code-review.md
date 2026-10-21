@@ -6,9 +6,9 @@ Lý do tồn tại: review nhất quán, có bằng chứng, không lặp lại 
 
 - **Mặc định report-only**: không tự sửa code trừ khi người dùng yêu cầu rõ ("fix").
 - Output tiếng Việt, ngắn gọn; mỗi finding có `file:dòng` và bằng chứng. Phân biệt lỗi chắc chắn với nghi ngờ.
-- Đọc trước: `AGENTS.md`, issue liên quan, và rule theo vùng code đổi (`architecture.md`, `dotnet.md`, `angular.md`, `messaging.md`, `terraform.md`).
+- Đọc trước: `AGENTS.md`, issue liên quan, và rule theo vùng code đổi (`architecture.md`, `dotnet.md`, `messaging.md`, `terraform.md`).
 - Phạm vi review là **diff**, nhưng phải truy ra consumer bên ngoài diff khi probe Blast Radius được kích hoạt.
-- Không review: `local/**`, file sinh ra (`bin`, `obj`, `node_modules`, `dist`, `.angular`), lockfile (chỉ xem phiên bản đổi). Ghi vào mục Coverage.
+- Không review: `local/**`, file sinh ra (`bin`, `obj`), lockfile (chỉ xem phiên bản đổi). Ghi vào mục Coverage.
 
 ## Diff và base
 
@@ -57,7 +57,7 @@ Ghi mỗi vòng vào issue:
 |---|---|---|---|
 | F1 | Transaction & lỗi | `try/catch`, transaction, outbox | `catch` có nuốt lỗi DB/hạ tầng không? Lỗi giữa chừng có rollback đúng phạm vi? |
 | F2 | Validation | Validation ở endpoint/service/form | Có trùng lặp hoặc mâu thuẫn giữa client, endpoint và domain? Dữ liệu qua validate nhưng hỏng ở mapper thì ai bắt? |
-| F3 | Độ sâu test | Test mới/sửa | Test kiểm tra **trạng thái thật** (DB, message, DOM) hay chỉ status code? Có test chuỗi (retry rồi lỗi)? |
+| F3 | Độ sâu test | Test mới/sửa | Test kiểm tra **trạng thái thật** (DB, message phát ra) hay chỉ status code? Có test chuỗi (retry rồi lỗi)? |
 | F4 | Idempotency & hết hạn | Consumer, retry, cache, token | Nhận trùng message → tác động một lần? Có test miss/hết hạn? |
 | F5 | Đối chiếu chéo | Thêm/sửa rule cho một field | Đã grep mọi nơi cùng kiểu dữ liệu (DTO, entity, form, schema)? |
 | F6 | Tiêu chí issue | Issue có tiêu chí hoàn thành | Mỗi tiêu chí đã có evidence (test, lệnh chạy)? Gap quan trọng = finding P1. |
@@ -69,7 +69,7 @@ Ghi mỗi vòng vào issue:
 | # | Probe | Kích hoạt khi | Câu hỏi |
 |---|---|---|---|
 | B1 | Code dùng chung | `src/shared/`, gateway, base class, interceptor | Đã grep mọi nơi dùng? Consumer khác bị phá không? |
-| B2 | Contract downstream | API, event schema, DTO, enum | Angular, service khác và contract test đã cập nhật? Breaking change có tăng `version` + ADR? |
+| B2 | Contract downstream | API, event schema, DTO, enum | Service khác (consumer) và contract test đã cập nhật? Breaking change có tăng `version` + ADR? |
 | B3 | Tác động chéo | Mutation, outbox, cache, bulk | Service/consumer khác có xung đột (thứ tự, version, quyền)? |
 | B4 | Tóm tắt tác động | Luôn | Ghi tác động lên API/contract, database, và tính năng liên quan; không liên quan thì ghi "Không áp dụng" + lý do. |
 
@@ -80,7 +80,7 @@ Probe áp dụng mà chưa grep/trace consumer → **không** được verdict "
 | # | Lens | Câu hỏi |
 |---|---|---|
 | BP1 | Chuẩn dự án | Đúng kiến trúc bắt buộc của service (`architecture.md`)? Không hardcode config, không truy cập DB service khác, `shared/` không có logic nghiệp vụ? |
-| BP2 | Idiom ngôn ngữ | C#: async + CancellationToken, nullable, DI, EF không N+1. Angular: OnPush, Signals, hủy subscription, không `any`. |
+| BP2 | Idiom ngôn ngữ | C#: async + CancellationToken, nullable, DI, EF không N+1. |
 | BP3 | Thiết kế & testability | Trách nhiệm đơn, dependency inject được, port/adapter đúng chỗ? |
 | BP4 | Hiệu năng | Có bottleneck thật (query, vòng lặp lớn, bundle) theo quy mô thực tế? Không cảnh báo tối ưu hình thức. |
 | BP5 | Dễ đọc | Tên nói rõ ý định, nesting nông, không đòi refactor chỉ vì style. |

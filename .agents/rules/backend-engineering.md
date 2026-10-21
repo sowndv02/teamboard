@@ -6,7 +6,7 @@ Bổ sung cho: `dotnet.md` (quy ước C#), `api-endpoints.md` (hình dạng HTT
 
 ## 1. Mã lỗi và thông báo (registry tập trung)
 
-- Lỗi API theo `application/problem+json` (xem `api-endpoints.md` mục 5). Trường `code` là **mã ổn định**, client (Angular) xử lý/i18n theo `code`, **không** rẽ nhánh theo `message`.
+- Lỗi API theo `application/problem+json` (xem `api-endpoints.md` mục 5). Trường `code` là **mã ổn định**, client xử lý theo `code`, **không** rẽ nhánh theo `message`.
 - `message`/`detail` mặc định bằng **tiếng Anh**, ngắn, không lộ chi tiết nội bộ; bản tiếng Việt do client dịch theo `code`.
 - Registry nằm ở `src/shared` (contract, không logic nghiệp vụ):
   - `ErrorCodes` (const string, UPPER_SNAKE): `VALIDATION_FAILED`, `NOT_FOUND`, `CONFLICT`, `INTERNAL_ERROR`, …

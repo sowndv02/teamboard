@@ -20,7 +20,7 @@ Rule liên quan: `git-workflow.md`, `git-commit.md`, `code-change-gate.md`, `qua
 1. **Kiểm tra lần cuối** (chỉ đọc/chạy kiểm tra): gate đầy đủ, `git status`, `git diff <base>...HEAD --stat`, quét secret thô; chắc chắn diff chỉ gồm phạm vi issue; không có file sinh ra, `local/`, secret.
 2. **Soạn PR** (hiển thị cho người dùng duyệt, chưa tạo):
    - **Tiêu đề:** `TB-NNN: <tóm tắt ngắn>` (theo `config/project.yaml`).
-   - **Mô tả:** mục tiêu và vì sao; link file issue/spec/design/plan; tóm tắt thay đổi chính theo service; **cách kiểm chứng** (lệnh test, kịch bản đã chạy, kết quả); tác động (API/contract, database/migration, consumer: Angular, service khác); rủi ro/giới hạn đã biết; các quyết định đã được người dùng chốt (từ Confirm log, tóm tắt); checklist gate đã chạy.
+   - **Mô tả:** mục tiêu và vì sao; link file issue/spec/design/plan; tóm tắt thay đổi chính theo service; **cách kiểm chứng** (lệnh test, kịch bản đã chạy, kết quả); tác động (API/contract, database/migration, consumer: service khác); rủi ro/giới hạn đã biết; các quyết định đã được người dùng chốt (từ Confirm log, tóm tắt); checklist gate đã chạy.
    - Nhãn/reviewer nếu repo có quy ước (không đoán).
 3. **Xin xác nhận** người dùng (công cụ hỏi): tiêu đề, mô tả, nhánh đích (mặc định `main`), repo. Chỉ sau khi được xác nhận mới tiếp tục.
 4. **Push và tạo PR:** `git push -u origin <branch>` rồi `gh pr create` (`--base main`, tiêu đề, mô tả). Không `--force`, không `--no-verify`. Nếu đã có PR mở cho branch → **cập nhật** thay vì tạo trùng; báo người dùng.

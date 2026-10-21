@@ -74,7 +74,7 @@ Trạng thái giữa các vòng ghi trong mục **"Test review rounds"** ở cu�
 Khi review test code (unit, integration, step definition), kiểm:
 
 - [ ] Test **đã từng đỏ đúng lý do** (nhật ký issue có bằng chứng đỏ → xanh), không phải test luôn xanh.
-- [ ] Assert trên **trạng thái/hành vi thật** (DB, message phát ra, DOM), không chỉ status code hay "không ném lỗi".
+- [ ] Assert trên **trạng thái/hành vi thật** (DB, message phát ra), không chỉ status code hay "không ném lỗi".
 - [ ] Mỗi kịch bản `.feature` có test thực thi tương ứng, tên/tag trỏ lại được ID kịch bản (`S01`).
 - [ ] Không mock quá mức che mất hành vi thật (không mock DB cho integration); mock chỉ ở biên ngoài (mạng bên thứ ba).
 - [ ] Test độc lập, không phụ thuộc thứ tự/thời gian thực/dữ liệu chung; deterministic (clock, id giả khi cần).

@@ -12,8 +12,7 @@ Giai đoạn 0 (xem lộ trình trong README). Mới có `src/teamboard-api` (AS
 
 | Service | Kiến trúc | Lưu trữ |
 |---|---|---|
-| web | Angular, feature-based, standalone + Signals | – |
-| gateway | API Gateway/BFF (YARP) | – |
+| gateway | API Gateway (YARP) | – |
 | identity-service | Vertical Slice | PostgreSQL |
 | board-service | Clean Architecture | SQL Server |
 | task-service | CQRS + Event Sourcing + Outbox | PostgreSQL |
@@ -24,7 +23,7 @@ Không "đơn giản hoá" một service về CRUD layered: kiến trúc khác n
 
 ## Quy ước riêng của dự án
 
-- Tech stack chính (ADR 0005): **ASP.NET Core (.NET 10)** cho backend, **Angular** cho frontend (`src/web`, chỉ gọi backend qua gateway). Công nghệ khác chỉ khi ADR cho phép.
+- Tech stack chính (ADR 0005, FE tạm hoãn theo ADR 0008): **ASP.NET Core (.NET 10)** cho backend. Giai đoạn hiện tại **không phát triển frontend**. Công nghệ khác chỉ khi ADR cho phép.
 - Mỗi service sở hữu database riêng; không truy cập DB của service khác.
 - `src/shared/` chỉ chứa contract (event schema) và cross-cutting (OTel, health). Không đặt business logic.
 - Giao tiếp: REST qua gateway; event qua SNS → SQS (+ DLQ). Producer dùng outbox, consumer idempotent theo `eventId`. Mọi request/event mang `correlationId` + `traceparent`.

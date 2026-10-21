@@ -2,17 +2,9 @@
 # Kiến trúc và lưu trữ: xem document/architecture/README.md §1
 
 services:
-  web:
-    status: planned
-    path: src/web
-    architecture: angular-feature-based (standalone + signals)   # ADR 0005
-    datastore: none
-    local_port: TODO            # ng serve mặc định 4200
-    talks_to: gateway           # chỉ gọi /api/v1 qua gateway
-
   gateway:
     status: planned
-    architecture: api-gateway-bff (YARP)
+    architecture: api-gateway (YARP)
     datastore: none
     local_port: TODO
     health: { live: /health/live, ready: /health/ready }

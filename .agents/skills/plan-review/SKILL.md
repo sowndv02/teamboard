@@ -36,7 +36,7 @@ description: Review kế hoạch triển khai (plan) để tìm điểm chưa r�
 - [ ] Gate và DoD đầy đủ (`code-change-gate.md`, `quality-gate.md`).
 
 ### E. Rủi ro, an toàn, vận hành
-- [ ] Migration an toàn, có rollback; không phá consumer (Angular, service khác); thay đổi contract có kế hoạch.
+- [ ] Migration an toàn, có rollback; không phá consumer (service khác); thay đổi contract có kế hoạch.
 - [ ] Bảo mật, cấu hình/secret, biến môi trường, quan sát được xét đến.
 - [ ] Tài liệu/ADR/config cần cập nhật được liệt kê.
 - [ ] Hạ tầng (nếu có): `plan` Terraform, chi phí; `apply` cần người dùng đồng ý.

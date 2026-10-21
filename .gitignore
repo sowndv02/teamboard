@@ -404,10 +404,3 @@ var/
 # IDE
 .idea/
 
-# Angular / Node
-node_modules/
-src/web/dist/
-src/web/.angular/
-src/web/coverage/
-*.tsbuildinfo
-npm-debug.log*

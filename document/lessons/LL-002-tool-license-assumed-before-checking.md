@@ -44,7 +44,7 @@ Tra cứu và ghi nhận tình trạng hiện hành; thêm chính sách và danh
 Thử thêm một thư viện mới theo `workflow`: agent phải hỏi/ghi giấy phép, hạng và nguồn kiểm trước khi thêm; thư viện T3 bị chặn hoặc hỏi người dùng.
 
 ## Phạm vi áp dụng
-Mọi dự án; mọi loại phụ thuộc (NuGet, npm, provider Terraform, image, công cụ CLI) và khi viết tài liệu có nêu công cụ cụ thể.
+Mọi dự án; mọi loại phụ thuộc (NuGet, provider Terraform, image, công cụ CLI) và khi viết tài liệu có nêu công cụ cụ thể.
 
 ## Liên kết
 `.agents/rules/dependency-policy.md`, `config/dependencies.yaml`, ADR 0007, ADR 0002.

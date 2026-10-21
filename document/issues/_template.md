@@ -4,6 +4,10 @@ title: <tiêu đề ngắn>
 status: todo
 phase: <số giai đoạn trong lộ trình>
 branch: feature/TB-000-<slug>
+estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
+created: YYYY-MM-DD
+started: null           # ngày chuyển in-progress
+closed: null            # ngày done/dropped
 ---
 
 # TB-000 — <tiêu đề>

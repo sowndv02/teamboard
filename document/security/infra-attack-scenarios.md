@@ -20,7 +20,7 @@ Mỗi kịch bản: **mục tiêu kẻ tấn công** → **cấu hình sai cho p
 - **Phát hiện:** IAM Access Analyzer (finding "public"), AWS Config rule, Macie (dữ liệu nhạy cảm), S3 server access/CloudTrail data events.
 - **Phòng ngừa:** bật Block Public Access ở cấp tài khoản và bucket; policy chặn truyền không TLS; SCP cấm tắt Block Public Access.
 - **Kiểm chứng an toàn:** cho Trivy/Checkov quét Terraform bucket cố ý sai; so với bản đúng.
-- **TeamBoard:** bucket state Terraform, bucket tĩnh cho Angular (S3 + CloudFront: dùng Origin Access Control, không public bucket).
+- **TeamBoard:** bucket state Terraform (mã hoá, chặn public, quyền tối thiểu).
 
 ### A2. Cơ sở dữ liệu/snapshot lộ ra Internet
 - **Mục tiêu:** truy cập DB trực tiếp hoặc chép snapshot.

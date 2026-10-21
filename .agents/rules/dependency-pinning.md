@@ -9,12 +9,6 @@ Lý do: build tái lập được, tránh lỗi "hôm qua chạy, hôm nay hỏn
 - Package họ Microsoft/EF Core/ASP.NET cùng major.minor để tránh lệch (ví dụ cùng `10.0.x`).
 - Thêm package mới: kiểm tra cần thật, giấy phép, bản ổn định mới nhất (không dùng bản `preview` trừ khi có lý do ghi trong issue). Thấy package `preview` đang có thì báo, không tự đổi.
 
-## npm (Angular)
-
-- Cố định phiên bản trong `package.json` (không `^`/`~` cho `@angular/*`, `typescript`, `rxjs`; các package `@angular/*` luôn cùng một version), commit `package-lock.json`, cài trong CI bằng `npm ci`.
-- Ghi phiên bản Node vào `.nvmrc` và `engines`; khớp `config/tool-versions.yaml`.
-- Nâng Angular dùng `ng update` trong một thay đổi riêng, không trộn với tính năng.
-
 ## Terraform
 
 - `required_version` và provider dùng `~>` theo minor (`~> 5.0`); commit `.terraform.lock.hcl`.

@@ -40,6 +40,7 @@ docs:
   plansRoot: document/plans                # plan theo issue: TB-NNN-<slug>.md
   workflowStateRoot: document/workflow     # state file của workflow: <id>.yaml
   lessonsRoot: document/lessons            # bài học kinh nghiệm: LL-NNN-<slug>.md
+  pmRoot: document/pm                      # hồ sơ quản lý dự án (skill project-manager)
   architectureIndex: document/architecture/README.md
   required:                                # tier: R0 luôn đọc · R1 đọc khi vào phạm vi · R2 đọc khi có điều kiện
     - { id: agent-rules,  path: AGENTS.md,                        tier: R0 }
@@ -56,6 +57,13 @@ docs:
     - { id: runbooks, glob: 'document/runbooks/*.md',         tier: R2, when: debug sự cố }
     - { id: services, path: config/services.yaml,             tier: R2, when: đụng cổng/tên service }
     - { id: envs,     path: config/environments.yaml,         tier: R2, when: đụng infra hoặc CI/CD }
+
+pm:                            # quản lý dự án (skill project-manager)
+  cadence: weekly               # nhịp kế hoạch/báo cáo
+  statusDay: TODO               # ngày trong tuần lập báo cáo; hỏi người dùng
+  capacityHoursPerWeek: TODO    # giờ khả dụng mỗi tuần; TODO → hỏi (cần để lên sprint và dự báo)
+  wipLimit: 2                   # đề xuất; số issue in-progress/review tối đa cùng lúc
+  bufferPercent: 25             # đề xuất đệm cho rủi ro/việc phát sinh; hiệu chỉnh bằng số liệu
 
 quality:                        # dùng cho lăng kính Chất lượng/Bảo mật/Chi phí trong các bước review
   monthlyBudgetUsd: TODO        # trần chi phí AWS/tháng (cả dự án); TODO → design-review yêu cầu chốt

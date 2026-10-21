@@ -8,7 +8,7 @@ Sổ ghi lại **lỗi/sự cố/sai sót đã xảy ra** và **cách ngăn nó 
 - Tra theo **tag** trước khi làm việc trong một vùng (đọc bảng dưới, chỉ mở lesson khớp tag).
 
 ## Từ vựng tag
-`security` `cost` `infra` `aws` `api` `messaging` `database` `testing` `workflow` `docs` `dependency` `git` `observability` `frontend` `backend` `agent-behavior` `process` + tên service (`board-service`, `task-service`...).
+`security` `cost` `infra` `aws` `api` `messaging` `database` `testing` `workflow` `docs` `dependency` `git` `observability` `backend` `agent-behavior` `process` + tên service (`board-service`, `task-service`...).
 
 ## Trạng thái phòng ngừa
 - `prevented`: đã có biện pháp phòng ngừa và đã kiểm chứng.

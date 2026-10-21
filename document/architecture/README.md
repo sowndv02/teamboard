@@ -11,15 +11,14 @@ Domain giữ nhỏ (Board, Task, thông báo, thống kê) để thời gian dà
 
 | Service | Trách nhiệm | Kiến trúc nội bộ (điểm luyện) | Lưu trữ | Giao tiếp |
 |---|---|---|---|---|
-| `web` | Giao diện người dùng (Angular SPA, xem ADR 0005) | **Feature-based**, standalone components + Signals | – | Gọi gateway qua `/api/v1` |
-| `gateway` | Entry point, routing, kiểm tra JWT, rate limit | **API Gateway / BFF** (YARP) | – | HTTP vào, HTTP ra |
+| `gateway` | Entry point, routing, kiểm tra JWT, rate limit | **API Gateway** (YARP) | – | HTTP vào, HTTP ra |
 | `identity-service` | Đăng ký, đăng nhập, JWT | **Vertical Slice** (Minimal API) | PostgreSQL | REST; phát JWKS |
 | `board-service` | CRUD Board, thành viên (từ `teamboard-api` hiện có) | **Clean Architecture** + EF Core | SQL Server (RDS) | REST; publish event |
 | `task-service` | Vòng đời Task (tạo, gán, đổi trạng thái) | **CQRS + Event Sourcing** + Outbox | PostgreSQL (event store + read model) | REST + publish event |
 | `notification-service` | Gửi email/webhook khi có event | **Hexagonal (Ports & Adapters)**, consumer idempotent, DLQ | DynamoDB (dedupe) | Consume SQS |
 | `activity-service` | Feed hoạt động + thống kê theo Board | **Serverless / Event-driven** (Lambda hoặc worker Go) | DynamoDB | Consume SNS→SQS |
 
-Ghi chú: tech stack chính là ASP.NET Core (.NET 10) + Angular (ADR 0005); `activity-service` là ứng viên dùng Go để thử polyglot (không bắt buộc).
+Ghi chú: tech stack chính là ASP.NET Core (.NET 10) (ADR 0005); frontend tạm hoãn ở giai đoạn này (ADR 0008); `activity-service` là ứng viên dùng Go để thử polyglot (không bắt buộc).
 
 ## 2. Giao tiếp
 
@@ -92,9 +91,10 @@ document/
 - [0002 Giao tiếp: REST + SNS/SQS + Outbox](adr/0002-communication.md)
 - [0003 Runtime: ECS Fargate thay vì EKS](adr/0003-ecs-fargate.md)
 - [0004 Terraform layout & state](adr/0004-terraform-layout.md)
-- [0005 Tech stack chính: ASP.NET Core + Angular](adr/0005-techstack-aspnet-angular.md)
+- [0005 Tech stack chính: ASP.NET Core + Angular](adr/0005-techstack-aspnet-angular.md) (phần Angular tạm hoãn bởi ADR 0008)
 - [0006 Tự xây identity-service (không dùng framework identity)](adr/0006-identity-self-built.md)
 - [0007 Chính sách phụ thuộc bên thứ ba](adr/0007-dependency-policy.md)
+- [0008 Tạm hoãn frontend ở giai đoạn hiện tại](adr/0008-defer-frontend.md)
 
 ## Tài liệu kiến trúc chi tiết
 

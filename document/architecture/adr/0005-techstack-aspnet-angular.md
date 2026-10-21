@@ -1,6 +1,6 @@
 # ADR 0005 — Tech stack chính: ASP.NET Core + Angular
 
-Trạng thái: Chấp nhận · Ngày: 2026-10-20
+Trạng thái: Chấp nhận (phần Backend); phần Frontend/Angular **tạm hoãn, thay thế một phần bởi ADR 0008** · Ngày: 2026-10-21
 
 ## Quyết định
 - Backend: **ASP.NET Core (.NET 10)** cho mọi service chính.

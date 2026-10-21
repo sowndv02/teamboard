@@ -41,11 +41,11 @@ Người dùng không cần gõ lệnh; suy ra chế độ từ ngữ cảnh, kh
 - Đã có spec/issue trùng hoặc gần giống? Báo người dùng, đề xuất `refine` thay vì tạo mới.
 
 ### 3. Phân tích khoảng trống
-Đối chiếu yêu cầu với bảng ở `references/gap-checklist.md` (đối tượng, mục tiêu, phạm vi, dữ liệu, quy tắc nghiệp vụ, luồng, quyền, tích hợp, phi chức năng, UI, vận hành, di chuyển dữ liệu, ràng buộc, tiêu chí chấp nhận). Mỗi mục đánh dấu: **Biết** / **Giả định** / **Chưa biết**. Chỉ những mục **Chưa biết** có tác động lớn mới thành câu hỏi.
+Đối chiếu yêu cầu với bảng ở `references/gap-checklist.md` (đối tượng, mục tiêu, phạm vi, dữ liệu, quy tắc nghiệp vụ, luồng, quyền, tích hợp, phi chức năng, vận hành, di chuyển dữ liệu, ràng buộc, tiêu chí chấp nhận). Mỗi mục đánh dấu: **Biết** / **Giả định** / **Chưa biết**. Chỉ những mục **Chưa biết** có tác động lớn mới thành câu hỏi.
 
 ### 4. Hỏi (vòng lặp)
 - Dùng công cụ hỏi có lựa chọn (`AskUserQuestion`), **tối đa 4 câu mỗi lô**, 2–4 lựa chọn, đặt phương án khuyến nghị đầu tiên kèm lý do ngắn. Cho phép người dùng nhập tự do.
-- Thứ tự ưu tiên: (1) mục tiêu/giá trị và người dùng, (2) phạm vi trong/ngoài, (3) quy tắc nghiệp vụ cốt lõi và trạng thái, (4) luồng lỗi/biên, (5) quyền và dữ liệu nhạy cảm, (6) phi chức năng, (7) chi tiết giao diện.
+- Thứ tự ưu tiên: (1) mục tiêu/giá trị và người dùng, (2) phạm vi trong/ngoài, (3) quy tắc nghiệp vụ cốt lõi và trạng thái, (4) luồng lỗi/biên, (5) quyền và dữ liệu nhạy cảm, (6) phi chức năng.
 - Câu hỏi: cụ thể, một ý, tránh câu hỏi dẫn dắt, có ví dụ khi trừu tượng ("khi hai người cùng sửa một task thì ai thắng?").
 - Sau mỗi lô: cập nhật bảng Biết/Giả định/Chưa biết, quyết định có cần lô tiếp. **Dừng hỏi** khi không còn "Chưa biết" mức cao; phần còn lại thành giả định/câu hỏi mở.
 - Người dùng nói "không biết/hỏi khách sau" → ghi vào **Câu hỏi mở** (kèm giả định mặc định và người cần trả lời), không chặn việc viết spec.

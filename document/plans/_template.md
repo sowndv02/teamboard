@@ -47,7 +47,7 @@ Công cụ test/BDD (từ `config/tool-versions.yaml`):
 | Rủi ro | Tác động | Giảm thiểu | Rollback |
 |---|---|---|---|
 
-Ảnh hưởng consumer (Angular, service khác):
+Ảnh hưởng consumer (service khác):
 
 Bảo mật (bước kiểm quyền/validate/secret và test tương ứng):
 

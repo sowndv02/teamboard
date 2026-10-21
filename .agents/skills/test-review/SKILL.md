@@ -31,7 +31,7 @@ description: Review bộ test BDD/TDD (file .feature và test thực thi, trạn
 ### D. Test thực thi và trạng thái đỏ (`test-review.md` mục 5)
 - [ ] Mỗi kịch bản có test thực thi tương ứng (bảng reconcile); gap → FIX nếu thiếu đơn thuần, CONFIRM nếu không rõ nên test thế nào.
 - [ ] **Chạy lại test**: đỏ **đúng lý do** (assertion/hành vi chưa có), không đỏ vì lỗi biên dịch, thiếu cấu hình hay môi trường. Đỏ sai lý do → FIX.
-- [ ] Assert trạng thái thật (DB, thông điệp phát ra, DOM), không chỉ status code; integration dùng DB thật; mock chỉ ở biên ngoài; test độc lập, deterministic; không skip/ignore/assert rỗng.
+- [ ] Assert trạng thái thật (DB, thông điệp phát ra), không chỉ status code; integration dùng DB thật; mock chỉ ở biên ngoài; test độc lập, deterministic; không skip/ignore/assert rỗng.
 - [ ] Test không chứa logic production; stub rỗng không có hành vi.
 - [ ] Gate tĩnh của phần test (format/lint) xanh theo `quality-gate.md`.
 

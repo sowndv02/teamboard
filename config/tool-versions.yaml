@@ -1,9 +1,6 @@
 # Phiên bản công cụ yêu cầu. Kiểm tra bằng các lệnh ở COMMANDS.md §1.
 
 dotnet: "10.0"                  # src/teamboard-api/teamboard-api.csproj: net10.0
-node: TODO                      # cần cho Angular; chọn LTS tương thích version Angular, ghi vào .nvmrc
-package_manager: npm            # đề xuất mặc định (ADR 0005); đổi thì cập nhật ADR
-angular: TODO                   # version Angular CLI/framework; pin khi scaffold src/web
 docker: TODO
 docker_compose: v2
 terraform: TODO                 # cần từ giai đoạn 4; pin trong required_version khi tạo infra
@@ -12,4 +9,3 @@ aws_provider: TODO
 # Kiểm thử (TDD/BDD)
 dotnet_test_framework: TODO     # đề xuất xUnit
 bdd_runner_dotnet: TODO         # đề xuất Reqnroll
-bdd_runner_web: TODO            # đề xuất Playwright + playwright-bdd hoặc Cucumber.js

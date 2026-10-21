@@ -5,7 +5,7 @@ Dùng ở bước 3 của skill. Với mỗi dòng đánh dấu **Biết / Giả
 | # | Chiều | Câu hỏi gợi ý | Tác động nếu bỏ sót |
 |---|---|---|---|
 | 1 | **Mục tiêu & giá trị** | Vấn đề gì cần giải? Thành công đo bằng gì? Nếu không làm thì sao? | Làm sai hướng, không biết khi nào xong |
-| 2 | **Người dùng & vai trò** | Ai dùng? Có vai trò nào khác nhau? Tần suất, mức thành thạo? | Sai giao diện, sai phân quyền |
+| 2 | **Người dùng & vai trò** | Ai dùng? Có vai trò nào khác nhau? Tần suất, mức thành thạo? | Sai phân quyền |
 | 3 | **Phạm vi** | Trong lần này gồm gì, **không** gồm gì? Có giai đoạn sau? | Phình việc, hiểu lầm kỳ vọng |
 | 4 | **Dữ liệu** | Thực thể nào, thuộc tính, ràng buộc (bắt buộc, duy nhất, độ dài)? Nguồn? Lưu bao lâu? | Sai mô hình, migration đau |
 | 5 | **Quy tắc nghiệp vụ** | Điều kiện, tính toán, trạng thái và chuyển trạng thái hợp lệ, ngoại lệ? | Lỗi logic khó sửa |
@@ -14,8 +14,8 @@ Dùng ở bước 3 của skill. Với mỗi dòng đánh dấu **Biết / Giả
 | 8 | **Đồng thời & nhất quán** | Hai người sửa cùng lúc? Thao tác lặp lại (bấm hai lần)? Thứ tự? | Mất dữ liệu, trùng bản ghi |
 | 9 | **Phân quyền & bảo mật** | Ai xem/sửa/xoá? Dữ liệu nhạy cảm/PII? Cần ghi vết (audit)? | Lộ dữ liệu, vi phạm quy định |
 | 10 | **Tích hợp & sự kiện** | Hệ thống/dịch vụ nào liên quan? Cần thông báo (email, webhook)? Ai phát/nhận sự kiện? | Thiếu liên kết, sai ranh giới service |
-| 11 | **Phi chức năng** | Số người dùng, số bản ghi, độ trễ chấp nhận, sẵn sàng, khôi phục sự cố, đa ngôn ngữ, truy cập được (a11y)? | Không đạt hiệu năng/độ tin cậy |
-| 12 | **Giao diện & trải nghiệm** | Màn hình, thiết bị, mẫu có sẵn? Thông báo/lỗi hiển thị thế nào? | Làm lại UI |
+| 11 | **Phi chức năng** | Số người dùng, số bản ghi, độ trễ chấp nhận, sẵn sàng, khôi phục sự cố? | Không đạt hiệu năng/độ tin cậy |
+| 12 | **Giao diện & trải nghiệm** | Chưa áp dụng ở giai đoạn này (không có frontend, ADR 0008); nếu yêu cầu có phần giao diện, ghi vào Ngoài phạm vi hoặc Câu hỏi mở | Làm lại khi có frontend |
 | 13 | **Vận hành & quan sát** | Cần báo cáo, số liệu, cảnh báo? Ai hỗ trợ khi lỗi? | Không theo dõi được |
 | 14 | **Di chuyển & tương thích** | Dữ liệu cũ cần chuyển? Có hệ thống cũ chạy song song? | Mất dữ liệu, gián đoạn |
 | 15 | **Ràng buộc** | Hạn chót, ngân sách, quy định, công nghệ bắt buộc, môi trường triển khai? | Phương án không khả thi |
