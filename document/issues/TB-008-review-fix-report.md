@@ -1,7 +1,7 @@
 ---
 key: TB-008
 title: Báo cáo mọi FIX agent đã sửa sau mỗi vòng review (không sửa im lặng)
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-008-review-fix-report
 estimate: S
@@ -32,6 +32,8 @@ Giao thức review (`review-loop.md`) cho agent tự sửa finding loại FIX, c
 
 ## Ghi chú / Nhật ký
 - 2026-10-22: làm theo làn nhỏ (tài liệu). Nhánh tách từ `main` bằng git worktree để không lẫn với thay đổi dở của TB-007. Người dùng chưa chọn định dạng; dùng mặc định: bảng "Đã sửa" trong báo cáo và issue, agent sửa xong mới báo.
+
+- 2026-10-22: mở PR https://github.com/sowndv02/teamboard/pull/4 (bằng `gh pr create`, `gh` cài qua winget). Chờ người dùng review và merge.
 
 ## Bài học (lessons learned)
 
