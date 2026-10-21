@@ -1,0 +1,61 @@
+# Danh bạ phụ thuộc bên thứ ba đã xét. Quy tắc: .agents/rules/dependency-policy.md (ADR 0007).
+# Hạng: T0 nền tảng | T1 quỹ/tổ chức trung lập | T2 công ty/ít người duy trì (cần phê duyệt, bọc sau interface) | T3 cấm trừ khi duyệt
+# status: approved | restricted | banned | watch | in-use
+# verified: true = đã đối chiếu nguồn (ghi ở `source`); false = từ trí nhớ/kỳ vọng, PHẢI kiểm tra trang chính thức trước khi dùng
+# Cập nhật file này mỗi khi thêm/đổi phụ thuộc. Không chứa secret.
+
+updated: 2026-10-21
+
+policy:
+  allow_licenses: [MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense]
+  review_licenses: [MPL-2.0, LGPL-2.1, LGPL-3.0, EPL-2.0]        # cần phê duyệt
+  deny_licenses: [GPL-2.0, GPL-3.0, AGPL-3.0, SSPL-1.0, BUSL-1.1, RSAL-2.0, Commercial, Proprietary, source-available, no-license]
+
+packages:
+  # ---- T0: nền tảng ----
+  - { name: ASP.NET Core / .NET BCL, ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false, note: "Microsoft first-party" }
+  - { name: Microsoft.EntityFrameworkCore (+ SqlServer, Npgsql provider), ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false, note: "EF Core first-party; đang dùng trong teamboard-api" }
+  - { name: Microsoft.Extensions.* (Logging, Options, DependencyInjection, Http.Resilience, Diagnostics.HealthChecks), ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false }
+  - { name: Microsoft.AspNetCore.OpenApi, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false }
+  - { name: AWSSDK.* (AWS SDK for .NET), ecosystem: nuget, tier: T0, status: approved, license: Apache-2.0, verified: false, note: "AWS first-party" }
+
+  # ---- T1: quỹ/tổ chức trung lập ----
+  - { name: OpenTelemetry .NET, ecosystem: nuget, tier: T1, status: approved, license: Apache-2.0, verified: false, note: "CNCF" }
+  - { name: Polly, ecosystem: nuget, tier: T1, status: approved, license: BSD-3-Clause, verified: false, note: ".NET Foundation; Microsoft.Extensions.Http.Resilience dựa trên Polly" }
+  - { name: xUnit, ecosystem: nuget, tier: T1, status: approved, license: Apache-2.0, verified: false, note: ".NET Foundation; framework test mặc định đề xuất (chưa chốt trong tool-versions.yaml)" }
+  - { name: Npgsql, ecosystem: nuget, tier: T1, status: approved, license: PostgreSQL-License, verified: false }
+  - { name: YARP (Yarp.ReverseProxy), ecosystem: nuget, tier: T1, status: approved, license: MIT, verified: false, note: "Microsoft; gateway" }
+
+  # ---- T2: cần phê duyệt, bọc sau interface ----
+  - { name: Serilog, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (blog 2026)", note: "Hiện permissive; ưu tiên ILogger + OpenTelemetry (observability.md)" }
+  - { name: FluentValidation, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (DepScope, blog 2026)", exit: "DataAnnotations/IValidatableObject hoặc validator tự viết" }
+  - { name: Reqnroll, ecosystem: nuget, tier: T2, status: watch, license: BSD-3-Clause, verified: true, source: "https://docs.reqnroll.net/latest/help/faq.html", note: "Nhánh cộng đồng của SpecFlow; BDD runner đề xuất, chưa chốt", exit: "test BDD viết tay bằng xUnit" }
+  - { name: Swashbuckle.AspNetCore.SwaggerUI, ecosystem: nuget, tier: T2, status: in-use, license: MIT, verified: false, note: "Đang dùng trong teamboard-api; ít người duy trì", exit: "Microsoft.AspNetCore.OpenApi + giao diện nhẹ khác" }
+  - { name: Testcontainers, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "docker compose cho test tích hợp" }
+  - { name: Mapster, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "ánh xạ thủ công" }
+  - { name: Carter, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "Minimal API MapGroup" }
+  - { name: Marten, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, note: "Nhà duy trì cũng bán dịch vụ thương mại; kiểm tra", exit: "EF Core/Npgsql + JSONB" }
+  - { name: Refit, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "HttpClient typed client" }
+  - { name: NSubstitute, ecosystem: nuget, tier: T2, status: watch, license: BSD-3-Clause, verified: false, exit: "fake viết tay" }
+  - { name: Mapperly (Riok.Mapperly), ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: false }
+
+  # ---- T3: cấm trừ khi duyệt tường minh + ADR + chi phí ----
+  - { name: MediatR, ecosystem: nuget, tier: T3, status: banned, license: "Apache-2.0 (≤12.5.0) / RPL-1.5 + Commercial (≥13)", verified: true, source: "https://www.jimmybogard.com/automapper-and-mediatr-commercial-editions-launch-today/ ; https://startdebugging.net/2026/05/mediatr-vs-plain-service-classes-in-2026/", exit: "handler class qua DI + dispatcher nhỏ tự viết" }
+  - { name: AutoMapper, ecosystem: nuget, tier: T3, status: banned, license: "Commercial (bản mới)", verified: true, source: "https://www.jimmybogard.com/automapper-and-mediatr-commercial-editions-launch-today/", exit: "ánh xạ thủ công / source generator" }
+  - { name: MassTransit, ecosystem: nuget, tier: T3, status: banned, license: "Commercial (v9); bản trước permissive", verified: true, source: "https://masstransit.io/support", exit: "lớp nhắn tin mỏng trên AWS SDK (SQS/SNS)" }
+  - { name: FluentAssertions, ecosystem: nuget, tier: T3, status: banned, license: "Xceed (≥8) / Apache-2.0 (≤7)", verified: true, source: "https://www.devclass.com/development/2025/01/16/another-open-source-project-shifts-to-restrictive-license-fluent-assertions-following-xceed-partnership/1621343", exit: "xUnit Assert hoặc AwesomeAssertions (kiểm tra giấy phép)" }
+  - { name: SpecFlow, ecosystem: nuget, tier: T3, status: banned, license: "hết vòng đời (2024-12-31)", verified: true, source: "https://reqnroll.net/news/2025/01/specflow-end-of-life-has-been-announced/", exit: "Reqnroll" }
+  - { name: Duende IdentityServer / IdentityServer4, ecosystem: nuget, tier: T3, status: banned, license: "Commercial / hết hỗ trợ (IS4)", verified: false, exit: "tự xây (ADR 0006) hoặc Cognito" }
+  - { name: Moq, ecosystem: nuget, tier: T3, status: restricted, license: BSD-3-Clause, verified: false, note: "Từng tranh cãi SponsorLink (2023, trí nhớ); kiểm tra tình trạng hiện hành", exit: "fake viết tay / NSubstitute" }
+
+tools:
+  - { name: Terraform, tier: T2, status: in-use, license: "BSL-1.1 (từ 2023)", verified: true, source: "https://www.softwareseni.com/migration-and-risk-assessment-playbook-for-ctos-evaluating-redis-to-valkey-and-terraform-to-opentofu-switches/", note: "Dùng cho hạ tầng của mình được phép; không phải mã nguồn mở", alt: "OpenTofu (nhánh Linux Foundation, kiểm tra giấy phép và tương thích)" }
+  - { name: OpenTofu, tier: T1, status: watch, license: "MPL-2.0 (kiểm tra)", verified: false }
+  - { name: Docker Engine / CLI / Compose, tier: T1, status: approved, license: Apache-2.0, verified: true, source: "https://docker.io/pricing/faq/" }
+  - { name: Docker Desktop, tier: T3, status: restricted, license: "Trả phí khi tổ chức vượt ngưỡng nhân sự/doanh thu", verified: true, source: "https://docker.io/pricing/faq/", note: "Kiểm tra điều khoản khi dùng cho việc ở công ty", alt: "Rancher Desktop, Podman, Docker Engine trong WSL2" }
+  - { name: LocalStack, tier: T3, status: restricted, license: "Cần auth token từ 2026.03; gói miễn phí phi thương mại", verified: true, source: "https://blog.localstack.cloud/localstack-single-image-next-steps/", note: "Chưa chốt công cụ giả lập AWS cục bộ (ADR 0007)", alt: "AWS sau interface + fake; DynamoDB Local (AWS); ElastiCache/SQS emulator cộng đồng (chưa kiểm chứng); tài khoản AWS sandbox" }
+  - { name: Redis (server), tier: T3, status: banned, license: "RSALv2/SSPL; Redis 8 thêm AGPLv3", verified: true, source: "https://sdtimes.com/os/open-source-wins-again-redis-adds-gnu-agpl-license-to-its-offering/", alt: "Valkey (BSD-3, Linux Foundation); ElastiCache dùng Valkey (kiểm tra)" }
+  - { name: Valkey, tier: T1, status: watch, license: BSD-3-Clause, verified: true, source: "https://thenewstack.io/linux-foundation-forks-the-open-source-redis-as-valkey/" }
+  - { name: Jaeger, Prometheus, OpenTelemetry Collector, tier: T1, status: approved, license: Apache-2.0, verified: false, note: "CNCF" }
+  - { name: Grafana / Loki / Tempo, tier: T2, status: watch, license: AGPL-3.0, verified: false, note: "Dùng nội bộ thường ổn; đọc điều khoản trước khi chỉnh sửa/cung cấp như dịch vụ" }
+  - { name: Seq, tier: T2, status: watch, license: "Thương mại, có gói miễn phí giới hạn", verified: false }

@@ -1,0 +1,78 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+# Tên file: <id>.yaml  (id = TB-NNN hoặc feature-<ten>). Không chứa secret.
+# Không chép nội dung artifact vào đây; chỉ trỏ tới đường dẫn, hash và bằng chứng.
+
+id: TB-000
+scope: issue                     # issue | feature
+title: <tên ngắn>
+updated: 2026-01-01T00:00:00Z
+updated_by: orchestrator:<định danh>
+
+links:
+  issue: document/issues/TB-000-<slug>.md
+  spec: document/spec/<ten>.md
+  design: document/design/<ten>.md
+  plan: document/plans/TB-000-<slug>.md
+  features_dir: document/spec/features/<service>/
+  branch: feature/TB-000-<slug>
+  base: main
+  pr: null
+
+current_step: plan-init          # tên bước đang ở (xem steps)
+next_action: "<ai> làm <việc gì> tiếp theo"
+blocked_by: null                 # lý do cụ thể nếu đang bị chặn
+
+# Mỗi bước: pending | in_progress | needs_confirm | needs_fix | blocked | done | invalidated
+# Với bước review: done tương ứng verdict PASS.
+steps:
+  requirements-discovery: { status: pending }
+  spec-review:            { status: pending }
+  system-design:          { status: pending }
+  design-review:          { status: pending }
+  plan-init:              { status: pending }
+  plan-review:            { status: pending }
+  test-init:              { status: pending }
+  test-review:            { status: pending }
+  coding-start:           { status: pending }
+  coding-review:          { status: pending }
+  create-pr:              { status: pending }
+  # Ví dụ một bước đã chạy:
+  # plan-review:
+  #   status: done
+  #   owner: reviewer:plan-1
+  #   started: 2026-01-01T09:00:00Z
+  #   finished: 2026-01-01T09:40:00Z
+  #   round: 3
+  #   verdict: PASS              # PASS | NEEDS_CONFIRM | NEEDS_FIX
+  #   open_confirm: 0
+  #   open_fix: 0
+  #   inputs:                    # hash artifact đầu vào lúc bắt đầu (git hash-object <file>)
+  #     spec: "<hash>"
+  #     design: "<hash>"
+  #     plan: "<hash>"
+  #   artifacts: [document/plans/TB-000-<slug>.md]
+  #   evidence: ["Confirm log: 4 quyết định", "Review rounds: 3 vòng"]
+
+# Điểm đang chờ người dùng chốt (chi tiết nguyên văn ở Confirm log của artifact)
+confirm_pending: []
+  # - { fingerprint: "spec:board-assign:fr003-vague-notify", question: "Thông báo gửi qua kênh nào?", step: spec-review }
+
+# Việc con giao cho sub-agent / agent khác
+subtasks: []
+  # - id: ST-001
+  #   step: coding-start
+  #   title: <việc>
+  #   owner: worker:coding-b1
+  #   status: pending            # pending | in_progress | done | failed | cancelled
+  #   depends_on: []
+  #   allowed_paths: [src/<service>/**]
+  #   inputs: { plan: "document/plans/TB-000-<slug>.md#B1", scenarios: ["@S01"] }
+  #   done_when: "<tiêu chí + lệnh kiểm chứng>"
+  #   claimed: null
+  #   result: null               # status, summary, files_changed, evidence, open_questions, deviations
+
+# Nhật ký sự kiện: chỉ thêm, không sửa/xoá
+events:
+  - { at: 2026-01-01T00:00:00Z, actor: "orchestrator:<định danh>", event: created, detail: "Khởi tạo state" }
+  # event gợi ý: step_started, review_round, needs_confirm, confirm_answered, step_done,
+  #              subtask_assigned, subtask_done, invalidated, rewind, scope_change, reconciled, reclaimed

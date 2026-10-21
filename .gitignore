@@ -361,3 +361,46 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# ---------- Project-specific ----------
+
+# Thư mục local: mọi thứ chỉ dùng trên máy cá nhân, không commit
+/local/
+
+# Secrets & env (chỉ giữ file mẫu)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+.aws/
+
+# Terraform
+.terraform/
+.terraform.lock.hcl.bak
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# LocalStack / dữ liệu giả lập local
+.localstack/
+volume/
+var/
+
+# Claude Code (cấu hình cá nhân)
+.claude/settings.local.json
+.claude/worktrees/
+
+# IDE
+.idea/
+
