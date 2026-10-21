@@ -74,4 +74,4 @@ Với mỗi nguyên nhân: xác suất sơ bộ, tác động, cách giảm, tí
 - [ ] Quan sát: trace/metric/log/cảnh báo cho luồng chính và luồng lỗi
 - [ ] Chi phí AWS ước tính và cách tắt khi không dùng
 - [ ] Lộ trình mở rộng và tín hiệu để nâng cấp
-- [ ] Nhãn `[Cần]`/`[Chọn để học]` trung thực
+- [ ] Nhãn `[Cần]`/`[Chọn để học]` trung thực; mục `[Chọn để học]` có cách thực tế làm và mức xa thực tế (Gần/Xa); mức *Xa* có xác nhận của người dùng

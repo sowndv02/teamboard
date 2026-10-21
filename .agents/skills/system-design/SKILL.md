@@ -5,7 +5,7 @@ description: Thiết kế hệ thống từ một spec đã rõ, kèm giải th�
 
 # System design có giải thích
 
-Từ **spec đã xác nhận** → **design doc** (`document/design/<ten>.md`) + **bản nháp ADR** cho mỗi quyết định lớn. Mục tiêu kép: ra thiết kế đủ tốt cho yêu cầu, **và** giúp người dùng hiểu *vì sao* (đánh đổi, phương án bị loại, khi nào đổi ý) để học system design.
+Từ **spec đã xác nhận** → **design doc** (`document/design/<ten>.md`) + **bản nháp ADR** cho mỗi quyết định lớn. Mục tiêu kép: ra thiết kế đủ tốt cho yêu cầu, **và** giúp người dùng hiểu *vì sao* (đánh đổi, phương án bị loại, khi nào đổi ý) để học system design. Thiết kế bám cách dự án thực tế làm; mục đích học không biện minh cho việc đi xa thực tế (nguyên tắc 6).
 
 Rule liên quan: `architecture.md` (kiến trúc bắt buộc từng service), `api-endpoints.md`, `messaging.md`, `observability.md`, `terraform.md`, `docs-conventions.md`, `docs-update-specs.md`, `agent-conduct.md` (trung thực, không bịa).
 
@@ -28,7 +28,7 @@ Không cần gõ lệnh; suy ra chế độ từ lời người dùng, không r�
 3. **Giải thích cả cái bị loại.** Mỗi quyết định phải có mục "Vì sao không chọn B/C", nói rõ điều kiện nào thì B/C lại đúng.
 4. **Đánh đổi nói thẳng**: lựa chọn nào cũng mất cái gì; ghi cái mất, ai chịu, khi nào thành vấn đề.
 5. **Đơn giản trước, có lộ trình mở rộng.** Chọn phương án đơn giản nhất đáp ứng NFR **có dự phòng hợp lý**, kèm tín hiệu cho biết khi nào phải nâng cấp (revisit trigger). Không thiết kế cho tải không có trong spec.
-6. **Tách "cần" và "chọn để luyện tập".** Dự án này cố ý bắt dùng nhiều kiến trúc để học (`architecture.md`). Khi một lựa chọn *không cần* cho yêu cầu nhưng *được chọn để luyện*, ghi rõ nhãn `[Chọn để học]` và nêu phương án đơn giản hơn nếu làm thật. Không giả vờ nó là bắt buộc kỹ thuật.
+6. **Tách "cần" và "chọn để luyện tập", và luôn bám thực tế.** Dự án này cố ý bắt dùng nhiều kiến trúc để học (`architecture.md`). Khi một lựa chọn *không cần* cho yêu cầu nhưng *được chọn để luyện*, ghi rõ nhãn `[Chọn để học]` và nêu phương án đơn giản hơn nếu làm thật. Không giả vờ nó là bắt buộc kỹ thuật. **Mục tiêu học không phải lý do để đi xa cách dự án thật làm.** Mọi lựa chọn `[Chọn để học]` phải ghi: (a) **cách dự án thực tế thường làm** cho bài toán này; (b) **mức xa thực tế**: *Gần* (đúng cách thực tế dùng, hoặc bản thu nhỏ hợp lý của nó) hoặc *Xa* (khác hẳn thực tế, ví dụ tự viết thứ đã có thư viện chuẩn như mật mã, giao thức, JWT; dựng hạ tầng nặng hơn nhiều so với tải; kiến trúc không ai dùng ở quy mô đó). Mặc định chọn *Gần*: việc học đạt được bằng cách **làm giống thực tế** (test, vận hành, quan sát, đọc mã nguồn thư viện, thử tấn công), không bằng cách làm khác thực tế. Lựa chọn *Xa* chỉ khi người dùng xác nhận rõ, rủi ro được nêu, và giới hạn trong lab hoặc phạm vi không nằm trên đường chính của sản phẩm; nếu không thì thay bằng phương án *Gần*.
 7. **Không bịa số liệu hay ví dụ.** Số ước lượng ghi rõ giả định; use case tương tự dựa trên pattern công khai, nói mức tin cậy, không bịa nội dung/số liệu cụ thể của công ty nào (xem bước 5).
 8. **Tôn trọng ràng buộc đã chốt**: tech stack (ADR 0005), AWS/Terraform, kiến trúc bắt buộc từng service. Muốn phá ràng buộc → nêu thành đề xuất ADR riêng, không tự phá. **Ràng buộc không phải lý do để bỏ qua phân tích:** với ranh giới service, loại lưu trữ và kiến trúc nội bộ, design vẫn phải nêu *vì sao* (mục D0, bước 3b). ADR hoặc `PROJECT.md` chỉ ghi kết quả mà không có lý do → ghi "ràng buộc chưa có lý do" và đề xuất bổ sung vào ADR; không tự bịa lý do cho hợp thức hoá.
 9. **Chỉ thiết kế, không code.** Trừ ví dụ ngắn minh hoạ trong tài liệu.
@@ -77,7 +77,7 @@ Cho **mỗi** quyết định `D1..Dn`:
 5. **Vì sao không chọn từng phương án còn lại** + **điều kiện để phương án đó trở nên đúng**.
 6. **Đánh đổi chấp nhận** và **rủi ro**; mức độ khó đảo ngược.
 7. **Tín hiệu xem lại (revisit trigger)**: chỉ số/sự kiện cụ thể buộc phải đổi (ví dụ "khi p95 ghi vượt 300 ms" / "khi cần quá 3 consumer").
-8. **Nhãn** `[Cần]` hoặc `[Chọn để học]` (nguyên tắc 6).
+8. **Nhãn** `[Cần]` hoặc `[Chọn để học]` (nguyên tắc 6); với `[Chọn để học]` ghi thêm cách dự án thực tế làm và mức xa thực tế (Gần/Xa).
 9. **Use case tương tự** (bước 5).
 
 ### 5. Use case tương tự
@@ -144,13 +144,14 @@ Với thiết kế hiện tại và tải mục tiêu: liệt kê điểm nghẽ
 - Không tự phá ràng buộc đã chốt; không tự tạo ADR/issue khi chưa được đồng ý.
 - Không sửa ADR đã chấp nhận (`docs-update-specs.md`); đổi quyết định = ADR mới.
 - Không biến lựa chọn "để học" thành lý do kỹ thuật giả; không dùng "đa dạng công nghệ" làm lý do chọn database hay kiến trúc.
+- Không chọn phương án *Xa* thực tế chỉ vì mục đích học khi chưa có xác nhận rõ của người dùng (nguyên tắc 6).
 - Không coi "ADR/`PROJECT.md` đã bắt buộc" hay "người dùng uỷ quyền" là xác nhận cho quyết định khó đảo ngược (nguyên tắc 8, 10, 11).
 
 ## Hoàn thành khi
 - [ ] Spec đầu vào đã `confirmed` (hoặc câu hỏi mở không chặn)
 - [ ] Có D0 (ranh giới, cô lập DB, loại DB, kiến trúc nội bộ) với lý do, kể cả khi bị ràng buộc; người dùng đã chọn hoặc xác nhận từng mục
 - [ ] Drivers có số đo hoặc giả định ghi rõ; có ước lượng bậc độ lớn
-- [ ] Mỗi quyết định lớn: ≥ 2 phương án, bảng so sánh, khuyến nghị, **vì sao không chọn từng phương án còn lại**, đánh đổi, revisit trigger, nhãn `[Cần]/[Chọn để học]`
+- [ ] Mỗi quyết định lớn: ≥ 2 phương án, bảng so sánh, khuyến nghị, **vì sao không chọn từng phương án còn lại**, đánh đổi, revisit trigger, nhãn `[Cần]/[Chọn để học]`; mục `[Chọn để học]` có cách thực tế làm và mức xa thực tế, mức *Xa* có xác nhận của người dùng
 - [ ] Có use case tương tự kèm mức tin cậy; không có nội dung bịa
 - [ ] Có sơ đồ (bối cảnh + sequence luồng chính/lỗi), failure modes, bảo mật, quan sát, chi phí, lộ trình mở rộng
 - [ ] Đã pre-mortem; đã ghi điều chủ ý chưa làm

@@ -22,6 +22,7 @@ description: Review một design doc (system design) để tìm điểm chưa r�
 - [ ] Mỗi quyết định lớn có **≥ 2 phương án thật** (gồm phương án đơn giản nhất) → thiếu: FIX nếu chỉ thiếu trình bày, CONFIRM nếu phương án thay thế có thể đổi hướng.
 - [ ] Có **bảng so sánh theo tiêu chí lấy từ NFR**, khuyến nghị, **"Vì sao không chọn B/C" và điều kiện B/C đúng**, đánh đổi, khả năng đảo ngược, **tín hiệu xem lại đo được**.
 - [ ] Nhãn `[Cần]`/`[Chọn để học]` trung thực; không biến lựa chọn "để học" thành lý do kỹ thuật giả (CONFIRM nếu không rõ).
+- [ ] **Bám thực tế:** mỗi mục `[Chọn để học]` ghi cách dự án thực tế thường làm và mức xa thực tế (Gần/Xa). Mức *Xa* (tự viết thứ đã có thư viện chuẩn như mật mã/giao thức/JWT, hạ tầng nặng hơn nhiều so với tải) mà chưa có xác nhận rõ của người dùng, hoặc nằm trên đường chính của sản phẩm → CONFIRM `scope` (đề xuất phương án *Gần*). Mục đích học không phải lý do chấp nhận phương án xa thực tế.
 - [ ] **Quyết định chưa được đưa ra** hoặc "tuỳ" ("có thể dùng A hoặc B") → CONFIRM `undecided`.
 - [ ] Lựa chọn phụ thuộc vào ưu tiên của người dùng (chi phí vs độ trễ, đơn giản vs mở rộng) chưa hỏi → CONFIRM.
 

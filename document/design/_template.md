@@ -78,7 +78,7 @@ Làm cả khi đã bị ràng buộc bởi ADR/`PROJECT.md`. Mỗi mục ≥ 2 p
 
 ### D1. <Bài toán>
 - **Tiêu chí và trọng số:**
-- **Nhãn:** `[Cần]` / `[Chọn để học]`
+- **Nhãn:** `[Cần]` / `[Chọn để học]` (nếu học: ghi cách dự án thực tế làm và mức xa thực tế *Gần*/*Xa*; *Xa* cần người dùng xác nhận)
 
 | Phương án | Mô tả | Tiêu chí 1 | Tiêu chí 2 | Tiêu chí 3 |
 |---|---|---|---|---|
