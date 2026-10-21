@@ -70,7 +70,7 @@ pm:                            # quản lý dự án (skill project-manager)
 
 quality:                        # dùng cho lăng kính Chất lượng/Bảo mật/Chi phí trong các bước review
   monthlyBudgetUsd: TODO        # trần chi phí AWS/tháng (cả dự án); TODO → design-review yêu cầu chốt
-  compliance: TODO              # ví dụ: none | GDPR | PCI-DSS ...; TODO → spec-review hỏi
+  compliance: GDPR              # ví dụ: none | GDPR | PCI-DSS ...; TODO → spec-review hỏi
   securityBaseline: [OWASP Top 10, OWASP ASVS, STRIDE]
   costBaseline: [AWS Well-Architected Cost Optimization, FinOps cơ bản]
 

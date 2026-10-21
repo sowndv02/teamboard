@@ -1,0 +1,58 @@
+id: TB-007
+scope: feature
+title: API gateway (YARP) mỏng
+updated: 2026-10-22T00:00:00Z
+updated_by: orchestrator:claude-code
+
+links:
+  issue: document/issues/TB-007-api-gateway.md
+  spec: document/spec/api-gateway.md
+  design: document/design/api-gateway.md
+  plan: null
+  features_dir: document/spec/features/gateway/
+  branch: feature/TB-007-api-gateway
+  base: main
+  pr: null
+
+current_step: system-design
+next_action: "orchestrator chạy system-design cho api-gateway: D0 (vì sao YARP) và mục [Chọn để học] cần sondv chọn"
+blocked_by: null
+
+steps:
+  requirements-discovery:
+    status: done
+    owner: orchestrator:claude-code
+    started: 2026-10-22T00:00:00Z
+    finished: 2026-10-22T00:00:00Z
+    artifacts: [document/spec/api-gateway.md]
+    evidence: ["2 lô hỏi, spec FR-001..FR-007, NFR-001..NFR-006"]
+  spec-review:
+    status: done
+    owner: orchestrator:claude-code
+    round: 2
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/spec/api-gateway.md]
+    evidence: ["Confirm log: 5 quyết định", "Review rounds: 2 vòng", "spec status: confirmed"]
+  system-design:          { status: pending }
+  design-review:          { status: pending }
+  plan-init:              { status: pending }
+  plan-review:            { status: pending }
+  test-init:              { status: pending }
+  test-review:            { status: pending }
+  coding-start:           { status: pending }
+  coding-review:          { status: pending }
+  create-pr:              { status: pending }
+
+confirm_pending: []
+
+subtasks: []
+
+events:
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: created, detail: "Làn lớn, bắt đầu từ spec vì chưa có spec" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "requirements-discovery: spec draft api-gateway.md" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: review_round, detail: "spec-review vòng 1: 3 CONFIRM, 8 FIX đã sửa" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "compliance=GDPR, A-01 stub upstream, giữ NFR-005 (A-06)" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: review_round, detail: "spec-review vòng 2: Q-04 mới (GDPR) đã chốt B" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "spec-review PASS; spec confirmed" }
