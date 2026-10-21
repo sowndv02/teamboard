@@ -43,7 +43,7 @@ review (vòng N)
 Quy tắc:
 
 1. **Vòng 1 phải đầy đủ** (làn vừa/lớn): chạy hết checklist của bước. Làn nhỏ: chạy phần checklist liên quan tới diff, một vòng. Không để dành finding cho vòng sau (trừ khi nó phát sinh từ chính các thay đổi vừa sửa).
-2. **Chỉ sang bước tiếp theo khi PASS.** Không được bắt đầu bước sau khi còn CONFIRM mở, kể cả khi "có vẻ nhỏ".
+2. **Chỉ sang bước tiếp theo khi PASS.** Không được bắt đầu bước sau khi còn CONFIRM mở, kể cả khi "có vẻ nhỏ". Còn điểm chờ người dùng xác nhận (CONFIRM mở, mục "chờ xác nhận" trong Confirm log, giả định agent đặt chưa xác nhận) thì **không thể PASS/done**; đây là cổng xác nhận chung của mọi bước (`state-protocol.md` mục 3 quy tắc 8).
 3. **Hỏi người dùng theo lô**: gom tất cả CONFIRM của vòng, dùng công cụ hỏi có lựa chọn (`AskUserQuestion`), **tối đa 4 câu mỗi lô**, ưu tiên theo mức chặn. Nhiều hơn 4 thì chia lô, hỏi các câu chặn nhất trước, rồi lô kế.
 4. **Ghi quyết định** vào mục **Confirm log** của artifact ngay khi nhận (xem mục 5), rồi mới sửa. Sửa artifact đúng theo quyết định; không thêm điều người dùng không nói.
 5. **Sau khi sửa → chạy review lại.** Vòng sau chỉ tập trung vào phần **thay đổi (delta)** và tác động của nó, nhưng vẫn kiểm các finding cũ đã đóng có bị tái phát không.
