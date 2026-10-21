@@ -54,6 +54,8 @@ Quy tắc:
 10. **Không bịa lý do** để PASS: PASS chỉ khi mọi mục checklist áp dụng đã kiểm chứng.
 11. **Uỷ quyền không phải xác nhận.** Người dùng trả lời kiểu "tuỳ", "chọn cái thực tế", "tham khảo thực tế" nghĩa là họ giao cho agent *đề xuất*, không phải đã chốt. Agent: (a) chọn theo nguyên tắc nêu rõ trong câu trả lời và trong tài liệu; (b) ghi Confirm log nguyên văn lời uỷ quyền, cột quyết định ghi **"Agent chọn theo uỷ quyền: <kết quả cụ thể>; chờ xác nhận"** kèm phương án thay thế chính; (c) hỏi lại người dùng xác nhận **kết quả cụ thể** (không hỏi lại điều họ đã chốt) trước khi PASS; khi xác nhận xong thì cập nhật cột đó. Nếu kết quả làm đổi ADR hoặc spec đã chốt, nêu rõ và đề xuất ADR/spec-review thay vì coi là xong. Đặc biệt nghiêm với quyết định khó đảo ngược (loại DB, ranh giới service, kiến trúc nội bộ, hợp đồng công khai).
 
+12. **Không sửa im lặng.** Mỗi thay đổi agent làm trong vòng (FIX tự sửa, hoặc sửa theo quyết định CONFIRM) phải được ghi vào **Fix log** của artifact ngay khi sửa và liệt kê trong báo cáo cuối vòng (mục 7). Báo số lượng thôi là chưa đủ: người dùng phải đọc được sửa gì, ở đâu, vì sao, và kiểm lại được bằng evidence.
+
 ## 4. Verdict
 
 | Verdict | Điều kiện | Hành động |
@@ -64,7 +66,7 @@ Quy tắc:
 
 ## 5. Ghi nhận trong artifact
 
-Mỗi artifact được review có hai bảng cuối file (nếu chưa có thì tạo):
+Mỗi artifact được review có ba bảng cuối file (nếu chưa có thì tạo):
 
 **Confirm log**
 
@@ -75,6 +77,11 @@ Mỗi artifact được review có hai bảng cuối file (nếu chưa có thì 
 
 | Vòng | Ngày | Phạm vi | CONFIRM mở | FIX mở | Verdict |
 |---|---|---|---|---|---|
+
+**Fix log** (mọi thay đổi agent đã làm, quy tắc 12)
+
+| Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
+|---|---|---|---|---|---|---|
 
 Với quyết định do uỷ quyền (quy tắc 11), cột "Quyết định của người dùng" ghi lời uỷ quyền nguyên văn và kết quả agent chọn, đánh dấu "chờ xác nhận" cho tới khi người dùng xác nhận.
 
@@ -90,6 +97,9 @@ Review khách quan hơn khi reviewer **không bị neo vào suy nghĩ của ngư
 
 Ngắn gọn, theo thứ tự:
 1. Verdict và số CONFIRM/FIX mở.
-2. Với `NEEDS_CONFIRM`: danh sách câu hỏi (qua công cụ hỏi), không dán cả báo cáo dài.
-3. Đường dẫn artifact và mục đã đổi.
-4. Việc tiếp theo.
+2. **Đã sửa trong vòng này**: bảng từng thay đổi (`Fingerprint | Vị trí | Vấn đề | Đã sửa thế nào | Evidence`), lấy từ Fix log. Không có thay đổi nào thì ghi "Không sửa gì". Không gộp thành số lượng và không bỏ qua cả khi chỉ là sửa nhỏ (chính tả, link).
+3. Với `NEEDS_CONFIRM`: danh sách câu hỏi (qua công cụ hỏi), không dán cả báo cáo dài.
+4. Đường dẫn artifact và mục đã đổi.
+5. Việc tiếp theo.
+
+Báo cáo "Đã sửa" xuất hiện ở **cuối mỗi vòng có sửa**, kể cả vòng kết thúc bằng `PASS`, để người dùng thấy toàn bộ thay đổi trước khi sang bước sau.

@@ -23,7 +23,7 @@ description: Review code của một issue sau khi mọi test đã pass - tìm l
 4. **Có CONFIRM mở** → hỏi người dùng theo lô ≤ 4 câu (nêu bằng chứng `file:dòng`, các lựa chọn, đánh đổi, khuyến nghị chỉ tham khảo), ghi Confirm log, **không tự chọn**. Người dùng chốt hành vi → cập nhật **spec** (và plan/`.feature`/test) **trước** rồi mới sửa code.
 5. **Sửa** (theo `code-review.md` mục "Khi người dùng yêu cầu sửa finding"): lô ≤ 3 finding mỗi commit/lượt, mỗi finding có test/evidence (finding validation/policy/contract/coverage chỉ đóng khi có test mới hoặc mở rộng); **chạy lại test và gate** sau mỗi lô — **test phải xanh hết** trước khi review lại. Fix mà đổi hành vi đã được người dùng chốt trước đó → hỏi lại.
 6. **Review delta** (vòng 2+): theo `code-review.md` (fingerprint, dedup, không leo mức, so khớp vòng trước, regression). Lặp bước 3–6.
-7. **Cập nhật issue:** bảng **Review rounds** (vòng, commit đã review, verdict, fingerprint mở), Workflow.
+7. **Cập nhật issue:** bảng **Review rounds** (vòng, commit đã review, verdict, fingerprint mở), **Fix log** (mỗi finding đã sửa: vị trí, cách sửa, commit/test), Workflow. Báo người dùng bảng "Đã sửa" của vòng (`review-loop.md` mục 7); không sửa im lặng.
 
 ## Lăng kính Chất lượng / Bảo mật / Chi phí (`../workflow/references/review-philosophy.md` mục 4)
 Ngoài probe của `code-review.md`, báo cáo phải có bảng "Lăng kính":
@@ -61,7 +61,7 @@ Nên chạy review trong phiên/sub-agent khác với phiên đã viết code (`
 
 ## PASS khi
 - Verdict `PASS` như bảng trên; lần chạy test và gate cuối **xanh**.
-- Issue: Review rounds đầy đủ, Workflow `coding-review: PASS`, Confirm log ghi mọi quyết định.
+- Issue: Review rounds và Fix log đầy đủ, Workflow `coding-review: PASS`, Confirm log ghi mọi quyết định.
 - Báo `workflow` mở `create-pr`.
 
 ## Ghi trạng thái workflow

@@ -63,6 +63,13 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
 
+## Fix log
+
+Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 12):
+
+| Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
+|---|---|---|---|---|---|---|
+
 ## Bài học (lessons learned)
 
 Liên kết lesson sinh ra từ issue này (`document/lessons/LL-NNN-*.md`), hoặc ghi "không có". Skill `lesson-learned`.
