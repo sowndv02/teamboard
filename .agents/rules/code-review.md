@@ -124,6 +124,7 @@ Vòng 1 đầy đủ; vòng 2+ thêm mục 3 và rút gọn probe không đổi.
 2. **Coverage**: vùng đã review, rule đã đọc, phần bỏ qua + lý do.
 3. **So khớp vòng trước** (vòng 2+): bảng `Fingerprint | Vòng trước | Vòng này | Ghi chú`.
 4. **Findings**: bảng `Fingerprint | Mức | Vị trí | Vấn đề | Gợi ý`. Vòng 2+ chỉ P0–P2 mới/mở.
+   **Đã sửa trong vòng này** (vòng 2+ hoặc sau khi sửa): bảng `Fingerprint | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (commit/test)`; không có thì ghi "Không sửa gì". Nguồn dữ liệu là Fix log của issue (`review-loop.md` quy tắc 12).
 5. **Testing gaps**: hành vi chưa có evidence (trong phạm vi delta ở vòng 2+).
 6. **Tiêu chí issue (F6)**: bảng `Tiêu chí | Trạng thái | Evidence`.
 7. **Risk Audit**: bảng `Probe F1–F8 | Áp dụng? | Kết quả | Finding`; probe áp dụng mà chưa kiểm chứng thì không được verdict merge.
@@ -140,6 +141,7 @@ Sau báo cáo: cập nhật bảng "Review rounds" trong issue (vòng, commit, v
 
 - Sửa theo lô nhỏ (≤ 3 finding mỗi commit); mỗi finding có test hoặc evidence trong cùng commit.
 - Finding về validation, policy, contract hoặc test coverage chỉ đóng khi có **test mới/mở rộng**, không chỉ sửa code production.
+- Ghi từng finding đã sửa vào Fix log của issue và liệt kê trong báo cáo vòng kế tiếp; không sửa im lặng.
 - Chạy lại gate, rồi review delta (vòng kế tiếp). Chỉ đóng finding sau khi delta review pass.
 - Finding mà fix là hoàn tác thay đổi người dùng đã yêu cầu → hỏi lại người dùng trước khi sửa.
 
