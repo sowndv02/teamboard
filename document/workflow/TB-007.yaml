@@ -12,10 +12,10 @@ links:
   features_dir: document/spec/features/gateway/
   branch: feature/TB-007-api-gateway
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/6
 
 current_step: plan-init
-next_action: "TB-001 làm trước (Q-D1); sondv quyết định mở PR tài liệu TB-007; sau TB-001 chạy plan-init cho lát 1 (TB-010)"
+next_action: "sondv review và merge PR #6; làm TB-001 (hoặc tách ServiceDefaults) rồi plan-init cho lát 1 (TB-010)"
 blocked_by: null
 
 steps:
@@ -64,7 +64,11 @@ steps:
   test-review:            { status: pending }
   coding-start:           { status: pending }
   coding-review:          { status: pending }
-  create-pr:              { status: pending }
+  create-pr:
+    status: done
+    owner: orchestrator:claude-code
+    finished: 2026-10-23T00:00:00Z
+    evidence: ["PR #6 mở vào main, PR tài liệu"]
 
 confirm_pending: []
 
@@ -86,3 +90,4 @@ events:
   - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: needs_confirm, detail: "Đã sửa 17 FIX; còn DA-05 chờ xác nhận" }
   - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "design-review PASS vòng 2; design confirmed" }
   - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "plan-init (slices) done; bảng lát approved; issue TB-010 cho lát 1" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "create-pr: PR #6 mở sau khi người dùng xác nhận" }

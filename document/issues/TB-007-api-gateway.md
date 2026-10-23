@@ -1,7 +1,7 @@
 ---
 key: TB-007
 title: Dựng API gateway (YARP) mỏng làm đường vào của hệ thống
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-007-api-gateway
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -47,6 +47,7 @@ Chi tiết do workflow quyết định (spec/design → plan). Điều kiện tr
 ## Ghi chú / Nhật ký
 - 2026-10-22: tạo issue, checkout nhánh `feature/TB-007-api-gateway` từ `main`.
 - 2026-10-23: TB-007 trở thành issue tài liệu (spec, design, bảng lát); code đi theo từng lát (TB-010..). PR của nhánh này chỉ gồm tài liệu.
+- 2026-10-23: mở PR tài liệu https://github.com/sowndv02/teamboard/pull/6 (chờ review, merge do người dùng).
 
 ## Workflow
 
@@ -66,7 +67,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-10-23 | PR tài liệu: https://github.com/sowndv02/teamboard/pull/6 |
 
 ## Confirm log
 
