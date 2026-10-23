@@ -5,3 +5,4 @@ Ghi chú gom kiến thức theo chủ đề (vấn đề, cách dùng, ưu/như�
 | Chủ đề | Ghi chú | Làm mới |
 |---|---|---|
 | Docker, Docker Compose | [docker-compose.md](docker-compose.md) | 2026-10-23 |
+| API Gateway (YARP) | [api-gateway.md](api-gateway.md) | 2026-10-23 |
