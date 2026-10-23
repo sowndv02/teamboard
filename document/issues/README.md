@@ -22,3 +22,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-009](TB-009-commit-per-step.md) | Commit file của từng bước workflow ngay khi bước đạt | 0 | review |
 | [TB-010](TB-010-gateway-skeleton-routing.md) | Gateway lát 1, khung YARP, route boards, health và 404 problem+json (chờ TB-001) | 1 | todo |
 | [TB-011](TB-011-learning-hub.md) | Skill learning-hub gom kiến thức theo chủ đề vào document/learning | 0 | review |
+| [TB-012](TB-012-learning-hub-realworld.md) | learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ | 0 | review |
