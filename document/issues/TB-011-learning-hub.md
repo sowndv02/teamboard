@@ -26,6 +26,7 @@ Dự án phục vụ học tập, nhưng kiến thức (docker, compose, API gat
 
 ## Ghi chú / Nhật ký
 - 2026-10-23: tạo issue, skill và hai ghi chú đầu tiên.
+- 2026-10-23: mở PR [#7](https://github.com/sowndv02/teamboard/pull/7), chuyển sang review.
 
 ## Confirm log
 
