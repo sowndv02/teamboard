@@ -65,6 +65,7 @@ Nếu một công cụ có bản mirror/trigger riêng (ví dụ `.cursor/rules`
 | `angular-feature` | Dựng một feature/màn hình Angular từ plan đã duyệt đến khi gate FE xanh (trong `coding-start`) | `.agents/skills/angular-feature/SKILL.md` |
 | `frontend-review` | Review diff Angular (signals/RxJS, bảo mật client, a11y, i18n, bundle, contract) | `.agents/skills/frontend-review/SKILL.md` |
 | `angular-learning` | Học Angular thực tế theo lộ trình A1–A7 gắn identity-auth; bài tập, review bài làm, tiến độ | `.agents/skills/angular-learning/SKILL.md` |
+| `learning-hub` | Gom tài liệu một chủ đề kiến thức (docker, caching/Redis, API gateway/YARP, microservice...) thành ghi chú trong `document/learning/`: khái niệm gốc trước có bản đồ giải pháp và từng cơ chế, công cụ sau; case real-world có nguồn; xem mục lục kiến thức | `.agents/skills/learning-hub/SKILL.md` |
 
 Claude Code đọc skill từ `.claude/skills/<tên>/SKILL.md` (file trỏ về canonical). Thêm skill mới: viết ở `.agents/skills/` rồi tạo file trỏ ở `.claude/skills/`.
 
