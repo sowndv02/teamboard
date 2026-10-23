@@ -67,10 +67,10 @@ Nguồn: sondv, chat với Claude Code, 2026-10-22. Phạm vi gateway mỏng (ro
 | FR-001 | Là client, tôi muốn gọi `/api/v1/boards/**` qua gateway để không cần biết địa chỉ `board-service`. | Must | Given `board-service` chạy, When `GET /api/v1/boards` qua gateway, Then nhận đúng status/body của service, path tới service không đổi. Given path không khớp route nào, When gọi, Then `404` `problem+json`. | Lời người dùng (cổng vào) + Q routing 2026-10-22 |
 | FR-002 | Là vận hành, tôi muốn gateway có `/health/live` và `/health/ready` để orchestrator kiểm tra. | Must | Given gateway khởi động xong, When `GET /health/live` và `/health/ready`, Then `200`. Given `board-service` chết, When `GET /health/ready`, Then vẫn `200` (ready không phụ thuộc downstream). Health không bị rate limit. | `PROJECT.md` (mọi service) + Q lỗi phía sau |
 | FR-003 | Là lập trình viên, tôi muốn mỗi request mang `X-Correlation-Id` và `traceparent` xuống service để tra xuyên service. | Must | Given request không có `X-Correlation-Id`, When qua gateway, Then gateway tạo mới, truyền xuống service và trả lại trong response. Given request có `X-Correlation-Id` hợp lệ (ký tự `A-Z a-z 0-9 - _ .`, tối đa 64 ký tự), Then giữ nguyên giá trị đó. Given `X-Correlation-Id` chứa ký tự khác hoặc dài 65 ký tự, Then gateway bỏ giá trị đó và tạo mới. Given có `traceparent`, Then span của gateway nối vào cùng trace. | `PROJECT.md`, `api-endpoints.md` |
-| FR-004 | Là vận hành, tôi muốn giới hạn số request theo IP, mức riêng từng route, để chặn spam và quá tải. | Must | Ngưỡng khởi điểm trên `/api/v1/boards/**` (cấu hình được): đọc (`GET`) 120/phút/IP, ghi (`POST/PUT/PATCH/DELETE`) 30/phút/IP. Given một IP đã gửi 30 request ghi trong phút, When gửi request ghi thứ 31, Then `429` `problem+json` kèm `Retry-After`. Given cùng IP đó, When `GET` lần thứ 121 trong phút, Then `429`; `GET` thứ 120 vẫn thành công. Given IP khác, Then không bị ảnh hưởng. | Lời người dùng + Q rate limit 2026-10-22 |
+| FR-004 | Là vận hành, tôi muốn giới hạn số request theo IP, mức riêng từng route, để chặn spam và quá tải. | Must | Ngưỡng khởi điểm trên `/api/v1/boards/**` (cấu hình được): đọc (`GET`) 120/phút/IP, ghi (`POST/PUT/PATCH/DELETE`) 30/phút/IP. Given một IP đã gửi 30 request ghi trong phút, When gửi request ghi thứ 31, Then `429` `problem+json` kèm `Retry-After`. Given cùng IP đó, When `GET` lần thứ 121 trong phút, Then `429`; `GET` thứ 120 vẫn thành công. Given hai địa chỉ IPv6 cùng dải /64, Then dùng chung một bộ đếm (IPv4 tính theo địa chỉ đầy đủ). Given IP khác, Then không bị ảnh hưởng. | Lời người dùng + Q rate limit 2026-10-22 |
 | FR-005 | Là web client (sau này), tôi muốn trình duyệt từ origin được phép gọi gateway mà không bị chặn CORS. | Should | Given origin nằm trong allowlist, When preflight `OPTIONS`, Then trả header CORS cho origin đó. Given origin ngoài allowlist, Then không có header cho phép CORS. | Q CORS 2026-10-22 |
-| FR-007 | Là vận hành, tôi muốn gateway từ chối body quá lớn để chặn request khổng lồ sớm. | Should | Given giới hạn 1 MB (cấu hình được), When gửi body đúng 1 MB, Then chuyển tiếp bình thường. When gửi body 1 MB + 1 byte, Then `413` `problem+json`, không chuyển xuống service. | Q-03 đã chốt 2026-10-22 |
-| FR-006 | Là client, tôi muốn lỗi từ phía sau được báo rõ để biết là gateway hay service lỗi. | Must | Given service phía sau không có đích khả dụng hoặc không kết nối được, When gọi, Then `503` `problem+json`. Given service trả lỗi giao thức hoặc ngắt kết nối giữa chừng, Then `502`. Given service không trả lời trong thời gian timeout (mặc định 30 giây, NFR-003), Then `504`. Mọi lỗi do gateway có `code`, `traceId`, `correlationId`, không lộ host nội bộ hay stack trace. | Q lỗi phía sau 2026-10-22, `api-endpoints.md` §2, §5 |
+| FR-007 | Là vận hành, tôi muốn gateway từ chối body quá lớn để chặn request khổng lồ sớm. | Should | Giới hạn 1 MiB = 1.048.576 byte (cấu hình được). Given body đúng 1.048.576 byte, When gửi, Then chuyển tiếp bình thường. Given `Content-Length` 1.048.577 byte, When gửi, Then `413` `problem+json`, không chuyển xuống service. Given body chunked (không có `Content-Length`) vượt giới hạn, Then gateway ngắt luồng và trả lỗi; service có thể đã nhận một phần body (đã chấp nhận ở design-review). | Q-03 đã chốt 2026-10-22; làm rõ ở design-review 2026-10-23 |
+| FR-006 | Là client, tôi muốn lỗi từ phía sau được báo rõ để biết là gateway hay service lỗi. | Must | Given service phía sau không có đích khả dụng hoặc không kết nối được, When gọi, Then `503` `problem+json`. Given service trả lỗi giao thức hoặc ngắt kết nối trước khi trả header, Then `502`. Given service không trả header trong thời gian timeout (tổng 30 giây, NFR-003), Then `504`. Given service đã trả header rồi mới ngắt hoặc treo, Then gateway ngắt kết nối với client và ghi log/metric có `correlationId` (không đổi được status đã gửi). Mọi lỗi do gateway có `code`, `traceId`, `correlationId`, không lộ host nội bộ hay stack trace. | Q lỗi phía sau 2026-10-22, `api-endpoints.md` §2, §5 |
 
 Ghi chú ưu tiên: 5 trên 7 FR là Must vì FR-001 là lý do tồn tại của gateway, FR-002 và FR-003 là yêu cầu bắt buộc mọi service (`PROJECT.md`), FR-004 do người dùng nêu trực tiếp, FR-006 là điều kiện để debug được khi service phía sau lỗi.
 
@@ -86,7 +86,7 @@ Ghi chú ưu tiên: 5 trên 7 FR là Must vì FR-001 là lý do tồn tại củ
 
 ### 8.1 Luồng chính
 1. Client gửi `GET /api/v1/boards`.
-2. Gateway kiểm rate limit theo IP và route; kiểm CORS nếu có `Origin`.
+2. Gateway kiểm CORS nếu có `Origin` (preflight trả luôn, không tính rate limit), rồi kiểm rate limit theo IP và route.
 3. Gateway gán hoặc giữ `X-Correlation-Id`, mở span, gắn `traceparent`.
 4. Gateway chuyển request tới `board-service` giữ nguyên path.
 5. Gateway trả response của service về client kèm `X-Correlation-Id`.
@@ -100,7 +100,7 @@ Ghi chú ưu tiên: 5 trên 7 FR là Must vì FR-001 là lý do tồn tại củ
 - Không khớp route: `404` `problem+json`.
 - Service phía sau không kết nối được: `503`; quá timeout: `504`.
 - `X-Correlation-Id` sai định dạng hoặc quá dài: gateway tạo mới (FR-003).
-- Body vượt 1 MB: `413` (FR-007).
+- Body vượt 1 MiB: `413` (FR-007).
 - Origin ngoài allowlist: response không có header CORS (trình duyệt chặn).
 
 ## 9. Dữ liệu
@@ -132,7 +132,7 @@ Không phát/nhận sự kiện (SNS/SQS).
 |---|---|
 | NFR-001 | Độ trễ gateway thêm vào mỗi request: p95 < 20 ms ở tải dev (giả định A-02, chưa đo; đo ở bước test/vận hành). |
 | NFR-002 | Mọi request qua gateway có trace nối được với span của service phía sau (kiểm bằng Jaeger). |
-| NFR-003 | Timeout tới service phía sau có giá trị cấu hình được, mặc định 30 giây (giả định A-03). |
+| NFR-003 | Timeout tới service phía sau có giá trị cấu hình được, mặc định tổng 30 giây (`Timeout` theo route) và idle tối đa 30 giây (`ActivityTimeout`) (giả định A-03). |
 | NFR-004 | Ngưỡng rate limit, origin CORS, địa chỉ service nằm trong cấu hình, không hardcode, không chứa secret. |
 | NFR-005 | Gateway khởi động và `ready` trong < 10 giây ở máy dev (giả định A-06). |
 | NFR-006 | Tuân thủ GDPR (đã chốt 2026-10-22; Q-04 chọn B): IP client là dữ liệu cá nhân và được ghi nguyên văn trong log/trace của gateway; thời hạn lưu log tối đa 7 ngày ở dev (cấu hình ở tầng lưu log, kiểm khi có hạ tầng giai đoạn 4; ở local chỉ ghi nhận), truy cập log hạn chế cho chủ dự án. Không bao giờ log token, header `Authorization`, cookie hay body. Kiểm chứng: Given một request có `Authorization` và body, When gateway ghi log, Then log có IP và `correlationId` nhưng không chứa giá trị `Authorization` hay nội dung body. |
@@ -211,6 +211,7 @@ Giai đoạn hiện tại không phát triển frontend (ADR 0008). CORS (FR-005
 |---|---|---|
 | 2026-10-22 | Tạo bản nháp; chốt rate limit theo IP mức riêng từng route, routing `/api/v1/boards/**` giữ nguyên path, CORS allowlist mặc định `http://localhost:4200`, lỗi phía sau `502/503/504` và `ready` không phụ thuộc downstream | Trả lời của sondv qua AskUserQuestion |
 | 2026-10-22 | Spec-review vòng 1-2: áp dụng Q-01..Q-03 (số rate limit, định dạng correlation id, giới hạn body, thêm FR-007), làm rõ 502/503/504, A-01 chọn stub upstream, thêm A-06 và NFR-006 (GDPR, Q-04 chọn B), compliance = GDPR; spec `confirmed` | Spec-review, sondv |
+| 2026-10-23 | Làm rõ sau design-review: FR-004 (IPv6 gộp /64), FR-006 (502/504 chỉ trước khi gửi header), FR-007 (1 MiB, body chunked), NFR-003 (tổng 30 giây + idle), thứ tự CORS trước rate limit ở 8.1 | sondv chọn ở design-review TB-007 |
 
 ## 19. Confirm log
 

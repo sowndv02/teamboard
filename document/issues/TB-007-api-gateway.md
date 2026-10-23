@@ -57,8 +57,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | requirements-discovery | done | – | 2026-10-22 | spec api-gateway.md, FR-001..007 |
 | spec-review | PASS | 2 | 2026-10-22 | spec `confirmed`; 5 quyết định trong Confirm log |
-| system-design | pending | – | | |
-| design-review | pending | | | |
+| system-design | done | – | 2026-10-22 | design draft; người dùng đã chọn D0.1, D0.4, D1 và xác nhận phần còn lại |
+| design-review | PASS | 2 | 2026-10-23 | design `confirmed`; 15 quyết định trong Confirm log |
 | plan-init | pending | – | | |
 | plan-review | pending | | | |
 | test-init | pending | – | | |

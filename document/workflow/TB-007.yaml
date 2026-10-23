@@ -14,8 +14,8 @@ links:
   base: main
   pr: null
 
-current_step: system-design
-next_action: "orchestrator chạy system-design cho api-gateway: D0 (vì sao YARP) và mục [Chọn để học] cần sondv chọn"
+current_step: plan-init
+next_action: "orchestrator chạy plan-init (chế độ slices): chia lát cho gateway, lát đầu phụ thuộc TB-001; cần sondv duyệt bảng lát"
 blocked_by: null
 
 steps:
@@ -35,8 +35,24 @@ steps:
     open_fix: 0
     artifacts: [document/spec/api-gateway.md]
     evidence: ["Confirm log: 5 quyết định", "Review rounds: 2 vòng", "spec status: confirmed"]
-  system-design:          { status: pending }
-  design-review:          { status: pending }
+  system-design:
+    status: done
+    owner: orchestrator:claude-code
+    started: 2026-10-22T00:00:00Z
+    finished: 2026-10-23T00:00:00Z
+    artifacts: [document/design/api-gateway.md]
+    evidence: ["D0.1, D0.4, D1 do người dùng chọn", "D0.2-D0.3, D2-D5, DA-01..DA-04, Q-D1..Q-D3 đã xác nhận"]
+  design-review:
+    status: done
+    owner: reviewer:subagent-1
+    started: 2026-10-23T00:00:00Z
+    round: 2
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/design/api-gateway.md, document/spec/api-gateway.md]
+    finished: 2026-10-23T00:00:00Z
+    evidence: ["Vòng 1: 6 CONFIRM đã chốt, 17 FIX đã sửa", "Vòng 2: DA-05 xác nhận, PASS", "design status: confirmed"]
   plan-init:              { status: pending }
   plan-review:            { status: pending }
   test-init:              { status: pending }
@@ -47,7 +63,7 @@ steps:
 
 confirm_pending: []
 
-subtasks: []
+subtasks:
 
 events:
   - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: created, detail: "Làn lớn, bắt đầu từ spec vì chưa có spec" }
@@ -56,3 +72,11 @@ events:
   - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "compliance=GDPR, A-01 stub upstream, giữ NFR-005 (A-06)" }
   - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: review_round, detail: "spec-review vòng 2: Q-04 mới (GDPR) đã chốt B" }
   - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "spec-review PASS; spec confirmed" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_started, detail: "system-design; người dùng chọn D0.1, D0.4, D1" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: needs_confirm, detail: "Design draft viết xong, chờ xác nhận và Q-D1..Q-D3" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "D0.2-D0.3, D2-D5, DA-01..04 xác nhận; Q-D1 A, Q-D2 A, Q-D3 20 USD" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "system-design done" }
+  - { at: 2026-10-23T00:00:00Z, actor: "reviewer:subagent-1", event: review_round, detail: "design-review vòng 1: 6 CONFIRM, 17 FIX" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "chi phí giờ lab, timeout tổng 30s, body chunked ngắt luồng, lỗi giữa chừng ngắt kết nối, IPv6 /64, 1 MiB" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: needs_confirm, detail: "Đã sửa 17 FIX; còn DA-05 chờ xác nhận" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "design-review PASS vòng 2; design confirmed" }
