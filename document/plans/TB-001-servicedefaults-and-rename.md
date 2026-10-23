@@ -52,6 +52,7 @@ Kịch bản (đặt trong `document/spec/features/`, tag `@TB-001`, ID `@S01…
 - @S11 Request qua compose hiện thành trace trong Jaeger (test tự động nhóm `Docker`, truy vấn API Jaeger).
 - @S12 Request tạo metric của máy chủ web (in-memory exporter).
 - @S13 Request tạo bản ghi log (in-memory exporter).
+- @S16 Endpoint OTLP không tới được thì service vẫn chạy (thêm ở coding-review).
 - @S14 Mọi gói NuGet của repo có phiên bản cố định (test canh giữ, xanh ngay; luật có unit test riêng).
 - @S15 Tệp compose không chứa bí mật viết cứng (test canh giữ, xanh ngay; luật có unit test riêng).
 
@@ -85,17 +86,17 @@ Mỗi bước là một commit nhỏ (dưới khoảng 400 dòng diff, không t�
 - **File/module dự kiến chạm:** `src/shared/ServiceDefaults/` (project mới `Teamboard.Shared.ServiceDefaults`, theo P-04): `Extensions` (`AddServiceDefaults`, `MapDefaultEndpoints`), `StartupHealthCheck`/cờ sẵn sàng gắn `IHostApplicationLifetime`; `src/board-service/Program.cs` (gọi hai extension, giữ ngắn); `src/board-service/board-service.csproj` (ProjectReference); `Dockerfile` (COPY project shared trước `restore`); `src/teamboard.slnx`; project test ServiceDefaults; file `.feature` mới.
 - **File `.feature`:** `document/spec/features/board-service/health.feature` (@S04, @S05, host board-service) và `document/spec/features/shared/service-defaults.feature` (@S06, @S07, host thử nghiệm; đã chỉnh lúc test-init vì mỗi `.feature` chỉ chạy trong một project test).
 - **Hợp đồng thay đổi:** thêm `/health/live` (không check dependency) và `/health/ready` (check có tag `ready`, hiện chỉ "đã sẵn sàng"); nằm ngoài versioning theo `api-endpoints.md` mục 1. Dùng response mặc định của health checks (văn bản `Healthy`/`Unhealthy`, không trả chi tiết từng check) để không lộ thông tin nội bộ.
-- **Migration / cấu hình:** không. Cấu hình bắt buộc qua Options có validate nếu có (`backend-engineering.md`).
+- **Migration / cấu hình:** không. Tên service là tham số bắt buộc của `AddServiceDefaults` (không có Options riêng, theo coding-review).
 - **Tài liệu cần cập nhật:** `COMMANDS.md` (health), chuyển phần còn lại sang B6.
 - **Kiểm chứng:** test @S04–@S07 xanh; `dotnet build -warnaserror`; build image qua compose xanh (Dockerfile copy đủ project shared).
 - **Phụ thuộc:** B2.
 
 ### B4. ServiceDefaults: OpenTelemetry (FR-003, NFR-004: @S08–@S10)
-- **Kịch bản/test sẽ viết (đỏ trước):** @S12 (metric) và @S13 (log) với in-memory exporter, cùng @S08 host test với in-memory exporter, một `GET /health/live` tạo Activity có tài nguyên `service.name = board-service`; @S09 host khởi động và phục vụ health khi không đặt endpoint OTLP; @S10 request mang header `Authorization: Bearer <giá trị thử>` và body, không thuộc tính span hay bản ghi log nào chứa giá trị đó.
-- **File/module dự kiến chạm:** `src/shared/ServiceDefaults/` (cấu hình OTel: trace ASP.NET Core + HttpClient, metric, log; exporter OTLP chỉ bật khi có `OTEL_EXPORTER_OTLP_ENDPOINT`; tên service lấy từ cấu hình/`OTEL_SERVICE_NAME`, board-service đặt `board-service`; Options có validate), `src/board-service/` (đặt tên service), test.
+- **Kịch bản/test sẽ viết (đỏ trước):** @S12 (metric) và @S13 (log) với in-memory exporter, cùng @S08 host test với in-memory exporter, một `GET /health/live` tạo Activity có tài nguyên `service.name = board-service`; @S09 host khởi động và phục vụ health khi không đặt endpoint OTLP; @S10 request mang header `Authorization`, cookie, query và body, không thuộc tính span hay bản ghi log nào chứa giá trị đó.
+- **File/module dự kiến chạm:** `src/shared/ServiceDefaults/` (cấu hình OTel: trace ASP.NET Core + HttpClient, metric, log; exporter OTLP chỉ bật khi có `OTEL_EXPORTER_OTLP_ENDPOINT`; tên service là tham số của `AddServiceDefaults` (kiểm không rỗng bằng `ArgumentException`), board-service đặt `board-service`; log "Request starting" của ASP.NET Core (có query string) không xuất sang telemetry, chỉnh ở coding-review), `src/board-service/` (đặt tên service), test.
 - **File `.feature`:** `document/spec/features/shared/telemetry.feature` (@S08–@S10, host thử nghiệm) và `document/spec/features/board-service/observability.feature` (@S11, nhóm `docker`).
 - **Hợp đồng thay đổi:** không có HTTP mới.
-- **Migration / cấu hình / biến môi trường:** `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SERVICE_NAME` (qua env, không secret); health không được lọc khỏi trace (Q-03).
+- **Migration / cấu hình / biến môi trường:** `OTEL_EXPORTER_OTLP_ENDPOINT` (qua env, không secret); health không được lọc khỏi trace (Q-03).
 - **Tài liệu cần cập nhật:** chuyển sang B6.
 - **Kiểm chứng:** test @S08–@S10 xanh; `dotnet build -warnaserror`; quét thô `git diff | grep -i -E "password|secret|apikey"` không có kết quả thật.
 - **Phụ thuộc:** B3.

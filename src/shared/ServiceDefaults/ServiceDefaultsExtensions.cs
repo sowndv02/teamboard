@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -20,11 +21,7 @@ public static class ServiceDefaultsExtensions
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder, string serviceName)
         where TBuilder : IHostApplicationBuilder
     {
-        builder.Services
-            .AddOptions<ServiceDefaultsOptions>()
-            .Configure(options => options.ServiceName = serviceName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+        ArgumentException.ThrowIfNullOrWhiteSpace(serviceName);
 
         // Singleton để mọi lần probe dùng cùng một check (không tạo instance và callback mới mỗi lần).
         builder.Services.AddSingleton<StartupHealthCheck>();
@@ -53,6 +50,9 @@ public static class ServiceDefaultsExtensions
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
         });
+
+        // Log "Request starting" của ASP.NET Core ghi cả query string (có thể chứa token), nên không xuất sang telemetry.
+        builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
         var telemetry = builder.Services
             .AddOpenTelemetry()

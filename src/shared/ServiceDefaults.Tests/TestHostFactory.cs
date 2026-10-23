@@ -24,11 +24,16 @@ internal sealed class TestHostFactory : IAsyncDisposable
 
     public HttpClient Client => App.GetTestClient();
 
-    public static TestHostFactory Build(string serviceName)
+    public static TestHostFactory Build(string serviceName, string? otlpEndpoint = null)
     {
         var factory = new TestHostFactory();
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
+        if (otlpEndpoint is not null)
+        {
+            builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] = otlpEndpoint;
+        }
+
         builder.AddServiceDefaults(serviceName);
         builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddInMemoryExporter(factory.Spans));
         builder.Services.ConfigureOpenTelemetryLoggerProvider(logging => logging.AddInMemoryExporter(factory.Logs));

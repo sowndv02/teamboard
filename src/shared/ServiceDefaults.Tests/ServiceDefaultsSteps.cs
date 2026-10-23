@@ -58,14 +58,23 @@ public sealed class ServiceDefaultsSteps : IAsyncDisposable
         _responses.Add(await Send(second));
     }
 
-    [When("tôi gửi một yêu cầu ghi dữ liệu với header Authorization {string} và body {string}")]
-    public async Task WhenPostWithSecrets(string authorization, string body)
+    [Given("một host dùng AddServiceDefaults với tên service {string} và endpoint OTLP không có dịch vụ lắng nghe đã khởi động")]
+    public async Task GivenHostWithUnreachableOtlpStarted(string serviceName)
     {
-        using var message = new HttpRequestMessage(HttpMethod.Post, "/echo")
+        // Cổng 1 không có dịch vụ nào lắng nghe: exporter không kết nối được nhưng service phải vẫn chạy.
+        _host = TestHostFactory.Build(serviceName, "http://127.0.0.1:1");
+        await _host.StartAsync();
+    }
+
+    [When("tôi gửi một yêu cầu ghi dữ liệu với header Authorization {string}, cookie {string}, query {string} và body {string}")]
+    public async Task WhenPostWithSecrets(string authorization, string cookie, string query, string body)
+    {
+        using var message = new HttpRequestMessage(HttpMethod.Post, $"/echo?{query}")
         {
             Content = new StringContent(body, Encoding.UTF8, "text/plain"),
         };
         message.Headers.TryAddWithoutValidation("Authorization", authorization);
+        message.Headers.TryAddWithoutValidation("Cookie", cookie);
         _responses.Add(await Host.Client.SendAsync(message));
     }
 

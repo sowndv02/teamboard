@@ -95,7 +95,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; 13 kịch bản đỏ đúng lý do (S01–S13), 2 canh giữ xanh (S14, S15); 7 FIX và 2 CONFIRM đã xử lý |
 | coding-start | done | – | 2026-10-23 | xanh 27/27 (7 ServiceDefaults + 20 board-service gồm 2 Docker); gate: build -warnaserror, format, vulnerable, compose config xanh; 6 commit B1–B6 |
-| coding-review | pending | | | |
+| coding-review | PASS | 2 | 2026-10-23 | review độc lập (sub-agent) vòng 1: 1 P2 + 8 P3, đã sửa/chấp nhận; vòng 2 delta: Sẵn sàng merge; 34 test xanh |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -113,6 +113,10 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 9 | tb001:docker-red | Docker daemon không chạy, S03 và S11 chưa chứng minh đỏ | Người dùng bật Docker Desktop, tôi chạy lại hai test trước khi sang test-review | 2 | 2026-10-23 |
 | 10 | test-review:TB-001:fr003-metric-log | Kịch bản cho metric và log của FR-003 | Thêm @S12 (metric) và @S13 (log) | 1 | 2026-10-23 |
 | 11 | test-review:TB-001:nfr-without-scenario | NFR-001, NFR-002, NFR-003 chưa có kịch bản | Thêm @S14 (NFR-003) và @S15 (NFR-001); NFR-002 kiểm bằng gate | 1 | 2026-10-23 |
+| 12 | coding-review:TB-001:otlp-unreachable | Test khi endpoint OTLP không tới được | Thêm @S16 | 3 | 2026-10-23 |
+| 13 | coding-review:TB-001:options-unused | ServiceDefaultsOptions không dùng | Bỏ Options, kiểm tên bằng ArgumentException | 3 | 2026-10-23 |
+| 14 | coding-review:TB-001:cookie-query-nfr004 | Cookie và query chưa được kiểm | Mở rộng @S10 | 3 | 2026-10-23 |
+| 15 | coding-review:TB-001:small-p3 | Healthcheck/depends_on compose, giấy phép gói bắc cầu, dcproj | Sửa giấy phép gói bắc cầu và dcproj; chấp nhận thiếu healthcheck (ghi Giới hạn đã biết) | 3 | 2026-10-23 |
 
 ## Kịch bản và TDD log
 
@@ -129,8 +133,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S07 Service khác dùng ServiceDefaults | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
 | @S08 Span có service.name | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
-| @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | xanh (B4) |
+| @S10 Telemetry không chứa Authorization, cookie, query, body | `ServiceDefaultsSteps` | đỏ (coding-review): `query-bi-mat-321` còn trong log "Request starting"; xanh sau khi lọc log đó (B4 và coding-review) | xanh |
 | @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | xanh (B5) |
+| @S16 Endpoint OTLP không tới được vẫn chạy (thêm ở coding-review) | `ServiceDefaultsSteps` (host với endpoint `127.0.0.1:1`) | không có đỏ production: hành vi đã đúng, thêm làm test khoá | xanh |
 | @S12 Request tạo metric | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S13 Request tạo bản ghi log | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S14 Mọi gói NuGet có phiên bản cố định | `RepositoryHygieneSteps` + `RepositoryPoliciesTests` (7 ca) | không có đỏ production: test canh giữ, luật được chứng minh bắt vi phạm bằng unit test (`10.*`, `*`, dải); xanh ngay vì repo hiện sạch | xanh |
@@ -155,6 +160,28 @@ Giới hạn đã biết: @S14, @S15 là test canh giữ (xanh ngay); @S10 chỉ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-23 | `1705517` | Sẵn sàng sau khi sửa | 1 P2 (guard secret @S15 có điểm mù) và 8 P3 (6 CONFIRM đã chốt, 2 FIX nhỏ); không P0/P1 |
+| 2 | 2026-10-23 | delta `1705517..HEAD` | Sẵn sàng merge | không còn finding mở; 34 test xanh sau sửa (11 ServiceDefaults + 23 board-service gồm 2 Docker), gate xanh |
+
+
+## Fix log (coding-review)
+
+| Fingerprint | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|
+| board-service.Tests:RepositoryPolicies.IsHardcodedSecret:blind-spot-connection-string (P2) | `src/board-service.Tests/Support/RepositoryPolicies.cs` | Luật quét bí mật chỉ nhìn tên khoá nên bỏ sót `Password=` trong connection string và `${VAR:-literal}` | Thêm bắt cặp `Password=/Pwd=/Secret=` trong chuỗi và giá trị mặc định literal | 3 ca unit test đỏ trước rồi xanh; commit `6c3cd76` |
+| ServiceDefaults:StartupHealthCheck:per-probe-instance (P3) | `ServiceDefaultsExtensions.cs` | Check được tạo lại mỗi lần probe | Đăng ký singleton | test health xanh; `6c3cd76` |
+| board-service.Tests:ObservabilitySteps.HasTrace:fragile-json (P3) | `ObservabilitySteps.cs` | `GetProperty` ném lỗi khi attribute kiểu khác | Dùng `TryGetProperty` | test @S11 xanh trước đó, build xanh; `6c3cd76` |
+| ServiceDefaults.Tests:OtlpEnabledBranch (P3, CONFIRM) | `telemetry.feature` | Chưa có test endpoint OTLP không tới được | Thêm @S16 | xanh; commit lô 2 |
+| ServiceDefaults:ServiceDefaultsOptions:unused-options (P3, CONFIRM) | `ServiceDefaultsExtensions.cs`, xoá `ServiceDefaultsOptions.cs` | Options thừa | Bỏ Options, `ArgumentException.ThrowIfNullOrWhiteSpace`; 3 unit test (đỏ trước) | `ServiceDefaultsGuardTests`; commit lô 2 |
+| ServiceDefaults.Tests:S10:cookie-query-not-covered (P3, CONFIRM) | `telemetry.feature`, `ServiceDefaultsExtensions.cs` | Cookie và query chưa kiểm; thực tế query bị lộ vào log "Request starting" | Mở rộng @S10 (đỏ), lọc log `Microsoft.AspNetCore.Hosting.Diagnostics` khỏi telemetry (xanh) | @S10 đỏ rồi xanh; commit lô 2 |
+| deps:transitive-license:Reqnroll (P3) | `config/dependencies.yaml` | Giấy phép gói bắc cầu chưa ghi | Ghi một dòng gom kèm nguồn đã kiểm (MIT, BSD-3-Clause, Apache-2.0; `Validation` là MS-PL đi kèm Xunit.SkippableFact) | nuspec và LICENSE; commit lô 2 |
+| dcproj:observability-not-listed (P3) | `src/docker-compose.dcproj` | Thiếu `docker-compose.observability.yml` | Thêm `<None Include>` | build xanh; commit lô 2 |
+
+Giới hạn đã biết (chấp nhận, người dùng chốt 2026-10-23):
+- `docker-compose.observability.yml` dùng `depends_on` trơn, chưa có `condition: service_healthy`; `board-service` chưa có HEALTHCHECK trong compose (image Jaeger không có shell; exporter tự retry). Làm ở lát sau.
+- Chưa kiểm span khi chạy Kestrel thật có chứa `url.query` hay không: test host in-memory không thấy query trong span, nhưng chỉ có log "Request starting" được chứng minh và đã lọc.
+- Chưa có công cụ quét giấy phép tự động.
+- Ngoài phạm vi, đã có sẵn từ trước: Dockerfile `EXPOSE 8080` lệch cổng 7070; `src/.dockerignore` chỉ loại `**/.env` chứ chưa loại `.env.*`.
 
 ## Bài học (lessons learned)
 
