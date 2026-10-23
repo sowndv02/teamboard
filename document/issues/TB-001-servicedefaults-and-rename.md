@@ -117,6 +117,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 13 | coding-review:TB-001:options-unused | ServiceDefaultsOptions không dùng | Bỏ Options, kiểm tên bằng ArgumentException | 3 | 2026-10-23 |
 | 14 | coding-review:TB-001:cookie-query-nfr004 | Cookie và query chưa được kiểm | Mở rộng @S10 | 3 | 2026-10-23 |
 | 15 | coding-review:TB-001:small-p3 | Healthcheck/depends_on compose, giấy phép gói bắc cầu, dcproj | Sửa giấy phép gói bắc cầu và dcproj; chấp nhận thiếu healthcheck (ghi Giới hạn đã biết) | 3 | 2026-10-23 |
+| 16 | create-pr:TB-001:main-learning-doc | `document/learning/docker-compose.md` (TB-011 trên main) còn tên cũ, làm @S02 đỏ sau khi merge | Merge main vào nhánh và viết lại tên trong bài học | 4 | 2026-10-23 |
 
 ## Kịch bản và TDD log
 
