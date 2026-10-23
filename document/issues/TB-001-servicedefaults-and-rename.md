@@ -65,12 +65,12 @@ Giai đoạn 0 của lộ trình (`document/architecture/README.md` §6): chuẩ
 - **Quyết định (2026-10-23):** A, không lọc health khỏi trace, dùng `GET /health/live`.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] `dotnet build src/teamboard.slnx -warnaserror` thành công; không còn tham chiếu tên cũ (FR-001).
-- [ ] `docker compose` (file chính + observability) chạy `board-service` và Jaeger.
-- [ ] `GET /health/live` và `/health/ready` trả 200 (FR-002).
-- [ ] Một request tới `board-service` hiện thành trace trong Jaeger (FR-003, theo Q-03).
-- [ ] `config/services.yaml`, `PROJECT.md`, `COMMANDS.md`, `config/tool-versions.yaml`, `config/dependencies.yaml` khớp.
-- [ ] Test (xUnit + Reqnroll) xanh; gate theo NFR-002.
+- [x] `dotnet build src/teamboard.slnx -warnaserror` thành công; không còn tham chiếu tên cũ (FR-001).
+- [x] `docker compose` (file chính + observability) chạy `board-service` và Jaeger.
+- [x] `GET /health/live` và `/health/ready` trả 200 (FR-002).
+- [x] Một request tới `board-service` hiện thành trace trong Jaeger (FR-003, theo Q-03).
+- [x] `config/services.yaml`, `PROJECT.md`, `COMMANDS.md`, `config/tool-versions.yaml`, `config/dependencies.yaml` khớp.
+- [x] Test (xUnit + Reqnroll) xanh; gate theo NFR-002.
 
 ## Kế hoạch
 Plan chi tiết: `document/plans/TB-001-servicedefaults-and-rename.md` (6 bước: công cụ, đổi tên, health, OpenTelemetry, Jaeger, đồng bộ tài liệu).
@@ -94,7 +94,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-10-23 | đỏ: 11 kịch bản đúng lý do (S01–S11), thêm S12–S15 ở test-review (S12, S13 đỏ; S14, S15 canh giữ xanh) |
 
 | test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; 13 kịch bản đỏ đúng lý do (S01–S13), 2 canh giữ xanh (S14, S15); 7 FIX và 2 CONFIRM đã xử lý |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-10-23 | xanh 27/27 (7 ServiceDefaults + 20 board-service gồm 2 Docker); gate: build -warnaserror, format, vulnerable, compose config xanh; 6 commit B1–B6 |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -121,7 +121,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
 | @S01 Tên assembly và namespace gốc | `ServiceIdentitySteps` (service-identity.feature) | đỏ: `Assert.Equal` expected `board-service`, actual `teamboard-api` | xanh (B2) |
-| @S02 Không tệp nào còn tên cũ | `ServiceIdentitySteps` | đỏ: còn tên cũ trong COMMANDS.md, config\*.yaml, document\architecture\*.md, PROJECT.md | |
+| @S02 Không tệp nào còn tên cũ | `ServiceIdentitySteps` | đỏ: còn tên cũ trong COMMANDS.md, config\*.yaml, document\architecture\*.md, PROJECT.md | xanh (B6) |
 | @S03 Compose chạy ở cổng 6060 (`@docker`) | `ServiceIdentitySteps` + `DockerCli` | đỏ: `Assert.Contains` không thấy `board-service` trong danh sách service đang chạy (collection `["teamboard-api"]`); đã dừng container `src-teamboard-api-1` của người dùng vì chiếm cổng 6060 (chạy lại bằng `docker start src-teamboard-api-1`) | xanh (B2) |
 | @S04 Live trả 200 | `HealthSteps` (WebApplicationFactory) | đỏ: expected OK, actual NotFound | xanh (B3) |
 | @S05 Ready trả 200 | `HealthSteps` | đỏ: expected OK, actual NotFound | xanh (B3) |

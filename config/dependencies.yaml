@@ -14,7 +14,7 @@ policy:
 packages:
   # ---- T0: nền tảng ----
   - { name: ASP.NET Core / .NET BCL, ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false, note: "Microsoft first-party" }
-  - { name: Microsoft.EntityFrameworkCore (+ SqlServer, Npgsql provider), ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false, note: "EF Core first-party; đang dùng trong teamboard-api" }
+  - { name: Microsoft.EntityFrameworkCore (+ SqlServer, Npgsql provider), ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false, note: "EF Core first-party; đang dùng trong board-service" }
   - { name: Microsoft.Extensions.* (Logging, Options, DependencyInjection, Http.Resilience, Diagnostics.HealthChecks), ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false }
   - { name: Microsoft.AspNetCore.OpenApi, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false }
   - { name: Microsoft.AspNetCore.Mvc.Testing + Microsoft.AspNetCore.TestHost 10.0.13, Microsoft.NET.Test.Sdk 18.11.0, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: true, source: "nuspec trên NuGet (MIT), TB-001", note: "Microsoft first-party; chỉ project test" }
@@ -33,7 +33,7 @@ packages:
   - { name: Serilog, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (blog 2026)", note: "Hiện permissive; ưu tiên ILogger + OpenTelemetry (observability.md)" }
   - { name: FluentValidation, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (DepScope, blog 2026)", exit: "DataAnnotations/IValidatableObject hoặc validator tự viết" }
   - { name: Reqnroll (Reqnroll.xUnit 3.3.4), ecosystem: nuget, tier: T2, status: in-use, license: BSD-3-Clause, verified: true, source: "https://docs.reqnroll.net/latest/installation/compatibility.html (.NET 10, xUnit) và nuspec 3.3.4", note: "Người dùng phê duyệt 2026-10-23 (TB-001); chỉ dùng trong project test, không rò vào production", exit: "test BDD viết tay bằng xUnit" }
-  - { name: Swashbuckle.AspNetCore.SwaggerUI, ecosystem: nuget, tier: T2, status: in-use, license: MIT, verified: false, note: "Đang dùng trong teamboard-api; ít người duy trì", exit: "Microsoft.AspNetCore.OpenApi + giao diện nhẹ khác" }
+  - { name: Swashbuckle.AspNetCore.SwaggerUI, ecosystem: nuget, tier: T2, status: in-use, license: MIT, verified: false, note: "Đang dùng trong board-service; ít người duy trì", exit: "Microsoft.AspNetCore.OpenApi + giao diện nhẹ khác" }
   - { name: Testcontainers, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "docker compose cho test tích hợp" }
   - { name: Xunit.SkippableFact 1.4.13, ecosystem: nuget, tier: T2, status: approved, license: MS-PL, verified: true, source: "nuspec 1.4.13 trên NuGet (MS-PL)", note: "Phụ thuộc bắc cầu của Reqnroll.xUnit (cho phép bỏ qua scenario khi chạy). MS-PL không nằm trong allow_licenses lẫn deny_licenses; người dùng duyệt riêng cho gói này, chỉ trong project test, 2026-10-23 (TB-001)", exit: "bỏ Reqnroll hoặc không dùng bỏ qua động" }
   - { name: Mapster, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "ánh xạ thủ công" }
