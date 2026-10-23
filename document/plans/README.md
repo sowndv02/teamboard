@@ -12,4 +12,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 |---|---|---|
 | [api-gateway-slices](api-gateway-slices.md) | TB-007 (bảng lát; lát 1 = TB-010) | approved |
 | [TB-001-servicedefaults-and-rename](TB-001-servicedefaults-and-rename.md) | TB-001 | approved |
-| [TB-010-gateway-skeleton-routing](TB-010-gateway-skeleton-routing.md) | TB-010 (lát 1 gateway) | draft |
+| [TB-010-gateway-skeleton-routing](TB-010-gateway-skeleton-routing.md) | TB-010 (lát 1 gateway) | approved |

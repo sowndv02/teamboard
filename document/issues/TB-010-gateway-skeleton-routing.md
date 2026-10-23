@@ -24,14 +24,14 @@ Lát 1 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
   - `/health/live`, `/health/ready` độc lập upstream (FR-002); thời gian đến `ready` < 10 giây (NFR-005).
   - Fallback `404 problem+json` (`ROUTE_NOT_FOUND`) cho mọi request không khớp route, gồm method không hỗ trợ.
   - Thư viện nhỏ trong `src/shared` cho `problem+json` (Q-D2), thêm vào `teamboard.slnx`.
-  - Compose service `gateway` và cập nhật `config/services.yaml` (cổng host chốt ở plan), cấu hình qua env, không secret (NFR-004).
+  - Compose service `gateway` và cập nhật `config/services.yaml` (cổng host 8080 → container 7070), cấu hình qua env, không secret (NFR-004).
 - Không làm: correlation/trace, lỗi upstream và timeout, rate limit, giới hạn body, CORS, metric/log đặc thù, smoke với board-service thật (các lát 2–8).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
 - [ ] `GET /api/v1/boards` qua gateway tới upstream giả trả đúng status/body, path không đổi.
 - [ ] Path không khớp route trả `404 problem+json` có `code: ROUTE_NOT_FOUND`, `traceId`, `correlationId`.
 - [ ] `/health/live` và `/health/ready` trả `200`; `ready` vẫn `200` khi upstream chết.
-- [ ] Gateway sẵn sàng trong dưới 10 giây (test khởi động).
+- [ ] Gateway sẵn sàng trong dưới 10 giây (đo trong test Docker, từ `compose up -d`).
 - [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
 - [ ] `config/services.yaml`, compose và `PROJECT.md` khớp.
 
@@ -51,7 +51,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-23 | `document/plans/TB-010-gateway-skeleton-routing.md` (draft), 4 bước B1–B4, 3 câu hỏi mở P-01..P-03 |
-| plan-review | pending | | | |
+| plan-review | PASS | 2 | 2026-10-23 | plan `approved`; 8 quyết định (xem plan, Confirm log), 6 FIX; review độc lập (sub-agent) |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
