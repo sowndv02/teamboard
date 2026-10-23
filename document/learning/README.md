@@ -14,7 +14,7 @@ Ghi chú gom kiến thức theo chủ đề (vấn đề, cách dùng, ưu/như�
 | Container | [container.md](container.md) | Có (runtime, build, điều phối, không dùng container) | 2026-10-23 | Đạt (Borg, OCI, Kaniko tự mở; dockershim Vừa) |
 | Caching (lộ trình Part 0–7) | [caching/README.md](caching/README.md) | Có (trình duyệt, CDN, trong tiến trình, HybridCache, Redis/Valkey, Memcached, DB, không cache) | 2026-10-23 | Đạt (Facebook, Cloudflare, AWS, Uber, Meta, Discord, Cloudbleed tự mở; Part 3 Lab Valkey và Part 6 dự án 6.2/6.3 chưa chạy) |
 | API Gateway (lộ trình Part 0–7, YARP là công cụ thực hành) | [api-gateway/README.md](api-gateway/README.md) | Có (thư viện proxy, proxy đa năng, plugin, managed, LB L7, K8s, mesh ingress, không dùng) | 2026-10-23 | Đạt (Azure, Microsoft, Uber, Stripe tự mở; Zuul, K8s Gateway API Vừa; chưa có postmortem công khai) |
-| Kiến trúc microservice | [microservice.md](microservice.md) | Có (monolith, modular monolith, microservice, DOMA, serverless, strangler) | 2026-10-23 | Đạt (Segment, Shopify, Uber tự mở; Prime Video chỉ thứ cấp) |
+| Kiến trúc microservice (lộ trình Part 0–7) | [microservice/README.md](microservice/README.md) | Có (monolith, modular monolith, microservice, DOMA, serverless, strangler) | 2026-10-23 | Đạt (Segment, Shopify, Uber tự mở; Prime Video chỉ thứ cấp) |
 
 ## Công cụ
 

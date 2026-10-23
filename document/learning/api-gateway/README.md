@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > **Mục tiêu:** hiểu API Gateway như một **vai trò** trong kiến trúc, nắm từng cơ chế của nó (định tuyến, offloading, cân bằng tải, health check, timeout, rate limit, xác thực, quan sát), thực hành bằng YARP trên .NET, và biết lúc nào **không** cần gateway.
-> **Cần biết trước:** HTTP cơ bản, C# cơ bản, khái niệm microservice ([microservice.md](../microservice.md)). Chưa cần biết YARP.
+> **Cần biết trước:** HTTP cơ bản, C# cơ bản, khái niệm microservice ([Microservice](../microservice/README.md)). Chưa cần biết YARP.
 > **Thời lượng ước tính:** 25 đến 35 giờ nếu làm đủ lab.
 > **Loại:** khái niệm, dùng **YARP** làm công cụ thực hành. Công cụ chỉ là **một trong các lựa chọn** (xem [Bản đồ giải pháp](part-1-fundamentals.md#bản-đồ-giải-pháp)).
 
