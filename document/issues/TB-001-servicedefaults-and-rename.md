@@ -127,12 +127,12 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S05 Ready trả 200 | `HealthSteps` | đỏ: expected OK, actual NotFound | xanh (B3) |
 | @S06 Check sẵn sàng Unhealthy trước khi khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException (khung rỗng `AddServiceDefaults`) | xanh (B3) |
 | @S07 Service khác dùng ServiceDefaults | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
-| @S08 Span có service.name | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S08 Span có service.name | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
-| @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | |
+| @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | xanh (B4) |
 | @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | |
-| @S12 Request tạo metric | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
-| @S13 Request tạo bản ghi log | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S12 Request tạo metric | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
+| @S13 Request tạo bản ghi log | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S14 Mọi gói NuGet có phiên bản cố định | `RepositoryHygieneSteps` + `RepositoryPoliciesTests` (7 ca) | không có đỏ production: test canh giữ, luật được chứng minh bắt vi phạm bằng unit test (`10.*`, `*`, dải); xanh ngay vì repo hiện sạch | xanh |
 | @S15 Compose không chứa bí mật viết cứng | `RepositoryHygieneSteps` + `RepositoryPoliciesTests` (5 ca) | như @S14 (bí mật viết cứng bị bắt trong unit test) | xanh |
 
