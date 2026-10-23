@@ -18,6 +18,7 @@ packages:
   - { name: Microsoft.Extensions.* (Logging, Options, DependencyInjection, Http.Resilience, Diagnostics.HealthChecks), ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false }
   - { name: Microsoft.AspNetCore.OpenApi, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false }
   - { name: Microsoft.AspNetCore.Mvc.Testing + Microsoft.AspNetCore.TestHost 10.0.13, Microsoft.NET.Test.Sdk 18.11.0, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: true, source: "nuspec trên NuGet (MIT), TB-001", note: "Microsoft first-party; chỉ project test" }
+  - { name: System.Security.Cryptography.Pkcs 10.0.13, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: true, source: "nuspec 10.0.13 trên NuGet (MIT); ghim trực tiếp để thay bản 9.0.11 bắc cầu có lỗ hổng NU1902/NU1903, TB-001", note: "Microsoft first-party; gỡ ghim khi Microsoft.Data.SqlClient nâng phụ thuộc" }
   - { name: AWSSDK.* (AWS SDK for .NET), ecosystem: nuget, tier: T0, status: approved, license: Apache-2.0, verified: false, note: "AWS first-party" }
   - { name: Angular (framework, CLI, router, forms), RxJS, TypeScript, ecosystem: npm, tier: T0, status: approved, license: MIT, verified: false, note: "ADR 0009; first-party Google/Microsoft; kiểm giấy phép từng gói phụ" }
 
