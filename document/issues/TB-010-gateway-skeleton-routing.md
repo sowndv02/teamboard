@@ -1,12 +1,12 @@
 ---
 key: TB-010
 title: Gateway lát 1, khung YARP, route boards, health và 404 problem+json
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-010-gateway-skeleton-routing
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-23
-started: null           # ngày chuyển in-progress
+started: 2026-10-23
 closed: null            # ngày done/dropped
 ---
 
@@ -15,7 +15,7 @@ closed: null            # ngày done/dropped
 ## Bối cảnh
 Lát 1 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `document/spec/api-gateway.md`, design `document/design/api-gateway.md`, issue tài liệu TB-007). Xương sống để các lát sau (correlation, lỗi upstream, rate limit, body, CORS, quan sát) cắm vào.
 
-**Phụ thuộc:** TB-001 phải xong trước (đổi tên `board-service`, `src/shared/ServiceDefaults`, Jaeger), theo quyết định Q-D1. Không tạo branch và không lập plan cho đến khi TB-001 xong.
+**Phụ thuộc:** TB-001 đã merge (PR 8, `board-service`, `src/shared/ServiceDefaults`, Jaeger). Branch `feature/TB-010-gateway-skeleton-routing` tạo từ `main` ngày 2026-10-23.
 
 ## Phạm vi
 - Làm:
@@ -36,10 +36,11 @@ Lát 1 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
 - [ ] `config/services.yaml`, compose và `PROJECT.md` khớp.
 
 ## Kế hoạch
-Plan chi tiết (`document/plans/TB-010-gateway-skeleton-routing.md`) lập sau khi TB-001 xong, qua `plan-init`.
+Plan chi tiết: `document/plans/TB-010-gateway-skeleton-routing.md` (4 bước: khung và YARP, thư viện problem+json, routing và health, compose).
 
 ## Ghi chú / Nhật ký
 - 2026-10-23: tạo từ lát 1 của bảng lát api-gateway (người dùng duyệt bảng 2026-10-23).
+- 2026-10-23: TB-001 đã merge; tạo branch từ `main` và lập plan draft.
 
 ## Workflow
 
@@ -49,7 +50,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | chờ TB-001 xong |
+| plan-init | done | – | 2026-10-23 | `document/plans/TB-010-gateway-skeleton-routing.md` (draft), 4 bước B1–B4, 3 câu hỏi mở P-01..P-03 |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |

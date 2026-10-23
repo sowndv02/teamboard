@@ -20,5 +20,5 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-007](TB-007-api-gateway.md) | API gateway (YARP) mỏng: spec, design và bảng lát (issue tài liệu; code theo từng lát TB-010..) | 0 | review |
 | [TB-008](TB-008-review-fix-report.md) | Báo cáo mọi FIX agent đã sửa sau mỗi vòng review (không sửa im lặng) | 0 | review |
 | [TB-009](TB-009-commit-per-step.md) | Commit file của từng bước workflow ngay khi bước đạt | 0 | review |
-| [TB-010](TB-010-gateway-skeleton-routing.md) | Gateway lát 1, khung YARP, route boards, health và 404 problem+json (chờ TB-001) | 1 | todo |
+| [TB-010](TB-010-gateway-skeleton-routing.md) | Gateway lát 1, khung YARP, route boards, health và 404 problem+json | 1 | in-progress |
 | [TB-011](TB-011-learning-hub.md) | Skill learning-hub gom kiến thức theo chủ đề vào document/learning | 0 | review |
