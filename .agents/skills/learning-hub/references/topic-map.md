@@ -9,7 +9,7 @@
 | Chủ đề | Khái niệm gốc | Nội bộ (đọc theo thứ tự) | Code/config | Chính thức |
 |---|---|---|---|---|
 | Container (namespace/cgroup, image, OCI, runtime, điều phối) | (là khái niệm) → ghi chú `document/learning/container.md` | `.agents/rules/docker.md`, ADR 0003 | – | opencontainers.org, kubernetes.io |
-| Docker (Dockerfile, image, layer) | Container | `.agents/rules/docker.md`, `COMMANDS.md` mục 3 | `src/teamboard-api/Dockerfile` | docs.docker.com |
+| Docker, Docker Compose (lộ trình Part 0–7 ở `document/learning/docker/`) | Container | `.agents/rules/docker.md`, `COMMANDS.md` mục 3 | `src/board-service/Dockerfile` | docs.docker.com |
 | Docker Compose | Container | `.agents/rules/docker.md`, `COMMANDS.md` mục 3 | `src/docker-compose*.yml`, `src/*.example` | docs.docker.com/compose |
 | API Gateway (cửa vào, routing, aggregation, offloading) | (là khái niệm) → `document/learning/api-gateway.md` | `document/spec/api-gateway.md`, `document/design/api-gateway.md`, `document/architecture/adr/0001-*.md`, `0002-*.md` | – | microservices.io, learn.microsoft.com (Azure Architecture Center) |
 | YARP, routing, proxy | API Gateway | `document/spec/api-gateway.md`, `document/design/api-gateway.md`, `document/plans/api-gateway-slices.md`, `document/issues/TB-007-*.md`, `TB-010-*.md` | `src/` (gateway khi có) | learn.microsoft.com (YARP) |
@@ -20,7 +20,7 @@
 | Observability (log, trace, metric, health) | (là khái niệm) | `document/architecture/observability.md`, `.agents/rules/observability.md` | ServiceDefaults (TB-001), `Program.cs` | opentelemetry.io |
 | Resilience (retry, circuit breaker, timeout) | (là khái niệm) | `document/architecture/resilience.md` | – | learn.microsoft.com (Polly/resilience) |
 | Identity, JWT, OAuth2, OIDC, PKCE | (là khái niệm) | `document/architecture/identity-learning.md`, `adr/0006-*.md`, `references.md` mục 2 | – | RFC 6749/7519/7636, OpenID Connect Core |
-| ASP.NET Core / C# / EF Core | Web framework, ORM | `.agents/rules/dotnet.md`, `backend-engineering.md`, `api-endpoints.md`, `adr/0005-*.md` | `src/teamboard-api/` | learn.microsoft.com |
+| ASP.NET Core / C# / EF Core | Web framework, ORM | `.agents/rules/dotnet.md`, `backend-engineering.md`, `api-endpoints.md`, `adr/0005-*.md` | `src/board-service/` | learn.microsoft.com |
 | Testing (TDD/BDD) | (là khái niệm) | `.agents/rules/testing.md`, `test-review.md` | `src/**/*Tests*` khi có | – |
 | Terraform, AWS, ECS Fargate | Infrastructure as Code, container orchestration | `.agents/rules/terraform.md`, `adr/0003-*.md`, `0004-*.md`, `document/security/infra-attack-scenarios.md`, skill `aws-service-selection` | `infra/` (giai đoạn 4) | developer.hashicorp.com, docs.aws.amazon.com |
 | Angular / frontend | Single-page application | skill `angular-learning`, `.agents/rules/angular.md`, `adr/0008-*.md`, `0009-*.md` | `src/web/` (chưa scaffold) | angular.dev |

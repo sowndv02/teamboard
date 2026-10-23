@@ -1,7 +1,7 @@
 # Kiến trúc microservice
 
 > Loại: Khái niệm (kiểu kiến trúc; xem [Bản đồ giải pháp](#bản-đồ-giải-pháp) để thấy microservice chỉ là một lựa chọn) · Khái niệm liên quan: [Caching](caching.md) (một công cụ giảm tải cho service), [API Gateway](api-gateway.md) (cửa vào của hệ nhiều service)
-> Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: giai đoạn 0, mới có `src/teamboard-api` (sẽ đổi tên `board-service`); các service còn lại chưa có code · Nguồn sự thật: `document/architecture/README.md`, ADR 0001, 0002
+> Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: giai đoạn 0, có `src/board-service` và `src/shared/ServiceDefaults`; các service còn lại chưa có code · Nguồn sự thật: `document/architecture/README.md`, ADR 0001, 0002
 
 ## 1. Vấn đề nó giải quyết
 
@@ -128,13 +128,13 @@ public async Task HandleAsync(EventEnvelope e, CancellationToken ct)
 
 Hai chỗ cố ý để bạn tìm (bài tập mục 10): relay nền đọc bảng outbox ở đâu và đánh dấu "đã gửi" thế nào; và `TryMarkAsync` rồi crash trước `SendNotificationAsync` thì chuyện gì xảy ra.
 
-**Chạy thử một "service" thật trong repo hiện tại** (chỉ `teamboard-api`):
+**Chạy thử một "service" thật trong repo hiện tại** (chỉ `board-service`):
 
 ```bash
 docker compose -f src/docker-compose.yml up --build -d
 docker compose -f src/docker-compose.yml ps
 ```
-Mong đợi: `teamboard-api` chạy ở http://localhost:6060. Chưa chạy lại trong phiên này.
+Mong đợi: `board-service` chạy ở http://localhost:6060. Chưa chạy lại trong phiên này.
 
 ## 5. Ưu và nhược điểm
 
@@ -159,7 +159,7 @@ Microservice là **một kiểu kiến trúc triển khai** trong một dải l�
 | **Microservice** | Segment (trước khi gộp), Netflix, TeamBoard | Nhiều đội, cần deploy/scale độc lập, đã có DevOps | Chi phí phân tán: mạng, eventual consistency, vận hành; có thể thành distributed monolith | [Segment](https://www.twilio.com/en-us/blog/developers/best-practices/goodbye-microservices) (Chắc, đã mở) |
 | **Microservice có cấu trúc domain** | Uber DOMA: gom khoảng 2.200 service thành khoảng 70 domain, mỗi domain một gateway | Số service rất lớn, cần giảm phối hợp xuyên đội | Thêm lớp cấu trúc (domain, tầng, extension) cần đầu tư | [Uber DOMA](https://www.uber.com/en-GB/blog/microservice-architecture/) (Chắc, đã mở) |
 | **Serverless / event-driven functions** | `activity-service` (Lambda + SNS/SQS + DynamoDB) | Tải thất thường, xử lý theo sự kiện, ít vận hành | Khó debug/test cục bộ, giới hạn runtime, chi phí có thể tăng ở tải ổn định lớn (Prime Video chỉ là thiết kế lại một dịch vụ, nguồn thứ cấp) | `patterns-catalog.md` mục 5 (nội bộ); Catchpoint (Vừa) |
-| **Di chuyển dần từ monolith** | Strangler Fig từ `teamboard-api` sang các service | Có monolith đang chạy | Chạy song song, chi phí tạm thời | `patterns-catalog.md` 3.7 (nội bộ) |
+| **Di chuyển dần từ monolith** | Strangler Fig từ `board-service` (monolith hiện có) sang các service | Có monolith đang chạy | Chạy song song, chi phí tạm thời | `patterns-catalog.md` 3.7 (nội bộ) |
 
 **Cách chọn:** bắt đầu từ nhu cầu (deploy độc lập? scale riêng? đội tự chủ?) rồi đi từ ít phân tán đến nhiều; nhiều công ty nêu ở mục 7 chọn hoặc quay về các họ ít phân tán hơn khi chi phí vượt lợi ích. Không có kiểu nào "đúng" mọi nơi (Fowler: có "phí bảo hiểm" cho microservice).
 
@@ -193,10 +193,10 @@ Microservice là **một kiểu kiến trúc triển khai** trong một dải l�
 ## 8. Trong TeamBoard
 
 - Sáu service, mỗi service một kiến trúc nội bộ khác nhau: `document/architecture/README.md` mục 1, ADR 0001. Ràng buộc: `.agents/rules/architecture.md` (không "đơn giản hoá" về CRUD layered).
-- **Đây là chủ ý học tập (`[Chọn để học]`), không phải khuyến nghị cho domain nhỏ.** ADR 0001 ghi rõ: domain bị chia "quá tay" có chủ đích. Mục 7 cho thấy vì sao: Shopify chọn modular monolith, Segment gộp lại. `patterns-catalog.md` mục 1.4 và 7 gợi ý dựng modular monolith đối chứng và Strangler Fig từ `teamboard-api`.
+- **Đây là chủ ý học tập (`[Chọn để học]`), không phải khuyến nghị cho domain nhỏ.** ADR 0001 ghi rõ: domain bị chia "quá tay" có chủ đích. Mục 7 cho thấy vì sao: Shopify chọn modular monolith, Segment gộp lại. `patterns-catalog.md` mục 1.4 và 7 gợi ý dựng modular monolith đối chứng và Strangler Fig từ `board-service`.
 - Giao tiếp: REST qua gateway, event SNS → SQS + DLQ, outbox, consumer idempotent (ADR 0002, `.agents/rules/messaging.md`).
 - Quan sát: `document/architecture/observability.md`; chịu lỗi: `document/architecture/resilience.md`.
-- Lộ trình: README mục 6; trạng thái hiện tại giai đoạn 0, TB-001 đang đổi tên `teamboard-api` và thêm `ServiceDefaults`.
+- Lộ trình: README mục 6; trạng thái hiện tại giai đoạn 0, TB-001 đã đổi tên thành `board-service` và thêm `ServiceDefaults`.
 - **Điểm lệch cần biết:** slide tham khảo dùng RabbitMQ + MassTransit; dự án dùng SNS/SQS và tự viết lớp nhắn tin mỏng (MassTransit từ v9 bị cấm theo `dependency-policy.md`). Học pattern, không bắt buộc thư viện.
 
 ## 9. Học tiếp

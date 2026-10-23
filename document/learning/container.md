@@ -1,7 +1,7 @@
 # Container
 
-> Loại: Khái niệm · Công cụ trong dự án: [Docker và Docker Compose](docker-compose.md) (chỉ là một trong các lựa chọn, xem [Bản đồ giải pháp](#bản-đồ-giải-pháp))
-> Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: `teamboard-api` đã có Dockerfile và compose; production dự kiến ECS Fargate (ADR 0003)
+> Loại: Khái niệm · Công cụ trong dự án: [Docker: lộ trình học](docker/README.md) (chỉ là một trong các lựa chọn, xem [Bản đồ giải pháp](#bản-đồ-giải-pháp))
+> Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: `board-service` có Dockerfile và bốn file compose; production dự kiến ECS Fargate (ADR 0003)
 
 ## 1. Vấn đề nó giải quyết
 
@@ -94,7 +94,7 @@ docker run --rm --memory=64m --cpus=0.5 alpine sh -c 'cat /sys/fs/cgroup/memory.
 ```
 Mong đợi: lệnh đầu chỉ liệt kê vài tiến trình; lệnh sau in giá trị khoảng 67108864 (64 MiB) nếu máy dùng cgroup v2.
 
-**Dùng thực tế**: viết Dockerfile (hoặc tương đương) → build image → đẩy lên registry → chạy bằng một runtime hoặc điều phối. Chi tiết với Docker và Compose nằm ở [docker-compose.md](docker-compose.md).
+**Dùng thực tế**: viết Dockerfile (hoặc tương đương) → build image → đẩy lên registry → chạy bằng một runtime hoặc điều phối. Chi tiết với Docker và Compose nằm ở [lộ trình Docker](docker/README.md).
 
 **Quy trình chọn công cụ:** (1) máy dev: Docker/Podman; (2) build trong CI: BuildKit hoặc Buildah; (3) production: giao cho điều phối (ECS/Kubernetes) thay vì tự chạy; (4) ghim base image theo digest, chạy không root.
 
@@ -144,7 +144,7 @@ Container là một khái niệm có nhiều lớp công cụ; **Docker không p
 ## 6. Lỗi hay gặp và cách tránh
 
 - **Dùng tag `latest`/tag mutable.** Triệu chứng: build không tái lập, rollback không chắc. Cách tránh: ghim digest (Docker docs khuyến nghị ghim bằng digest).
-- **Secret trong layer.** Triệu chứng: ai có image đều đọc được token. Nguyên nhân: truyền qua `ARG`/`ENV` khi build ("persist in the final image" theo Docker docs). Cách tránh: `docker build --secret` + `RUN --mount=type=secret` (xem [docker-compose.md](docker-compose.md)).
+- **Secret trong layer.** Triệu chứng: ai có image đều đọc được token. Nguyên nhân: truyền qua `ARG`/`ENV` khi build ("persist in the final image" theo Docker docs). Cách tránh: `docker build --secret` + `RUN --mount=type=secret` (xem [Part 4](docker/part-4-advanced.md), Lab 4.3).
 - **Chạy root trong container.** Cách tránh: `USER` không đặc quyền; rootless nếu có thể.
 - **Nhầm container với VM.** Coi cô lập như hypervisor trong khi chung kernel. Cách tránh: cập nhật kernel/host, giới hạn capability, cân nhắc VM khi cần cô lập mạnh.
 - **Mất dữ liệu khi xoá container.** Cách tránh: volume hoặc dữ liệu ở dịch vụ ngoài (DB).
@@ -160,7 +160,7 @@ Container là một khái niệm có nhiều lớp công cụ; **Docker không p
 | **Kubernetes bỏ dockershim** | Docker Engine ra đời trước CRI nên Kubernetes giữ một lớp adapter | Trang FAQ cho thấy việc gỡ được công bố từ v1.20 và có cập nhật theo v1.24; **lý do cụ thể và tác động lên image chưa đọc được trong phần trang đã mở**. Kiến thức chung (Chưa kiểm): kubelet chuyển sang gọi thẳng containerd/CRI-O vì duy trì adapter là gánh nặng; image build bằng Docker vẫn chạy vì theo chuẩn OCI | Bài học: tách runtime khỏi công cụ dev nhờ chuẩn mở | [Dockershim FAQ](https://kubernetes.io/blog/2022/02/17/dockershim-faq/) (17/02/2022) | Vừa |
 | **Bài về Borg, Omega, Kubernetes** (ACM Queue 2016) | Bài học từ ba hệ thống quản lý container của Google | Tổng kết sau khoảng một thập kỷ | Bản đầy đủ trả 403, chỉ đọc được trang tóm tắt | [research.google](https://research.google/pubs/borg-omega-and-kubernetes/) | Vừa (agent đã mở) |
 
-Hai case thực hành chính thức khác về secret trong build, Compose trong production và giới hạn pull Docker Hub nằm ở bảng của [docker-compose.md](docker-compose.md) mục 7.
+Hai case thực hành chính thức khác về secret trong build, Compose trong production và giới hạn pull Docker Hub nằm ở [Part 3](docker/part-3-multi-container.md), [Part 4](docker/part-4-advanced.md) và [Part 5](docker/part-5-production-security-ops.md).
 
 **Mô hình phổ biến (Chắc, theo Docker docs đã mở):** cùng một image đi từ dev → CI → production; Compose cho local/test, điều phối cho production.
 
@@ -168,7 +168,7 @@ Hai case thực hành chính thức khác về secret trong build, Compose trong
 
 ## 8. Trong TeamBoard
 
-- Công cụ đang dùng: Docker + Compose cho local (`src/docker-compose.yml`), chi tiết ở [docker-compose.md](docker-compose.md).
+- Công cụ đang dùng: Docker + Compose cho local (`src/docker-compose.yml`), chi tiết ở [lộ trình Docker](docker/README.md).
 - Production: **ECS Fargate** (ADR 0003, `document/architecture/adr/0003-ecs-fargate.md`) thay vì Kubernetes; lý do theo ADR: khớp lộ trình khoá, ít thành phần hơn Kubernetes, chi phí thấp hơn (ADR nêu control plane EKS khoảng 73 USD/tháng chưa tính node, chưa kiểm lại giá hiện hành). Đánh đổi ADR ghi rõ: không học Kubernetes. Xem thêm README kiến trúc mục 5 và skill `aws-service-selection`.
 - Chính sách: Docker Desktop có thể cần gói trả phí khi tổ chức vượt ngưỡng; Docker Engine/CLI/Compose dùng Apache-2.0 (`.agents/rules/dependency-policy.md` mục 7); Nomad (BUSL) thuộc hạng cần xem xét, Kaniko không nên dùng cho CI mới.
 - Quy tắc Docker: `.agents/rules/docker.md`.
@@ -177,7 +177,7 @@ Hai case thực hành chính thức khác về secret trong build, Compose trong
 
 | # | Tài liệu | Loại | Đọc để biết | Mức |
 |---|---|---|---|---|
-| 1 | [docker-compose.md](docker-compose.md) | Nội bộ | Docker/Compose cụ thể, Dockerfile của dự án | Chắc |
+| 1 | [docker/README.md](docker/README.md) | Nội bộ | Docker/Compose cụ thể, Dockerfile của dự án | Chắc |
 | 2 | `.agents/rules/docker.md`, ADR 0003 | Nội bộ | luật và lựa chọn runtime | Chắc |
 | 3 | https://opencontainers.org/about/overview/ | Chuẩn | OCI | Chắc (đã mở) |
 | 4 | https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/ | Paper | Borg | Chắc (đã mở) |
