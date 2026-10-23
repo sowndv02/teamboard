@@ -1,4 +1,4 @@
-@TB-001
+@TB-001 @board-service
 Feature: Tên service board-service nhất quán
   Là lập trình viên
   Tôi muốn service có một tên duy nhất ở mọi nơi
@@ -8,11 +8,10 @@ Feature: Tên service board-service nhất quán
   Scenario: Tên assembly và namespace gốc của service là board-service
     When tôi kiểm tra assembly của service
     Then tên assembly là "board-service"
-    And dự án "src/board-service/board-service.csproj" khai báo namespace gốc "BoardService"
+    And namespace gốc của dự án service là "BoardService"
 
   @S02 @FR-001
   Scenario: Không tệp hiện hành nào còn tên cũ của service
-    Given gốc repo được xác định
     When tôi quét mã nguồn, cấu hình và tài liệu hiện hành
     Then không tệp nào chứa tên cũ của service
 

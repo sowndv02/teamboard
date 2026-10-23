@@ -91,9 +91,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | system-design | n/a (làn vừa) | | | không có quyết định kiến trúc mới (OTel, health đã quy định ở `observability.md`) |
 | plan-init | done | – | 2026-10-23 | `document/plans/TB-001-servicedefaults-and-rename.md`, 6 bước |
 | plan-review | PASS | 1 | 2026-10-23 | plan `approved`; 5 quyết định (tên cũ viết lại, tên ServiceDefaults, kiểm giả định, test Docker tự động, xUnit v2); 6 FIX |
-| test-init | done | – | 2026-10-23 | đỏ: 11/11 test (S01–S11) đúng lý do; test Docker chạy thật với Docker Desktop |
+| test-init | done | – | 2026-10-23 | đỏ: 11 kịch bản đúng lý do (S01–S11), thêm S12–S15 ở test-review (S12, S13 đỏ; S14, S15 canh giữ xanh) |
 
-| test-review | pending | | | |
+| test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; 13 kịch bản đỏ đúng lý do (S01–S13), 2 canh giữ xanh (S14, S15); 7 FIX và 2 CONFIRM đã xử lý |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -111,6 +111,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 7 | tb001:pkcs-vulnerability | Gói bắc cầu System.Security.Cryptography.Pkcs 9.0.11 có lỗ hổng, gate -warnaserror đỏ sẵn trên main | Sửa trong TB-001 bằng cách ghim phiên bản đã vá (thêm vào B1 của plan) | 2 | 2026-10-23 |
 | 8 | tb001:mspl-license | MS-PL của Xunit.SkippableFact (bắc cầu từ Reqnroll.xUnit) | Duyệt, chỉ trong project test | 2 | 2026-10-23 |
 | 9 | tb001:docker-red | Docker daemon không chạy, S03 và S11 chưa chứng minh đỏ | Người dùng bật Docker Desktop, tôi chạy lại hai test trước khi sang test-review | 2 | 2026-10-23 |
+| 10 | test-review:TB-001:fr003-metric-log | Kịch bản cho metric và log của FR-003 | Thêm @S12 (metric) và @S13 (log) | 1 | 2026-10-23 |
+| 11 | test-review:TB-001:nfr-without-scenario | NFR-001, NFR-002, NFR-003 chưa có kịch bản | Thêm @S14 (NFR-003) và @S15 (NFR-001); NFR-002 kiểm bằng gate | 1 | 2026-10-23 |
 
 ## Kịch bản và TDD log
 
@@ -129,11 +131,25 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
 | @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | |
 | @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | |
+| @S12 Request tạo metric | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S13 Request tạo bản ghi log | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S14 Mọi gói NuGet có phiên bản cố định | `RepositoryHygieneSteps` + `RepositoryPoliciesTests` (7 ca) | không có đỏ production: test canh giữ, luật được chứng minh bắt vi phạm bằng unit test (`10.*`, `*`, dải); xanh ngay vì repo hiện sạch | xanh |
+| @S15 Compose không chứa bí mật viết cứng | `RepositoryHygieneSteps` + `RepositoryPoliciesTests` (5 ca) | như @S14 (bí mật viết cứng bị bắt trong unit test) | xanh |
+
+Lệnh chạy test (phạm vi theo `quality-gate.md`):
+
+- Nhanh (không Docker): `dotnet test src/teamboard.slnx --filter "Category!=docker"`.
+- Docker (@S03, @S11): `dotnet test src/board-service.Tests/board-service.Tests.csproj --filter "Category=docker"`; cần Docker Desktop chạy, cổng 6060 trống (dừng container `src-teamboard-api-1` nếu có); không có Docker thì scenario bị bỏ qua (`SkipException`), không phải đỏ.
+- Đầy đủ: `dotnet test src/teamboard.slnx` (hai test Docker chạy tuần tự, `DisableTestParallelization`).
+
+Giới hạn đã biết: @S14, @S15 là test canh giữ (xanh ngay); @S10 chỉ có ý nghĩa khi telemetry thật chạy (đã thêm khẳng định có span); `dotnet build -warnaserror` đang đỏ trên `main` do gói bắc cầu có lỗ hổng, sửa ở B1.
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-23 | `6d04a92` | Cần sửa feature | 2 CONFIRM (metric/log, NFR không có kịch bản) và 7 FIX: thiếu tag service, S10 có thể xanh rỗng, hai test Docker chạy song song tranh cổng 6060, bước Given kỹ thuật ở S02, lộ đường dẫn và endpoint thử trong S01 và S10, thiếu lệnh chạy |
+| 2 | 2026-10-23 | delta sau `6d04a92` | Sẵn sàng code | không còn finding mở; kiểm lại: đỏ đúng lý do, format xanh, tag đủ |
 
 ## Review rounds
 

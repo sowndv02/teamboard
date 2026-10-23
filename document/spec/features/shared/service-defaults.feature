@@ -1,4 +1,4 @@
-@TB-001
+@TB-001 @shared
 Feature: ServiceDefaults dùng chung cho mọi service
   Là lập trình viên
   Tôi muốn một thư viện ServiceDefaults dùng lại được

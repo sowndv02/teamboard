@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Reqnroll;
 using Xunit;
@@ -57,11 +58,10 @@ public sealed class ServiceDefaultsSteps : IAsyncDisposable
         _responses.Add(await Send(second));
     }
 
-    [When("tôi gửi {string} với header Authorization {string} và body {string}")]
-    public async Task WhenPostWithSecrets(string request, string authorization, string body)
+    [When("tôi gửi một yêu cầu ghi dữ liệu với header Authorization {string} và body {string}")]
+    public async Task WhenPostWithSecrets(string authorization, string body)
     {
-        var (method, path) = Split(request);
-        using var message = new HttpRequestMessage(new HttpMethod(method), path)
+        using var message = new HttpRequestMessage(HttpMethod.Post, "/echo")
         {
             Content = new StringContent(body, Encoding.UTF8, "text/plain"),
         };
@@ -99,6 +99,27 @@ public sealed class ServiceDefaultsSteps : IAsyncDisposable
         Assert.Contains(Host.Spans, span => span.Kind == ActivityKind.Server);
         var attributes = tracerProvider.GetResource().Attributes;
         Assert.Contains(attributes, attribute => attribute.Key == "service.name" && (string?)attribute.Value == serviceName);
+    }
+
+    [Then("telemetry đã ghi nhận ít nhất một span")]
+    public void ThenSpanRecorded()
+    {
+        Host.App.Services.GetRequiredService<TracerProvider>().ForceFlush();
+        Assert.NotEmpty(Host.Spans);
+    }
+
+    [Then("telemetry đã ghi nhận ít nhất một metric")]
+    public void ThenMetricRecorded()
+    {
+        Host.App.Services.GetRequiredService<MeterProvider>().ForceFlush();
+        Assert.NotEmpty(Host.Metrics);
+    }
+
+    [Then("telemetry đã ghi nhận ít nhất một bản ghi log")]
+    public void ThenLogRecorded()
+    {
+        Host.App.Services.GetRequiredService<LoggerProvider>().ForceFlush();
+        Assert.NotEmpty(Host.Logs);
     }
 
     [Then("không span hay bản ghi log nào chứa {string}")]

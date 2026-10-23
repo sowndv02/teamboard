@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace Teamboard.Shared.ServiceDefaults.Tests;
@@ -16,6 +17,8 @@ internal sealed class TestHostFactory : IAsyncDisposable
     public List<Activity> Spans { get; } = [];
 
     public List<LogRecord> Logs { get; } = [];
+
+    public List<Metric> Metrics { get; } = [];
 
     public WebApplication App { get; private set; } = null!;
 
@@ -29,6 +32,7 @@ internal sealed class TestHostFactory : IAsyncDisposable
         builder.AddServiceDefaults(serviceName);
         builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddInMemoryExporter(factory.Spans));
         builder.Services.ConfigureOpenTelemetryLoggerProvider(logging => logging.AddInMemoryExporter(factory.Logs));
+        builder.Services.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddInMemoryExporter(factory.Metrics));
 
         factory.App = builder.Build();
         factory.App.MapDefaultEndpoints();

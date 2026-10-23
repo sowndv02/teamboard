@@ -1,4 +1,4 @@
-@TB-001
+@TB-001 @shared
 Feature: Telemetry OpenTelemetry của ServiceDefaults
   Là lập trình viên
   Tôi muốn trace, metric, log xuất bằng OpenTelemetry
@@ -20,6 +20,19 @@ Feature: Telemetry OpenTelemetry của ServiceDefaults
   @S10 @NFR-004
   Scenario: Telemetry không chứa Authorization hay body
     Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
-    When tôi gửi "POST /echo" với header Authorization "Bearer token-bi-mat-123" và body "noi-dung-bi-mat-456"
-    Then không span hay bản ghi log nào chứa "token-bi-mat-123"
+    When tôi gửi một yêu cầu ghi dữ liệu với header Authorization "Bearer token-bi-mat-123" và body "noi-dung-bi-mat-456"
+    Then telemetry đã ghi nhận ít nhất một span
+    And không span hay bản ghi log nào chứa "token-bi-mat-123"
     And không span hay bản ghi log nào chứa "noi-dung-bi-mat-456"
+
+  @S12 @FR-003
+  Scenario: Request tạo metric của máy chủ web
+    Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
+    When tôi gọi "GET /health/live"
+    Then telemetry đã ghi nhận ít nhất một metric
+
+  @S13 @FR-003
+  Scenario: Request tạo bản ghi log
+    Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
+    When tôi gọi "GET /health/live"
+    Then telemetry đã ghi nhận ít nhất một bản ghi log

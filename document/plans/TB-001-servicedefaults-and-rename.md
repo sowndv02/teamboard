@@ -31,10 +31,10 @@ services: [board-service, shared/ServiceDefaults]
 | FR-001 (tên nhất quán) | Q-05 phạm vi đổi tên (issue) | B2, B6 | @S01, @S02, @S03 | Test tên assembly/namespace; test quét tên cũ; test `Docker` chạy compose (@S03) |
 | FR-002 (health) | Q-02 ready chỉ "đã sẵn sàng" | B3 | @S04, @S05, @S06 | Unit health check + host test `/health/*` |
 | FR-004 (dùng lại được) | – | B3, B4 | @S07 | Host tối thiểu gọi `AddServiceDefaults`/`MapDefaultEndpoints` |
-| FR-003 (telemetry, Jaeger) | Q-02 OTLP trực tiếp; Q-03 dùng `/health/live` | B4, B5 | @S08, @S09, @S10, @S11 | In-memory exporter; thiếu endpoint vẫn chạy; test `Docker` truy vấn Jaeger (@S11) |
-| NFR-001 (không secret) | – | B4, B5 | @S10 | Test cấu hình; quét secret thô |
+| FR-003 (telemetry, Jaeger) | Q-02 OTLP trực tiếp; Q-03 dùng `/health/live` | B4, B5 | @S08, @S09, @S11, @S12, @S13 | In-memory exporter; thiếu endpoint vẫn chạy; test `Docker` truy vấn Jaeger (@S11) |
+| NFR-001 (không secret) | – | B1–B5 | @S15 | Test quét tệp compose không có bí mật viết cứng; quét secret thô ở gate |
 | NFR-002 (gate xanh) | – | B1–B6 | – | `dotnet build -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes`, `docker compose config -q` |
-| NFR-003 (pin, danh bạ) | Q-04 xUnit + Reqnroll | B1 | – | `config/dependencies.yaml` có dòng cho mọi gói mới; phiên bản cố định |
+| NFR-003 (pin, danh bạ) | Q-04 xUnit + Reqnroll | B1 | @S14 | Test quét mọi `PackageReference` có phiên bản cố định; `config/dependencies.yaml` có dòng cho mọi gói mới (kiểm ở gate) |
 | NFR-004 (không log secret/body) | GDPR | B4 | @S10 | Test thuộc tính span không chứa giá trị `Authorization` |
 | NFR-005 (Jaeger bind local, pin) | `docker.md` | B5 | @S11 | `docker compose config` kiểm `127.0.0.1` và tag |
 
@@ -50,6 +50,10 @@ Kịch bản (đặt trong `document/spec/features/`, tag `@TB-001`, ID `@S01…
 - @S09 Không đặt endpoint OTLP thì service vẫn khởi động, không lỗi.
 - @S10 Span/log không chứa giá trị `Authorization` hay body.
 - @S11 Request qua compose hiện thành trace trong Jaeger (test tự động nhóm `Docker`, truy vấn API Jaeger).
+- @S12 Request tạo metric của máy chủ web (in-memory exporter).
+- @S13 Request tạo bản ghi log (in-memory exporter).
+- @S14 Mọi gói NuGet của repo có phiên bản cố định (test canh giữ, xanh ngay; luật có unit test riêng).
+- @S15 Tệp compose không chứa bí mật viết cứng (test canh giữ, xanh ngay; luật có unit test riêng).
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 
@@ -87,7 +91,7 @@ Mỗi bước là một commit nhỏ (dưới khoảng 400 dòng diff, không t�
 - **Phụ thuộc:** B2.
 
 ### B4. ServiceDefaults: OpenTelemetry (FR-003, NFR-004: @S08–@S10)
-- **Kịch bản/test sẽ viết (đỏ trước):** @S08 host test với in-memory exporter, một `GET /health/live` tạo Activity có tài nguyên `service.name = board-service`; @S09 host khởi động và phục vụ health khi không đặt endpoint OTLP; @S10 request mang header `Authorization: Bearer <giá trị thử>` và body, không thuộc tính span hay bản ghi log nào chứa giá trị đó.
+- **Kịch bản/test sẽ viết (đỏ trước):** @S12 (metric) và @S13 (log) với in-memory exporter, cùng @S08 host test với in-memory exporter, một `GET /health/live` tạo Activity có tài nguyên `service.name = board-service`; @S09 host khởi động và phục vụ health khi không đặt endpoint OTLP; @S10 request mang header `Authorization: Bearer <giá trị thử>` và body, không thuộc tính span hay bản ghi log nào chứa giá trị đó.
 - **File/module dự kiến chạm:** `src/shared/ServiceDefaults/` (cấu hình OTel: trace ASP.NET Core + HttpClient, metric, log; exporter OTLP chỉ bật khi có `OTEL_EXPORTER_OTLP_ENDPOINT`; tên service lấy từ cấu hình/`OTEL_SERVICE_NAME`, board-service đặt `board-service`; Options có validate), `src/board-service/` (đặt tên service), test.
 - **File `.feature`:** `document/spec/features/shared/telemetry.feature` (@S08–@S10, host thử nghiệm) và `document/spec/features/board-service/observability.feature` (@S11, nhóm `docker`).
 - **Hợp đồng thay đổi:** không có HTTP mới.

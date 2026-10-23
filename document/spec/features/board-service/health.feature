@@ -1,4 +1,4 @@
-@TB-001
+@TB-001 @board-service
 Feature: Health của board-service
   Là vận hành
   Tôi muốn board-service có /health/live và /health/ready

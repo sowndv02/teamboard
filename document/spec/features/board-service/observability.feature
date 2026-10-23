@@ -1,4 +1,4 @@
-@TB-001
+@TB-001 @board-service
 Feature: Trace của board-service hiện trong Jaeger
   Là lập trình viên
   Tôi muốn trace của request tới board-service hiện trong Jaeger

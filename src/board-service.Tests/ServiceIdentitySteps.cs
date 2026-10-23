@@ -31,12 +31,8 @@ public sealed class ServiceIdentitySteps
 
     private readonly DockerCli _docker = new();
     private Assembly? _assembly;
-    private string? _repoRoot;
     private List<string> _violations = [];
     private CommandResult? _composeResult;
-
-    [Given("gốc repo được xác định")]
-    public void GivenRepoRoot() => _repoRoot = RepoRoot.Find();
 
     [Given("Docker khả dụng")]
     public void GivenDocker() => DockerCli.RequireDocker();
@@ -47,7 +43,7 @@ public sealed class ServiceIdentitySteps
     [When("tôi quét mã nguồn, cấu hình và tài liệu hiện hành")]
     public void WhenScan()
     {
-        var root = _repoRoot!;
+        var root = RepoRoot.Find();
         var targets = new List<string>();
         foreach (var directory in new[] { "src", "config", "document" })
         {
@@ -77,9 +73,10 @@ public sealed class ServiceIdentitySteps
     [Then("tên assembly là {string}")]
     public void ThenAssemblyName(string expected) => Assert.Equal(expected, _assembly!.GetName().Name);
 
-    [Then("dự án {string} khai báo namespace gốc {string}")]
-    public void ThenRootNamespace(string projectPath, string expected)
+    [Then("namespace gốc của dự án service là {string}")]
+    public void ThenRootNamespace(string expected)
     {
+        const string projectPath = "src/board-service/board-service.csproj";
         var path = Path.Combine(RepoRoot.Find(), projectPath.Replace('/', Path.DirectorySeparatorChar));
         Assert.True(File.Exists(path), $"Không có dự án {projectPath}.");
         var rootNamespace = XDocument.Load(path).Descendants("RootNamespace").Select(e => e.Value).FirstOrDefault();
