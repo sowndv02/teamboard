@@ -69,8 +69,8 @@ pm:                            # quản lý dự án (skill project-manager)
   bufferPercent: 25             # đề xuất đệm cho rủi ro/việc phát sinh; hiệu chỉnh bằng số liệu
 
 quality:                        # dùng cho lăng kính Chất lượng/Bảo mật/Chi phí trong các bước review
-  monthlyBudgetUsd: TODO        # trần chi phí AWS/tháng (cả dự án); TODO → design-review yêu cầu chốt
-  compliance: TODO              # ví dụ: none | GDPR | PCI-DSS ...; TODO → spec-review hỏi
+  monthlyBudgetUsd: 20          # trần chi phí AWS/tháng (cả dự án), người dùng chốt 2026-10-23
+  compliance: GDPR              # ví dụ: none | GDPR | PCI-DSS ...; TODO → spec-review hỏi
   securityBaseline: [OWASP Top 10, OWASP ASVS, STRIDE]
   costBaseline: [AWS Well-Architected Cost Optimization, FinOps cơ bản]
 

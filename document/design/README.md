@@ -10,3 +10,4 @@ Thiết kế hệ thống cho từng tính năng/service, dựa trên spec đã 
 
 | Design | Trạng thái | Spec | ADR | Issue |
 |---|---|---|---|---|
+| [api-gateway](api-gateway.md) | confirmed | [api-gateway](../spec/api-gateway.md) | chưa có | TB-007 |

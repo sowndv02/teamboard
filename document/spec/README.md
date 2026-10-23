@@ -10,3 +10,4 @@
 
 | Spec | Trạng thái | Service | Issue |
 |---|---|---|---|
+| [api-gateway](api-gateway.md) | confirmed | gateway, board-service | TB-007 |

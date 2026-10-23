@@ -10,3 +10,4 @@ Mỗi tính năng/issue đang chạy trong workflow có một state file để a
 
 | State | Phạm vi | Bước hiện tại | Chờ ai | Cập nhật |
 |---|---|---|---|---|
+| [TB-007](TB-007.yaml) | feature | create-pr (PR #6 mở, chờ review) | sondv | 2026-10-22 |

@@ -1,0 +1,93 @@
+id: TB-007
+scope: feature
+title: API gateway (YARP) mỏng
+updated: 2026-10-22T00:00:00Z
+updated_by: orchestrator:claude-code
+
+links:
+  issue: document/issues/TB-007-api-gateway.md
+  spec: document/spec/api-gateway.md
+  design: document/design/api-gateway.md
+  plan: null
+  features_dir: document/spec/features/gateway/
+  branch: feature/TB-007-api-gateway
+  base: main
+  pr: https://github.com/sowndv02/teamboard/pull/6
+
+current_step: plan-init
+next_action: "sondv review và merge PR #6; làm TB-001 (hoặc tách ServiceDefaults) rồi plan-init cho lát 1 (TB-010)"
+blocked_by: null
+
+steps:
+  requirements-discovery:
+    status: done
+    owner: orchestrator:claude-code
+    started: 2026-10-22T00:00:00Z
+    finished: 2026-10-22T00:00:00Z
+    artifacts: [document/spec/api-gateway.md]
+    evidence: ["2 lô hỏi, spec FR-001..FR-007, NFR-001..NFR-006"]
+  spec-review:
+    status: done
+    owner: orchestrator:claude-code
+    round: 2
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/spec/api-gateway.md]
+    evidence: ["Confirm log: 5 quyết định", "Review rounds: 2 vòng", "spec status: confirmed"]
+  system-design:
+    status: done
+    owner: orchestrator:claude-code
+    started: 2026-10-22T00:00:00Z
+    finished: 2026-10-23T00:00:00Z
+    artifacts: [document/design/api-gateway.md]
+    evidence: ["D0.1, D0.4, D1 do người dùng chọn", "D0.2-D0.3, D2-D5, DA-01..DA-04, Q-D1..Q-D3 đã xác nhận"]
+  design-review:
+    status: done
+    owner: reviewer:subagent-1
+    started: 2026-10-23T00:00:00Z
+    round: 2
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/design/api-gateway.md, document/spec/api-gateway.md]
+    finished: 2026-10-23T00:00:00Z
+    evidence: ["Vòng 1: 6 CONFIRM đã chốt, 17 FIX đã sửa", "Vòng 2: DA-05 xác nhận, PASS", "design status: confirmed"]
+  plan-init:
+    status: done
+    owner: orchestrator:claude-code
+    finished: 2026-10-23T00:00:00Z
+    artifacts: [document/plans/api-gateway-slices.md, document/issues/TB-010-gateway-skeleton-routing.md]
+    evidence: ["Bảng lát 8 lát approved", "Phủ mọi FR/NFR Must/Should", "Issue lát 1 = TB-010"]
+  plan-review:            { status: pending }
+  test-init:              { status: pending }
+  test-review:            { status: pending }
+  coding-start:           { status: pending }
+  coding-review:          { status: pending }
+  create-pr:
+    status: done
+    owner: orchestrator:claude-code
+    finished: 2026-10-23T00:00:00Z
+    evidence: ["PR #6 mở vào main, PR tài liệu"]
+
+confirm_pending: []
+
+subtasks:
+
+events:
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: created, detail: "Làn lớn, bắt đầu từ spec vì chưa có spec" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "requirements-discovery: spec draft api-gateway.md" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: review_round, detail: "spec-review vòng 1: 3 CONFIRM, 8 FIX đã sửa" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "compliance=GDPR, A-01 stub upstream, giữ NFR-005 (A-06)" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: review_round, detail: "spec-review vòng 2: Q-04 mới (GDPR) đã chốt B" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "spec-review PASS; spec confirmed" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: step_started, detail: "system-design; người dùng chọn D0.1, D0.4, D1" }
+  - { at: 2026-10-22T00:00:00Z, actor: "orchestrator:claude-code", event: needs_confirm, detail: "Design draft viết xong, chờ xác nhận và Q-D1..Q-D3" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "D0.2-D0.3, D2-D5, DA-01..04 xác nhận; Q-D1 A, Q-D2 A, Q-D3 20 USD" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "system-design done" }
+  - { at: 2026-10-23T00:00:00Z, actor: "reviewer:subagent-1", event: review_round, detail: "design-review vòng 1: 6 CONFIRM, 17 FIX" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: confirm_answered, detail: "chi phí giờ lab, timeout tổng 30s, body chunked ngắt luồng, lỗi giữa chừng ngắt kết nối, IPv6 /64, 1 MiB" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: needs_confirm, detail: "Đã sửa 17 FIX; còn DA-05 chờ xác nhận" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "design-review PASS vòng 2; design confirmed" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "plan-init (slices) done; bảng lát approved; issue TB-010 cho lát 1" }
+  - { at: 2026-10-23T00:00:00Z, actor: "orchestrator:claude-code", event: step_done, detail: "create-pr: PR #6 mở sau khi người dùng xác nhận" }
