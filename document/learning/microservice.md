@@ -1,6 +1,6 @@
 # Kiến trúc microservice
 
-> Loại: Khái niệm (kiểu kiến trúc; xem [Bản đồ giải pháp](#bản-đồ-giải-pháp) để thấy microservice chỉ là một lựa chọn) · Khái niệm liên quan: [Caching](caching/README.md) (một công cụ giảm tải cho service), [API Gateway](api-gateway.md) (cửa vào của hệ nhiều service)
+> Loại: Khái niệm (kiểu kiến trúc; xem [Bản đồ giải pháp](#bản-đồ-giải-pháp) để thấy microservice chỉ là một lựa chọn) · Khái niệm liên quan: [Caching](caching/README.md) (một công cụ giảm tải cho service), [API Gateway](api-gateway/README.md) (cửa vào của hệ nhiều service)
 > Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: giai đoạn 0, có `src/board-service` và `src/shared/ServiceDefaults`; các service còn lại chưa có code · Nguồn sự thật: `document/architecture/README.md`, ADR 0001, 0002
 
 ## 1. Vấn đề nó giải quyết
