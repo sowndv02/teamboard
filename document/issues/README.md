@@ -25,3 +25,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-012](TB-012-learning-hub-realworld.md) | learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ | 0 | done |
 | [TB-013](TB-013-learning-roadmap-docker.md) | Lộ trình học hai chiều (Part × L1–L8) cho learning-hub, mẫu trên Docker | 0 | in-progress |
 | [TB-014](TB-014-learning-roadmap-caching.md) | Lộ trình học Caching (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | in-progress |
+| [TB-015](TB-015-learning-roadmap-valkey.md) | Lộ trình học Redis / Valkey (công cụ) theo Part 0–7 × L1–L8 | 0 | in-progress |
