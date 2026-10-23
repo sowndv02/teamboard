@@ -7,8 +7,8 @@ terraform: TODO                 # cần từ giai đoạn 4; pin trong required_
 aws_provider: TODO
 
 # Kiểm thử (TDD/BDD)
-dotnet_test_framework: TODO     # đề xuất xUnit
-bdd_runner_dotnet: TODO         # đề xuất Reqnroll
+dotnet_test_framework: xUnit      # người dùng chọn 2026-10-23 (TB-001); phiên bản pin ở B1
+bdd_runner_dotnet: Reqnroll       # người dùng chọn 2026-10-23 (TB-001); T2, phiên bản pin ở B1
 
 # Frontend (ADR 0009). Giá trị TODO: chốt và xác minh tại https://angular.dev/reference/versions khi scaffold src/web
 node: TODO                      # chọn theo ma trận tương thích của version Angular; ghi vào .nvmrc và engines

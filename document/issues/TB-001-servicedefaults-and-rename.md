@@ -89,8 +89,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | spec ngắn trong issue | done | – | 2026-10-23 | FR-001..004, NFR-001..005, Q-03 đã chốt |
 | spec-review | PASS | 1 | 2026-10-23 | kiểm A, B, D, D2, G (làn vừa); 2 FIX: thêm NFR-004 (không log secret/body) và NFR-005 (Jaeger bind 127.0.0.1, pin image); 0 CONFIRM mới |
 | system-design | n/a (làn vừa) | | | không có quyết định kiến trúc mới (OTel, health đã quy định ở `observability.md`) |
-| plan-init | done | – | 2026-10-23 | `document/plans/TB-001-servicedefaults-and-rename.md` (draft), 6 bước, 2 câu hỏi mở P-03, P-04 |
-| plan-review | pending | | | |
+| plan-init | done | – | 2026-10-23 | `document/plans/TB-001-servicedefaults-and-rename.md`, 6 bước |
+| plan-review | PASS | 1 | 2026-10-23 | plan `approved`; 5 quyết định (tên cũ viết lại, tên ServiceDefaults, kiểm giả định, test Docker tự động, xUnit v2); 6 FIX |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
