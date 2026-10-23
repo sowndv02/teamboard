@@ -26,3 +26,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-013](TB-013-learning-roadmap-docker.md) | Lộ trình học hai chiều (Part × L1–L8) cho learning-hub, mẫu trên Docker | 0 | in-progress |
 | [TB-014](TB-014-learning-roadmap-caching.md) | Lộ trình học Caching (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | in-progress |
 | [TB-015](TB-015-learning-roadmap-valkey.md) | Lộ trình học Redis / Valkey (công cụ) theo Part 0–7 × L1–L8 | 0 | in-progress |
+| [TB-016](TB-016-learning-roadmap-api-gateway.md) | Lộ trình học API Gateway và YARP theo Part 0–7 × L1–L8 | 0 | in-progress |
