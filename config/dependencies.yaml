@@ -17,22 +17,24 @@ packages:
   - { name: Microsoft.EntityFrameworkCore (+ SqlServer, Npgsql provider), ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false, note: "EF Core first-party; đang dùng trong teamboard-api" }
   - { name: Microsoft.Extensions.* (Logging, Options, DependencyInjection, Http.Resilience, Diagnostics.HealthChecks), ecosystem: nuget, tier: T0, status: approved, license: MIT, verified: false }
   - { name: Microsoft.AspNetCore.OpenApi, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: false }
+  - { name: Microsoft.AspNetCore.Mvc.Testing + Microsoft.AspNetCore.TestHost 10.0.13, Microsoft.NET.Test.Sdk 18.11.0, ecosystem: nuget, tier: T0, status: in-use, license: MIT, verified: true, source: "nuspec trên NuGet (MIT), TB-001", note: "Microsoft first-party; chỉ project test" }
   - { name: AWSSDK.* (AWS SDK for .NET), ecosystem: nuget, tier: T0, status: approved, license: Apache-2.0, verified: false, note: "AWS first-party" }
   - { name: Angular (framework, CLI, router, forms), RxJS, TypeScript, ecosystem: npm, tier: T0, status: approved, license: MIT, verified: false, note: "ADR 0009; first-party Google/Microsoft; kiểm giấy phép từng gói phụ" }
 
   # ---- T1: quỹ/tổ chức trung lập ----
-  - { name: OpenTelemetry .NET, ecosystem: nuget, tier: T1, status: approved, license: Apache-2.0, verified: false, note: "CNCF" }
+  - { name: OpenTelemetry .NET (Extensions.Hosting, Exporter.OpenTelemetryProtocol, Instrumentation.AspNetCore, Instrumentation.Http, Exporter.InMemory 1.20.1), ecosystem: nuget, tier: T1, status: in-use, license: Apache-2.0, verified: true, source: "nuspec 1.20.1 trên NuGet (Apache-2.0), TB-001", note: "CNCF" }
   - { name: Polly, ecosystem: nuget, tier: T1, status: approved, license: BSD-3-Clause, verified: false, note: ".NET Foundation; Microsoft.Extensions.Http.Resilience dựa trên Polly" }
-  - { name: xUnit, ecosystem: nuget, tier: T1, status: approved, license: Apache-2.0, verified: false, note: ".NET Foundation; framework test mặc định đề xuất (chưa chốt trong tool-versions.yaml)" }
+  - { name: xUnit (xunit 2.9.3, xunit.runner.visualstudio 3.1.5), ecosystem: nuget, tier: T1, status: in-use, license: Apache-2.0, verified: true, source: "nuspec của gói trên NuGet (license expression Apache-2.0), TB-001", note: ".NET Foundation; người dùng chọn 2026-10-23" }
   - { name: Npgsql, ecosystem: nuget, tier: T1, status: approved, license: PostgreSQL-License, verified: false }
   - { name: YARP (Yarp.ReverseProxy), ecosystem: nuget, tier: T1, status: approved, license: MIT, verified: false, note: "Microsoft; gateway" }
 
   # ---- T2: cần phê duyệt, bọc sau interface ----
   - { name: Serilog, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (blog 2026)", note: "Hiện permissive; ưu tiên ILogger + OpenTelemetry (observability.md)" }
   - { name: FluentValidation, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (DepScope, blog 2026)", exit: "DataAnnotations/IValidatableObject hoặc validator tự viết" }
-  - { name: Reqnroll, ecosystem: nuget, tier: T2, status: watch, license: BSD-3-Clause, verified: true, source: "https://docs.reqnroll.net/latest/help/faq.html", note: "Nhánh cộng đồng của SpecFlow; BDD runner đề xuất, chưa chốt", exit: "test BDD viết tay bằng xUnit" }
+  - { name: Reqnroll (Reqnroll.xUnit 3.3.4), ecosystem: nuget, tier: T2, status: in-use, license: BSD-3-Clause, verified: true, source: "https://docs.reqnroll.net/latest/installation/compatibility.html (.NET 10, xUnit) và nuspec 3.3.4", note: "Người dùng phê duyệt 2026-10-23 (TB-001); chỉ dùng trong project test, không rò vào production", exit: "test BDD viết tay bằng xUnit" }
   - { name: Swashbuckle.AspNetCore.SwaggerUI, ecosystem: nuget, tier: T2, status: in-use, license: MIT, verified: false, note: "Đang dùng trong teamboard-api; ít người duy trì", exit: "Microsoft.AspNetCore.OpenApi + giao diện nhẹ khác" }
   - { name: Testcontainers, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "docker compose cho test tích hợp" }
+  - { name: Xunit.SkippableFact 1.4.13, ecosystem: nuget, tier: T2, status: approved, license: MS-PL, verified: true, source: "nuspec 1.4.13 trên NuGet (MS-PL)", note: "Phụ thuộc bắc cầu của Reqnroll.xUnit (cho phép bỏ qua scenario khi chạy). MS-PL không nằm trong allow_licenses lẫn deny_licenses; người dùng duyệt riêng cho gói này, chỉ trong project test, 2026-10-23 (TB-001)", exit: "bỏ Reqnroll hoặc không dùng bỏ qua động" }
   - { name: Mapster, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "ánh xạ thủ công" }
   - { name: Carter, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "Minimal API MapGroup" }
   - { name: Marten, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, note: "Nhà duy trì cũng bán dịch vụ thương mại; kiểm tra", exit: "EF Core/Npgsql + JSONB" }
@@ -57,6 +59,7 @@ tools:
   - { name: LocalStack, tier: T3, status: restricted, license: "Cần auth token từ 2026.03; gói miễn phí phi thương mại", verified: true, source: "https://blog.localstack.cloud/localstack-single-image-next-steps/", note: "Chưa chốt công cụ giả lập AWS cục bộ (ADR 0007)", alt: "AWS sau interface + fake; DynamoDB Local (AWS); ElastiCache/SQS emulator cộng đồng (chưa kiểm chứng); tài khoản AWS sandbox" }
   - { name: Redis (server), tier: T3, status: banned, license: "RSALv2/SSPL; Redis 8 thêm AGPLv3", verified: true, source: "https://sdtimes.com/os/open-source-wins-again-redis-adds-gnu-agpl-license-to-its-offering/", alt: "Valkey (BSD-3, Linux Foundation); ElastiCache dùng Valkey (kiểm tra)" }
   - { name: Valkey, tier: T1, status: watch, license: BSD-3-Clause, verified: true, source: "https://thenewstack.io/linux-foundation-forks-the-open-source-redis-as-valkey/" }
-  - { name: Jaeger, Prometheus, OpenTelemetry Collector, tier: T1, status: approved, license: Apache-2.0, verified: false, note: "CNCF" }
+  - { name: Jaeger (image cr.jaegertracing.io/jaegertracing/jaeger:2.22.0), tier: T1, status: approved, license: Apache-2.0, verified: true, source: "https://github.com/jaegertracing/jaeger/blob/main/LICENSE", note: "CNCF; pin tag 2.22.0 (TB-001); OTLP bật sẵn trong all-in-one chưa xác nhận, kiểm ở B5" }
+  - { name: Prometheus, OpenTelemetry Collector, tier: T1, status: approved, license: Apache-2.0, verified: false, note: "CNCF" }
   - { name: Grafana / Loki / Tempo, tier: T2, status: watch, license: AGPL-3.0, verified: false, note: "Dùng nội bộ thường ổn; đọc điều khoản trước khi chỉnh sửa/cung cấp như dịch vụ" }
   - { name: Seq, tier: T2, status: watch, license: "Thương mại, có gói miễn phí giới hạn", verified: false }

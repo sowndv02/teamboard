@@ -3,4 +3,7 @@
     <Build />
   </Project>
   <Project Path="teamboard-api/teamboard-api.csproj" />
+  <Project Path="board-service.Tests/board-service.Tests.csproj" />
+  <Project Path="shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj" />
+  <Project Path="shared/ServiceDefaults.Tests/Teamboard.Shared.ServiceDefaults.Tests.csproj" />
 </Solution>

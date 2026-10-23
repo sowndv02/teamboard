@@ -91,7 +91,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | system-design | n/a (làn vừa) | | | không có quyết định kiến trúc mới (OTel, health đã quy định ở `observability.md`) |
 | plan-init | done | – | 2026-10-23 | `document/plans/TB-001-servicedefaults-and-rename.md`, 6 bước |
 | plan-review | PASS | 1 | 2026-10-23 | plan `approved`; 5 quyết định (tên cũ viết lại, tên ServiceDefaults, kiểm giả định, test Docker tự động, xUnit v2); 6 FIX |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-10-23 | đỏ: 11/11 test (S01–S11) đúng lý do; test Docker chạy thật với Docker Desktop |
+
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -107,6 +108,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 4 | tb001:test-framework | Test framework | xUnit + Reqnroll (BDD) ngay (Reqnroll T2: ghi phê duyệt vào `config/dependencies.yaml`, bọc sau interface) | 0 | 2026-10-23 |
 | 5 | tb001:rename-scope | Phạm vi đổi tên | Đổi mọi tên theo service, gồm cả xoá controller mẫu `WeatherForecast`; giữ `teamboard.slnx` và cổng 6060 | 0 | 2026-10-23 |
 | 6 | tb001:trace-request | Request kiểm trace sau khi xoá controller mẫu | A: không lọc health khỏi trace, dùng `GET /health/live` | 1 | 2026-10-23 |
+| 7 | tb001:pkcs-vulnerability | Gói bắc cầu System.Security.Cryptography.Pkcs 9.0.11 có lỗ hổng, gate -warnaserror đỏ sẵn trên main | Sửa trong TB-001 bằng cách ghim phiên bản đã vá (thêm vào B1 của plan) | 2 | 2026-10-23 |
+| 8 | tb001:mspl-license | MS-PL của Xunit.SkippableFact (bắc cầu từ Reqnroll.xUnit) | Duyệt, chỉ trong project test | 2 | 2026-10-23 |
+| 9 | tb001:docker-red | Docker daemon không chạy, S03 và S11 chưa chứng minh đỏ | Người dùng bật Docker Desktop, tôi chạy lại hai test trước khi sang test-review | 2 | 2026-10-23 |
 
 ## Kịch bản và TDD log
 
@@ -114,6 +118,17 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 Tên assembly và namespace gốc | `ServiceIdentitySteps` (service-identity.feature) | đỏ: `Assert.Equal` expected `board-service`, actual `teamboard-api` | |
+| @S02 Không tệp nào còn tên cũ | `ServiceIdentitySteps` | đỏ: còn tên cũ trong COMMANDS.md, config\*.yaml, document\architecture\*.md, PROJECT.md | |
+| @S03 Compose chạy ở cổng 6060 (`@docker`) | `ServiceIdentitySteps` + `DockerCli` | đỏ: `Assert.Contains` không thấy `board-service` trong danh sách service đang chạy (collection `["teamboard-api"]`); đã dừng container `src-teamboard-api-1` của người dùng vì chiếm cổng 6060 (chạy lại bằng `docker start src-teamboard-api-1`) | |
+| @S04 Live trả 200 | `HealthSteps` (WebApplicationFactory) | đỏ: expected OK, actual NotFound | |
+| @S05 Ready trả 200 | `HealthSteps` | đỏ: expected OK, actual NotFound | |
+| @S06 Check sẵn sàng Unhealthy trước khi khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException (khung rỗng `AddServiceDefaults`) | |
+| @S07 Service khác dùng ServiceDefaults | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S08 Span có service.name | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | |
+| @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | |
 
 ## Test review rounds
 

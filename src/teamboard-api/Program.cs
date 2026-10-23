@@ -26,3 +26,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Khung tối thiểu để test dùng WebApplicationFactory<Program> (TB-001, test-init).
+public partial class Program;
