@@ -1,7 +1,7 @@
 ---
 key: TB-001
 title: Đổi tên board-service, thêm ServiceDefaults và Jaeger
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-001-servicedefaults-and-rename
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -77,6 +77,7 @@ Plan chi tiết: `document/plans/TB-001-servicedefaults-and-rename.md` (6 bướ
 
 ## Ghi chú / Nhật ký
 - 2026-10-23: chọn làn vừa, phạm vi trọn gói (đổi tên + ServiceDefaults + Jaeger); nhánh tạo từ `origin/main` (`28a7792`).
+- 2026-10-23: mở PR https://github.com/sowndv02/teamboard/pull/8 (chờ review, merge do người dùng).
 
 ## Workflow
 
@@ -96,7 +97,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; 13 kịch bản đỏ đúng lý do (S01–S13), 2 canh giữ xanh (S14, S15); 7 FIX và 2 CONFIRM đã xử lý |
 | coding-start | done | – | 2026-10-23 | xanh 27/27 (7 ServiceDefaults + 20 board-service gồm 2 Docker); gate: build -warnaserror, format, vulnerable, compose config xanh; 6 commit B1–B6 |
 | coding-review | PASS | 2 | 2026-10-23 | review độc lập (sub-agent) vòng 1: 1 P2 + 8 P3, đã sửa/chấp nhận; vòng 2 delta: Sẵn sàng merge; 34 test xanh |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-10-23 | PR: https://github.com/sowndv02/teamboard/pull/8 |
 
 ## Confirm log
 
