@@ -19,8 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Đổi sang ..\board-service\board-service.csproj ở B2 cùng lúc đổi tên thư mục. -->
-    <ProjectReference Include="..\teamboard-api\teamboard-api.csproj" />
+    <ProjectReference Include="..\board-service\board-service.csproj" />
   </ItemGroup>
 
   <ItemGroup>

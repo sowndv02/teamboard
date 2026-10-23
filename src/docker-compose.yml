@@ -1,9 +1,9 @@
 services:
-  teamboard-api:
-    image: teamboard-api
+  board-service:
+    image: board-service
     build:
       context: .
-      dockerfile: teamboard-api/Dockerfile
+      dockerfile: board-service/Dockerfile
     environment:
       ASPNETCORE_URLS: http://+:7070
     ports:

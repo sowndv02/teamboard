@@ -1,5 +1,5 @@
 services:
-  teamboard-api:
+  board-service:
     environment:
       ASPNETCORE_ENVIRONMENT: Staging
       ConnectionStrings__DefaultConnection: "${STG_CONNECTION_STRING}"
