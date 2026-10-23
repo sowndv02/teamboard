@@ -52,7 +52,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-23 | `document/plans/TB-010-gateway-skeleton-routing.md` (draft), 4 bước B1–B4, 3 câu hỏi mở P-01..P-03 |
 | plan-review | PASS | 2 | 2026-10-23 | plan `approved`; 8 quyết định (xem plan, Confirm log), 6 FIX; review độc lập (sub-agent) |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-10-23 | đỏ: 23 test đúng lý do (16 gateway.Tests nhanh + 7 Http.Tests) và @S05 Docker đỏ khi chạy thật; khung biên dịch: `Teamboard.Shared.Http` (stub), `gateway` (Program rỗng), `GatewayErrorCodes` rỗng |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -69,6 +69,14 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 Route boards giữ method và path (Outline, 8 dòng: GET×3 gồm query và không segment cuối, HEAD, POST, PUT, PATCH, DELETE) | `GatewaySteps` (routing.feature) + upstream giả `UpstreamStub` | đỏ: `Assert.Single` — upstream giả không nhận request nào (gateway chưa có route) | |
+| @S02 404 problem+json và không tới upstream (Outline, 4 dòng: `/api/v1/unknown`, `/api/v1/boardsX`, `/foo.txt`, `TRACE /api/v1/boards`) | `GatewaySteps` | đỏ: `Assert.Equal` expected `application/problem+json`, actual null (404 rỗng mặc định) | |
+| @S03 Live trả 200 | `GatewaySteps` (health.feature) | đỏ: expected OK, actual NotFound | |
+| @S04 Ready trả 200 khi upstream đã dừng | `GatewaySteps` | đỏ: expected OK, actual NotFound | |
+| @S05 Compose chạy riêng gateway, ready trong 10 giây (`@docker`) | `ComposeSteps` + `DockerCli` (bản sao) | đỏ: `docker compose build gateway`: no such service: gateway (chạy thật với Docker Desktop) | |
+| Unit: `ProblemFactory` (4 ca) | `Teamboard.Shared.Http.Tests` | đỏ: `NotImplementedException` (khung rỗng) | |
+| Unit: `SharedErrors` (3 ca) | `Teamboard.Shared.Http.Tests` | đỏ: bảng mã trống, không có `INTERNAL_ERROR` | |
+| Unit: `GatewayErrorCodes` (2 ca) | `gateway.Tests` | đỏ: bảng mã trống, không có `ROUTE_NOT_FOUND` | |
 
 ## Test review rounds
 
