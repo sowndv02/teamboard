@@ -52,8 +52,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-23 | `document/plans/TB-010-gateway-skeleton-routing.md` (draft), 4 bước B1–B4, 3 câu hỏi mở P-01..P-03 |
 | plan-review | PASS | 2 | 2026-10-23 | plan `approved`; 8 quyết định (xem plan, Confirm log), 6 FIX; review độc lập (sub-agent) |
-| test-init | done | – | 2026-10-23 | đỏ: 23 test đúng lý do (16 gateway.Tests nhanh + 7 Http.Tests) và @S05 Docker đỏ khi chạy thật; khung biên dịch: `Teamboard.Shared.Http` (stub), `gateway` (Program rỗng), `GatewayErrorCodes` rỗng |
-| test-review | pending | | | |
+| test-init | done | – | 2026-10-23 | đỏ: 24 test nhanh đúng lý do (17 gateway.Tests + 7 Http.Tests) và @S05 Docker đỏ khi chạy thật; khung biên dịch: `Teamboard.Shared.Http` (stub), `gateway` (Program rỗng), `GatewayErrorCodes` rỗng |
+| test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; thêm @S06; 1 CONFIRM và 4 FIX đã xử lý |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -69,19 +69,30 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 Route boards giữ method và path (Outline, 8 dòng: GET×3 gồm query và không segment cuối, HEAD, POST, PUT, PATCH, DELETE) | `GatewaySteps` (routing.feature) + upstream giả `UpstreamStub` | đỏ: `Assert.Single` — upstream giả không nhận request nào (gateway chưa có route) | |
+| @S01 Route boards giữ method, path, status và body của upstream (Outline, 8 dòng; upstream giả trả 201 cho POST, 204 cho DELETE) | `GatewaySteps` (routing.feature) + upstream giả `UpstreamStub` | đỏ: `Assert.Single` — upstream giả không nhận request nào (gateway chưa có route) | |
 | @S02 404 problem+json và không tới upstream (Outline, 4 dòng: `/api/v1/unknown`, `/api/v1/boardsX`, `/foo.txt`, `TRACE /api/v1/boards`) | `GatewaySteps` | đỏ: `Assert.Equal` expected `application/problem+json`, actual null (404 rỗng mặc định) | |
 | @S03 Live trả 200 | `GatewaySteps` (health.feature) | đỏ: expected OK, actual NotFound | |
 | @S04 Ready trả 200 khi upstream đã dừng | `GatewaySteps` | đỏ: expected OK, actual NotFound | |
 | @S05 Compose chạy riêng gateway, ready trong 10 giây (`@docker`) | `ComposeSteps` + `DockerCli` (bản sao) | đỏ: `docker compose build gateway`: no such service: gateway (chạy thật với Docker Desktop) | |
+| @S06 Upstream trả 404 problem+json được chuyển nguyên (thêm ở test-review) | `GatewaySteps` + `UpstreamStub` (404 theo đường dẫn) | đỏ: expected `application/problem+json`, actual null (gateway chưa có route) | |
 | Unit: `ProblemFactory` (4 ca) | `Teamboard.Shared.Http.Tests` | đỏ: `NotImplementedException` (khung rỗng) | |
 | Unit: `SharedErrors` (3 ca) | `Teamboard.Shared.Http.Tests` | đỏ: bảng mã trống, không có `INTERNAL_ERROR` | |
 | Unit: `GatewayErrorCodes` (2 ca) | `gateway.Tests` | đỏ: bảng mã trống, không có `ROUTE_NOT_FOUND` | |
+
+Lệnh chạy test (phạm vi theo `quality-gate.md`):
+
+- Nhanh (không Docker): `dotnet test src/teamboard.slnx --filter "Category!=docker"`.
+- Docker (@S05 của gateway; @S03, @S11 của board-service): `dotnet test src/gateway.Tests/gateway.Tests.csproj --filter "Category=docker"`; cần Docker Desktop chạy và cổng 8080 trống; không có Docker thì scenario bị bỏ qua (`SkipException`), không phải đỏ.
+- Đầy đủ: `dotnet test src/teamboard.slnx` (hai assembly chạy tuần tự trong từng assembly, `DisableTestParallelization`).
+
+Giới hạn đã biết: @S05 đo thời gian khởi động trên Docker Desktop nên có thể chậm hơn máy khác (ngưỡng 10 giây theo NFR-005, không nới); giả định A-04 (ghi đè địa chỉ upstream bằng `UseSetting`) chỉ kiểm được ở B3a; bản sao helper Docker là nợ kỹ thuật đã được người dùng chấp nhận.
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-23 | `7f86b6b` | Cần sửa feature | 1 CONFIRM (upstream trả lỗi, đã chốt: thêm @S06) và 4 FIX: kiểm status/body upstream thay vì chỉ 200, @S03 thiếu kiểm upstream không nhận request, bảng mã gateway thiếu kiểm UPPER_SNAKE, thiếu lệnh chạy test |
+| 2 | 2026-10-23 | delta sau `7f86b6b` | Sẵn sàng code | không còn finding mở; 17 test nhanh đỏ đúng lý do, @S05 đỏ khi chạy thật; format xanh |
 
 ## Review rounds
 

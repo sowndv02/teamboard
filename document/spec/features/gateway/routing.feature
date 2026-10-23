@@ -39,3 +39,11 @@ Feature: Gateway chuyển tiếp API boards tới board-service
       | GET    | /api/v1/boardsX     |
       | GET    | /foo.txt            |
       | TRACE  | /api/v1/boards      |
+
+  @S06 @FR-001
+  Scenario: Lỗi do upstream trả về được chuyển nguyên, không bị thay bằng lỗi của gateway
+    Given một upstream giả đang chạy và trả 404 problem+json với mã "BOARD_NOT_FOUND" cho đường dẫn "/api/v1/boards/3f2b1c4e"
+    And gateway được cấu hình trỏ tới upstream giả
+    When tôi gửi "GET" tới "/api/v1/boards/3f2b1c4e"
+    Then phản hồi là 404 problem+json với mã "BOARD_NOT_FOUND"
+    And phản hồi giữ nguyên nội dung do upstream trả

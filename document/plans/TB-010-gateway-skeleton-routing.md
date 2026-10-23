@@ -30,7 +30,7 @@ Lát 1 trong [`api-gateway-slices.md`](api-gateway-slices.md) (`approved`). Làn
 
 | Yêu cầu (FR/BR/NFR) | Quyết định design | Bước plan | Kịch bản | Test dự kiến |
 |---|---|---|---|---|
-| FR-001 route giữ path, `404 problem+json` khi không khớp | D0.4, D3, 6.3 | B3a | @S01, @S02 | Host test + upstream giả; Scenario Outline theo method và path |
+| FR-001 route giữ path, chuyển nguyên status/body của upstream (kể cả lỗi), `404 problem+json` khi không khớp | D0.4, D3, 6.3 | B3a | @S01, @S02, @S06 | Host test + upstream giả; Scenario Outline theo method và path |
 | FR-002 health, ready không phụ thuộc upstream | 6.3, 6.4 | B3b | @S03, @S04 | Host test, dừng upstream giả rồi gọi `/health/ready` |
 | BR-001 không tên service trong path | 6.3 | B3a | @S01 | Upstream giả ghi lại path nhận được |
 | BR-002 không nghiệp vụ, không DB | D0.2, D0.3 | B1, B3a | – | Không có test hành vi; kiểm bằng `config/services.yaml` (`datastore: none`) và review |
@@ -47,6 +47,7 @@ Kịch bản (ID duy nhất, tag `@TB-010 @gateway`):
 - @S03 `GET /health/live` trả 200.
 - @S04 `GET /health/ready` trả 200 khi upstream giả đã dừng.
 - @S05 (`@docker`) Compose chạy riêng service `gateway`: `GET /health/live` ở cổng host 8080 trả 200 và `/health/ready` trả 200 trong 10 giây kể từ lệnh `up -d` (image đã build).
+- @S06 Upstream trả `404 problem+json` (mã `BOARD_NOT_FOUND`) thì client nhận nguyên nội dung của upstream, gateway không thay bằng `ROUTE_NOT_FOUND` (thêm ở test-review; thuộc FR-001, nằm ở `routing.feature`, bước B3a).
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 
@@ -72,12 +73,12 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước. Mỗ
 - **Phụ thuộc:** B1.
 
 ### B3a. Routing và fallback 404 (FR-001: @S01, @S02)
-- **Kịch bản/test sẽ viết (đỏ trước):** `document/spec/features/gateway/routing.feature` (@S01, @S02), step definition và upstream giả (Kestrel trong tiến trình, cổng ngẫu nhiên, ghi lại method và path nhận được; khởi động trước, địa chỉ truyền cho gateway bằng `WithWebHostBuilder(... UseSetting("ReverseProxy:Clusters:board-service:Destinations:d1:Address", ...))`). Đỏ vì gateway chưa có route hay fallback.
+- **Kịch bản/test sẽ viết (đỏ trước):** `document/spec/features/gateway/routing.feature` (@S01, @S02, @S06), step definition và upstream giả (Kestrel trong tiến trình, cổng ngẫu nhiên, ghi lại method và path nhận được; khởi động trước, địa chỉ truyền cho gateway bằng `WithWebHostBuilder(... UseSetting("ReverseProxy:Clusters:board-service:Destinations:d1:Address", ...))`). Đỏ vì gateway chưa có route hay fallback.
 - **File/module dự kiến chạm:** `src/gateway/Program.cs` (`AddServiceDefaults("gateway")`, `AddReverseProxy().LoadFromConfig(...)`, `MapReverseProxy()`, `MapDefaultEndpoints()`, `MapFallback("{**path}", ...)`), `src/gateway/appsettings.json` (Routes `boards-read` cho `GET, HEAD`, `boards-write` cho `POST, PUT, PATCH, DELETE`; Cluster `board-service` với địa chỉ upstream), `GatewayErrorCodes` (bảng mã riêng, `ErrorDefinition`) và hằng số route, `src/gateway.Tests/`, `document/spec/features/gateway/`.
 - **Hợp đồng thay đổi:** route công khai `/api/v1/boards/**` (không tên service trong path); lỗi `404` `problem+json` mã `ROUTE_NOT_FOUND`. Thứ tự middleware đầy đủ của design 6.4 chưa cần ở lát này (chưa có correlation, CORS, rate limit); ghi thứ tự đích trong comment và cập nhật dần ở các lát sau.
 - **Migration / cấu hình / biến môi trường:** khoá YARP `ReverseProxy:Clusters:board-service:Destinations:d1:Address`; địa chỉ mặc định `http://board-service:7070` trong cấu hình cho compose; biến môi trường tương ứng `ReverseProxy__Clusters__board-service__Destinations__d1__Address` (tên khoá đối chiếu tài liệu YARP ở B3a).
 - **Tài liệu cần cập nhật:** chuyển sang B4.
-- **Kiểm chứng:** @S01, @S02 xanh (gồm HEAD, `/api/v1/boards` không có segment cuối, path kiểu tệp, method lạ); `dotnet build -warnaserror`; `dotnet format --verify-no-changes`; chạy lặp 10 lần nhóm test nhanh để loại flaky (cổng ngẫu nhiên).
+- **Kiểm chứng:** @S01, @S02, @S06 xanh (gồm HEAD, `/api/v1/boards` không có segment cuối, path kiểu tệp, method lạ); `dotnet build -warnaserror`; `dotnet format --verify-no-changes`; chạy lặp 10 lần nhóm test nhanh để loại flaky (cổng ngẫu nhiên).
 - **Phụ thuộc:** B1, B2.
 
 ### B3b. Health độc lập upstream (FR-002: @S03, @S04)
@@ -177,3 +178,4 @@ Giả định (kiểm ở bước tương ứng): A-01 `Yarp.ReverseProxy` 2.3.0
 |---|---|---|
 | 2026-10-23 | Tạo bản nháp | plan-init cho TB-010 (lát 1 của gateway) |
 | 2026-10-23 | plan-review vòng 1: ghi quyết định P-01..P-03 và 5 CONFIRM; sửa 6 FIX; tách B3; gộp NFR-005 vào @S05 (test Docker); đánh số lại kịch bản (@S05 là test Docker) | plan-review TB-010 |
+| 2026-10-23 | test-review: thêm @S06 (upstream trả lỗi được chuyển nguyên) vào B3a; upstream giả trả 201/204 theo method | test-review TB-010 |

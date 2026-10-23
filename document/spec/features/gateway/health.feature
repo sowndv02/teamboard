@@ -10,6 +10,7 @@ Feature: Health của gateway
     And gateway được cấu hình trỏ tới upstream giả
     When tôi gửi "GET" tới "/health/live"
     Then mã trạng thái là 200
+    And upstream giả không nhận request nào
 
   @S04 @FR-002
   Scenario: Ready trả 200 khi upstream đã dừng

@@ -25,9 +25,21 @@ internal sealed class UpstreamStub : IAsyncDisposable
 
     public string Address { get; }
 
+    /// <summary>Status upstream giả trả theo method, giống API thật: tạo mới 201, xoá 204, còn lại 200.</summary>
+    public static int ExpectedStatus(string method) => method switch
+    {
+        "POST" => StatusCodes.Status201Created,
+        "DELETE" => StatusCodes.Status204NoContent,
+        _ => StatusCodes.Status200OK,
+    };
+
+    public static string ExpectedBody(string method, string path) => $"upstream:{method}:{path}";
+
     public ConcurrentQueue<(string Method, string PathAndQuery)> Received { get; } = new();
 
-    public static async Task<UpstreamStub> StartAsync()
+    public const string UpstreamTraceId = "upstream-trace-id";
+
+    public static async Task<UpstreamStub> StartAsync(string? problemPath = null, string? problemCode = null)
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");
@@ -37,9 +49,21 @@ internal sealed class UpstreamStub : IAsyncDisposable
         app.Run(async context =>
         {
             stub!.Received.Enqueue((context.Request.Method, context.Request.Path + context.Request.QueryString));
+            if (problemPath is not null && context.Request.Path == problemPath)
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                context.Response.ContentType = "application/problem+json";
+                await context.Response.WriteAsync(
+                    $"{{\"type\":\"https://teamboard/errors/board-not-found\",\"title\":\"Board not found\",\"status\":404,\"code\":\"{problemCode}\",\"traceId\":\"{UpstreamTraceId}\",\"correlationId\":\"{UpstreamTraceId}\"}}");
+                return;
+            }
+
             context.Response.Headers[MarkerHeader] = "1";
-            context.Response.StatusCode = StatusCodes.Status200OK;
-            await context.Response.WriteAsync($"upstream:{context.Request.Method}:{context.Request.Path}");
+            context.Response.StatusCode = ExpectedStatus(context.Request.Method);
+            if (context.Response.StatusCode != StatusCodes.Status204NoContent)
+            {
+                await context.Response.WriteAsync(ExpectedBody(context.Request.Method, context.Request.Path));
+            }
         });
 
         await app.StartAsync();
