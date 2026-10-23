@@ -1,6 +1,6 @@
 ---
 name: learning-hub
-description: Gom tài liệu của một chủ đề kiến thức trong dự án (docker, docker compose, API gateway/YARP, caching/Redis, microservice, OpenTelemetry, outbox, JWT/OAuth, Terraform...) thành một gói đọc có thứ tự - khái niệm gốc trước, công cụ sau (công cụ không đại diện khái niệm: khái niệm có bản đồ giải pháp so sánh các lựa chọn và từng cơ chế nêu riêng); tài liệu nội bộ, code liên quan, tài liệu chính thức, case real-world có nguồn, bài tập - và lưu ghi chú vào document/learning/. Dùng khi người dùng muốn học/đọc về một chủ đề, hỏi "tài liệu về X ở đâu", "gom tài liệu X", hoặc muốn xem mục lục kiến thức.
+description: Gom tài liệu của một chủ đề kiến thức trong dự án (docker, docker compose, API gateway/YARP, caching/Redis, microservice, OpenTelemetry, outbox, JWT/OAuth, Terraform...) thành một gói đọc hoặc lộ trình học có thứ tự (chủ đề lớn: nhiều Part theo chiều ngang, 8 tầng L1-L8 từ What tới Mastery theo chiều sâu) - khái niệm gốc trước, công cụ sau (công cụ không đại diện khái niệm: khái niệm có bản đồ giải pháp so sánh các lựa chọn và từng cơ chế nêu riêng); tài liệu nội bộ, code liên quan, tài liệu chính thức, case real-world có nguồn, bài tập - và lưu ghi chú vào document/learning/. Dùng khi người dùng muốn học/đọc về một chủ đề, hỏi "tài liệu về X ở đâu", "gom tài liệu X", hoặc muốn xem mục lục kiến thức.
 ---
 
 # Learning hub
@@ -19,6 +19,12 @@ Khác `angular-learning`: skill đó dạy một lộ trình Angular; skill này
 
 Không cần gõ lệnh; suy ra từ lời người dùng.
 
+## Hình thức ghi chú: lộ trình hay một file
+
+- **Chủ đề lớn (công cụ lớn, khái niệm nền tảng) → lộ trình hai chiều** theo `references/lesson-model.md`: chiều ngang là Part 0–7, chiều sâu là 8 tầng L1 What → L8 Mastery, kèm ma trận phủ ở Part 0. Mỗi file Part theo khuôn `references/part-template.md` (hộp tóm tắt, thẻ khái niệm có **Use case**, lab có đầu ra thật, thẻ case, mục "Nguồn và độ tin cậy"). Đây là hình thức áp dụng cho Docker (mẫu đầu tiên, TB-013).
+- **Chủ đề nhỏ → một file** theo mẫu 10 mục dưới đây, cho tới khi người dùng duyệt chuyển chủ đề đó sang lộ trình.
+- Quy tắc "khái niệm trước, công cụ sau", Bản đồ giải pháp, mục Phạm vi, real-world ≥3 case có nguồn **áp dụng cho cả hai hình thức**.
+
 ## Quy trình `pack`
 
 1. **Chuẩn hoá chủ đề và xác định tầng.** Đối chiếu `references/topic-map.md` (chủ đề → khái niệm gốc → nơi tìm). Chủ đề chưa có trong bảng: tìm bằng Grep/Glob trong `document/`, `.agents/rules/`, `src/`, `config/`, `infra/`; sau khi xong, thêm dòng mới vào bảng.
@@ -27,7 +33,7 @@ Không cần gõ lệnh; suy ra từ lời người dùng.
 2. **Đọc thật** các file nguồn trước khi viết; không dựa vào tên file. File không tồn tại hoặc rỗng thì bỏ, không bịa đường dẫn.
 3. **Tài liệu chính thức.** Link ra ngoài chỉ khi đã mở/kiểm được (WebFetch/WebSearch) hoặc ghi rõ `Chưa kiểm`. Phiên bản lấy từ `config/tool-versions.yaml`, không đoán. Ưu tiên tài liệu gốc (docs.docker.com, learn.microsoft.com, RFC...) hơn blog.
 4. **Nghiên cứu bên ngoài (bắt buộc), ba phần:** (a) **từng cơ chế/biến thể** của khái niệm để viết mục 3.1: mỗi cái cần nguồn riêng, cái nào không có thì ghi `Chưa kiểm`; (b) **các lựa chọn khác** để lập Bản đồ giải pháp (docs chính thức, giấy phép, khi chọn, cái giá của từng lựa chọn); (c) **real-world**: **mở đọc bài gốc** của dự án/công ty thật đã dùng chủ đề này (engineering blog của chính họ, paper, bài hội nghị, tài liệu chính thức, sách), gồm cả case thất bại hoặc bị bỏ. Chủ đề rộng thì giao tối đa 3 subagent đọc song song mỗi đợt, mỗi agent trả danh sách kèm URL đã mở; agent không ghi file. **Người gọi phải tự mở lại các nguồn then chốt** (nguồn của bản đồ, của số liệu, của từng cơ chế) trước khi ghi mức Chắc, và tự kiểm phép tính của số liệu (đã từng bắt được ví dụ số sai trong một blog). Chuẩn tối thiểu ở mục 7 của mẫu.
-5. **Viết ghi chú** theo mẫu dưới, tiếng Việt, thuật ngữ nâng cao giải thích lần đầu theo `explain-terms.md`. Khái niệm trước, công cụ sau.
+5. **Viết ghi chú**, tiếng Việt, thuật ngữ nâng cao giải thích lần đầu theo `explain-terms.md`. Khái niệm trước, công cụ sau. Lộ trình: theo `lesson-model.md` và `part-template.md`; một file: theo mẫu 10 mục dưới. **Chạy thật** mọi lệnh L4/L5 có thể chạy cục bộ và ghi đầu ra thật; chỉ động tới tài nguyên do mình tạo (tiền tố riêng như `lh-`), không chạy lệnh dọn dẹp rộng (`prune`) hay xoá volume; lệnh không chạy được thì gắn ⚠.
 6. **Cập nhật mục lục** `document/learning/README.md`: tách bảng Khái niệm và bảng Công cụ; cột: loại, "một trong các lựa chọn của" (với công cụ), có Bản đồ giải pháp (với khái niệm), làm mới, real-world đạt chuẩn hay chưa và vì sao.
 7. **Chạy checklist cuối** (mục "Checklist trước khi báo xong").
 8. **Báo lại** trong chat: đường dẫn ghi chú, 3–5 dòng điều cốt lõi, thứ tự nên đọc, điều chưa kiểm và nguồn chỉ ở mức Vừa.
@@ -122,6 +128,12 @@ Ghi chú **công cụ**:
 - [ ] Dòng đầu "Một trong các lựa chọn của [khái niệm](…#bản-đồ-giải-pháp)" và link đó không gãy.
 - [ ] Có "### Phạm vi và những gì công cụ này KHÔNG đại diện".
 - [ ] Không lặp phần chung của khái niệm; có real-world riêng của công cụ.
+
+Lộ trình (thư mục Part):
+- [ ] Part 0 có ma trận phủ; mỗi ô ✓ có đúng một mục `## Lx` trong file Part, mỗi ô `–` có lý do; tuân quy tắc tối thiểu ở `lesson-model.md`.
+- [ ] Mỗi file Part có hộp `> [!NOTE]` tóm tắt, mục "Tự kiểm tra" (đáp án ngắn), mục "Nguồn và độ tin cậy".
+- [ ] Mọi thẻ khái niệm có **Use case**; mọi lab có đầu ra thật hoặc ⚠ chưa chạy và bước dọn dẹp.
+- [ ] Không ô bảng nào quá ~140 ký tự, không bảng quá 5 cột, không câu kể quy trình ("tôi chưa", "agent đã đọc") trong thân bài.
 
 Cả hai:
 - [ ] Mọi đường dẫn nội bộ tồn tại, mọi link `.md` chéo và anchor không gãy (kiểm bằng script).
