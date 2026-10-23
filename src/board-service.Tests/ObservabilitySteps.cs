@@ -31,8 +31,12 @@ public sealed class ObservabilitySteps
     [Then("Jaeger có trace của service {string} trong thời gian chờ")]
     public async Task ThenJaegerHasTrace(string service)
     {
-        var url = $"http://127.0.0.1:16686/api/traces?service={service}&limit=1";
-        var body = await HttpWait.GetBodyUntilAsync(url, HasTrace, TimeSpan.FromSeconds(90));
+        // Jaeger 2.x chỉ còn API v3 (/api/traces của v1 trả 404) và bắt buộc khoảng thời gian tìm kiếm.
+        var from = DateTime.UtcNow.AddMinutes(-15).ToString("yyyy-MM-ddTHH:mm:ssZ");
+        var to = DateTime.UtcNow.AddMinutes(5).ToString("yyyy-MM-ddTHH:mm:ssZ");
+        var url = $"http://127.0.0.1:16686/api/v3/traces?query.service_name={service}"
+            + $"&query.start_time_min={from}&query.start_time_max={to}&query.num_traces=1";
+        var body = await HttpWait.GetBodyUntilAsync(url, json => HasTrace(json, service), TimeSpan.FromSeconds(90));
         Assert.True(body is not null, $"Jaeger không có trace của {service}.");
     }
 
@@ -51,9 +55,19 @@ public sealed class ObservabilitySteps
     [AfterScenario("docker")]
     public void Cleanup() => _docker.ComposeDown();
 
-    private static bool HasTrace(string json)
+    private static bool HasTrace(string json, string service)
     {
+        // Jaeger v3 trả JSON OTLP: result.resourceSpans[].resource.attributes có service.name.
         using var document = JsonDocument.Parse(json);
-        return document.RootElement.TryGetProperty("data", out var data) && data.GetArrayLength() > 0;
+        if (!document.RootElement.TryGetProperty("result", out var result)
+            || !result.TryGetProperty("resourceSpans", out var resourceSpans))
+        {
+            return false;
+        }
+
+        return resourceSpans.EnumerateArray().Any(resourceSpan =>
+            resourceSpan.GetProperty("resource").GetProperty("attributes").EnumerateArray().Any(attribute =>
+                attribute.GetProperty("key").GetString() == "service.name"
+                && attribute.GetProperty("value").GetProperty("stringValue").GetString() == service));
     }
 }

@@ -156,7 +156,7 @@ Bài học đã tra (`document/lessons/README.md`, tag `observability`, `backend
 
 ## 7. Câu hỏi mở và giả định
 
-Giả định A-01..A-03 của issue, đã kiểm ngày 2026-10-23: **A-03 đã xác minh** (giấy phép Jaeger là Apache-2.0, theo file `LICENSE` ở `github.com/jaegertracing/jaeger`); **A-02 xác minh một phần** (tài liệu Reqnroll liệt kê .NET 10 và xUnit; còn phải kiểm `.feature` ngoài project ở B1); **A-01 xác minh một phần** (tài liệu Jaeger ghi cổng OTLP 4317/4318 mặc định, chưa nêu rõ bật sẵn trong all-in-one; kiểm thực tế ở B5). Người dùng chấp nhận tiếp tục với phần còn lại kiểm ở B1/B5; sai thì dừng và hỏi.
+Giả định A-01..A-03 của issue, đã kiểm ngày 2026-10-23: **A-03 đã xác minh** (giấy phép Jaeger là Apache-2.0, theo file `LICENSE` ở `github.com/jaegertracing/jaeger`); **A-02 xác minh một phần** (tài liệu Reqnroll liệt kê .NET 10 và xUnit; còn phải kiểm `.feature` ngoài project ở B1); **A-01 đã xác minh ở B5** (OTLP bật sẵn trong all-in-one 2.22.0; lưu ý API truy vấn chỉ có v3, `/api/traces` của v1 trả 404). Người dùng chấp nhận tiếp tục với phần còn lại kiểm ở B1/B5; sai thì dừng và hỏi.
 
 | # | Điều chưa rõ | Ảnh hưởng tới | Người trả lời | Ghi chú (không tự điền) |
 |---|---|---|---|---|

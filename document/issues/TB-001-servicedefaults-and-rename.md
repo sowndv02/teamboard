@@ -130,7 +130,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S08 Span có service.name | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
 | @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | xanh (B4) |
-| @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | |
+| @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | xanh (B5) |
 | @S12 Request tạo metric | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S13 Request tạo bản ghi log | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B4) |
 | @S14 Mọi gói NuGet có phiên bản cố định | `RepositoryHygieneSteps` + `RepositoryPoliciesTests` (7 ca) | không có đỏ production: test canh giữ, luật được chứng minh bắt vi phạm bằng unit test (`10.*`, `*`, dải); xanh ngay vì repo hiện sạch | xanh |
