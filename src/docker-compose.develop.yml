@@ -1,5 +1,5 @@
 services:
-  teamboard-api:
+  board-service:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AppDb;User Id=sa;Password=${SA_PASSWORD};Encrypt=False;TrustServerCertificate=True;"

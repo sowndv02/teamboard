@@ -10,6 +10,7 @@
     <None Include=".env.stg" />
     <None Include="docker-compose.stg.yml" />
     <None Include="docker-compose.develop.yml" />
+    <None Include="docker-compose.observability.yml" />
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>

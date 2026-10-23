@@ -78,4 +78,4 @@ paths:
   src: src
   infra: infra                  # chưa tạo
   services:
-    boardService: src/teamboard-api   # sẽ đổi tên thành src/board-service
+    boardService: src/board-service

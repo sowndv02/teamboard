@@ -48,8 +48,8 @@ Mục đích: bản đồ để học và để chọn kiến trúc nội bộ c
 | **3.3 Pub/Sub (event-driven)** (SNS/SQS; slide: RabbitMQ + MassTransit) | Rất cao | Tách thời gian/độ sẵn sàng, fan-out | Sự kiện nghiệp vụ nhiều bên quan tâm | Cần phản hồi ngay | Nhất quán cuối cùng; idempotent | `teamboard-events` (`messaging.md`) |
 | **3.4 Saga** (choreography/orchestration) | Cao khi có quy trình nhiều bước | Nhất quán xuyên service không có giao dịch chung | Quy trình nhiều service có bồi hoàn | Quy trình trong một service | Phức tạp theo dõi/gỡ lỗi | "Xoá Board" (bài tập) |
 | **3.5 API Gateway** (YARP: reverse proxy, định tuyến, rate limit; biến thể BFF cho từng loại client chỉ cần khi có client) | Rất cao | Điểm vào thống nhất, ẩn topology | Nhiều service | Một service đơn lẻ | Điểm lỗi tập trung nếu thiết kế kém | `gateway` (YARP) |
-| **3.6 Anti-Corruption Layer (ACL)** | Cao khi tích hợp hệ cũ/ngoài | Bảo vệ mô hình miền khỏi mô hình bên ngoài | Tích hợp hệ thống cũ/của người khác | Không có ranh giới ngoài | Thêm lớp dịch | Dùng khi tách khỏi `teamboard-api` cũ hoặc tích hợp bên thứ ba |
-| **3.7 Strangler Fig** (thay dần monolith bằng service mới sau một mặt tiền) | Cao (di chuyển hệ cũ) | Di chuyển từng phần an toàn | Có monolith đang chạy | Hệ mới hoàn toàn | Chạy song song, chi phí tạm thời | **`teamboard-api` hiện tại là monolith**: có thể coi việc tách thành `board-service`/`task-service` là một bài tập Strangler |
+| **3.6 Anti-Corruption Layer (ACL)** | Cao khi tích hợp hệ cũ/ngoài | Bảo vệ mô hình miền khỏi mô hình bên ngoài | Tích hợp hệ thống cũ/của người khác | Không có ranh giới ngoài | Thêm lớp dịch | Dùng khi tách khỏi hệ thống cũ hoặc tích hợp bên thứ ba |
+| **3.7 Strangler Fig** (thay dần monolith bằng service mới sau một mặt tiền) | Cao (di chuyển hệ cũ) | Di chuyển từng phần an toàn | Có monolith đang chạy | Hệ mới hoàn toàn | Chạy song song, chi phí tạm thời | **Service Board ban đầu gom cả Board và Task**: có thể coi việc tách phần Task ra `task-service` là một bài tập Strangler |
 
 ## 4. Độ tin cậy, quan sát, vận hành
 
@@ -86,7 +86,7 @@ Mục đích: bản đồ để học và để chọn kiến trúc nội bộ c
 
 Theo thứ tự giá trị học, kèm chi phí:
 1. **Modular monolith đối chứng** của cùng domain Board/Task (so sánh độ phức tạp vận hành, tốc độ phát triển).
-2. **Strangler Fig** từ `teamboard-api` hiện có sang `board-service` (có thật, không cần dựng giả).
+2. **Strangler Fig** tách phần Task khỏi `board-service` sang `task-service` (có thật, không cần dựng giả).
 3. **gRPC** cho một call đồng bộ nội bộ (so với REST: hợp đồng, hiệu năng, debug).
 4. **Cache-aside + Decorator** với Redis cho một truy vấn đọc nhiều (nhớ chi phí chạy rỗng của ElastiCache: `aws-service-selection`).
 

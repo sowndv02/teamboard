@@ -26,13 +26,13 @@ services:
     health: { live: /health/live, ready: /health/ready }
 
   board-service:
-    status: existing            # hiện là src/teamboard-api, sẽ đổi tên
-    path: src/teamboard-api
+    status: existing
+    path: src/board-service
     architecture: clean-architecture
     datastore: sqlserver
     local_port: 6060            # host; container nghe 7070 (docker-compose.yml)
     container_port: 7070
-    health: { live: /health/live, ready: /health/ready }   # chưa implement
+    health: { live: /health/live, ready: /health/ready }
 
   task-service:
     status: planned

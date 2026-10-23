@@ -13,7 +13,7 @@ Domain giữ nhỏ (Board, Task, thông báo, thống kê) để thời gian dà
 |---|---|---|---|---|
 | `gateway` | Entry point, routing, kiểm tra JWT, rate limit | **API Gateway** (YARP) | – | HTTP vào, HTTP ra |
 | `identity-service` | Đăng ký, đăng nhập, JWT | **Vertical Slice** (Minimal API) | PostgreSQL | REST; phát JWKS |
-| `board-service` | CRUD Board, thành viên (từ `teamboard-api` hiện có) | **Clean Architecture** + EF Core | SQL Server (RDS) | REST; publish event |
+| `board-service` | CRUD Board, thành viên (service hiện có) | **Clean Architecture** + EF Core | SQL Server (RDS) | REST; publish event |
 | `task-service` | Vòng đời Task (tạo, gán, đổi trạng thái) | **CQRS + Event Sourcing** + Outbox | PostgreSQL (event store + read model) | REST + publish event |
 | `notification-service` | Gửi email/webhook khi có event | **Hexagonal (Ports & Adapters)**, consumer idempotent, DLQ | DynamoDB (dedupe) | Consume SQS |
 | `activity-service` | Feed hoạt động + thống kê theo Board | **Serverless / Event-driven** (Lambda hoặc worker Go) | DynamoDB | Consume SNS→SQS |
@@ -41,7 +41,7 @@ Ghi chú: tech stack chính là ASP.NET Core (.NET 10) (ADR 0005); frontend Angu
 src/
   gateway/
   identity-service/
-  board-service/          # đổi tên từ teamboard-api
+  board-service/
   task-service/
   notification-service/
   activity-service/
@@ -71,7 +71,7 @@ document/
 
 | Giai đoạn | Nội dung | Kết quả kiểm chứng |
 |---|---|---|
-| 0 | Chốt ADR, đổi tên `teamboard-api` → `board-service`, `shared/ServiceDefaults` (OTel, health) | compose chạy 1 service có trace trong Jaeger |
+| 0 | Chốt ADR, đặt tên `board-service`, `shared/ServiceDefaults` (OTel, health) | compose chạy 1 service có trace trong Jaeger |
 | 1 | `gateway` + `identity-service` + `board-service` (sync only) | login → tạo board qua gateway |
 | 2 | `task-service` (CQRS/ES + outbox) + SNS/SQS trên LocalStack | tạo task → event xuất hiện đúng 1 lần |
 | 3 | `notification-service`, `activity-service` (consumer, idempotency, DLQ) | poison message vào DLQ, replay được |

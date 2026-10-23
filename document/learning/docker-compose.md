@@ -12,7 +12,7 @@
 - **Docker Compose**: một file YAML mô tả cả cụm container (API + DB + ...) và nối chúng chung một mạng; `up` là cả cụm chạy.
 
 ```
- máy bạn ──6060──► [teamboard-api :7070] ──► [db-dev :1433]
+ máy bạn ──6060──► [board-service :7070] ──► [db-dev :1433]
                         mạng compose (gọi nhau bằng tên service)
 ```
 
@@ -22,7 +22,7 @@ Khác máy ảo (VM): container dùng chung nhân hệ điều hành của máy 
 
 | Khái niệm | Nghĩa | Ví dụ trong dự án |
 |---|---|---|
-| Image / container | Khuôn / một lần chạy từ khuôn | `image: teamboard-api` |
+| Image / container | Khuôn / một lần chạy từ khuôn | `image: board-service` |
 | Layer + cache | Mỗi `COPY/RUN` là một lớp; đầu vào không đổi thì dùng lại | `restore` đứng trước `COPY . .` |
 | Multi-stage build | Nhiều `FROM` trong một Dockerfile; image cuối chỉ lấy kết quả | SDK để build, `aspnet` để chạy |
 | Port mapping `host:container` | Mở cổng máy bạn, nối vào cổng trong container | `6060:7070` |
@@ -34,21 +34,21 @@ Khác máy ảo (VM): container dùng chung nhân hệ điều hành của máy 
 
 ## 4. Cách dùng
 
-Dockerfile tối thiểu cho .NET (rút gọn từ `src/teamboard-api/Dockerfile`):
+Dockerfile tối thiểu cho .NET (rút gọn từ `src/board-service/Dockerfile`):
 
 ```dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY teamboard-api/teamboard-api.csproj teamboard-api/   # chỉ copy csproj trước
-RUN dotnet restore teamboard-api/teamboard-api.csproj    # lớp này được cache
+COPY board-service/board-service.csproj board-service/   # chỉ copy csproj trước
+RUN dotnet restore board-service/board-service.csproj    # lớp này được cache
 COPY . .
-RUN dotnet publish teamboard-api -c Release -o /out
+RUN dotnet publish board-service -c Release -o /out
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0                # runtime nhỏ, không có SDK
 WORKDIR /app
 COPY --from=build /out .
 USER $APP_UID                                            # không chạy bằng root
-ENTRYPOINT ["dotnet", "teamboard-api.dll"]
+ENTRYPOINT ["dotnet", "board-service.dll"]
 ```
 
 Compose: gộp nhiều file bằng `-f`, file sau ghi đè/bổ sung file trước.
@@ -57,7 +57,7 @@ Compose: gộp nhiều file bằng `-f`, file sau ghi đè/bổ sung file trư�
 docker compose -f src/docker-compose.yml config -q     # kiểm cú pháp, im lặng nếu đúng
 docker compose -f src/docker-compose.yml up --build -d # build + chạy nền
 docker compose -f src/docker-compose.yml ps            # xem trạng thái
-docker compose -f src/docker-compose.yml logs -f teamboard-api
+docker compose -f src/docker-compose.yml logs -f board-service
 docker compose -f src/docker-compose.yml down          # dừng; KHÔNG thêm -v (xoá volume = mất dữ liệu)
 ```
 
@@ -101,8 +101,8 @@ Chạy kèm DB dev: thêm `-f src/docker-compose.develop.yml --env-file src/.env
 
 | File | Vai trò |
 |---|---|
-| `src/teamboard-api/Dockerfile` | 4 stage: `base` (aspnet, `USER $APP_UID`) → `build` → `publish` → `final` |
-| `src/docker-compose.yml` | Service `teamboard-api`, host 6060 → container 7070 (`ASPNETCORE_URLS`) |
+| `src/board-service/Dockerfile` | 4 stage: `base` (aspnet, `USER $APP_UID`) → `build` → `publish` → `final` |
+| `src/docker-compose.yml` | Service `board-service`, host 6060 → container 7070 (`ASPNETCORE_URLS`) |
 | `src/docker-compose.develop.yml` | Thêm `db-dev` (SQL Server 2022, healthcheck `sqlcmd`, volume `sqlserver_dev_data`), bind `127.0.0.1:1433` |
 | `src/docker-compose.stg.yml` | Env `Staging`, connection string từ `${STG_CONNECTION_STRING}` |
 | `src/.env.*.example` | Mẫu biến; file thật bị gitignore (không đọc/in giá trị) |
