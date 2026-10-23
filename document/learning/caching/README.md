@@ -4,7 +4,7 @@
 > **Mục tiêu:** hiểu caching như một khái niệm độc lập với công cụ, rồi tự thiết kế, triển khai, đo và gỡ lỗi một lớp cache cho dịch vụ .NET, biết khi nào **không** nên cache.
 > **Cần biết trước:** đọc được C# cơ bản, biết HTTP và khái niệm cơ sở dữ liệu. Chưa cần biết Redis hay CDN.
 > **Thời lượng ước tính:** 25 đến 35 giờ nếu làm đủ lab.
-> **Loại:** khái niệm. Công cụ trong dự án: [Redis / Valkey](../redis.md), chỉ là **một trong các lựa chọn** (xem [Bản đồ giải pháp](part-1-fundamentals.md#bản-đồ-giải-pháp)).
+> **Loại:** khái niệm. Công cụ trong dự án: [Redis / Valkey](../valkey/README.md), chỉ là **một trong các lựa chọn** (xem [Bản đồ giải pháp](part-1-fundamentals.md#bản-đồ-giải-pháp)).
 
 ## Cách học lộ trình này
 
@@ -59,7 +59,7 @@ Mô hình đầy đủ: [lesson-model.md](../../../.agents/skills/learning-hub/r
 
 ## Môi trường dùng để chạy thử
 
-Windows 11, .NET SDK 10.0.402 (runtime 10.0.13), 12 luồng logic, ngày 23/10/2026. Gói dùng trong lab (thư mục thử ngoài repo): `Microsoft.Extensions.Caching.Memory` 10.0.13 và `Microsoft.Extensions.Caching.Hybrid` 10.11.0. Các lab L4 của Part 1 đến 6 đã chạy thật trên môi trường này và ghi đầu ra thật; số đo thời gian chỉ có giá trị tương đối trên máy này. **Lab dùng Valkey thật (Part 3) chưa chạy** vì Docker Desktop đang tắt; ghi ⚠. Các lab "mô phỏng" tự viết (eviction, jitter, XFetch, poisoning) là mô hình, không phải phép đo hệ thống thật, và ghi rõ như vậy.
+Windows 11, .NET SDK 10.0.402 (runtime 10.0.13), 12 luồng logic, ngày 23/10/2026. Gói dùng trong lab (thư mục thử ngoài repo): `Microsoft.Extensions.Caching.Memory` 10.0.13 và `Microsoft.Extensions.Caching.Hybrid` 10.11.0. Các lab L4 của Part 1 đến 6 đã chạy thật trên môi trường này và ghi đầu ra thật; số đo thời gian chỉ có giá trị tương đối trên máy này. Lab 3.3 dùng Valkey 9.1.2 thật (Docker, image `valkey/valkey:9.1.2-alpine`) và `Microsoft.Extensions.Caching.StackExchangeRedis` 10.0.13. Các lab "mô phỏng" tự viết (eviction, jitter, XFetch, poisoning) là mô hình, không phải phép đo hệ thống thật, và ghi rõ như vậy.
 
 ## Tiêu chí hoàn thành
 
@@ -82,4 +82,4 @@ Windows 11, .NET SDK 10.0.402 (runtime 10.0.13), 12 luồng logic, ngày 23/10/2
 
 ## Nguồn và độ tin cậy
 
-Mỗi file Part có mục "Nguồn và độ tin cậy" riêng. Mô hình bài học và khuôn Part: `.agents/skills/learning-hub/references/`. Ghi chú công cụ liên quan: [redis.md](../redis.md).
+Mỗi file Part có mục "Nguồn và độ tin cậy" riêng. Mô hình bài học và khuôn Part: `.agents/skills/learning-hub/references/`. Ghi chú công cụ liên quan: [Redis / Valkey](../valkey/README.md).

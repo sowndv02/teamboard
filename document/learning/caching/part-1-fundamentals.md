@@ -234,7 +234,7 @@ Cache là một **họ kỹ thuật ở nhiều tầng**, không phải một c�
 - Chưa đo: truy vấn chậm có thể sửa bằng index; cache chỉ che lỗi thiết kế.
 
 ### Phạm vi và những gì công cụ cụ thể KHÔNG đại diện
-Khái niệm cache **không phải** Redis. [Redis / Valkey](../redis.md) là một lựa chọn trong bản đồ trên; HTTP cache, cache trong tiến trình và cache của DB thường là bước đầu rẻ hơn và không cần thêm hạ tầng.
+Khái niệm cache **không phải** Redis. [Redis / Valkey](../valkey/README.md) là một lựa chọn trong bản đồ trên; HTTP cache, cache trong tiến trình và cache của DB thường là bước đầu rẻ hơn và không cần thêm hạ tầng.
 
 ## Tự kiểm tra
 

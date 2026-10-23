@@ -122,7 +122,7 @@ Các case gateway nói chung (Zuul, Amazon API Gateway, Stripe, Uber, Kubernetes
 | [ADR 0001](../architecture/adr/0001-service-boundaries.md), [ADR 0002](../architecture/adr/0002-communication.md) | Vì sao có gateway, client ↔ gateway ↔ service dùng REST |
 | [patterns-catalog.md](../architecture/patterns-catalog.md) mục 3.5 | API Gateway trong danh mục pattern |
 
-Quyết định đã chốt trong design: tự host YARP (không managed), host mỏng không Clean Architecture, rate limit trong bộ nhớ (sliding window, IPv6 gộp /64), route cấu hình tĩnh, timeout tổng 30 giây, chưa JWT/retry/circuit breaker, **không đưa ra internet trước khi có JWT**. Kho dùng chung (Redis/Valkey) được cân nhắc và loại vì chỉ 1 instance (`document/design/api-gateway.md:153`, xem [redis.md](redis.md)).
+Quyết định đã chốt trong design: tự host YARP (không managed), host mỏng không Clean Architecture, rate limit trong bộ nhớ (sliding window, IPv6 gộp /64), route cấu hình tĩnh, timeout tổng 30 giây, chưa JWT/retry/circuit breaker, **không đưa ra internet trước khi có JWT**. Kho dùng chung (Redis/Valkey) được cân nhắc và loại vì chỉ 1 instance (`document/design/api-gateway.md:153`, xem [Redis / Valkey](valkey/README.md)).
 
 **Điểm cần lưu ý khi gom:**
 1. Gateway **chưa có code**; mọi thứ ở trên là thiết kế, không phải hành vi đã chạy. Ví dụ ở mục 4 là minh hoạ chung.

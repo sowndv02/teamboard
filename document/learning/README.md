@@ -21,5 +21,5 @@ Ghi chú gom kiến thức theo chủ đề (vấn đề, cách dùng, ưu/như�
 | Chủ đề | Một trong các lựa chọn của | Ghi chú | Làm mới | Real-world |
 |---|---|---|---|---|
 | Docker, Docker Compose (lộ trình Part 0–7) | [Container](container.md) | [docker/README.md](docker/README.md) | 2026-10-23 | Đạt một phần (OCI, Borg, arXiv, ECS tự mở; Part 6 chưa chạy lab container; xem từng Part) |
-| Redis / Valkey | [Caching](caching/README.md) | [redis.md](redis.md) | 2026-10-23 | Đạt (GitHub, Redis giấy phép, Valkey tự mở; Stack Overflow, Slack, AWS Vừa) |
+| Redis / Valkey (lộ trình Part 0–7) | [Caching](caching/README.md) | [valkey/README.md](valkey/README.md) | 2026-10-23 | Đạt (GitHub, Redis giấy phép, Valkey tự mở; Stack Overflow, Slack, AWS Vừa) |
 | YARP | [API Gateway](api-gateway.md) | [yarp.md](yarp.md) | 2026-10-23 | Đạt một phần (YARP 1.0, eShopOnContainers tự mở; hai nguồn còn lại Vừa) |

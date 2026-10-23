@@ -38,7 +38,7 @@ Cache bắt đầu như một tối ưu và dần thành **thành phần bắt b
 | **tải lên nguồn** | tác dụng thật của cache | tăng khi hit ratio tụt |
 | tỉ lệ đọc cũ (nếu đo được) | độ đúng | tăng sau thay đổi triển khai |
 
-Tên chỉ số của Valkey lấy từ lệnh `INFO` ⚠ (chưa chạy); trên AWS các chỉ số tương ứng nằm ở CloudWatch với tên riêng ⚠.
+Tên chỉ số của Valkey lấy từ lệnh `INFO` (đã chạy ở [Valkey Part 5, Lab 5.1](../valkey/part-5-production-security-ops.md)); trên AWS các chỉ số tương ứng nằm ở CloudWatch với tên riêng ⚠.
 
 ### Khi cache chết
 

@@ -89,15 +89,20 @@ HybridCache.GetOrCreateAsync        : chạm nguồn  1 lần, 238 ms
 ```
 **Giải thích:** `IMemoryCache.GetOrCreateAsync` **không** gom: 50 lần chạm nguồn. `Lazy<Task>` tự viết và `HybridCache` đều còn 1 lần, chênh vài chục ms là nhiễu đo. Phạm vi: chỉ trong **một tiến trình**.
 
-#### Lab 3.3 — Valkey thật ⚠ chưa chạy
-Lab này cần Docker Desktop đang chạy và kéo image Valkey (tên và tag cần kiểm trên Docker Hub trước khi kéo). Hướng làm, **chưa chạy, không có đầu ra**:
-```bash
-docker run -d --name lh-valkey -p 127.0.0.1:16379:6379 valkey/valkey:<tag-đã-kiểm>
-docker exec lh-valkey valkey-cli SET board:1 v1 EX 30
-docker exec lh-valkey valkey-cli TTL board:1
-docker rm -f lh-valkey
+#### Lab 3.3 — `HybridCache` với Valkey thật làm L2
+Valkey 9.1.2 (`valkey/valkey:9.1.2-alpine`, container `lh-valkey`, `127.0.0.1:16379`), `AddStackExchangeRedisCache` rồi `AddHybridCache`, `LocalCacheExpiration` 1 giây. Lab đầy đủ và các kiểm chứng khác: [lộ trình Valkey, Part 3 Lab 3.5](../valkey/part-3-multi-component.md).
+**Đầu ra thật:**
+```text
+A đọc: v1  (chạm DB 1)
+ngay sau A: Valkey có 0 key
+sau 200 ms: Valkey có 1 key; TTL = 30 giây
+B đọc: v1  (chạm DB 1: B lấy từ L2 trong Valkey)
+A xoá khoá; Valkey còn 0 key
+B đọc ngay: v1  (chạm DB 1)  <- L1 của B còn bản cũ
+B đọc sau 1200 ms: v2  (chạm DB 2)
+40 yêu cầu đồng thời trên 2 instance: chạm DB 2 lần
 ```
-Trong ứng dụng: `AddStackExchangeRedisCache(o => o.Configuration = "127.0.0.1:16379")` rồi `AddHybridCache()` ⚠ (tên gói và phương thức theo tài liệu Microsoft, chưa chạy). Khi chạy thật cần ghi đầu ra thật và đối chiếu với Lab 3.1.
+**Giải thích:** khớp với Lab 3.1 dùng L2 giả: ghi L2 chạy nền, xoá không lan sang L1 của instance khác, và gom request chỉ trong một instance (hai instance cùng miss thì chạm nguồn hai lần).
 
 ## L5 Troubleshooting — Khi nhiều instance không khớp
 
@@ -118,7 +123,7 @@ Trong ứng dụng: `AddStackExchangeRedisCache(o => o.Configuration = "127.0.0.
 | `IDistributedCache` + Valkey | nhiều instance cần chung dữ liệu hoặc bộ đếm | mỗi lần đọc qua mạng; tự lo stampede và serialization |
 | `HybridCache` (L1 + L2) | muốn nhanh như RAM và chia sẻ được | hai nơi có thể cũ; xoá không lan hết (Lab 3.1) |
 | Memcached | key-value thuần, ưu tiên đơn giản, không cần cấu trúc dữ liệu | không có replication, failover sẵn |
-| Valkey/Redis | cần cấu trúc dữ liệu, replication, failover, persistence | vận hành phức tạp hơn; [ghi chú công cụ](../redis.md) |
+| Valkey/Redis | cần cấu trúc dữ liệu, replication, failover, persistence | vận hành phức tạp hơn; [ghi chú công cụ](../valkey/README.md) |
 | Không dùng cache phân tán | một instance, hoặc tải đọc thấp | không chia sẻ được giữa instance |
 
 **Cách chọn:** hỏi (1) có nhiều instance cần thấy cùng dữ liệu không, (2) độ cũ tối đa chấp nhận được là bao lâu, (3) mất cache có làm sập nguồn không. Một instance và chịu được độ cũ: `IMemoryCache` đủ. Nhiều instance, chịu được độ cũ vài giây: `HybridCache`. Cần xoá đồng bộ nhanh: thêm kênh sự kiện hoặc dùng L2 trực tiếp (bỏ L1).
@@ -143,7 +148,7 @@ Trong ứng dụng: `AddStackExchangeRedisCache(o => o.Configuration = "127.0.0.
 
 ## Nguồn và độ tin cậy
 
-**Đã tự chạy:** Lab 3.1 và 3.2 (đầu ra thật; L2 là bản tự viết trong tiến trình, không phải Valkey).
+**Đã tự chạy:** Lab 3.1 và 3.2 (L2 là bản tự viết trong tiến trình), Lab 3.3 (Valkey 9.1.2 thật); đầu ra thật.
 **Đã tự mở:** AWS ElastiCache "Choosing an engine" (so sánh Memcached và Valkey: đa luồng, replication, persistence).
 **Chỉ qua agent (⚠):** tài liệu Microsoft Learn về `IDistributedCache` và `HybridCache` (L1/L2, tag logic, đăng ký `AddHybridCache`); gói `Microsoft.Extensions.Caching.StackExchangeRedis`.
-**Chưa kiểm:** Lab 3.3 (Valkey thật) chưa chạy; độ trễ mạng thật, hành vi khi L2 chết, và đồng bộ L1 giữa nhiều tiến trình thật chưa quan sát.
+**Chưa kiểm:** hành vi khi L2 chết và độ trễ mạng thật (Valkey chạy cùng máy qua loopback) chưa quan sát.
