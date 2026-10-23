@@ -1,11 +1,11 @@
 # Redis / Valkey
 
-> Loại: Công cụ · Một trong các lựa chọn của [Caching](caching.md#bản-đồ-giải-pháp) (xem phần "Phạm vi" ở mục 5). Cache-aside, TTL, invalidation, stampede nằm ở caching.md; ghi chú này chỉ nói phần riêng của Redis/Valkey
+> Loại: Công cụ · Một trong các lựa chọn của [Caching](caching/part-1-fundamentals.md#bản-đồ-giải-pháp) (xem phần "Phạm vi" ở mục 5). Cache-aside, TTL, invalidation, stampede nằm ở lộ trình [Caching](caching/README.md); ghi chú này chỉ nói phần riêng của Redis/Valkey
 > Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: **chưa dùng, chưa có code**; Redis server bị cấm (T3), **Valkey** là hướng thay thế đang theo dõi (`config/dependencies.yaml:58-59`) · Phiên bản: chưa ghim (`config/tool-versions.yaml` không có mục này)
 
 ## 1. Vì sao cần một công cụ riêng cho cache?
 
-[caching.md](caching.md) nói cache là khái niệm; còn cache trong tiến trình (`IMemoryCache`) mỗi instance một bản riêng nên nhiều instance trả kết quả khác nhau và mất khi restart. Redis/Valkey là **kho dữ liệu trong RAM dùng chung qua mạng**: mọi instance thấy cùng một bản, lại có sẵn TTL, eviction và thao tác nguyên tử (tăng bộ đếm, thêm vào set). Vì có cấu trúc dữ liệu nên nó còn được dùng ngoài cache: bộ đếm rate limit tập trung, phiên, hàng đợi nhẹ, stream, pub/sub.
+[Caching](caching/README.md) nói cache là khái niệm; còn cache trong tiến trình (`IMemoryCache`) mỗi instance một bản riêng nên nhiều instance trả kết quả khác nhau và mất khi restart. Redis/Valkey là **kho dữ liệu trong RAM dùng chung qua mạng**: mọi instance thấy cùng một bản, lại có sẵn TTL, eviction và thao tác nguyên tử (tăng bộ đếm, thêm vào set). Vì có cấu trúc dữ liệu nên nó còn được dùng ngoài cache: bộ đếm rate limit tập trung, phiên, hàng đợi nhẹ, stream, pub/sub.
 
 ## 2. Là gì (hiểu trong 1 phút)
 
@@ -23,7 +23,7 @@ Một server key-value giữ dữ liệu trong RAM, mỗi key trỏ tới một 
 | Cluster | 16384 hash slot, `slot = CRC16(key) mod 16384` | lệnh nhiều key chỉ chạy khi các key cùng slot; dùng hash tag `{...}` |
 | Pub/sub, Stream | Truyền thông điệp trong Valkey | đẩy sự kiện realtime (Stack Overflow, mục 7) |
 
-**Persistence, giải thích kỹ.** Khi dùng làm cache, mất dữ liệu khi restart chấp nhận được vì dựng lại từ DB; khi bạn tắt persistence thì restart cho cache rỗng (cold start, xem caching.md). Khi dùng như kho dữ liệu, bật RDB + AOF (tài liệu Valkey khuyên bật cả hai nếu cần độ bền gần như DB; khi bật cả hai nó dùng AOF để khôi phục). Cái giá: RDB dùng `fork()` và với dataset lớn có thể làm server khựng từ vài ms tới gần 1 giây. **Bẫy replication:** nếu primary tắt persistence rồi tự khởi động lại với dữ liệu rỗng, replica sẽ sao chép bản rỗng và mất sạch (theo tài liệu replication).
+**Persistence, giải thích kỹ.** Khi dùng làm cache, mất dữ liệu khi restart chấp nhận được vì dựng lại từ DB; khi bạn tắt persistence thì restart cho cache rỗng (cold start, xem [Part 5](caching/part-5-production-security-ops.md)). Khi dùng như kho dữ liệu, bật RDB + AOF (tài liệu Valkey khuyên bật cả hai nếu cần độ bền gần như DB; khi bật cả hai nó dùng AOF để khôi phục). Cái giá: RDB dùng `fork()` và với dataset lớn có thể làm server khựng từ vài ms tới gần 1 giây. **Bẫy replication:** nếu primary tắt persistence rồi tự khởi động lại với dữ liệu rỗng, replica sẽ sao chép bản rỗng và mất sạch (theo tài liệu replication).
 
 ## 4. Cách dùng
 
@@ -77,7 +77,7 @@ public sealed class BoardCache(IDistributedCache cache, ILogger<BoardCache> logg
 }
 ```
 
-Khối `try/catch` là điểm khác với cache trong tiến trình: cache ngoài **có thể lỗi qua mạng**, và hệ thống không nên sập vì thế (bài học Discord và Honeycomb ở caching.md). Mỗi `catch` phải ghi log (thêm bộ đếm metric nếu có): nuốt lỗi âm thầm là vi phạm `AGENTS.md`, và khi đó Redis hỏng nhưng không ai biết, DB bị dội tải mà không có tín hiệu. Đặt lớp này sau interface của mình (Decorator như caching.md) để thay được công cụ.
+Khối `try/catch` là điểm khác với cache trong tiến trình: cache ngoài **có thể lỗi qua mạng**, và hệ thống không nên sập vì thế (bài học Discord và Honeycomb ở [Part 7](caching/part-7-troubleshooting-mastery.md)). Mỗi `catch` phải ghi log (thêm bộ đếm metric nếu có): nuốt lỗi âm thầm là vi phạm `AGENTS.md`, và khi đó Redis hỏng nhưng không ai biết, DB bị dội tải mà không có tín hiệu. Đặt lớp này sau interface của mình (Decorator, [Part 2](caching/part-2-core-skills.md)) để thay được công cụ.
 
 ## 5. Ưu và nhược điểm
 
@@ -93,7 +93,7 @@ Khối `try/catch` là điểm khác với cache trong tiến trình: cache ngo�
 **Không nên khi:** tải thấp (cache trong tiến trình hoặc không cache), cần nguồn sự thật bền (dùng DB; xem GitHub, mục 7), chưa được duyệt giấy phép.
 ### Phạm vi và những gì công cụ này KHÔNG đại diện
 
-Redis/Valkey chỉ là **một dòng** ("cache phân tán kiểu cấu trúc dữ liệu") trong [bản đồ giải pháp caching](caching.md#bản-đồ-giải-pháp). Nó **không** đại diện cho cả khái niệm cache:
+Redis/Valkey chỉ là **một dòng** ("cache phân tán kiểu cấu trúc dữ liệu") trong [bản đồ giải pháp caching](caching/part-1-fundamentals.md#bản-đồ-giải-pháp). Nó **không** đại diện cho cả khái niệm cache:
 
 - **Cache không cần Redis.** HTTP cache của trình duyệt/CDN (`Cache-Control`, ETag) và cache trong tiến trình (`IMemoryCache`) thường là bước đầu rẻ hơn và không thêm hạ tầng.
 - **Memcached** (theo bảng AWS ElastiCache đã mở): đa luồng, kiểu dữ liệu đơn giản, **không** replication/HA sẵn, không pub/sub, không durability; Redis/Valkey đơn luồng nhưng có cấu trúc dữ liệu phức tạp, replication, pub/sub và (Valkey 9.0 trên ElastiCache) durability.
@@ -142,7 +142,7 @@ Redis/Valkey chỉ là **một dòng** ("cache phân tán kiểu cấu trúc d�
 
 | # | Tài liệu | Loại | Đọc để biết | Mức |
 |---|---|---|---|---|
-| 1 | [caching.md](caching.md) | Nội bộ | khái niệm gốc, stampede, invalidation | Chắc |
+| 1 | [Caching](caching/README.md) | Nội bộ | khái niệm gốc, stampede, invalidation | Chắc |
 | 2 | `.agents/rules/dependency-policy.md` mục 2, 4, 5 | Nội bộ | vì sao Valkey thay Redis | Chắc |
 | 3 | `document/architecture/patterns-catalog.md` mục 2.5 | Nội bộ | cache-aside + Decorator | Chắc |
 | 4 | https://valkey.io/topics/persistence/ , `/replication/` , `/cluster-spec/` , `/lru-cache/` | Chính thức | persistence, nhân bản, cluster, eviction | Chắc (đã mở trang `/lru-cache/` và mục lục; ba trang còn lại qua agent) |

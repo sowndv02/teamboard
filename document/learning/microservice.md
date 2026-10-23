@@ -1,6 +1,6 @@
 # Kiến trúc microservice
 
-> Loại: Khái niệm (kiểu kiến trúc; xem [Bản đồ giải pháp](#bản-đồ-giải-pháp) để thấy microservice chỉ là một lựa chọn) · Khái niệm liên quan: [Caching](caching.md) (một công cụ giảm tải cho service), [API Gateway](api-gateway.md) (cửa vào của hệ nhiều service)
+> Loại: Khái niệm (kiểu kiến trúc; xem [Bản đồ giải pháp](#bản-đồ-giải-pháp) để thấy microservice chỉ là một lựa chọn) · Khái niệm liên quan: [Caching](caching/README.md) (một công cụ giảm tải cho service), [API Gateway](api-gateway.md) (cửa vào của hệ nhiều service)
 > Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: giai đoạn 0, có `src/board-service` và `src/shared/ServiceDefaults`; các service còn lại chưa có code · Nguồn sự thật: `document/architecture/README.md`, ADR 0001, 0002
 
 ## 1. Vấn đề nó giải quyết
@@ -74,7 +74,7 @@ Orchestration: Orchestrator ─lệnh─► A ─► B ─► C (lỗi) ─► r
 
 #### f. Chịu lỗi cho call đồng bộ: timeout, retry, circuit breaker
 - **Timeout:** không chờ vô hạn. **Retry có jitter:** thử lại có giãn cách ngẫu nhiên, chỉ cho thao tác idempotent. **Circuit breaker:** ngắt tạm call tới service đang lỗi để khỏi kéo sập chuỗi.
-- **Cái giá/bẫy:** retry ở nhiều tầng nhân lên (sách Google SRE: 3 tầng mỗi tầng 4 lần thử → 4×4×4 = 64 lần lên backend quá tải); circuit breaker cũng có thể lỗi (Discord, [caching.md](caching.md) mục 7). Chi tiết: `document/architecture/resilience.md`.
+- **Cái giá/bẫy:** retry ở nhiều tầng nhân lên (sách Google SRE: 3 tầng mỗi tầng 4 lần thử → 4×4×4 = 64 lần lên backend quá tải); circuit breaker cũng có thể lỗi (Discord, [Caching Part 7](caching/part-7-troubleshooting-mastery.md)). Chi tiết: `document/architecture/resilience.md`.
 
 #### g. Quan sát xuyên service
 `correlationId` + `traceparent` ở mọi request/event, log/trace/metric (OpenTelemetry); không có thì debug xuyên service gần như bất khả thi. Chi tiết: `document/architecture/observability.md`.
