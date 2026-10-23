@@ -1,13 +1,13 @@
 ---
 key: TB-012
 title: learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ
-status: review
+status: done
 phase: 0
 branch: feature/TB-012-learning-hub-realworld
 estimate: M
 created: 2026-10-23
 started: 2026-10-23
-closed: null
+closed: 2026-10-23
 ---
 
 # TB-012 — learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ
