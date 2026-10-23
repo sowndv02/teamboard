@@ -26,4 +26,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>

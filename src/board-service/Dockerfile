@@ -11,6 +11,7 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj", "shared/ServiceDefaults/"]
 COPY ["board-service/board-service.csproj", "board-service/"]
 RUN dotnet restore "./board-service/board-service.csproj"
 COPY . .

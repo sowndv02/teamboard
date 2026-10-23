@@ -1,4 +1,7 @@
+using Teamboard.Shared.ServiceDefaults;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults("board-service");
 
 // Add services to the container.
 
@@ -24,8 +27,9 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapDefaultEndpoints();
 
 app.Run();
 
-// Khung tối thiểu để test dùng WebApplicationFactory<Program> (TB-001, test-init).
+// Để test dùng WebApplicationFactory<Program>.
 public partial class Program;

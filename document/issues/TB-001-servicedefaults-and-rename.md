@@ -123,12 +123,12 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S01 Tên assembly và namespace gốc | `ServiceIdentitySteps` (service-identity.feature) | đỏ: `Assert.Equal` expected `board-service`, actual `teamboard-api` | xanh (B2) |
 | @S02 Không tệp nào còn tên cũ | `ServiceIdentitySteps` | đỏ: còn tên cũ trong COMMANDS.md, config\*.yaml, document\architecture\*.md, PROJECT.md | |
 | @S03 Compose chạy ở cổng 6060 (`@docker`) | `ServiceIdentitySteps` + `DockerCli` | đỏ: `Assert.Contains` không thấy `board-service` trong danh sách service đang chạy (collection `["teamboard-api"]`); đã dừng container `src-teamboard-api-1` của người dùng vì chiếm cổng 6060 (chạy lại bằng `docker start src-teamboard-api-1`) | xanh (B2) |
-| @S04 Live trả 200 | `HealthSteps` (WebApplicationFactory) | đỏ: expected OK, actual NotFound | |
-| @S05 Ready trả 200 | `HealthSteps` | đỏ: expected OK, actual NotFound | |
-| @S06 Check sẵn sàng Unhealthy trước khi khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException (khung rỗng `AddServiceDefaults`) | |
-| @S07 Service khác dùng ServiceDefaults | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S04 Live trả 200 | `HealthSteps` (WebApplicationFactory) | đỏ: expected OK, actual NotFound | xanh (B3) |
+| @S05 Ready trả 200 | `HealthSteps` | đỏ: expected OK, actual NotFound | xanh (B3) |
+| @S06 Check sẵn sàng Unhealthy trước khi khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException (khung rỗng `AddServiceDefaults`) | xanh (B3) |
+| @S07 Service khác dùng ServiceDefaults | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
 | @S08 Span có service.name | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
-| @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |
+| @S09 Thiếu endpoint OTLP vẫn khởi động | `ServiceDefaultsSteps` | đỏ: NotImplementedException | xanh (B3) |
 | @S10 Telemetry không chứa Authorization/body | `ServiceDefaultsSteps` | đỏ: NotImplementedException (test canh giữ, xanh khi B4 không bật capture) | |
 | @S11 Trace hiện trong Jaeger (`@docker`) | `ObservabilitySteps` + `DockerCli` | đỏ: `docker compose up` lỗi vì chưa có `src/docker-compose.observability.yml` | |
 | @S12 Request tạo metric | `ServiceDefaultsSteps` | đỏ: NotImplementedException | |

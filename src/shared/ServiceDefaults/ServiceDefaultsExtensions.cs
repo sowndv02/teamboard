@@ -1,15 +1,35 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Teamboard.Shared.ServiceDefaults;
 
-// Khung tối thiểu để test biên dịch được (TB-001, test-init). Hành vi thật được viết ở B3 và B4.
 public static class ServiceDefaultsExtensions
 {
+    public const string ReadyTag = "ready";
+
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder, string serviceName)
         where TBuilder : IHostApplicationBuilder
-        => throw new NotImplementedException();
+    {
+        builder.Services
+            .AddOptions<ServiceDefaultsOptions>()
+            .Configure(options => options.ServiceName = serviceName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
+        builder.Services
+            .AddHealthChecks()
+            .AddCheck<StartupHealthCheck>("startup", tags: [ReadyTag]);
+
+        return builder;
+    }
+
+    /// <summary>`/health/live` không kiểm dependency; `/health/ready` kiểm các check có tag "ready".</summary>
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
-        => throw new NotImplementedException();
+    {
+        app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains(ReadyTag) });
+        return app;
+    }
 }
