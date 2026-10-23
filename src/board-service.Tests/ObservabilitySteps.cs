@@ -66,8 +66,13 @@ public sealed class ObservabilitySteps
         }
 
         return resourceSpans.EnumerateArray().Any(resourceSpan =>
-            resourceSpan.GetProperty("resource").GetProperty("attributes").EnumerateArray().Any(attribute =>
-                attribute.GetProperty("key").GetString() == "service.name"
-                && attribute.GetProperty("value").GetProperty("stringValue").GetString() == service));
+            resourceSpan.TryGetProperty("resource", out var resource)
+            && resource.TryGetProperty("attributes", out var attributes)
+            && attributes.EnumerateArray().Any(attribute =>
+                attribute.TryGetProperty("key", out var key)
+                && key.GetString() == "service.name"
+                && attribute.TryGetProperty("value", out var value)
+                && value.TryGetProperty("stringValue", out var text)
+                && text.GetString() == service));
     }
 }

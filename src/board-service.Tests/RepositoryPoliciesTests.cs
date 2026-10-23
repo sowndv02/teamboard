@@ -23,6 +23,9 @@ public sealed class RepositoryPoliciesTests
     [InlineData("      MSSQL_SA_PASSWORD: \"Matkhau-that-123\"", true)]
     [InlineData("      API_KEY: abcdef123456", true)]
     [InlineData("      ASPNETCORE_URLS: http://+:7070", false)]
+    [InlineData("      ConnectionStrings__DefaultConnection: \"Server=db;Password=Hunter2;Encrypt=False;\"", true)]
+    [InlineData("      ConnectionStrings__DefaultConnection: \"Server=db;Pwd=Hunter2;\"", true)]
+    [InlineData("      MSSQL_SA_PASSWORD: \"${SA_PASSWORD:-Hunter2}\"", true)]
     public void IsHardcodedSecret_Line_ReturnsExpected(string line, bool expected) =>
         Assert.Equal(expected, RepositoryPolicies.IsHardcodedSecret(line));
 }

@@ -26,6 +26,8 @@ public static class ServiceDefaultsExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        // Singleton để mọi lần probe dùng cùng một check (không tạo instance và callback mới mỗi lần).
+        builder.Services.AddSingleton<StartupHealthCheck>();
         builder.Services
             .AddHealthChecks()
             .AddCheck<StartupHealthCheck>("startup", tags: [ReadyTag]);
