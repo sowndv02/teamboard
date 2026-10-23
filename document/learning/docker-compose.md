@@ -1,5 +1,6 @@
 # Docker và Docker Compose
 
+> Loại: Công cụ · Một trong các lựa chọn của [Container](container.md#bản-đồ-giải-pháp) (xem phần "Phạm vi" ở mục 5). Đọc [container.md](container.md) trước để hiểu khái niệm; ghi chú này chỉ nói riêng về Docker và Compose
 > Làm mới lần cuối: 2026-10-23 · Máy hiện có: Docker 29.5.3, Compose v5.1.4 (`config/tool-versions.yaml`: `docker: TODO`, `docker_compose: v2`)
 
 ## 1. Vấn đề nó giải quyết
@@ -16,7 +17,7 @@
                         mạng compose (gọi nhau bằng tên service)
 ```
 
-Khác máy ảo (VM): container dùng chung nhân hệ điều hành của máy chủ nên khởi động trong giây và nhẹ hơn nhiều, đổi lại cô lập yếu hơn VM.
+Khác máy ảo (VM): container dùng chung nhân hệ điều hành của máy chủ nên khởi động trong giây và nhẹ hơn nhiều, đổi lại cô lập yếu hơn VM. Cơ chế nền (namespaces, cgroups), chuẩn OCI và các công cụ khác ngoài Docker nằm ở [container.md](container.md).
 
 ## 3. Khái niệm cốt lõi
 
@@ -76,11 +77,17 @@ Chạy kèm DB dev: thêm `-f src/docker-compose.develop.yml --env-file src/.env
 **Nên dùng khi:** nhiều service cần chạy cùng nhau trên máy dev/CI; muốn môi trường tái lập được; triển khai lên dịch vụ chạy container (như ECS Fargate, ADR 0003).
 **Không nên / chưa cần khi:** script một file không phụ thuộc gì; cần hiệu năng đĩa/mạng cực cao; nhu cầu scale, tự phục hồi, rolling update nhiều node thì compose không đủ.
 
-**Lựa chọn thay thế:**
-- **Podman**: tương tự Docker nhưng không cần daemon chạy nền, chạy rootless mặc định.
-- **Kubernetes (EKS)**: điều phối container nhiều node, scale/tự phục hồi; phức tạp và tốn kém hơn (ADR 0003 đã cân và không chọn cho dự án này).
-- **ECS Fargate**: chạy container trên AWS không phải quản lý máy chủ; là đích triển khai của dự án.
-- **Chạy thẳng trên máy**: nhẹ hơn nhưng không tái lập môi trường.
+### Phạm vi và những gì công cụ này KHÔNG đại diện
+
+Docker (Engine/Desktop) và Compose chỉ là **một họ** trong [bản đồ giải pháp container](container.md#bản-đồ-giải-pháp): "engine đầy đủ cho nhà phát triển, một máy". Đừng nhầm nó với cả khái niệm container:
+
+- **Docker không phải container.** Container là cơ chế của kernel Linux (namespaces + cgroups) và chuẩn OCI; Docker là một cách thuận tiện để dùng nó. Image build bằng Docker chạy được trên runtime khác theo chuẩn OCI (containerd, CRI-O, Podman).
+- **Podman**: không có daemon, rootless; CLI tương thích Docker (Vừa, chi tiết ở container.md).
+- **containerd / CRI-O**: runtime cấp thấp cho node Kubernetes, không phải công cụ cho người dùng cuối.
+- **Build image không cần Docker daemon**: BuildKit, Buildah (Kaniko đã archived, không chọn mới).
+- **Compose không phải điều phối.** Compose mô tả cụm container trên **một máy** (Docker docs: chạy production được trên một server; nhiều máy thì Swarm). Scale, tự phục hồi, rolling update nhiều node là việc của Kubernetes hoặc **ECS Fargate** (đích triển khai của dự án, ADR 0003, đã cân Kubernetes/EKS và không chọn).
+- **Không dùng container:** chạy thẳng trên máy hoặc VM nhẹ hơn nhưng không tái lập môi trường.
+- **Docker Desktop** có điều kiện giấy phép trả phí với tổ chức lớn; Docker Engine/CLI/Compose không (`dependency-policy.md` mục 7).
 
 ## 6. Lỗi hay gặp và cách tránh
 
@@ -92,10 +99,20 @@ Chạy kèm DB dev: thêm `-f src/docker-compose.develop.yml --env-file src/.env
 
 ## 7. Trong thực tế (real-world)
 
-- **Mô hình phổ biến (Vừa):** cùng một image đi từ máy dev → CI → môi trường chạy; mỗi môi trường chỉ khác cấu hình (biến môi trường), không build lại image. Compose dùng cho local và test tích hợp trong CI; production thường dùng nền tảng điều phối (ECS, Kubernetes).
-- **Thực hành tốt (Chắc, theo tài liệu Docker/Microsoft):** multi-stage build, base image pin phiên bản chứ không `latest`, chạy không root, không nhét secret vào image, quét lỗ hổng image trong CI, `.dockerignore` đầy đủ.
-- **Dễ sai ở production (Vừa):** dùng tag `latest` làm build không tái lập; image chạy root; thiếu healthcheck nên bộ điều phối không biết container hỏng; log ghi ra file trong container thay vì stdout.
-- **Với .NET (Chắc):** Microsoft cung cấp image `sdk` (build) và `aspnet` (runtime) tách riêng và khuyến khích multi-stage, đúng như Dockerfile của dự án.
+| Công ty / dự án | Bối cảnh, vấn đề | Cách làm | Kết quả, bài học | Nguồn (đã mở) | Mức |
+|---|---|---|---|---|---|
+| **OCI** (2015) | Sau khi Docker phổ biến, mỗi công cụ có định dạng và runtime riêng, nguy cơ phân mảnh | Docker, CoreOS và các bên lập Open Container Initiative dưới Linux Foundation; ba spec: runtime, image, distribution | Image build ở đâu cũng chạy trên runtime tuân chuẩn, tránh lock-in vào một công cụ | [opencontainers.org/about/overview](https://opencontainers.org/about/overview/) | Vừa (agent đã mở, tôi chưa mở lại) |
+| **Google Borg** (paper 2015) | Chạy hàng trăm nghìn job của nhiều nghìn ứng dụng trên cụm hàng chục nghìn máy | Admission control, bin-packing, over-commitment, cách ly hiệu năng mức tiến trình; job khai báo | Kinh nghiệm hơn 10 năm vận hành; tiền đề tư tưởng của các hệ điều phối container sau này (suy luận của agent, trang abstract không nhắc Kubernetes) | [Large-scale cluster management at Google with Borg](https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/) | Vừa (như trên) |
+| **Docker docs: secret trong build** | Truyền token/key bằng `ARG` hoặc `ENV` khi build | Dùng `docker build --secret` + `RUN --mount=type=secret`; secret chỉ tồn tại trong lệnh `RUN` đó | Build arg và env vẫn nằm trong image cuối ("persist in the final image") nên không phù hợp cho secret | [Build secrets](https://docs.docker.com/build/building/secrets/) | Chắc (đã mở) |
+| **Docker docs: Compose cho production** | Có chạy Compose ở production được không | Chạy được trên **một server**; khi cần mở rộng thì dùng Swarm; nên bỏ bind mount mã nguồn, thêm `restart`, tách `compose.production.yaml` ghi đè bằng `-f` | Khớp thực tế dự án: Compose cho local/test, production dùng điều phối khác (ECS theo ADR 0003) | [Compose in production](https://docs.docker.com/compose/how-tos/production/) | Chắc (đã mở) |
+| **Docker Hub: giới hạn pull** | Pull ẩn danh từ CI dùng chung IP dễ chạm giới hạn | Hiện hành: 100 lượt/6 giờ cho mỗi IPv4 hoặc /64 IPv6 khi chưa đăng nhập, 200 với tài khoản Personal, gói trả phí không giới hạn; vượt thì HTTP 429 | Đăng nhập trong CI hoặc dùng registry riêng; số liệu 2020 không tự kiểm được nên bỏ | [Docker Hub pull usage](https://docs.docker.com/docker-hub/usage/pulls/) | Chắc (đã mở) |
+| **Microsoft: container hoá .NET** | Image chứa SDK thì nặng | Dockerfile hai stage: image `sdk` để build, image `aspnet`/runtime để chạy; ví dụ ghim digest sau tag | Đúng như Dockerfile của dự án; trang là ví dụ console app, không phải ASP.NET Core | [Containerize a .NET app](https://learn.microsoft.com/en-us/dotnet/core/docker/build-container) | Vừa (agent đã mở) |
+
+**Mô hình phổ biến (Chắc, theo Docker docs ở bảng trên):** cùng một image đi từ máy dev → CI → môi trường chạy; mỗi môi trường chỉ khác cấu hình (biến môi trường), không build lại image; pin base image theo digest thay vì tag có thể đổi, chạy `USER` không root, dùng `.dockerignore`.
+
+**Dễ sai ở production (Vừa, thực hành chung, không có postmortem công khai đã mở):** tag `latest` làm build không tái lập; image chạy root; thiếu healthcheck nên bộ điều phối không biết container hỏng; log ghi ra file trong container thay vì stdout. Docker docs bảo mật cũng nói daemon mặc định cần root trừ khi bật rootless (agent đã đọc, tôi chưa mở lại).
+
+**Chưa tìm được nguồn gốc đã mở cho:** Spotify, Shopify, Airbnb, Uber dùng container (chưa thử hoặc không mở được); Netflix Titus chỉ có bản tin thứ cấp. Nên không nêu các case đó.
 
 ## 8. Trong TeamBoard
 
