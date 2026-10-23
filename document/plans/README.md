@@ -10,3 +10,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 
 | Plan | Issue | Trạng thái |
 |---|---|---|
+| [api-gateway-slices](api-gateway-slices.md) | TB-007 (bảng lát; lát 1 = TB-010) | approved |

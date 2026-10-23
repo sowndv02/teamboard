@@ -1,0 +1,86 @@
+---
+key: TB-010
+title: Gateway lát 1, khung YARP, route boards, health và 404 problem+json
+status: todo
+phase: 1
+branch: feature/TB-010-gateway-skeleton-routing
+estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
+created: 2026-10-23
+started: null           # ngày chuyển in-progress
+closed: null            # ngày done/dropped
+---
+
+# TB-010 — Gateway lát 1, khung YARP, route boards, health và 404 problem+json
+
+## Bối cảnh
+Lát 1 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `document/spec/api-gateway.md`, design `document/design/api-gateway.md`, issue tài liệu TB-007). Xương sống để các lát sau (correlation, lỗi upstream, rate limit, body, CORS, quan sát) cắm vào.
+
+**Phụ thuộc:** TB-001 phải xong trước (đổi tên `board-service`, `src/shared/ServiceDefaults`, Jaeger), theo quyết định Q-D1. Không tạo branch và không lập plan cho đến khi TB-001 xong.
+
+## Phạm vi
+- Làm:
+  - Dự án `src/gateway` (host ASP.NET Core, YARP theo cấu hình tĩnh) và project test host in-process với upstream giả.
+  - Route `GET, HEAD` và `POST, PUT, PATCH, DELETE` của `/api/v1/boards/**` giữ nguyên path tới upstream (FR-001).
+  - `/health/live`, `/health/ready` độc lập upstream (FR-002); thời gian đến `ready` < 10 giây (NFR-005).
+  - Fallback `404 problem+json` (`ROUTE_NOT_FOUND`) cho mọi request không khớp route, gồm method không hỗ trợ.
+  - Thư viện nhỏ trong `src/shared` cho `problem+json` (Q-D2), thêm vào `teamboard.slnx`.
+  - Compose service `gateway` và cập nhật `config/services.yaml` (cổng host chốt ở plan), cấu hình qua env, không secret (NFR-004).
+- Không làm: correlation/trace, lỗi upstream và timeout, rate limit, giới hạn body, CORS, metric/log đặc thù, smoke với board-service thật (các lát 2–8).
+
+## Tiêu chí hoàn thành (kiểm chứng được)
+- [ ] `GET /api/v1/boards` qua gateway tới upstream giả trả đúng status/body, path không đổi.
+- [ ] Path không khớp route trả `404 problem+json` có `code: ROUTE_NOT_FOUND`, `traceId`, `correlationId`.
+- [ ] `/health/live` và `/health/ready` trả `200`; `ready` vẫn `200` khi upstream chết.
+- [ ] Gateway sẵn sàng trong dưới 10 giây (test khởi động).
+- [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
+- [ ] `config/services.yaml`, compose và `PROJECT.md` khớp.
+
+## Kế hoạch
+Plan chi tiết (`document/plans/TB-010-gateway-skeleton-routing.md`) lập sau khi TB-001 xong, qua `plan-init`.
+
+## Ghi chú / Nhật ký
+- 2026-10-23: tạo từ lát 1 của bảng lát api-gateway (người dùng duyệt bảng 2026-10-23).
+
+## Workflow
+
+Làn: lớn (service mới). Spec/design/bảng lát dùng chung ở TB-007; bước bắt đầu từ plan-init của lát.
+
+Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đạt.
+
+| Bước | Trạng thái | Vòng | Ngày | Ghi chú |
+|---|---|---|---|---|
+| plan-init | pending | – | | chờ TB-001 xong |
+| plan-review | pending | | | |
+| test-init | pending | – | | |
+| test-review | pending | | | |
+| coding-start | pending | – | | |
+| coding-review | pending | | | |
+| create-pr | pending | – | | |
+
+## Confirm log
+
+| # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
+|---|---|---|---|---|---|
+
+## Kịch bản và TDD log
+
+Đối chiếu kịch bản ↔ test (xem `.agents/rules/test-review.md` mục 6):
+
+| Kịch bản | Test thực thi | Đỏ | Xanh |
+|---|---|---|---|
+
+## Test review rounds
+
+| Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
+|---|---|---|---|---|
+
+## Review rounds
+
+| Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
+|---|---|---|---|---|
+
+## Bài học (lessons learned)
+
+Liên kết lesson sinh ra từ issue này (`document/lessons/LL-NNN-*.md`), hoặc ghi "không có". Skill `lesson-learned`.
+
+- 

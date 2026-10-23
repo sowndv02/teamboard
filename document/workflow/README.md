@@ -10,4 +10,4 @@ Mỗi tính năng/issue đang chạy trong workflow có một state file để a
 
 | State | Phạm vi | Bước hiện tại | Chờ ai | Cập nhật |
 |---|---|---|---|---|
-| [TB-007](TB-007.yaml) | feature | plan-init (chờ bắt đầu) | sondv | 2026-10-22 |
+| [TB-007](TB-007.yaml) | feature | plan-init (slices xong; chờ TB-001) | sondv | 2026-10-22 |

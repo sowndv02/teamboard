@@ -1,12 +1,12 @@
 ---
 key: TB-007
 title: Dựng API gateway (YARP) mỏng làm đường vào của hệ thống
-status: todo
+status: in-progress
 phase: 0
 branch: feature/TB-007-api-gateway
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-22
-started: null           # ngày chuyển in-progress
+started: 2026-10-22
 closed: null            # ngày done/dropped
 ---
 
@@ -46,6 +46,7 @@ Chi tiết do workflow quyết định (spec/design → plan). Điều kiện tr
 
 ## Ghi chú / Nhật ký
 - 2026-10-22: tạo issue, checkout nhánh `feature/TB-007-api-gateway` từ `main`.
+- 2026-10-23: TB-007 trở thành issue tài liệu (spec, design, bảng lát); code đi theo từng lát (TB-010..). PR của nhánh này chỉ gồm tài liệu.
 
 ## Workflow
 
@@ -59,7 +60,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | spec-review | PASS | 2 | 2026-10-22 | spec `confirmed`; 5 quyết định trong Confirm log |
 | system-design | done | – | 2026-10-22 | design draft; người dùng đã chọn D0.1, D0.4, D1 và xác nhận phần còn lại |
 | design-review | PASS | 2 | 2026-10-23 | design `confirmed`; 15 quyết định trong Confirm log |
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-10-23 | chế độ slices: `document/plans/api-gateway-slices.md` (approved), lát 1 = TB-010; plan chi tiết lập theo từng lát |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
