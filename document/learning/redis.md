@@ -9,7 +9,7 @@
 
 ## 2. Là gì (hiểu trong 1 phút)
 
-Một server key-value giữ dữ liệu trong RAM, mỗi key trỏ tới một **cấu trúc dữ liệu** (không chỉ chuỗi). Lệnh được xử lý **tuần tự trên một luồng**, nên một lệnh chậm chặn mọi client khác (mục 6). **Valkey** là nhánh BSD-3 của Redis do Linux Foundation tạo năm 2024 (mục 7); client Redis nói chuyện với Valkey được ở mức thực dụng, nhưng tác giả StackExchange.Redis không duy trì danh sách tương thích chính thức, nên cần thử với đúng phiên bản bạn dùng.
+Một server key-value giữ dữ liệu trong RAM, mỗi key trỏ tới một **cấu trúc dữ liệu** (không chỉ chuỗi). Việc **thực thi lệnh** diễn ra tuần tự trên một luồng, nên một lệnh chậm chặn mọi client khác (mục 6); từ Valkey 8.0 phần đọc/ghi mạng (I/O) có thể chạy ở luồng riêng (theo trang so sánh engine của ElastiCache), nhưng thực thi lệnh vẫn tuần tự. **Valkey** là nhánh BSD-3 của Redis do Linux Foundation tạo năm 2024 (mục 7); client Redis nói chuyện với Valkey được ở mức thực dụng, nhưng tác giả StackExchange.Redis không duy trì danh sách tương thích chính thức, nên cần thử với đúng phiên bản bạn dùng.
 
 ## 3. Khái niệm cốt lõi (riêng của công cụ)
 
@@ -45,7 +45,7 @@ builder.Services.AddStackExchangeRedisCache(o =>
     o.InstanceName = "teamboard:";
 });
 
-public sealed class BoardCache(IDistributedCache cache)
+public sealed class BoardCache(IDistributedCache cache, ILogger<BoardCache> logger)
 {
     public async Task<BoardSummary?> GetAsync(Guid id, Func<Task<BoardSummary?>> load, CancellationToken ct)
     {
@@ -55,7 +55,11 @@ public sealed class BoardCache(IDistributedCache cache)
             var bytes = await cache.GetAsync(key, ct);
             if (bytes is not null) return JsonSerializer.Deserialize<BoardSummary>(bytes);
         }
-        catch (Exception) { /* cache lỗi thì rơi về nguồn; ghi log + metric, không nuốt im lặng */ }
+        catch (Exception ex)
+        {
+            // Cache lỗi thì rơi về nguồn, nhưng phải để lại dấu vết để thấy hit ratio tụt
+            logger.LogWarning(ex, "Đọc cache thất bại cho {Key}, chuyển sang đọc nguồn", key);
+        }
 
         var value = await load();
         if (value is null) return null;
@@ -64,13 +68,16 @@ public sealed class BoardCache(IDistributedCache cache)
             await cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(value),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30) }, ct);
         }
-        catch (Exception) { /* như trên */ }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Ghi cache thất bại cho {Key}", key);
+        }
         return value;
     }
 }
 ```
 
-Khối `try/catch` là điểm khác với cache trong tiến trình: cache ngoài **có thể lỗi qua mạng**, và hệ thống không nên sập vì thế (bài học Discord và Honeycomb ở caching.md). Đặt lớp này sau interface của mình (Decorator như caching.md) để thay được công cụ.
+Khối `try/catch` là điểm khác với cache trong tiến trình: cache ngoài **có thể lỗi qua mạng**, và hệ thống không nên sập vì thế (bài học Discord và Honeycomb ở caching.md). Mỗi `catch` phải ghi log (thêm bộ đếm metric nếu có): nuốt lỗi âm thầm là vi phạm `AGENTS.md`, và khi đó Redis hỏng nhưng không ai biết, DB bị dội tải mà không có tín hiệu. Đặt lớp này sau interface của mình (Decorator như caching.md) để thay được công cụ.
 
 ## 5. Ưu và nhược điểm
 

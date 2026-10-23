@@ -135,7 +135,7 @@ Container là một khái niệm có nhiều lớp công cụ; **Docker không p
 
 | Họ / cách làm | Công cụ ví dụ | Khi chọn | Cái giá | Nguồn |
 |---|---|---|---|---|
-| Điều phối mã nguồn mở đa năng | Kubernetes | Cần hệ sinh thái lớn, di động giữa cloud | Phức tạp vận hành; control plane tốn chi phí (ADR 0003 đã chọn ECS Fargate vì lý do này, xem dưới) | kubernetes.io (Vừa) |
+| Điều phối mã nguồn mở đa năng | Kubernetes | Cần hệ sinh thái lớn, di động giữa cloud | Phức tạp vận hành; bản managed trên AWS (EKS) tính phí control plane, ADR 0003 nêu khoảng 73 USD/tháng chưa tính node (chưa kiểm giá hiện hành); tự dựng thì tốn công vận hành | kubernetes.io (Vừa) |
 | Điều phối quản lý hoàn toàn của AWS | Amazon ECS (EC2 hoặc Fargate) | Đã ở AWS, muốn ít vận hành; Fargate không phải quản server | Gắn chặt vào AWS | docs.aws.amazon.com/AmazonECS (Vừa) |
 | Điều phối tích hợp sẵn Docker | Docker Swarm | Cụm nhỏ, đã dùng Docker, cần đơn giản | Hệ sinh thái nhỏ hơn Kubernetes | docs.docker.com/engine/swarm (Vừa) |
 | Điều phối linh hoạt, chạy cả không-container | HashiCorp Nomad | Cần lập lịch cả ứng dụng không container; một binary | Giấy phép BUSL-1.1 (xem `dependency-policy.md`, hạng cần phê duyệt hoặc cấm); ghép Consul/Vault để đủ chức năng | developer.hashicorp.com/nomad (Vừa) |

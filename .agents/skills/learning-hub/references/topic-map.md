@@ -4,7 +4,7 @@
 
 **Cột "Khái niệm gốc":** chủ đề là công cụ thì ghi khái niệm nó triển khai (viết ghi chú khái niệm trước, công cụ trỏ về). Chủ đề tự nó là khái niệm thì ghi `(là khái niệm)`.
 
-**Công cụ không đại diện khái niệm:** hỏi một công cụ thì luôn ra cả ghi chú khái niệm có "Bản đồ giải pháp" (các họ giải pháp và lựa chọn khác công cụ đó). Ví dụ lựa chọn khác để bản đồ không thiên vị: container → Docker, Podman, containerd/nerdctl; API gateway → YARP, Ocelot, Envoy, NGINX, Kong, Traefik, AWS API Gateway, Azure API Management; caching → cache trong tiến trình, Redis/Valkey, Memcached, CDN/HTTP cache, cache của DB.
+**Công cụ không đại diện khái niệm:** hỏi một công cụ thì luôn ra cả ghi chú khái niệm có "Bản đồ giải pháp" (các họ giải pháp và lựa chọn khác công cụ đó). Danh sách lựa chọn nằm ở "Bản đồ giải pháp" của từng ghi chú khái niệm (nguồn duy nhất, không chép lại ở đây để khỏi lệch).
 
 | Chủ đề | Khái niệm gốc | Nội bộ (đọc theo thứ tự) | Code/config | Chính thức |
 |---|---|---|---|---|

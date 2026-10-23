@@ -13,7 +13,7 @@ Khác `angular-learning`: skill đó dạy một lộ trình Angular; skill này
 
 | Chế độ | Khi nào | Đầu ra |
 |---|---|---|
-| `pack` | "Gom tài liệu docker", "tôi muốn đọc về API gateway" | Ghi chú `document/learning/<topic>.md` (tạo mới hoặc làm mới) + tóm tắt ngắn trong chat |
+| `pack` | "Gom tài liệu docker", "tôi muốn đọc về API gateway" | Hỏi một công cụ: **cặp** ghi chú `document/learning/` (khái niệm gốc + công cụ, tạo mới hoặc làm mới); hỏi một khái niệm: ghi chú khái niệm. Kèm tóm tắt ngắn trong chat |
 | `index` | "Có những chủ đề nào?", "mục lục" | Đọc `document/learning/README.md`, liệt kê chủ đề theo loại (khái niệm/công cụ), công cụ thuộc khái niệm nào, ghi chú khái niệm đã có "Bản đồ giải pháp" chưa, real-world đạt chuẩn chưa; chỉ ra khái niệm gốc còn thiếu |
 | `find` | "X được nói ở đâu trong repo?" | Danh sách file:dòng, không tạo ghi chú |
 
@@ -69,14 +69,14 @@ Viết cho người **chưa biết chủ đề**: đi từ "vấn đề" đến 
 
 **Nên dùng khi / không nên dùng khi:** ...
 
-### Bản đồ giải pháp (bắt buộc với ghi chú KHÁI NIỆM; tiêu đề đúng như vậy để link tới được)
-Bảng các **họ giải pháp** và **≥3 lựa chọn cụ thể**, kể cả lựa chọn "không dùng" nếu có (không cache, modular monolith...). Không để công cụ nào đứng làm đại diện duy nhất của khái niệm.
+### Bản đồ giải pháp
+**Bắt buộc với ghi chú KHÁI NIỆM. Giữ nguyên đúng tiêu đề này, không thêm chú thích vào heading**, vì ghi chú công cụ link tới neo `#bản-đồ-giải-pháp`. Bảng các **họ giải pháp** và **≥3 lựa chọn cụ thể**, kể cả lựa chọn "không dùng" nếu có (không cache, modular monolith...). Không để công cụ nào đứng làm đại diện duy nhất của khái niệm.
 
 | Họ / cách làm | Công cụ ví dụ | Khi chọn | Cái giá | Nguồn (đã mở hoặc Chưa kiểm) |
 |---|---|---|---|---|
 
-### Phạm vi và những gì công cụ này KHÔNG đại diện (bắt buộc với ghi chú CÔNG CỤ)
-Nói thẳng: công cụ thuộc họ nào trong bản đồ của khái niệm; phần nào của khái niệm nó **không** bao quát; các lựa chọn khác khác nó ở điểm cốt lõi nào (một dòng mỗi lựa chọn, link về bản đồ). Ghi chú công cụ không có mục này thì chưa đạt.
+### Phạm vi và những gì công cụ này KHÔNG đại diện
+**Bắt buộc với ghi chú CÔNG CỤ; giữ nguyên tiêu đề này.** Nói thẳng: công cụ thuộc họ nào trong bản đồ của khái niệm; phần nào của khái niệm nó **không** bao quát; các lựa chọn khác khác nó ở điểm cốt lõi nào (một dòng mỗi lựa chọn, link về bản đồ). Ghi chú công cụ không có mục này thì chưa đạt.
 
 ## 6. Lỗi hay gặp và cách tránh
 (3–5 mục: triệu chứng → nguyên nhân → cách phát hiện/sửa.)
@@ -104,7 +104,7 @@ Nói thẳng: công cụ thuộc họ nào trong bản đồ của khái niệm;
 Mục 7 (real-world), quy tắc cứng:
 - **Nguồn chấp nhận:** engineering blog của chính công ty, paper, bài hội nghị, tài liệu chính thức, sách, RFC. Bài thứ cấp (blog bên thứ ba, tin tức) chỉ làm nguồn phụ, gắn `Vừa`.
 - **Mở thật mới ghi.** Mỗi case phải đã mở được bài gốc ở phiên làm việc này; không dựa vào trí nhớ. Link không mở được thì bỏ hoặc gắn `Chưa kiểm`, không tính vào 3 case.
-- **Không đủ 3 case có nguồn:** vẫn viết số case có được, ghi lý do thiếu, và đánh dấu ghi chú **"chưa đạt chuẩn real-world"** trong mục lục. Không bịa tên công ty, số liệu, kiến trúc.
+- **Trạng thái real-world trong mục lục (ba mức, ghi kèm lý do):** **Đạt** = ≥3 case của công ty/dự án có bài gốc người viết tự mở; **Đạt một phần** = đủ 3 nguồn nhưng chưa đủ 3 case công ty tự mở (ví dụ phần còn lại là tài liệu chính thức hoặc chỉ qua agent); **Chưa đạt** = dưới 3 nguồn có thể kiểm. Không đủ thì vẫn viết số case có được, ghi lý do thiếu. Không bịa tên công ty, số liệu, kiến trúc.
 - **Số liệu** chỉ nêu khi nằm trong bài gốc, kèm nguồn và ngữ cảnh. Diễn đạt lại bằng lời mình; trích nguyên văn tối đa một câu ngắn có dẫn nguồn.
 - **Cân bằng:** nếu có case quay lại hướng cũ hoặc sự cố thì nêu, để người học thấy cả cái giá.
 
