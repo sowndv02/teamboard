@@ -3,7 +3,7 @@
 id: TB-021
 scope: issue
 title: Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền
-updated: 2026-10-25T03:40:00Z
+updated: 2026-10-25T06:00:00Z
 updated_by: orchestrator:claude-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "Chạy test-init cho TB-021 (viết .feature @S01–@S06, step definition, test thực thi, xác nhận đỏ đúng lý do; chưa viết code production)"
+current_step: coding-start
+next_action: "Chạy coding-start cho TB-021: lặp Đỏ-Xanh-Refactor theo B1–B4 của plan (9 test đang đỏ); chưa commit test-init/test-review nếu người dùng chưa yêu cầu"
 blocked_by: null
 
 steps:
@@ -45,8 +45,25 @@ steps:
     inputs: { plan: "65428a329edaf0336bb557d056dfabd8df20bfd7" }
     artifacts: [document/plans/TB-021-identity-service-skeleton.md]
     evidence: ["Confirm log: 8 quyết định (#1–#8)", "Review rounds: 2 vòng (vòng 2 PASS)", "Fix log: 6 thay đổi", "plan status approved"]
-  test-init:              { status: pending }
-  test-review:            { status: pending }
+  test-init:
+    status: done
+    owner: orchestrator:claude-session
+    started: 2026-10-25T04:00:00Z
+    finished: 2026-10-25T05:00:00Z
+    inputs: { plan: "40de7f61b23bf312567ba6d3289effadd02b7efe" }
+    artifacts: [document/spec/features/identity-service/, src/identity-service.Tests/, src/identity-service/, src/.env.example]
+    evidence: ["7 test: đỏ 6 đúng lý do (404, bảng migration chưa tạo, no such service, lỗi chưa xử lý), xanh 1 (@S07)", "dotnet build src/teamboard.slnx -warnaserror xanh", "chưa có code production có logic"]
+  test-review:
+    status: done
+    owner: orchestrator:claude-session
+    started: 2026-10-25T05:10:00Z
+    finished: 2026-10-25T06:00:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/spec/features/identity-service/, src/identity-service.Tests/]
+    evidence: ["Confirm log: 3 quyết định (#9–#11)", "5 finding P2: 2 FIX đã sửa, 3 CONFIRM đã chốt", "9 test đỏ đúng lý do, build và format xanh", "git hash-object health.feature: 4269346abc6e028f53c0728310c314123f31e85e"]
   coding-start:           { status: pending }
   coding-review:          { status: pending }
   create-pr:              { status: pending }
@@ -60,3 +77,5 @@ events:
   - { at: 2026-10-25T02:30:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "Duyệt bảng lát: giữ 18 lát + nhãn I1–I9, tách 1a/1b, lát 19 giữ chỗ cho I9, ADR tạo ngay trước lát cần" }
   - { at: 2026-10-25T03:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "plan-init: plan TB-021 draft, chờ plan-review" }
   - { at: 2026-10-25T03:40:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "plan-review PASS vòng 2: 8 CONFIRM đã chốt, 6 thay đổi ở Fix log; plan approved" }
+  - { at: 2026-10-25T05:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "test-init: 4 file .feature, 7 test, đỏ 6 đúng lý do; người dùng chọn image postgres:17-alpine" }
+  - { at: 2026-10-25T06:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "test-review vòng 1 PASS: thêm @S08 (OTel) và @S09 (user DB), @S07 đổi để đỏ, 2 FIX; 9 test đỏ đúng lý do" }

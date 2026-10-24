@@ -29,12 +29,12 @@ Lát 1a trong [`identity-auth-slices.md`](identity-auth-slices.md) (`approved`, 
 
 | Yêu cầu (FR/BR/NFR) | Quyết định design | Bước plan | Kịch bản | Test dự kiến |
 |---|---|---|---|---|
-| NFR-001 `/health/live`, `/health/ready`, OTel | 6.3, mục 9 | B1, B3 | @S01, @S02, @S03 | Host test (live không cần DB); integration với PostgreSQL thật (ready lên/xuống) |
+| NFR-001 `/health/live`, `/health/ready`, OTel | 6.3, mục 9 | B1, B3 | @S01, @S02, @S03, @S08 | Host test (live không cần DB; telemetry mang `service.name` đúng); integration với PostgreSQL thật (ready lên/xuống) |
 | NFR-003 lỗi `problem+json`, không lộ nội bộ | 6.3, `backend-engineering.md` mục 1 | B2 | @S06 | Host test với endpoint ném lỗi chỉ có trong test host |
 | NFR-004 `traceparent` (một phần; `X-Correlation-Id` để sau, Confirm log #5) | mục 9 | B1 | – | Kiểm `ServiceDefaults` đã gắn trace; không thêm test riêng |
-| NFR-009 khôi phục DB dev bằng migration | 10 | B3 | @S04 | Áp migration lên DB trống, kiểm bảng lịch sử migration |
+| NFR-009 khôi phục DB dev bằng migration | 10 | B3 | @S04, @S07 | Áp migration lên DB trống, kiểm bảng lịch sử migration |
 | Compose chạy identity-service + DB (tiêu chí issue) | 10, D0.2 | B4 | @S05 | Test nhóm `docker` gọi `docker compose` qua Process |
-| Database + user riêng (D0.2) | D0.2 | B3, B4 | @S05 | Script khởi tạo tạo DB và user riêng; kiểm kết nối bằng user của identity |
+| Database + user riêng (D0.2) | D0.2 | B3, B4 | @S05, @S09 | Script khởi tạo tạo database và user `identity` riêng; kết nối bằng user đó (ready) và user không có quyền quản trị |
 | Gate xanh (tiêu chí issue) | – | B1–B4 | – | `dotnet build -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes`, `docker compose config -q` |
 
 Kịch bản (ID duy nhất, tag `@TB-021 @identity-service`):
@@ -43,6 +43,9 @@ Kịch bản (ID duy nhất, tag `@TB-021 @identity-service`):
 - @S03 `GET /health/ready` trả 503 khi PostgreSQL không kết nối được; body không chứa chuỗi kết nối hay mật khẩu.
 - @S04 Migration nền áp lên PostgreSQL trống thành công và bảng lịch sử migration có bản ghi nền; áp lần hai không đổi gì.
 - @S05 (`@docker`) Compose chạy identity-service và PostgreSQL: `/health/ready` ở cổng host trả 200 trong 30 giây kể từ `up -d` (image đã build).
+- @S07 Khi cờ tự áp migration tắt thì service vẫn khởi động (`/health/live` 200) và không tạo lịch sử migration (từ B3: "có test cờ tắt thì không áp"; `test-init` thêm ID, `test-review` thêm kiểm live để test từng đỏ, Confirm log #10 của issue).
+- @S08 Telemetry của service mang `service.name` = `identity-service` (NFR-001; thêm ở `test-review`, Confirm log #9 của issue).
+- @S09 (`@docker`) Người dùng DB của identity không là superuser, không có quyền tạo role hay database (D0.2; thêm ở `test-review`, Confirm log #11 của issue).
 - @S06 Lỗi chưa xử lý trả `500 problem+json` có `code` `INTERNAL_ERROR`, `traceId`; body không có stack trace, tên máy, đường dẫn nội bộ.
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
@@ -78,7 +81,7 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước. Mỗ
 
 ### B4. Dockerfile, compose, cấu hình và tài liệu (@S05)
 - **Kịch bản/test sẽ viết (đỏ trước):** `compose.feature` @S05 (`@docker`) gọi `docker compose` qua Process (theo `gateway.Tests/ComposeSteps.cs`), kiểm ready trong ngưỡng; sửa test hygiene của TB-001 quét compose mới nếu cần.
-- **File/module dự kiến chạm:** `src/identity-service/Dockerfile` (theo mẫu `gateway/Dockerfile`: `COPY` csproj của cả `shared/ServiceDefaults` và `shared/Http` trước `restore`), `src/docker-compose.yml` (service `identity-service` host 6061 → container 7070; service `postgres` dùng chung ở compose chính, không mở cổng ra host, volume, healthcheck; `identity-service` `depends_on` postgres healthy; `Database__MigrateOnStartup: "true"`; Confirm log #3, #4, #6), script khởi tạo DB và user riêng cho identity (D0.2, chạy khi volume trống; task-service dùng lại instance và thêm DB riêng sau), `src/.env.example` (tên biến mật khẩu, giá trị mẫu không phải mật khẩu thật; `.gitignore` đã cho phép `!.env.example`; compose dùng `${POSTGRES_PASSWORD:?}` và `${IDENTITY_DB_PASSWORD:?}`, Confirm log #8), `src/docker-compose.dcproj` (liệt kê file mới nếu thêm), `config/services.yaml` (`status: existing`, `path`, `local_port`, `container_port`), `PROJECT.md` (trạng thái hiện tại), `COMMANDS.md` (cổng, lệnh), `document/spec/features/identity-service/compose.feature`.
+- **File/module dự kiến chạm:** `src/identity-service/Dockerfile` (theo mẫu `gateway/Dockerfile`: `COPY` csproj của cả `shared/ServiceDefaults` và `shared/Http` trước `restore`), `src/docker-compose.yml` (service `identity-service` host 6061 → container 7070; service `postgres` dùng chung ở compose chính, không mở cổng ra host, volume, healthcheck; `identity-service` `depends_on` postgres healthy; `Database__MigrateOnStartup: "true"`; Confirm log #3, #4, #6), script khởi tạo database và user `identity` riêng, không quyền quản trị (D0.2, chạy khi volume trống; task-service dùng lại instance và thêm DB riêng sau), `src/.env.example` (tên biến mật khẩu, giá trị mẫu không phải mật khẩu thật; `.gitignore` đã cho phép `!.env.example`; compose dùng `${POSTGRES_PASSWORD:?}` và `${IDENTITY_DB_PASSWORD:?}`, Confirm log #8), `src/docker-compose.dcproj` (liệt kê file mới nếu thêm), `config/services.yaml` (`status: existing`, `path`, `local_port`, `container_port`), `PROJECT.md` (trạng thái hiện tại), `COMMANDS.md` (cổng, lệnh), `document/spec/features/identity-service/compose.feature`.
 - **Hợp đồng thay đổi:** cổng host 6061 của identity-service (Confirm log #4); không route ở gateway.
 - **Migration / cấu hình:** biến môi trường `ConnectionStrings__IdentityDb`, mật khẩu DB lấy từ `src/.env` local, không có giá trị mặc định trong repo (LL-001). Người dùng tạo `src/.env` từ `src/.env.example`; gate và test docker truyền `--env-file src/.env.example`.
 - **Tài liệu cần cập nhật:** `config/services.yaml` (`local_port: 6061`), `PROJECT.md`, `COMMANDS.md` (cổng 6061, bước tạo `.env`, `--env-file` ở lệnh gate compose), `config/tool-versions.yaml` (phiên bản image PostgreSQL: người dùng chọn major khi làm B4, ghim theo `dependency-pinning.md`).

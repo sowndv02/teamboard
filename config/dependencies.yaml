@@ -4,7 +4,7 @@
 # verified: true = đã đối chiếu nguồn (ghi ở `source`); false = từ trí nhớ/kỳ vọng, PHẢI kiểm tra trang chính thức trước khi dùng
 # Cập nhật file này mỗi khi thêm/đổi phụ thuộc. Không chứa secret.
 
-updated: 2026-10-21
+updated: 2026-10-25
 
 policy:
   allow_licenses: [MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense]
@@ -26,7 +26,7 @@ packages:
   - { name: OpenTelemetry .NET (Extensions.Hosting, Exporter.OpenTelemetryProtocol, Instrumentation.AspNetCore, Instrumentation.Http, Exporter.InMemory 1.20.1), ecosystem: nuget, tier: T1, status: in-use, license: Apache-2.0, verified: true, source: "nuspec 1.20.1 trên NuGet (Apache-2.0), TB-001", note: "CNCF" }
   - { name: Polly, ecosystem: nuget, tier: T1, status: approved, license: BSD-3-Clause, verified: false, note: ".NET Foundation; Microsoft.Extensions.Http.Resilience dựa trên Polly" }
   - { name: xUnit (xunit 2.9.3, xunit.runner.visualstudio 3.1.5), ecosystem: nuget, tier: T1, status: in-use, license: Apache-2.0, verified: true, source: "nuspec của gói trên NuGet (license expression Apache-2.0), TB-001", note: ".NET Foundation; người dùng chọn 2026-10-23" }
-  - { name: Npgsql, ecosystem: nuget, tier: T1, status: approved, license: PostgreSQL-License, verified: false }
+  - { name: Npgsql 10.0.3, ecosystem: nuget, tier: T1, status: in-use, license: PostgreSQL, verified: true, source: "nuspec 10.0.3 trên NuGet (giấy phép PostgreSQL)", note: "Hiện dùng trong test của identity-service để kiểm bảng lịch sử migration; provider EF thêm ở B3" }
   - { name: YARP (Yarp.ReverseProxy 2.3.0), ecosystem: nuget, tier: T1, status: in-use, license: MIT, verified: true, source: "nuspec 2.3.0 trên NuGet (MIT); cấu hình Routes/Clusters theo https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/config-files (đọc 2026-10-24, có moniker aspnetcore-10.0)", note: "Microsoft; gateway (TB-010). Build xanh trên .NET 10." }
 
   # ---- T2: cần phê duyệt, bọc sau interface ----
@@ -34,7 +34,7 @@ packages:
   - { name: FluentValidation, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (DepScope, blog 2026)", exit: "DataAnnotations/IValidatableObject hoặc validator tự viết" }
   - { name: Reqnroll (Reqnroll.xUnit 3.3.4), ecosystem: nuget, tier: T2, status: in-use, license: BSD-3-Clause, verified: true, source: "https://docs.reqnroll.net/latest/installation/compatibility.html (.NET 10, xUnit) và nuspec 3.3.4", note: "Người dùng phê duyệt 2026-10-23 (TB-001); chỉ dùng trong project test, không rò vào production", exit: "test BDD viết tay bằng xUnit" }
   - { name: Swashbuckle.AspNetCore.SwaggerUI, ecosystem: nuget, tier: T2, status: in-use, license: MIT, verified: false, note: "Đang dùng trong board-service; ít người duy trì", exit: "Microsoft.AspNetCore.OpenApi + giao diện nhẹ khác" }
-  - { name: Testcontainers, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "docker compose cho test tích hợp" }
+  - { name: Testcontainers (Testcontainers.PostgreSql 4.16.0), ecosystem: nuget, tier: T2, status: in-use, license: MIT, verified: true, source: "nuspec 4.16.0 trên NuGet (MIT); người dùng phê duyệt 2026-10-25, plan TB-021 Confirm log #2", note: "Chỉ dùng trong project test (identity-service.Tests)", exit: "docker compose cho test tích hợp" }
   - { name: Xunit.SkippableFact 1.4.13, ecosystem: nuget, tier: T2, status: approved, license: MS-PL, verified: true, source: "nuspec 1.4.13 trên NuGet (MS-PL)", note: "Phụ thuộc bắc cầu của Reqnroll.xUnit (cho phép bỏ qua scenario khi chạy). MS-PL không nằm trong allow_licenses lẫn deny_licenses; người dùng duyệt riêng cho gói này, chỉ trong project test, 2026-10-23 (TB-001)", exit: "bỏ Reqnroll hoặc không dùng bỏ qua động" }
   - { name: "Gói bắc cầu của Reqnroll.xUnit 3.3.4 và xUnit (chỉ project test): Cucumber.CucumberExpressions 17.1.0, Cucumber.HtmlFormatter 22.2.0, Cucumber.Messages 30.1.0, Gherkin 35.0.0, Reqnroll.Tools.MsBuild.Generation 3.3.4, xunit.core/assert/extensibility 2.9.3, xunit.abstractions 2.0.3, Validation 2.4.18", ecosystem: nuget, tier: T2, status: approved, license: "MIT (Cucumber.*, Gherkin), BSD-3-Clause (Reqnroll.*), Apache-2.0 (xunit.*), MS-PL (Validation, đi kèm Xunit.SkippableFact cùng giấy phép đã duyệt)", verified: true, source: "nuspec trên NuGet; Validation: https://raw.githubusercontent.com/AArnott/Validation/69e6a2c4f3/LICENSE.txt (MS-PL); xunit.abstractions: licenseUrl trỏ tới giấy phép xUnit (Apache-2.0)", note: "Kiểm ngày 2026-10-23 trong coding-review TB-001; chưa có công cụ quét giấy phép tự động" }
   - { name: Mapster, ecosystem: nuget, tier: T2, status: watch, license: MIT, verified: false, exit: "ánh xạ thủ công" }

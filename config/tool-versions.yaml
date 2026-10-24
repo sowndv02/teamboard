@@ -3,6 +3,7 @@
 dotnet: "10.0"                  # src/board-service/board-service.csproj: net10.0
 docker: TODO
 docker_compose: v2
+postgresql: "17-alpine"         # image test (Testcontainers) và compose; người dùng chọn 2026-10-25 (TB-021)
 terraform: TODO                 # cần từ giai đoạn 4; pin trong required_version khi tạo infra
 aws_provider: TODO
 
