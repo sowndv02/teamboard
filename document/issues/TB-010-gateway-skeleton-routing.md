@@ -75,8 +75,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S04 Ready trả 200 khi upstream đã dừng | `GatewaySteps` | đỏ: expected OK, actual NotFound | |
 | @S05 Compose chạy riêng gateway, ready trong 10 giây (`@docker`) | `ComposeSteps` + `DockerCli` (bản sao) | đỏ: `docker compose build gateway`: no such service: gateway (chạy thật với Docker Desktop) | |
 | @S06 Upstream trả 404 problem+json được chuyển nguyên (thêm ở test-review) | `GatewaySteps` + `UpstreamStub` (404 theo đường dẫn) | đỏ: expected `application/problem+json`, actual null (gateway chưa có route) | |
-| Unit: `ProblemFactory` (4 ca) | `Teamboard.Shared.Http.Tests` | đỏ: `NotImplementedException` (khung rỗng) | |
-| Unit: `SharedErrors` (3 ca) | `Teamboard.Shared.Http.Tests` | đỏ: bảng mã trống, không có `INTERNAL_ERROR` | |
+| Unit: `ProblemFactory` (4 ca) | `Teamboard.Shared.Http.Tests` | đỏ: `NotImplementedException` (khung rỗng) | xanh (B2) |
+| Unit: `SharedErrors` (3 ca) | `Teamboard.Shared.Http.Tests` | đỏ: bảng mã trống, không có `INTERNAL_ERROR` | xanh (B2) |
 | Unit: `GatewayErrorCodes` (2 ca) | `gateway.Tests` | đỏ: bảng mã trống, không có `ROUTE_NOT_FOUND` | |
 
 Lệnh chạy test (phạm vi theo `quality-gate.md`):
