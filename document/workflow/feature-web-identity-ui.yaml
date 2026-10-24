@@ -1,0 +1,49 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: feature-web-identity-ui
+scope: feature
+title: Giao diện web cho xác thực (Angular, phần identity)
+updated: 2026-10-21T20:00:00Z
+updated_by: orchestrator:claude-session
+
+links:
+  issue: TB-004
+  spec: document/spec/web-identity-ui.md
+  design: null
+  plan: null
+  features_dir: document/spec/features/web/
+  branch: feature/TB-004-identity-auth
+  base: main
+  pr: null
+
+current_step: requirements-discovery
+next_action: "người dùng xem tóm tắt spec FE draft (6 câu hỏi mở Q-01…Q-06; Q-01 token storage cần ADR, Q-02 hồ sơ cần userinfo) rồi xác nhận; sau đó spec-review"
+blocked_by: null
+
+steps:
+  requirements-discovery:
+    status: needs_confirm
+    owner: orchestrator:claude-session
+    started: 2026-10-21T19:40:00Z
+    round: 2
+    inputs: { raw_request: "Tạo FE angular; angular real-world project; cần bổ sung spec FE" }
+    artifacts: [document/spec/web-identity-ui.md]
+    evidence: ["2 lô hỏi (8 câu) đã trả lời", "spec draft: 10 FR, 6 BR, 9 NFR, 6 giả định, 6 câu hỏi mở"]
+  spec-review:           { status: pending }
+  system-design:         { status: pending }
+  design-review:         { status: pending }
+  plan-init:             { status: pending }
+  plan-review:           { status: pending }
+  test-init:             { status: pending }
+  test-review:           { status: pending }
+  coding-start:          { status: pending }
+  coding-review:         { status: pending }
+  create-pr:             { status: pending }
+
+confirm_pending: []
+
+subtasks: []
+
+events:
+  - { at: 2026-10-21T19:40:00Z, actor: "orchestrator:claude-session", event: step_started, detail: "requirements-discovery cho spec FE (Q-13 của spec identity)" }
+  - { at: 2026-10-21T20:00:00Z, actor: "orchestrator:claude-session", event: needs_confirm, detail: "Spec FE draft đã viết; chờ người dùng xác nhận" }

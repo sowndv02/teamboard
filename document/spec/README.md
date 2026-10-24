@@ -11,3 +11,5 @@
 | Spec | Trạng thái | Service | Issue |
 |---|---|---|---|
 | [api-gateway](api-gateway.md) | confirmed | gateway, board-service | TB-007 |
+| [identity-auth](identity-auth.md) | confirmed (review vòng 3; I5 phụ thuộc spec FE) | identity-service | – |
+| [web-identity-ui](web-identity-ui.md) | draft | web, identity-service | – |
