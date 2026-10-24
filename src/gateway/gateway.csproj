@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj" />
     <ProjectReference Include="../shared/Http/Teamboard.Shared.Http.csproj" />
   </ItemGroup>
