@@ -1,7 +1,7 @@
 ---
 key: TB-010
 title: Gateway lát 1, khung YARP, route boards, health và 404 problem+json
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-010-gateway-skeleton-routing
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -41,6 +41,7 @@ Plan chi tiết: `document/plans/TB-010-gateway-skeleton-routing.md` (4 bước:
 ## Ghi chú / Nhật ký
 - 2026-10-23: tạo từ lát 1 của bảng lát api-gateway (người dùng duyệt bảng 2026-10-23).
 - 2026-10-23: TB-001 đã merge; tạo branch từ `main` và lập plan draft.
+- 2026-10-25: mở PR https://github.com/sowndv02/teamboard/pull/11 (chờ review, merge do người dùng); đã merge main vào nhánh và sửa tên cũ trong hai bài học của TB-012.
 
 ## Workflow
 
@@ -56,7 +57,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; thêm @S06; 1 CONFIRM và 4 FIX đã xử lý |
 | coding-start | done | – | 2026-10-24 | xanh 59/59 (7 Http + 11 ServiceDefaults + 18 gateway + 23 board-service, gồm 3 test Docker); gate: build -warnaserror, format, vulnerable, compose config xanh; 4 commit B1–B4 |
 | coding-review | PASS | 2 | 2026-10-24 | review độc lập (sub-agent) vòng 1: 4 P3 đã xử lý; vòng 2 delta: Sẵn sàng merge; 59 test xanh |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-10-25 | PR: https://github.com/sowndv02/teamboard/pull/11 |
 
 ## Confirm log
 
