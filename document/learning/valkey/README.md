@@ -4,6 +4,7 @@
 > **Mục tiêu:** dùng Valkey (và Redis) như một **công cụ**: chọn đúng kiểu dữ liệu cho từng bài toán, hiểu persistence, replication, cluster, vận hành an toàn, và biết lúc nào **không** nên dùng nó.
 > **Cần biết trước:** khái niệm cache ([lộ trình Caching](../caching/README.md)), C# cơ bản. Chưa cần biết Redis.
 > **Thời lượng ước tính:** 25 đến 35 giờ nếu làm đủ lab.
+> **Redis riêng:** phần khác của Redis (giấy phép, mô-đun Redis 8, lệnh riêng) nằm ở [lộ trình Redis](../redis/README.md) và [ghi chú so sánh](../redis-vs-valkey.md).
 > **Loại:** công cụ. Khái niệm gốc: [Caching](../caching/README.md). Redis/Valkey chỉ là **một dòng** trong [Bản đồ giải pháp](../caching/part-1-fundamentals.md#bản-đồ-giải-pháp).
 
 ## Phạm vi và những gì công cụ này KHÔNG đại diện

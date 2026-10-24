@@ -22,4 +22,5 @@ Ghi chú gom kiến thức theo chủ đề (vấn đề, cách dùng, ưu/như�
 |---|---|---|---|---|
 | Docker, Docker Compose (lộ trình Part 0–7) | [Container](container/README.md) | [docker/README.md](docker/README.md) | 2026-10-23 | Đạt một phần (OCI, Borg, arXiv, ECS tự mở; Part 6 chưa chạy lab container; xem từng Part) |
 | Redis / Valkey (lộ trình Part 0–7) | [Caching](caching/README.md) | [valkey/README.md](valkey/README.md) | 2026-10-23 | Đạt (GitHub, Redis giấy phép, Valkey tự mở; Stack Overflow, Slack, AWS Vừa) |
+| Redis (phần riêng, lộ trình Part 0–7) và so sánh với Valkey | [Caching](caching/README.md) | [redis/README.md](redis/README.md), [redis-vs-valkey.md](redis-vs-valkey.md) | 2026-10-24 | Đạt (giấy phép, release notes, Valkey migration, AWS tự mở; Part 3 mô-đun Valkey và Google Memorystore ⚠) |
 | YARP (nằm trong lộ trình API Gateway) | [API Gateway](api-gateway/README.md) | [api-gateway/README.md](api-gateway/README.md) | 2026-10-23 | Đạt (YARP 1.0, Cloudflare, Uber, Stripe tự mở; Part 6 dự án 6.2 và 6.3 chưa chạy) |
