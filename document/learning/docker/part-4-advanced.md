@@ -202,7 +202,7 @@ lh-cpu2 CPU=99.81%
 ## L7 Architecture — Chọn công cụ build
 
 #### Phạm vi và những gì Docker KHÔNG đại diện
-Phần build của Docker (BuildKit) chỉ là **một lựa chọn** trong bản đồ build ở [container.md](../container.md#bản-đồ-giải-pháp):
+Phần build của Docker (BuildKit) chỉ là **một lựa chọn** trong bản đồ build ở [Container, Part 4](../container/part-4-advanced.md#l7-architecture--chọn-runtime-và-cách-build):
 - **BuildKit** (backend của Docker): cache tốt, build song song, chạy được không cần root.
 - **Buildah**: build không cần daemon, từ Dockerfile hoặc script.
 - **Kaniko**: build trong cluster không cần daemon, nhưng kho mã nguồn đã **archived từ 03/06/2025**, không còn được phát triển; không chọn cho dự án mới.

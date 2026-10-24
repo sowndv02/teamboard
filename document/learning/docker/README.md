@@ -4,7 +4,7 @@
 > **Mục tiêu:** từ chỗ chưa biết Docker, tới khi tự đóng gói, ghép, vận hành và gỡ lỗi một dịch vụ .NET trong container, và giải thích được vì sao chọn (hoặc không chọn) Docker.
 > **Cần biết trước:** dùng được terminal; biết HTTP và biến môi trường ở mức cơ bản. Chưa cần biết Linux sâu.
 > **Thời lượng ước tính:** 25 đến 35 giờ nếu làm đủ lab.
-> **Loại:** công cụ · **Một trong các lựa chọn của** [Container](../container.md#bản-đồ-giải-pháp) (Podman, containerd và nerdctl, CRI-O là các lựa chọn khác).
+> **Loại:** công cụ · **Một trong các lựa chọn của** [Container](../container/part-1-fundamentals.md#bản-đồ-giải-pháp) (Podman, containerd và nerdctl, CRI-O là các lựa chọn khác).
 
 ## Cách học lộ trình này
 

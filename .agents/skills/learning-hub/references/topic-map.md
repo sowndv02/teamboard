@@ -8,7 +8,7 @@
 
 | Chủ đề | Khái niệm gốc | Nội bộ (đọc theo thứ tự) | Code/config | Chính thức |
 |---|---|---|---|---|
-| Container (namespace/cgroup, image, OCI, runtime, điều phối) | (là khái niệm) → ghi chú `document/learning/container.md` | `.agents/rules/docker.md`, ADR 0003 | – | opencontainers.org, kubernetes.io |
+| Container (namespace/cgroup, image, OCI, runtime, điều phối) | (là khái niệm) → `document/learning/container/README.md` (Part 0–7) | `.agents/rules/docker.md`, ADR 0003 | – | opencontainers.org, kubernetes.io |
 | Docker, Docker Compose (lộ trình Part 0–7 ở `document/learning/docker/`) | Container | `.agents/rules/docker.md`, `COMMANDS.md` mục 3 | `src/board-service/Dockerfile` | docs.docker.com |
 | Docker Compose | Container | `.agents/rules/docker.md`, `COMMANDS.md` mục 3 | `src/docker-compose*.yml`, `src/*.example` | docs.docker.com/compose |
 | API Gateway (cửa vào, routing, aggregation, offloading) | (là khái niệm) → `document/learning/api-gateway/README.md` (Part 0–7) | `document/spec/api-gateway.md`, `document/design/api-gateway.md`, `document/architecture/adr/0001-*.md`, `0002-*.md` | – | microservices.io, learn.microsoft.com (Azure Architecture Center) |

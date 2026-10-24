@@ -195,11 +195,11 @@ exit=125
 ## L7 Architecture — Docker là một lựa chọn, không phải "container"
 
 #### Phạm vi và những gì Docker KHÔNG đại diện
-Docker là **một họ** trong [bản đồ giải pháp Container](../container.md#bản-đồ-giải-pháp): "engine đầy đủ cho nhà phát triển". Nó không đại diện cho cả khái niệm.
+Docker là **một họ** trong [bản đồ giải pháp Container](../container/part-1-fundamentals.md#bản-đồ-giải-pháp): "engine đầy đủ cho nhà phát triển". Nó không đại diện cho cả khái niệm.
 
 - **Container là cơ chế của kernel** (namespaces, cgroups) cộng chuẩn OCI. Docker là cách tiện dụng để dùng chúng.
 - **Image build bằng Docker chạy được trên runtime khác** tuân chuẩn OCI (containerd, CRI-O, Podman).
-- **Podman** chạy không cần daemon và mặc định rootless; **containerd + nerdctl** dùng runtime trực tiếp; **CRI-O** chỉ phục vụ Kubernetes. Chi tiết ở [container.md](../container.md).
+- **Podman** chạy không cần daemon và mặc định rootless; **containerd + nerdctl** dùng runtime trực tiếp; **CRI-O** chỉ phục vụ Kubernetes. Chi tiết ở [Container](../container/README.md).
 - **Docker Desktop** có điều kiện giấy phép trả phí với tổ chức lớn; Docker Engine thì không (Part 5).
 
 #### Khi nào KHÔNG nên dùng container
