@@ -35,7 +35,7 @@ Lát 1a của `document/plans/identity-auth-slices.md` (`approved`; spec `docume
 - [ ] `config/services.yaml`, compose, `PROJECT.md` khớp; không secret trong repo (có `*.example`).
 
 ## Kế hoạch
-Plan chi tiết: `document/plans/TB-021-identity-service-skeleton.md` (`draft`, chờ `plan-review`).
+Plan chi tiết: `document/plans/TB-021-identity-service-skeleton.md` (`approved`, plan-review PASS vòng 2).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ hàng 1a của bảng lát; nhánh từ `main` `e79560d`.
@@ -47,7 +47,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | Plan `draft`, có câu hỏi mở chờ `plan-review` |
-| plan-review | pending | | | |
+| plan-review | done | 2 | 2026-10-25 | PASS; plan `approved`, Confirm log #1–#8 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |

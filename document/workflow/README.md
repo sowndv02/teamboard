@@ -12,4 +12,4 @@ Mỗi tính năng/issue đang chạy trong workflow có một state file để a
 |---|---|---|---|---|
 | [TB-007](TB-007.yaml) | feature | create-pr (PR #6 mở, chờ review) | sondv | 2026-10-22 |
 | [feature-identity-auth](feature-identity-auth.yaml) | feature | plan-init (design-review PASS) | sondv | 2026-10-25 |
-| [TB-021](TB-021.yaml) | issue | plan-review (plan draft, 5 câu hỏi mở) | sondv | 2026-10-25 |
+| [TB-021](TB-021.yaml) | issue | test-init (plan-review PASS) | sondv | 2026-10-25 |
