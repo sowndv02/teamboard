@@ -1,0 +1,102 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: feature-identity-auth
+scope: feature
+title: Xác thực và ủy quyền (identity-service)
+updated: 2026-10-25T02:00:00Z
+updated_by: orchestrator:claude-session
+
+links:
+  issue: TB-004
+  spec: document/spec/identity-auth.md
+  design: document/design/identity-auth.md
+  plan: null
+  features_dir: document/spec/features/identity-service/
+  branch: feature/TB-004-identity-auth
+  base: main
+  pr: null
+
+current_step: plan-init
+next_action: "sondv quyết định tạo ADR đề xuất (mục 16 design), rồi plan-init (slices) cho I1–I4, I6 và thêm lát I9 vào bảng lát; spec FE web-identity-ui cần spec-review PASS trước design bổ sung I5/I7/I8"
+blocked_by: null
+
+steps:
+  requirements-discovery:
+    status: done
+    owner: orchestrator:claude-session
+    started: 2026-10-21T15:50:00Z
+    finished: 2026-10-21T16:10:00Z
+    round: 2
+    inputs: { raw_request: "chức năng auth" }
+    artifacts: [document/spec/identity-auth.md]
+    evidence: ["2 lô hỏi (8 câu) đã được trả lời", "spec draft: 21 FR, 8 BR, 7 NFR, 7 giả định, 10 câu hỏi mở", "git hash-object spec: c4f68e53c646740226f92e74a88bd2948c776a82", "người dùng xác nhận 'Spec ổn'"]
+  spec-review:
+    status: done
+    owner: orchestrator:claude-session
+    started: 2026-10-21T16:10:00Z
+    finished: 2026-10-21T19:35:00Z
+    round: 3
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    inputs: { spec: "32bedf4590088826d84b4ca27136cda34f39fc9b" }
+    artifacts: [document/spec/identity-auth.md]
+    evidence: ["Confirm log: 12 quyết định", "Review rounds: 3 vòng (vòng 3 PASS sau đổi phạm vi FE, Confirm log 16 mục)", "git hash-object spec sau PASS: 53217db7aed46bdb27c2bae86d3d2fee2569305f", "kiểm ID FR/BR/NFR không trùng"]
+  system-design:          { status: done, owner: "orchestrator:claude-session", artifacts: [document/design/identity-auth.md], evidence: ["D1 RS256, D2 thư viện src/shared, D3 Secrets Manager, D4 PostgreSQL nguyên tử, D5 khoá tạm DB + rate limit bộ nhớ, D7 xoay thủ công 24h do người dùng chọn", "D6 chưa chốt: người dùng muốn Angular FE (học), trái ADR 0008"] }
+  design-review:
+    status: done
+    owner: orchestrator:claude-session
+    started: 2026-10-22T08:00:00Z
+    round: 6
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    note: "Vòng 6 PASS 2026-10-25: người dùng xác nhận D0.2–D0.4 và Q-G=A; 4 FIX đã sửa (Fix log mục 20)"
+    scope: "I1–I4, I6 (I5, I7, I8: design bổ sung sau spec FE confirmed)"
+    inputs: { design: "afcc742c2b13a5170fb81630d846208f4d6baf22", spec: "50422fc1227c5c146b2403df0206c51f4ed5092a" }
+    artifacts: [document/design/identity-auth.md, config/project.yaml]
+    evidence: ["Confirm log: 13 quyết định (#9–#11 và #13 xác nhận 2026-10-25)", "Review rounds: 6 vòng (vòng 6 PASS)", "git hash-object design sau PASS: afcc742c2b13a5170fb81630d846208f4d6baf22", "Fix log mục 20: 4 FIX", "link trong design đều tồn tại"]
+  plan-init:              { status: pending }
+  plan-review:            { status: pending }
+  test-init:              { status: pending }
+  test-review:            { status: pending }
+  coding-start:           { status: pending }
+  coding-review:          { status: pending }
+  create-pr:              { status: pending }
+
+confirm_pending: []
+
+subtasks: []
+
+events:
+  - { at: 2026-10-21T15:50:00Z, actor: "orchestrator:claude-session", event: step_started, detail: "requirements-discovery cho 'chức năng auth'" }
+  - { at: 2026-10-21T16:00:00Z, actor: "orchestrator:claude-session", event: needs_confirm, detail: "Spec draft đã viết; chờ người dùng xác nhận" }
+  - { at: 2026-10-21T16:10:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "requirements-discovery: người dùng xác nhận spec" }
+  - { at: 2026-10-21T16:10:00Z, actor: "orchestrator:claude-session", event: step_started, detail: "spec-review vòng 1" }
+  - { at: 2026-10-21T16:15:00Z, actor: "orchestrator:claude-session", event: needs_confirm, detail: "Vòng 1: 12 CONFIRM chia 3 lô; hỏi lô 1" }
+  - { at: 2026-10-21T16:50:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "3 lô đã trả lời; Confirm log 12 mục trong spec; spec đã sửa" }
+  - { at: 2026-10-21T17:00:00Z, actor: "orchestrator:claude-session", event: review_round, detail: "Vòng 2 (delta): 0 CONFIRM, 0 FIX, PASS" }
+  - { at: 2026-10-21T17:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "spec-review PASS; spec status confirmed" }
+  - { at: 2026-10-21T18:00:00Z, actor: "orchestrator:claude-session", event: scope_change, detail: "Người dùng chọn Angular FE kiểu dự án thực tế (trái ADR 0008, spec mục Ngoài phạm vi); ghi Confirm log #13 của spec; cần spec FE riêng + ADR supersede 0008" }
+  - { at: 2026-10-21T18:05:00Z, actor: "orchestrator:claude-session", event: step_needs_confirm, detail: "system-design draft document/design/identity-auth.md viết xong; chờ người dùng xem và xác nhận; budget 20 USD/tháng chưa ghi vào config" }
+  - { at: 2026-10-21T19:00:00Z, actor: "orchestrator:claude-session", event: invalidated, detail: "spec identity-auth đổi theo ADR 0009 (FR-019, A-06, NFR-010, Q-12; Confirm log #14); spec-review PASS cũ không còn hiệu lực; status spec về draft" }
+  - { at: 2026-10-21T19:10:00Z, actor: "orchestrator:claude-session", event: step_started, detail: "spec-review vòng 3 (delta sau đổi phạm vi FE): 2 FIX đã sửa (FR-019 bỏ giải pháp kỹ thuật, thêm NFR-008/ví dụ lỗi), 2 CONFIRM mở" }
+  - { at: 2026-10-21T19:30:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "Confirm log #15 (cookie 30 phút, đăng xuất huỷ phiên), #16 (giao diện trang đăng nhập thuộc spec FE)" }
+  - { at: 2026-10-21T19:35:00Z, actor: "orchestrator:claude-session", event: review_round, detail: "Vòng 3 (delta): 0 CONFIRM, 0 FIX, PASS; spec status confirmed; hash 32bedf4590088826d84b4ca27136cda34f39fc9b" }
+  - { at: 2026-10-21T19:35:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "spec-review PASS (vòng 3); I5 phụ thuộc spec FE (Q-13); bước tiếp: requirements-discovery cho FE hoặc design-review identity-auth" }
+  - { at: 2026-10-22T08:00:00Z, actor: "orchestrator:claude-session", event: step_started, detail: "design-review vòng 1 (làn lớn, A–G): 7 CONFIRM, 9 FIX" }
+  - { at: 2026-10-22T08:40:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "2 lô đã trả lời; Confirm log 7 mục trong design; ghi quality.monthlyBudgetUsd: 20 vào config" }
+  - { at: 2026-10-22T09:00:00Z, actor: "orchestrator:claude-session", event: review_round, detail: "Vòng 2 (delta): 0 CONFIRM, 0 FIX, PASS" }
+  - { at: 2026-10-22T09:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "design-review PASS cho I1–I4, I6; design status confirmed; I5/I7/I8 design bổ sung sau spec FE" }
+  - { at: 2026-10-22T10:00:00Z, actor: "orchestrator:claude-session", event: rewind, detail: "Người dùng chỉ ra design thiếu lý do cấp service (ranh giới, DB riêng, loại DB, kiến trúc); mở lại design-review, thêm D0, status design về draft; Confirm log #8–#11" }
+  - { at: 2026-10-22T10:05:00Z, actor: "orchestrator:claude-session", event: needs_confirm, detail: "Chờ người dùng xác nhận lý do D0.2, D0.3, D0.4" }
+  - { at: 2026-10-22T11:00:00Z, actor: "orchestrator:claude-session", event: process_change, detail: "Người dùng duyệt sửa system-design (D0, nguyên tắc 8/10/11), design-review (B2), review-loop (quy tắc 11), template design; ghi LL-004" }
+  - { at: 2026-10-22T11:05:00Z, actor: "orchestrator:claude-session", event: needs_confirm, detail: "Mở lại D2 (JWT, Agent chọn theo uỷ quyền, Confirm log #2) vòng 4; còn chờ #9, #10, #11" }
+  - { at: 2026-10-22T11:20:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "D2 (Confirm log #2): người dùng xác nhận phương án A, thư viện chuẩn cả hai phía; ADR sửa phạm vi ADR 0006/I2 vẫn là đề xuất chưa tạo; còn chờ #9, #10, #11" }
+  - { at: 2026-10-22T12:00:00Z, actor: "orchestrator:claude-session", event: process_change, detail: "Commit 2b88271: skill bám thực tế (mức Gần/Xa cho [Chọn để học]); bổ sung mức Gần/Xa vào design identity-auth (D0.1, D0.4, D6); tự xây identity thay IdP ghi là Xa có giới hạn" }
+  - { at: 2026-10-22T13:00:00Z, actor: "orchestrator:claude-session", event: reconciled, detail: "Commit 645b112 (rule explain-terms). Thêm giải thích thuật ngữ vào design (mục 1.1) và spec (mục 5). Spec và design đổi hash nhưng không đổi nội dung yêu cầu/quyết định (chỉ thêm thuật ngữ), nên không invalidated; design vẫn needs_confirm chờ #9, #10, #11" }
+  - { at: 2026-10-22T14:00:00Z, actor: "orchestrator:claude-session", event: process_change, detail: "Commit ee09798: câu hỏi mở phải có lựa chọn, khuyến nghị kèm lý do, hậu quả (template, 4 skill, LL-005). Cập nhật mục câu hỏi mở của spec (Q-02, Q-03, Q-11, Q-12 answered; Q-13 có lựa chọn) và design (Q-FE, Q-F); không đổi yêu cầu hay quyết định; design vẫn needs_confirm chờ #9, #10, #11" }
+  - { at: 2026-10-22T15:00:00Z, actor: "orchestrator:claude-session", event: needs_confirm, detail: "Người dùng phát hiện identity không đi qua gateway (trái api-endpoints.md và README kiến trúc). Người dùng chọn A (qua gateway), design thêm D0.5, Confirm log #12; spec làm rõ mục 11 và NFR-008 (không đổi yêu cầu). Câu hỏi mở mới Q-G (rate limit khi chưa có gateway). Design vẫn needs_confirm: chờ #9, #10, #11 và Q-G" }
+  - { at: 2026-10-25T00:00:00Z, actor: "orchestrator:claude-session", event: resumed, detail: "Nạp lại WIP từ bản sao lưu lên nhánh feature/TB-004-identity-auth-docs (từ origin/main 26403ab). Gateway mới có lát 1 (TB-010); rate limit, correlation, CORS chưa làm nên Q-G vẫn mở (đã cập nhật bối cảnh trong design). Bảng lát chưa có lát I9 (route identity + JWT ở gateway); spec gateway chưa có route identity. Vẫn needs_confirm: chờ #9, #10, #11 và Q-G" }
+  - { at: 2026-10-25T01:00:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "Người dùng xác nhận #9 (giữ A), #10 (giữ PostgreSQL), #11 (giữ Vertical Slice), Q-G chọn A (Confirm log #13). Mở design-review vòng 6" }
+  - { at: 2026-10-25T02:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "design-review vòng 6 PASS (0 CONFIRM, 4 FIX đã sửa); design status confirmed cho I1–I4, I6" }

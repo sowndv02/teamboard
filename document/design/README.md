@@ -11,3 +11,4 @@ Thiết kế hệ thống cho từng tính năng/service, dựa trên spec đã 
 | Design | Trạng thái | Spec | ADR | Issue |
 |---|---|---|---|---|
 | [api-gateway](api-gateway.md) | confirmed | [api-gateway](../spec/api-gateway.md) | chưa có | TB-007 |
+| [identity-auth](identity-auth.md) | confirmed (PASS vòng 6; phạm vi I1–I4, I6) | [identity-auth](../spec/identity-auth.md) | 0009 đã có; ADR khác đề xuất, chưa tạo (xem mục 16 của design) | TB-004 |
