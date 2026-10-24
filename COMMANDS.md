@@ -23,7 +23,7 @@ Quy tắc đầy đủ: `.agents/rules/code-change-gate.md`. Chạy gate của t
 ```bash
 # .NET
 dotnet build src/teamboard.slnx -warnaserror
-dotnet test src/teamboard.slnx --filter "Category!=docker"   # nhanh; thêm test Docker bằng `--filter "Category=docker"` (cần Docker Desktop, cổng 6060 trống)
+dotnet test src/teamboard.slnx --filter "Category!=docker"   # nhanh; thêm test Docker bằng `--filter "Category=docker"` (cần Docker Desktop, cổng 6060 và 8080 trống)
 dotnet format src/teamboard.slnx --verify-no-changes
 
 # Angular (src/web), 🚧 chưa scaffold; dùng `npm ci` (không `npm install`) trong gate
@@ -64,7 +64,7 @@ docker compose -f src/docker-compose.yml logs -f <service>
 docker compose -f src/docker-compose.yml down
 ```
 
-Cổng hiện tại: `board-service` ở http://localhost:6060 (container 7070); health ở `/health/live`, `/health/ready`.
+Cổng hiện tại: `gateway` ở http://localhost:8080 (container 7070, điểm vào của client), `board-service` ở http://localhost:6060 (container 7070, chỉ để debug trực tiếp); health ở `/health/live`, `/health/ready`.
 Quan sát cục bộ (Jaeger, chỉ bind 127.0.0.1): `docker compose -f src/docker-compose.yml -f src/docker-compose.observability.yml up --build -d`, giao diện http://127.0.0.1:16686 (API truy vấn chỉ có v3).
 Compose theo môi trường: `src/docker-compose.develop.yml`, `src/docker-compose.stg.yml` (cần file `.env.*` tương ứng, xem mục Vấn đề đã biết trong `PROJECT.md`).
 

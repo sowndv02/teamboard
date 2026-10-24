@@ -28,12 +28,12 @@ Lát 1 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
 - Không làm: correlation/trace, lỗi upstream và timeout, rate limit, giới hạn body, CORS, metric/log đặc thù, smoke với board-service thật (các lát 2–8).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] `GET /api/v1/boards` qua gateway tới upstream giả trả đúng status/body, path không đổi.
-- [ ] Path không khớp route trả `404 problem+json` có `code: ROUTE_NOT_FOUND`, `traceId`, `correlationId`.
-- [ ] `/health/live` và `/health/ready` trả `200`; `ready` vẫn `200` khi upstream chết.
-- [ ] Gateway sẵn sàng trong dưới 10 giây (đo trong test Docker, từ `compose up -d`).
-- [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
-- [ ] `config/services.yaml`, compose và `PROJECT.md` khớp.
+- [x] `GET /api/v1/boards` qua gateway tới upstream giả trả đúng status/body, path không đổi.
+- [x] Path không khớp route trả `404 problem+json` có `code: ROUTE_NOT_FOUND`, `traceId`, `correlationId`.
+- [x] `/health/live` và `/health/ready` trả `200`; `ready` vẫn `200` khi upstream chết.
+- [x] Gateway sẵn sàng trong dưới 10 giây (đo trong test Docker, từ `compose up -d`).
+- [x] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
+- [x] `config/services.yaml`, compose và `PROJECT.md` khớp.
 
 ## Kế hoạch
 Plan chi tiết: `document/plans/TB-010-gateway-skeleton-routing.md` (4 bước: khung và YARP, thư viện problem+json, routing và health, compose).
@@ -54,7 +54,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 2 | 2026-10-23 | plan `approved`; 8 quyết định (xem plan, Confirm log), 6 FIX; review độc lập (sub-agent) |
 | test-init | done | – | 2026-10-23 | đỏ: 24 test nhanh đúng lý do (17 gateway.Tests + 7 Http.Tests) và @S05 Docker đỏ khi chạy thật; khung biên dịch: `Teamboard.Shared.Http` (stub), `gateway` (Program rỗng), `GatewayErrorCodes` rỗng |
 | test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; thêm @S06; 1 CONFIRM và 4 FIX đã xử lý |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-10-24 | xanh 59/59 (7 Http + 11 ServiceDefaults + 18 gateway + 23 board-service, gồm 3 test Docker); gate: build -warnaserror, format, vulnerable, compose config xanh; 4 commit B1–B4 |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -73,7 +73,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S02 404 problem+json và không tới upstream (Outline, 4 dòng: `/api/v1/unknown`, `/api/v1/boardsX`, `/foo.txt`, `TRACE /api/v1/boards`) | `GatewaySteps` | đỏ: `Assert.Equal` expected `application/problem+json`, actual null (404 rỗng mặc định) | xanh (B3) |
 | @S03 Live trả 200 | `GatewaySteps` (health.feature) | đỏ: expected OK, actual NotFound | xanh (B3) |
 | @S04 Ready trả 200 khi upstream đã dừng | `GatewaySteps` | đỏ: expected OK, actual NotFound | xanh (B3) |
-| @S05 Compose chạy riêng gateway, ready trong 10 giây (`@docker`) | `ComposeSteps` + `DockerCli` (bản sao) | đỏ: `docker compose build gateway`: no such service: gateway (chạy thật với Docker Desktop) | |
+| @S05 Compose chạy riêng gateway, ready trong 10 giây (`@docker`) | `ComposeSteps` + `DockerCli` (bản sao) | đỏ: `docker compose build gateway`: no such service: gateway (chạy thật với Docker Desktop) | xanh (B4) |
 | @S06 Upstream trả 404 problem+json được chuyển nguyên (thêm ở test-review) | `GatewaySteps` + `UpstreamStub` (404 theo đường dẫn) | đỏ: expected `application/problem+json`, actual null (gateway chưa có route) | xanh (B3) |
 | Unit: `ProblemFactory` (4 ca) | `Teamboard.Shared.Http.Tests` | đỏ: `NotImplementedException` (khung rỗng) | xanh (B2) |
 | Unit: `SharedErrors` (3 ca) | `Teamboard.Shared.Http.Tests` | đỏ: bảng mã trống, không có `INTERNAL_ERROR` | xanh (B2) |

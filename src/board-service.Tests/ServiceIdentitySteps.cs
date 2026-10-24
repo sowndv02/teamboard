@@ -66,7 +66,7 @@ public sealed class ServiceIdentitySteps
     [When("tôi chạy compose chính với tên dự án riêng")]
     public void WhenComposeUp()
     {
-        _composeResult = _docker.ComposeUp(Path.Combine("src", "docker-compose.yml"));
+        _composeResult = _docker.ComposeUp([Path.Combine("src", "docker-compose.yml")], "board-service");
         Assert.True(_composeResult.ExitCode == 0, $"docker compose up lỗi: {_composeResult.Error}");
     }
 
