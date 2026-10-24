@@ -1,7 +1,7 @@
 ---
 key: TB-020
 title: Lộ trình học Identity (xác thực và ủy quyền) theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-020-learning-roadmap-identity
 estimate: L
@@ -39,6 +39,7 @@ Nhánh cắt từ `origin/main` (PR #10 với 7 lộ trình trước đã merge)
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue theo kế hoạch người dùng duyệt (plan mode).
 - 2026-10-25: viết Part 0–7 và chạy lab thật (.NET 10, ngoài repo); cập nhật topic-map và mục lục; script kiểm chứng đạt cho 8 lộ trình; quét thô không có khoá hay token thật. Chưa commit. Còn thiếu bằng chứng I7, I8, I9 và nguồn sự cố chỉ qua agent (ghi ở Part 6, 7).
+- 2026-10-25: mở PR https://github.com/sowndv02/teamboard/pull/13, chuyển sang review.
 
 ## Bài học (lessons learned)
 
