@@ -19,7 +19,7 @@
 | Giao tiếp, event, SNS/SQS, DLQ, idempotent | (là khái niệm: messaging) | `.agents/rules/messaging.md`, `adr/0002-*.md`, `patterns-catalog.md` | `src/shared/` | docs.aws.amazon.com (SNS, SQS) |
 | Observability (log, trace, metric, health) | (là khái niệm) | `document/architecture/observability.md`, `.agents/rules/observability.md` | ServiceDefaults (TB-001), `Program.cs` | opentelemetry.io |
 | Resilience (retry, circuit breaker, timeout) | (là khái niệm) | `document/architecture/resilience.md` | – | learn.microsoft.com (Polly/resilience) |
-| Identity, JWT, OAuth2, OIDC, PKCE | (là khái niệm) | `document/architecture/identity-learning.md`, `adr/0006-*.md`, `references.md` mục 2 | – | RFC 6749/7519/7636, OpenID Connect Core |
+| Identity, JWT, OAuth2, OIDC, PKCE | (là khái niệm) → `document/learning/identity/README.md` (Part 0–7) | `document/architecture/identity-learning.md`, `adr/0006-*.md`, `references.md` mục 2 | – | RFC 6749/7519/7636, OpenID Connect Core |
 | ASP.NET Core / C# / EF Core | Web framework, ORM | `.agents/rules/dotnet.md`, `backend-engineering.md`, `api-endpoints.md`, `adr/0005-*.md` | `src/board-service/` | learn.microsoft.com |
 | Testing (TDD/BDD) | (là khái niệm) | `.agents/rules/testing.md`, `test-review.md` | `src/**/*Tests*` khi có | – |
 | Terraform, AWS, ECS Fargate | Infrastructure as Code, container orchestration | `.agents/rules/terraform.md`, `adr/0003-*.md`, `0004-*.md`, `document/security/infra-attack-scenarios.md`, skill `aws-service-selection` | `infra/` (giai đoạn 4) | developer.hashicorp.com, docs.aws.amazon.com |
