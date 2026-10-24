@@ -1,7 +1,7 @@
 # Container
 
 > Loại: Khái niệm · Công cụ trong dự án: [Docker và Docker Compose](docker-compose.md) (chỉ là một trong các lựa chọn, xem [Bản đồ giải pháp](#bản-đồ-giải-pháp))
-> Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: `teamboard-api` đã có Dockerfile và compose; production dự kiến ECS Fargate (ADR 0003)
+> Làm mới lần cuối: 2026-10-23 · Trạng thái dự án: `board-service` và `gateway` đã có Dockerfile và compose; production dự kiến ECS Fargate (ADR 0003)
 
 ## 1. Vấn đề nó giải quyết
 
