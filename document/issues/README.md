@@ -30,3 +30,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-017](TB-017-learning-roadmap-microservice.md) | Lộ trình học Microservice (khái niệm) theo Part 0–7 × L1–L8 | 0 | review |
 | [TB-018](TB-018-learning-roadmap-container.md) | Lộ trình học Container (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | review |
 | [TB-019](TB-019-learning-roadmap-redis.md) | Lộ trình học Redis (phần riêng) và ghi chú so sánh Redis với Valkey | 0 | review |
+| [TB-020](TB-020-learning-roadmap-identity.md) | Lộ trình học Identity (xác thực và ủy quyền) theo Part 0–7 × L1–L8 | 0 | in-progress |
