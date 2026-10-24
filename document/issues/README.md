@@ -28,3 +28,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-015](TB-015-learning-roadmap-valkey.md) | Lộ trình học Redis / Valkey (công cụ) theo Part 0–7 × L1–L8 | 0 | in-progress |
 | [TB-016](TB-016-learning-roadmap-api-gateway.md) | Lộ trình học API Gateway và YARP theo Part 0–7 × L1–L8 | 0 | in-progress |
 | [TB-017](TB-017-learning-roadmap-microservice.md) | Lộ trình học Microservice (khái niệm) theo Part 0–7 × L1–L8 | 0 | in-progress |
+| [TB-018](TB-018-learning-roadmap-container.md) | Lộ trình học Container (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | in-progress |
