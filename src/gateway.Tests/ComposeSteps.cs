@@ -36,15 +36,15 @@ public sealed class ComposeSteps
     [Then("cổng host 8080 trả 200 cho {string}")]
     public async Task ThenPortOk(string path)
     {
-        var status = await HttpWait.GetStatusAsync($"{GatewayUrl}{path}", TimeSpan.FromSeconds(30));
+        var status = await HttpWait.GetStatusUntilAsync($"{GatewayUrl}{path}", 200, TimeSpan.FromSeconds(30));
         Assert.Equal(200, status);
     }
 
     [Then("{string} trả 200 trong vòng 10 giây kể từ lệnh chạy")]
     public async Task ThenReadyWithinTenSeconds(string path)
     {
-        var body = await HttpWait.GetBodyUntilAsync($"{GatewayUrl}{path}", _ => true, TimeSpan.FromSeconds(10) - _sinceUp.Elapsed);
-        Assert.True(body is not null, $"{path} chưa sẵn sàng sau 10 giây kể từ lệnh chạy.");
+        var status = await HttpWait.GetStatusUntilAsync($"{GatewayUrl}{path}", 200, TimeSpan.FromSeconds(10) - _sinceUp.Elapsed);
+        Assert.True(status is not null, $"{path} chưa sẵn sàng sau 10 giây kể từ lệnh chạy.");
         Assert.True(_sinceUp.Elapsed < TimeSpan.FromSeconds(10), $"Mất {_sinceUp.Elapsed.TotalSeconds:F1} giây.");
     }
 

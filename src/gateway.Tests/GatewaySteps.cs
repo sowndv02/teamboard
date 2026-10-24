@@ -83,6 +83,14 @@ public sealed class GatewaySteps : IAsyncDisposable
         Assert.Equal(404, document.RootElement.GetProperty("status").GetInt32());
     }
 
+    [Then("phản hồi có type và title theo mã lỗi của gateway")]
+    public void ThenTypeAndTitle()
+    {
+        using var document = JsonDocument.Parse(_body);
+        Assert.Equal("https://teamboard/errors/route-not-found", document.RootElement.GetProperty("type").GetString());
+        Assert.Equal("Not Found", document.RootElement.GetProperty("title").GetString());
+    }
+
     [Then("phản hồi có traceId và correlationId")]
     public void ThenHasTraceAndCorrelation()
     {
@@ -97,6 +105,7 @@ public sealed class GatewaySteps : IAsyncDisposable
         Assert.DoesNotContain(new Uri(Upstream.Address).Authority, _body);
         Assert.DoesNotContain("board-service", _body);
         Assert.DoesNotContain("Exception", _body);
+        Assert.DoesNotContain(_path, _body);
     }
 
     [Then("phản hồi giữ nguyên nội dung do upstream trả")]

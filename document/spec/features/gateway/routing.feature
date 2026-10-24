@@ -29,6 +29,7 @@ Feature: Gateway chuyển tiếp API boards tới board-service
     And gateway được cấu hình trỏ tới upstream giả
     When tôi gửi "<method>" tới "<path>"
     Then phản hồi là 404 problem+json với mã "ROUTE_NOT_FOUND"
+    And phản hồi có type và title theo mã lỗi của gateway
     And phản hồi có traceId và correlationId
     And phản hồi không chứa địa chỉ hay tên nội bộ của upstream
     And upstream giả không nhận request nào

@@ -55,7 +55,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-10-23 | đỏ: 24 test nhanh đúng lý do (17 gateway.Tests + 7 Http.Tests) và @S05 Docker đỏ khi chạy thật; khung biên dịch: `Teamboard.Shared.Http` (stub), `gateway` (Program rỗng), `GatewayErrorCodes` rỗng |
 | test-review | PASS | 2 | 2026-10-23 | `.feature` sẵn sàng code; thêm @S06; 1 CONFIRM và 4 FIX đã xử lý |
 | coding-start | done | – | 2026-10-24 | xanh 59/59 (7 Http + 11 ServiceDefaults + 18 gateway + 23 board-service, gồm 3 test Docker); gate: build -warnaserror, format, vulnerable, compose config xanh; 4 commit B1–B4 |
-| coding-review | pending | | | |
+| coding-review | PASS | 2 | 2026-10-24 | review độc lập (sub-agent) vòng 1: 4 P3 đã xử lý; vòng 2 delta: Sẵn sàng merge; 59 test xanh |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -98,6 +98,24 @@ Giới hạn đã biết: @S05 đo thời gian khởi động trên Docker Deskt
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-24 | `8645d4d` | Sẵn sàng sau khi sửa | 0 P0–P2; 4 P3 (1 CONFIRM đã chốt, 3 FIX); gate xanh |
+| 2 | 2026-10-24 | delta `8645d4d..HEAD` | Sẵn sàng merge | không còn finding mở; 59 test xanh (gồm 3 Docker) sau sửa |
+
+
+## Fix log (coding-review)
+
+| Fingerprint | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|
+| gateway.Tests:GatewaySteps.ThenNoInternalNames:weak-assert (P3) | `GatewaySteps.cs`, `routing.feature` @S02 | Test không kiểm `type`, `title` và body có thể chứa path của request | Thêm bước kiểm `type` = `https://teamboard/errors/route-not-found`, `title` = `Not Found`; body không chứa path request | @S02 xanh (17/17 test nhanh) |
+| gateway:Dockerfile:expose-vs-default-port (P3) | `src/gateway/Dockerfile` | `EXPOSE 7070` nhưng image mặc định nghe 8080 | Thêm `ENV ASPNETCORE_URLS=http://+:7070` | build xanh; @S05 Docker xanh |
+| gateway.Tests:HttpWait:first-response-wins (P3) | `Support/HttpWait.cs`, `ComposeSteps.cs` | Trả ngay mã đầu tiên kể cả không phải 200, vòng poll 1 giây | Thêm `GetStatusUntilAsync` thử lại tới khi đúng mã, bước 250 ms; @S05 dùng nó | @S05 xanh khi chạy thật |
+| gateway:INTERNAL_ERROR-handler:unassigned-slice (P3, CONFIRM) | `api-gateway-slices.md` | `500 INTERNAL_ERROR` và ExceptionHandler chưa thuộc lát nào | Người dùng chốt: gán vào lát 2; cập nhật bảng lát và Confirm log của bảng | commit sửa tài liệu |
+
+Giới hạn đã biết (ghi nhận):
+- `/health/*` trả 200 cho mọi method (do `MapDefaultEndpoints` của ServiceDefaults), không chỉ `GET` như design 6.3; chưa có test, để lát 7 xem xét.
+- YARP mặc định tự thêm `X-Forwarded-*`; xử lý ở lát 4 theo DA-05.
+- `ForwardedHeaders`, CORS, rate limit, giới hạn body, correlation thật, ExceptionHandler, lỗi upstream (`502/503/504`) chưa có: đúng thứ tự lát 2–7.
+- Bản sao helper Docker giữa hai project test là nợ kỹ thuật đã được chấp nhận.
 
 ## Bài học (lessons learned)
 
