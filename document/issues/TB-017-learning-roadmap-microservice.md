@@ -1,7 +1,7 @@
 ---
 key: TB-017
 title: Lộ trình học Microservice (khái niệm) theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-017-learning-roadmap-microservice
 estimate: L
@@ -39,6 +39,8 @@ Phụ thuộc: TB-013 đến TB-016 chưa push. Nhánh này cắt từ nhánh TB
 ## Ghi chú / Nhật ký
 - 2026-10-23: tạo issue theo kế hoạch người dùng duyệt (plan mode).
 - 2026-10-23: viết xong Part 0–7, `git rm` `microservice.md`, sửa link ở `api-gateway/README.md`, `topic-map.md`, mục lục. Script kiểm chứng đạt cho microservice, api-gateway, valkey, caching, docker. Lab là mô phỏng trong một tiến trình (HTTP loopback thật, giao dịch SQLite thật, broker và saga là mô hình), ghi rõ ở Part 0. Chưa chạy (⚠): SNS/SQS, nhiều tiến trình, circuit breaker thật, saga có bồi hoàn tự lỗi, dự án 6.2 đa tiến trình và 6.3. Chưa commit.
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 

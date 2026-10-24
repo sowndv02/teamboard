@@ -1,7 +1,7 @@
 ---
 key: TB-015
 title: Lộ trình học Redis / Valkey (công cụ) theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-015-learning-roadmap-valkey
 estimate: L
@@ -39,6 +39,8 @@ Phụ thuộc: TB-014 (và TB-013) chưa push. Nhánh này cắt từ nhánh TB-
 - 2026-10-23: tạo issue theo kế hoạch người dùng duyệt (plan mode). Docker Desktop đang tắt lúc bắt đầu; người dùng bật và duyệt kéo `valkey/valkey:9.1.2-alpine`.
 - 2026-10-23: viết xong Part 0–7, thay `redis.md` bằng `document/learning/valkey/`, sửa link ở `yarp.md`, `caching/*`, mục lục; cập nhật Lab 3.3 của Caching Part 3 bằng Valkey thật. Script kiểm chứng đạt cho valkey, caching, docker. Chưa chạy (gắn ⚠): Sentinel, Cluster nhiều node, TLS, ElastiCache/MemoryDB, dự án 6.3. Container, volume, mạng `lh-` đã dọn; image giữ lại. Chưa commit.
 - Phát hiện khi chạy: `DEL` trên big key 3M phần tử mất 25 µs với `lazyfree-lazy-user-del yes` (mặc định 9.1.2) và ~240 ms khi `no`; replica mới chưa đồng bộ trong 2 giây đầu (diskless delay).
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 

@@ -1,7 +1,7 @@
 ---
 key: TB-014
 title: Lộ trình học Caching (khái niệm gốc) theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-014-learning-roadmap-caching
 estimate: L
@@ -39,6 +39,8 @@ Phụ thuộc: skill v3 của TB-013 (chưa push). Nhánh này cắt từ nhánh
 - 2026-10-23: tạo issue theo kế hoạch người dùng duyệt (plan mode). Quyết định: chủ đề Caching (khái niệm gốc), đủ Part 0–7.
 - 2026-10-23: viết xong Part 0–7, thay `caching.md`, sửa link ở `redis.md`, `microservice.md`, `topic-map.md`, mục lục. Script kiểm chứng (ma trận, khuôn Part, bảng, link/neo) đạt. Chưa chạy: Lab 3.3 (Valkey thật, Docker tắt, chưa duyệt kéo image) và Dự án 6.2/6.3 (bài tập chưa chạy trên `board-service`); cả hai gắn ⚠ trong tài liệu. Chưa commit.
 - Cần duyệt riêng khi tới Part 3: kéo image Valkey và bật Docker Desktop cho lab phân tán; gói NuGet `Microsoft.Extensions.Caching.StackExchangeRedis` chỉ dùng trong lab ngoài repo.
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 

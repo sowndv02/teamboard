@@ -1,7 +1,7 @@
 ---
 key: TB-019
 title: Lộ trình học Redis (phần riêng) và ghi chú so sánh Redis với Valkey
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-019-learning-roadmap-redis
 estimate: L
@@ -40,6 +40,8 @@ Phụ thuộc: TB-013 đến TB-018 chưa push. Nhánh này cắt từ nhánh TB
 - 2026-10-24: tạo issue theo kế hoạch người dùng duyệt (plan mode); người dùng duyệt kéo `redis:8.10.2-alpine` và `redis:7.2.16-alpine`.
 - 2026-10-24: viết xong Part 0–7 của `document/learning/redis/` và `document/learning/redis-vs-valkey.md`; thêm một dòng liên kết ở `valkey/README.md`, mục lục, topic-map. Script đạt cho 7 lộ trình. Lab thật trên Redis 8.10.2, Redis 7.2.16, Valkey 9.1.2; container `lh-` đã dọn, image giữ lại. Chưa chạy (⚠): cluster và atomic slot migration, hiệu năng, `DELIFEQ`, Redis Software/Cloud, mô-đun Valkey, `DUMP`/`RESTORE` giữa hai engine. Chưa commit.
 - Phát hiện khi chạy: RDB của Redis 8.10.2 (`REDIS0015`) không nạp được vào Valkey 9.1.2 dù chỉ có kiểu cơ bản; Valkey 9.1.2 ghi tiêu đề `VALKEY080` mà Redis không đọc; Valkey 9.1.2 có hash field expiration, `HSETEX`, `HGETEX`, `SET IFEQ` nhưng không có `DELEX` và mô-đun Redis 8.
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 

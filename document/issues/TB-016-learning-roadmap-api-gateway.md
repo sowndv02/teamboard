@@ -1,7 +1,7 @@
 ---
 key: TB-016
 title: Lộ trình học API Gateway và YARP theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-016-learning-roadmap-api-gateway
 estimate: L
@@ -40,6 +40,8 @@ Phụ thuộc: TB-013, TB-014, TB-015 chưa push. Nhánh này cắt từ nhánh 
 - 2026-10-23: tạo issue theo kế hoạch người dùng duyệt (plan mode). Quyết định: một lộ trình khái niệm với YARP là công cụ thực hành, thay cả hai file cũ.
 - 2026-10-23: viết xong Part 0–7, `git rm` `api-gateway.md` và `yarp.md`, sửa link ở `microservice.md`, `topic-map.md`, mục lục. Script kiểm chứng đạt cho api-gateway, valkey, caching, docker. Không dùng Docker. Chưa chạy (⚠): TLS, gateway sau ALB, nhiều instance gateway thật, token bucket, session affinity, dự án 6.2 và 6.3. Chưa commit.
 - Điểm khác giữa YARP và design TB-007 (báo, không tự sửa; chi tiết ở Part 6): method không hỗ trợ trả 405 thay vì 404; `Timeout` của route cho 400 thay vì 504; `MaxRequestBodySize` trả 413 nhưng upstream vẫn thấy yêu cầu.
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 

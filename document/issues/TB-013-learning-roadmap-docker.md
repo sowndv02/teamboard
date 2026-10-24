@@ -1,7 +1,7 @@
 ---
 key: TB-013
 title: Lộ trình học hai chiều (Part × L1–L8) cho learning-hub, mẫu trên Docker
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-013-learning-roadmap-docker
 estimate: L
@@ -47,6 +47,8 @@ Phụ thuộc: thay đổi skill của PR #9 (TB-012), đã merge vào `main` l�
 - Điểm lệch của repo, ghi nhận không sửa (Part 3, Part 6): `src/docker-compose.develop.yml:5` host `sqlserver` so với service `db-dev`; `Dockerfile:7` `EXPOSE 8080` so với 7070; `mssql/server:2022-latest`; chưa có `HEALTHCHECK`; `.dockerignore` thiếu `.env*` và `local/`; mật khẩu qua `-P` trong healthcheck.
 - Còn lại: chạy Lab 6.2 và 6.3 khi Docker bật; quyết định build từ Dockerfile; áp mô hình lộ trình cho các chủ đề khác (Redis, caching, YARP, microservice) sau khi người dùng duyệt mẫu Docker.
 - Việc pull image công khai nhỏ (`hello-world`, `alpine`, `nginx`) để kiểm lệnh đã được người dùng duyệt cùng kế hoạch.
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 

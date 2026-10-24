@@ -1,7 +1,7 @@
 ---
 key: TB-018
 title: Lộ trình học Container (khái niệm gốc) theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-018-learning-roadmap-container
 estimate: L
@@ -39,6 +39,8 @@ Phụ thuộc: TB-013 đến TB-017 chưa push. Nhánh này cắt từ nhánh TB
 - 2026-10-24: tạo issue theo kế hoạch người dùng duyệt (plan mode). Docker Desktop đang tắt lúc bắt đầu; người dùng bật và duyệt dùng image có sẵn (`alpine:latest`), không kéo thêm.
 - 2026-10-24: viết xong Part 0–7, `git rm` `container.md`, sửa link ở `docker/README.md`, `docker/part-1`, `docker/part-4`, `topic-map.md`, mục lục. Script kiểm chứng đạt cho 6 lộ trình. Lab mới: `/proc` trong container, đọc image OCI bằng tay (manifest, config, layer, whiteout), mô hình reconciler (không Docker), capabilities và seccomp từ `/proc`, lớp ghi và volume. Lab trùng với lộ trình Docker chỉ liên kết. Chưa chạy (⚠): Kubernetes, ECS, Nomad, runc trực tiếp, Podman và rootless, quét lỗ hổng, bài tập 6.2 và 6.3. Chưa commit.
 - Phát hiện khi chạy: `docker image inspect` báo Size 125 MB còn `docker images` báo 455 MB cho cùng `board-service:latest` (hai cách đo, chưa điều tra); `seccomp=unconfined` và `--privileged` vẫn còn một bộ lọc seccomp trong Docker Desktop (chưa rõ nguồn). Điểm lệch với `.agents/rules/docker.md` (báo ở Part 6): thiếu HEALTHCHECK, `EXPOSE 8080` không khớp cổng 7070, `.dockerignore` chưa có `.env.*`.
+
+- 2026-10-25: mở PR gộp [sowndv02/teamboard#10](https://github.com/sowndv02/teamboard/pull/10) (TB-013 đến TB-019), trạng thái review.
 
 ## Bài học (lessons learned)
 
