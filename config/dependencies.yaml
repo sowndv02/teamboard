@@ -27,7 +27,7 @@ packages:
   - { name: Polly, ecosystem: nuget, tier: T1, status: approved, license: BSD-3-Clause, verified: false, note: ".NET Foundation; Microsoft.Extensions.Http.Resilience dựa trên Polly" }
   - { name: xUnit (xunit 2.9.3, xunit.runner.visualstudio 3.1.5), ecosystem: nuget, tier: T1, status: in-use, license: Apache-2.0, verified: true, source: "nuspec của gói trên NuGet (license expression Apache-2.0), TB-001", note: ".NET Foundation; người dùng chọn 2026-10-23" }
   - { name: Npgsql, ecosystem: nuget, tier: T1, status: approved, license: PostgreSQL-License, verified: false }
-  - { name: YARP (Yarp.ReverseProxy), ecosystem: nuget, tier: T1, status: approved, license: MIT, verified: false, note: "Microsoft; gateway" }
+  - { name: YARP (Yarp.ReverseProxy 2.3.0), ecosystem: nuget, tier: T1, status: in-use, license: MIT, verified: true, source: "nuspec 2.3.0 trên NuGet (MIT); cấu hình Routes/Clusters theo https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/config-files (đọc 2026-10-24, có moniker aspnetcore-10.0)", note: "Microsoft; gateway (TB-010). Build xanh trên .NET 10." }
 
   # ---- T2: cần phê duyệt, bọc sau interface ----
   - { name: Serilog, ecosystem: nuget, tier: T2, status: watch, license: Apache-2.0, verified: true, source: "nguồn thứ cấp (blog 2026)", note: "Hiện permissive; ưu tiên ILogger + OpenTelemetry (observability.md)" }

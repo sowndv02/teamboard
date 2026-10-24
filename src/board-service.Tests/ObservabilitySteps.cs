@@ -16,7 +16,7 @@ public sealed class ObservabilitySteps
     [Given("compose chính và compose observability đang chạy với tên dự án riêng")]
     public void GivenComposeRunning()
     {
-        var result = _docker.ComposeUp(MainCompose, ObservabilityCompose);
+        var result = _docker.ComposeUp([MainCompose, ObservabilityCompose], "board-service", "jaeger");
         Assert.True(result.ExitCode == 0, $"docker compose up lỗi: {result.Error}");
     }
 

@@ -9,3 +9,16 @@ services:
     ports:
       - "6060:7070"
     restart: unless-stopped
+
+  # Điểm vào duy nhất của client. Không có depends_on: gateway phải sống và ready độc lập với upstream (FR-002).
+  gateway:
+    image: gateway
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:7070
+      ReverseProxy__Clusters__board-service__Destinations__d1__Address: http://board-service:7070
+    ports:
+      - "8080:7070"
+    restart: unless-stopped

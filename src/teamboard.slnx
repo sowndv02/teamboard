@@ -6,4 +6,8 @@
   <Project Path="board-service.Tests/board-service.Tests.csproj" />
   <Project Path="shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj" />
   <Project Path="shared/ServiceDefaults.Tests/Teamboard.Shared.ServiceDefaults.Tests.csproj" />
+  <Project Path="shared/Http/Teamboard.Shared.Http.csproj" />
+  <Project Path="shared/Http.Tests/Teamboard.Shared.Http.Tests.csproj" />
+  <Project Path="gateway/gateway.csproj" />
+  <Project Path="gateway.Tests/gateway.Tests.csproj" />
 </Solution>

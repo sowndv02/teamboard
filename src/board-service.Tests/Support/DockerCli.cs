@@ -22,11 +22,12 @@ internal sealed class DockerCli
         }
     }
 
-    public CommandResult ComposeUp(params string[] composeFiles)
+    /// <summary>Chạy chỉ các service được chỉ định, để test không kéo theo service khác trong cùng file compose (xem plan TB-010).</summary>
+    public CommandResult ComposeUp(string[] composeFiles, params string[] services)
     {
         _composeFiles = composeFiles;
         _composeStarted = true;
-        return Compose(TimeSpan.FromMinutes(10), "up", "--build", "-d");
+        return Compose(TimeSpan.FromMinutes(10), ["up", "--build", "-d", .. services]);
     }
 
     public CommandResult Compose(TimeSpan timeout, params string[] args)

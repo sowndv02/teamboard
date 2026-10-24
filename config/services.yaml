@@ -3,10 +3,12 @@
 
 services:
   gateway:
-    status: planned
+    status: existing
+    path: src/gateway
     architecture: api-gateway (YARP)
     datastore: none
-    local_port: TODO
+    local_port: 8080            # host; container nghe 7070 (docker-compose.yml)
+    container_port: 7070
     health: { live: /health/live, ready: /health/ready }
 
   web:
