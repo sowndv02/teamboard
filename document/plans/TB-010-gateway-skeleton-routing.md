@@ -133,6 +133,8 @@ Bài học đã tra (`document/lessons/README.md`, tag `api`, `observability`, `
 
 ## 7. Câu hỏi mở và giả định
 
+Kết quả kiểm giả định ở coding-start (2026-10-24): A-01 đúng (YARP 2.3.0 build xanh trên .NET 10, nuspec MIT, schema theo docs); A-02, A-03, A-04 đúng (17 test xanh, lặp 10 lần không flaky); B3b không cần mã riêng vì health đã nằm trong `MapDefaultEndpoints()` ở B3a.
+
 Giả định (kiểm ở bước tương ứng): A-01 `Yarp.ReverseProxy` 2.3.0 hỗ trợ .NET 10 (B1); A-02 `MapFallback("{**path}", ...)` đặt cùng `MapReverseProxy` bắt mọi request không khớp, gồm method lạ trên path boards và path kiểu tệp (B3a, @S02); A-03 `HEAD` được route cùng nhóm `GET` như design 6.3 (B3a, @S01); A-04 YARP đọc địa chỉ upstream từ cấu hình khi host build nên `UseSetting` trong test có hiệu lực (B3a). Chưa xác minh; sai thì dừng và hỏi, không tự đổi cách làm.
 
 | # | Điều chưa rõ | Ảnh hưởng tới | Người trả lời | Ghi chú |

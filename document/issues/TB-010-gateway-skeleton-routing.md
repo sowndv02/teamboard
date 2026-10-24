@@ -69,15 +69,15 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 Route boards giữ method, path, status và body của upstream (Outline, 8 dòng; upstream giả trả 201 cho POST, 204 cho DELETE) | `GatewaySteps` (routing.feature) + upstream giả `UpstreamStub` | đỏ: `Assert.Single` — upstream giả không nhận request nào (gateway chưa có route) | |
-| @S02 404 problem+json và không tới upstream (Outline, 4 dòng: `/api/v1/unknown`, `/api/v1/boardsX`, `/foo.txt`, `TRACE /api/v1/boards`) | `GatewaySteps` | đỏ: `Assert.Equal` expected `application/problem+json`, actual null (404 rỗng mặc định) | |
-| @S03 Live trả 200 | `GatewaySteps` (health.feature) | đỏ: expected OK, actual NotFound | |
-| @S04 Ready trả 200 khi upstream đã dừng | `GatewaySteps` | đỏ: expected OK, actual NotFound | |
+| @S01 Route boards giữ method, path, status và body của upstream (Outline, 8 dòng; upstream giả trả 201 cho POST, 204 cho DELETE) | `GatewaySteps` (routing.feature) + upstream giả `UpstreamStub` | đỏ: `Assert.Single` — upstream giả không nhận request nào (gateway chưa có route) | xanh (B3) |
+| @S02 404 problem+json và không tới upstream (Outline, 4 dòng: `/api/v1/unknown`, `/api/v1/boardsX`, `/foo.txt`, `TRACE /api/v1/boards`) | `GatewaySteps` | đỏ: `Assert.Equal` expected `application/problem+json`, actual null (404 rỗng mặc định) | xanh (B3) |
+| @S03 Live trả 200 | `GatewaySteps` (health.feature) | đỏ: expected OK, actual NotFound | xanh (B3) |
+| @S04 Ready trả 200 khi upstream đã dừng | `GatewaySteps` | đỏ: expected OK, actual NotFound | xanh (B3) |
 | @S05 Compose chạy riêng gateway, ready trong 10 giây (`@docker`) | `ComposeSteps` + `DockerCli` (bản sao) | đỏ: `docker compose build gateway`: no such service: gateway (chạy thật với Docker Desktop) | |
-| @S06 Upstream trả 404 problem+json được chuyển nguyên (thêm ở test-review) | `GatewaySteps` + `UpstreamStub` (404 theo đường dẫn) | đỏ: expected `application/problem+json`, actual null (gateway chưa có route) | |
+| @S06 Upstream trả 404 problem+json được chuyển nguyên (thêm ở test-review) | `GatewaySteps` + `UpstreamStub` (404 theo đường dẫn) | đỏ: expected `application/problem+json`, actual null (gateway chưa có route) | xanh (B3) |
 | Unit: `ProblemFactory` (4 ca) | `Teamboard.Shared.Http.Tests` | đỏ: `NotImplementedException` (khung rỗng) | xanh (B2) |
 | Unit: `SharedErrors` (3 ca) | `Teamboard.Shared.Http.Tests` | đỏ: bảng mã trống, không có `INTERNAL_ERROR` | xanh (B2) |
-| Unit: `GatewayErrorCodes` (2 ca) | `gateway.Tests` | đỏ: bảng mã trống, không có `ROUTE_NOT_FOUND` | |
+| Unit: `GatewayErrorCodes` (2 ca) | `gateway.Tests` | đỏ: bảng mã trống, không có `ROUTE_NOT_FOUND` | xanh (B3) |
 
 Lệnh chạy test (phạm vi theo `quality-gate.md`):
 
@@ -85,7 +85,7 @@ Lệnh chạy test (phạm vi theo `quality-gate.md`):
 - Docker (@S05 của gateway; @S03, @S11 của board-service): `dotnet test src/gateway.Tests/gateway.Tests.csproj --filter "Category=docker"`; cần Docker Desktop chạy và cổng 8080 trống; không có Docker thì scenario bị bỏ qua (`SkipException`), không phải đỏ.
 - Đầy đủ: `dotnet test src/teamboard.slnx` (hai assembly chạy tuần tự trong từng assembly, `DisableTestParallelization`).
 
-Giới hạn đã biết: @S05 đo thời gian khởi động trên Docker Desktop nên có thể chậm hơn máy khác (ngưỡng 10 giây theo NFR-005, không nới); giả định A-04 (ghi đè địa chỉ upstream bằng `UseSetting`) chỉ kiểm được ở B3a; bản sao helper Docker là nợ kỹ thuật đã được người dùng chấp nhận.
+Giới hạn đã biết: @S05 đo thời gian khởi động trên Docker Desktop nên có thể chậm hơn máy khác (ngưỡng 10 giây theo NFR-005, không nới); giả định A-04 (ghi đè địa chỉ upstream bằng `UseSetting`) đã kiểm ở B3 (hiệu lực); bản sao helper Docker là nợ kỹ thuật đã được người dùng chấp nhận.
 
 ## Test review rounds
 
