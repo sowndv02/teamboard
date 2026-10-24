@@ -3,7 +3,7 @@
 id: feature-identity-auth
 scope: feature
 title: Xác thực và ủy quyền (identity-service)
-updated: 2026-10-25T02:00:00Z
+updated: 2026-10-25T03:00:00Z
 updated_by: orchestrator:claude-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: plan-init
-next_action: "sondv quyết định tạo ADR đề xuất (mục 16 design), rồi plan-init (slices) cho I1–I4, I6 và thêm lát I9 vào bảng lát; spec FE web-identity-ui cần spec-review PASS trước design bổ sung I5/I7/I8"
+current_step: plan-review
+next_action: "Theo dõi từng lát qua state của issue (lát 1a: TB-021, plan-review). Lát 19 (I9) cần spec/design gateway và board bổ sung trước khi plan; ADR tạo ngay trước lát cần"
 blocked_by: null
 
 steps:
@@ -56,7 +56,7 @@ steps:
     inputs: { design: "afcc742c2b13a5170fb81630d846208f4d6baf22", spec: "50422fc1227c5c146b2403df0206c51f4ed5092a" }
     artifacts: [document/design/identity-auth.md, config/project.yaml]
     evidence: ["Confirm log: 13 quyết định (#9–#11 và #13 xác nhận 2026-10-25)", "Review rounds: 6 vòng (vòng 6 PASS)", "git hash-object design sau PASS: afcc742c2b13a5170fb81630d846208f4d6baf22", "Fix log mục 20: 4 FIX", "link trong design đều tồn tại"]
-  plan-init:              { status: pending }
+  plan-init:              { status: done, evidence: ["Chế độ slices: bảng lát approved 2026-10-25 (identity-auth-slices.md); lát 1a = TB-021, plan theo issue ở document/workflow/TB-021.yaml"] }
   plan-review:            { status: pending }
   test-init:              { status: pending }
   test-review:            { status: pending }
@@ -100,3 +100,4 @@ events:
   - { at: 2026-10-25T00:00:00Z, actor: "orchestrator:claude-session", event: resumed, detail: "Nạp lại WIP từ bản sao lưu lên nhánh feature/TB-004-identity-auth-docs (từ origin/main 26403ab). Gateway mới có lát 1 (TB-010); rate limit, correlation, CORS chưa làm nên Q-G vẫn mở (đã cập nhật bối cảnh trong design). Bảng lát chưa có lát I9 (route identity + JWT ở gateway); spec gateway chưa có route identity. Vẫn needs_confirm: chờ #9, #10, #11 và Q-G" }
   - { at: 2026-10-25T01:00:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "Người dùng xác nhận #9 (giữ A), #10 (giữ PostgreSQL), #11 (giữ Vertical Slice), Q-G chọn A (Confirm log #13). Mở design-review vòng 6" }
   - { at: 2026-10-25T02:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "design-review vòng 6 PASS (0 CONFIRM, 4 FIX đã sửa); design status confirmed cho I1–I4, I6" }
+  - { at: 2026-10-25T03:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "plan-init (slices): bảng lát approved, tạo TB-021 cho lát 1a; từng lát có state riêng theo issue" }
