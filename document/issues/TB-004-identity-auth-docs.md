@@ -23,13 +23,13 @@ Giai đoạn 1 cần `identity-service`. Chạy workflow: khai phá yêu cầu, 
 - [x] Spec identity-auth `confirmed` (spec-review vòng 3 PASS)
 - [x] Design identity-auth bản draft có D1–D7 theo lựa chọn của chủ dự án
 - [x] Spec FE `web-identity-ui` bản draft kèm 6 câu hỏi mở có owner
-- [ ] `design-review` identity-auth PASS
+- [x] `design-review` identity-auth PASS (vòng 6, 2026-10-25)
 - [ ] `spec-review` web-identity-ui PASS
 - [ ] Chốt Q-01 (nơi lưu token), Q-02 (hồ sơ lấy email từ đâu), ghi `quality.monthlyBudgetUsd` vào config
 - [ ] Bảng lát `approved`, rồi tạo issue cho lát đầu
 
 ## Kế hoạch
-Xem `document/workflow/feature-identity-auth.yaml` và `feature-web-identity-ui.yaml`. Bước kế: `design-review`, `spec-review` cho spec FE, chốt các câu hỏi mở, duyệt bảng lát.
+Xem `document/workflow/feature-identity-auth.yaml` và `feature-web-identity-ui.yaml`. Bước kế: `plan-init` (design-review đã PASS), `spec-review` cho spec FE, chốt các câu hỏi mở, duyệt bảng lát.
 
 ## Ghi chú / Nhật ký
 - 2026-10-21: khai phá, review spec (3 vòng), system design; đổi phạm vi sang Angular FE (Confirm log #13–#16 của spec identity).

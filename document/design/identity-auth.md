@@ -1,8 +1,8 @@
 ---
 title: Thiết kế identity-service (xác thực và ủy quyền)
-status: draft            # draft | confirmed | superseded; đã PASS vòng 2 (2026-10-22), về draft vì thêm D0 (cấp service) chờ người dùng xác nhận lý do
+status: confirmed        # draft | confirmed | superseded; PASS vòng 6 (2026-10-25) cho I1–I4, I6 sau khi người dùng xác nhận D0.2–D0.4 và Q-G
 owner: sondv
-updated: 2026-10-22
+updated: 2026-10-25
 spec: document/spec/identity-auth.md
 scope: [I1, I2, I3, I4, I6]   # I5, I7, I8: design bổ sung sau khi spec FE confirmed (Confirm log #1)
 services: [identity-service]
@@ -386,7 +386,7 @@ Phát hiện sau khi design đã qua một vòng review: sơ đồ và D5/D6 coi
 
 ### D5. Khoá tạm và rate limit — chọn **khoá tạm trong PostgreSQL, rate limit trong bộ nhớ** (người dùng chọn)
 - **Tiêu chí:** đúng khi nhiều instance (thấp, hiện 1 instance), chi phí (cao), chịu restart (vừa).
-- **Nhãn:** `[Cần]` cho khoá tạm; rate limit bộ nhớ là phương án đơn giản nhất đủ ở 1 instance. **Nơi thực thi rate limit (D0.5, Confirm log #12):** theo `api-endpoints.md`, rate limit và CORS cấu hình ở **gateway**; identity chỉ giữ khoá tạm trong DB. Khi chưa có gateway: câu hỏi Q-G (mục 14).
+- **Nhãn:** `[Cần]` cho khoá tạm; rate limit bộ nhớ là phương án đơn giản nhất đủ ở 1 instance. **Nơi thực thi rate limit (D0.5, Confirm log #12):** theo `api-endpoints.md`, rate limit và CORS cấu hình ở **gateway**; identity chỉ giữ khoá tạm trong DB. Khi gateway chưa có rate limit (lát 4): **Q-G đã chọn A (Confirm log #13)**, xem dưới.
 
 | Phương án | Đúng khi >1 instance | Ghi DB mỗi request | Mất khi restart |
 |---|---|---|---|
@@ -394,7 +394,7 @@ Phát hiện sau khi design đã qua một vòng review: sơ đồ và D5/D6 coi
 | B. Cả hai trong DB | Đúng | Mọi request chạm endpoint nhạy cảm | Không |
 | C. Cả hai trong bộ nhớ | Sai | Không | Mất cả hai |
 
-- **Khuyến nghị:** A. Bảng `login_attempt(email_norm, ip, failures, locked_until, updated_at)` cập nhật nguyên tử (`INSERT ... ON CONFLICT DO UPDATE`); đăng nhập đúng reset bộ đếm của cặp; rate limit theo IP (NFR-008) do gateway thực thi (D0.5); `RateLimiter` có sẵn của ASP.NET ở identity chỉ là phương án dự phòng, xem Q-G.
+- **Khuyến nghị:** A. Bảng `login_attempt(email_norm, ip, failures, locked_until, updated_at)` cập nhật nguyên tử (`INSERT ... ON CONFLICT DO UPDATE`); đăng nhập đúng reset bộ đếm của cặp; rate limit theo IP (NFR-008) do gateway thực thi (D0.5); identity bật `RateLimiter` có sẵn của ASP.NET bằng **cờ cấu hình** (Q-G = A, Confirm log #13): bật khi chạy trực tiếp (I1–I4, trước gateway lát 4), tắt khi gateway đã thực thi NFR-008, vì sau gateway mọi request cùng IP gateway nên limiter ở identity sẽ chặn nhầm cả người dùng. Cờ và hành vi hai chế độ phải có test (mục 11).
 - **Vì sao không B:** thêm tải ghi và phụ thuộc DB cho mọi lần gọi, dù tải rất nhỏ. **B đúng khi** chạy >1 instance và cần giới hạn toàn cục chính xác.
 - **Vì sao không C:** restart xoá khoá tạm, kẻ tấn công chờ restart (hoặc gây restart) để thử tiếp.
 - **Chú ý IP:** client đi qua gateway (D0.5) nên identity chỉ thấy IP của gateway; IP client lấy từ `X-Forwarded-For` **chỉ khi** nguồn là proxy tin cậy đã cấu hình (gateway, và ALB nếu có); không cấu hình thì mọi người dùng gom thành một IP làm khoá tạm khoá nhầm hàng loạt, cấu hình sai thì cho phép giả IP để né khoá (rủi ro, mục 13).
@@ -569,6 +569,7 @@ ECS Fargate (ADR 0003), một task; PostgreSQL; Secrets Manager; ALB hoặc các
 - Contract test hai chiều (D2): token do `JsonWebTokenHandler` của identity phát phải qua `Teamboard.Auth`; token sai (sửa payload, `alg=none`, sai `iss/aud`, `kid` lạ, tráo khoá HMAC bằng khoá công khai) bị từ chối.
 - Test CLI xoay khoá: `start` → `activate` → `retire` đúng trình tự và từ chối khi chưa đủ thời gian chờ; token cũ còn hạn vẫn qua bộ kiểm trong lúc xoay.
 - Benchmark băm mật khẩu ở I1 để chọn vCPU (D8, mục 3).
+- Test cờ rate limit (D5, Q-G = A): cờ bật thì vượt 10 req/phút/IP trên đăng ký, đăng nhập, `token` nhận 429 kèm `Retry-After`; cờ tắt thì không giới hạn ở identity (gateway chịu trách nhiệm).
 
 ## 12. Lộ trình mở rộng
 | Mức tải | Điểm nghẽn đầu tiên | Cách xử lý | Chi phí/rủi ro |
@@ -608,7 +609,7 @@ Câu hỏi mở (mỗi câu có lựa chọn, khuyến nghị kèm lý do, hậu
 |---|---|---|---|---|
 | Q-FE | Khi nào thiết kế I5, I7, I8 (phiên cookie, mã uỷ quyền, CORS, scope) so với spec FE và ADR nơi lưu token | sondv | Trước khi bắt đầu I5 | `deferred` có chủ đích (Confirm log #1): sondv chịu trách nhiệm |
 | Q-F | Giá AWS trong mục 10 chưa xác minh | sondv | Trước khi viết Terraform | `deferred` sang `aws-service-selection` |
-| Q-G | NFR-008 (rate limit) thực thi thế nào khi chưa có gateway ở I1–I4 | sondv | Trước khi vào plan I1 | `open` |
+| Q-G | NFR-008 (rate limit) thực thi thế nào khi chưa có gateway ở I1–I4 | sondv | Trước khi vào plan I1 | Đã chọn A (Confirm log #13, 2026-10-25) |
 
 ### Q-FE Thiết kế I5, I7, I8
 - **Lựa chọn:**
@@ -629,6 +630,8 @@ Câu hỏi mở (mỗi câu có lựa chọn, khuyến nghị kèm lý do, hậu
 - **Mặc định nếu quá hạn:** không dùng số trong mục 10 để quyết định triển khai.
 
 ### Q-G Rate limit khi chưa có gateway
+**Đã chốt: A (người dùng, 2026-10-25, Confirm log #13).** Nội dung bên dưới giữ để truy vết.
+
 Bối cảnh: D0.5 giao rate limit (NFR-008) cho gateway. Cập nhật 2026-10-25: gateway đã merge lát 1 (TB-010: khung YARP, route `/api/v1/boards/**`, health, `404 problem+json`), nhưng rate limit theo IP (lát 4), correlation (lát 2) và CORS (lát 6) trong `document/plans/api-gateway-slices.md` **chưa làm**, và spec gateway chưa có route cho identity. Vì vậy Q-G vẫn còn hiệu lực cho I1–I4 (chỉ thu hẹp: khi gateway lát 4 xong thì cờ ở phương án A tắt được).
 - **Lựa chọn:**
   - A) Identity bật `RateLimiter` ASP.NET theo cấu hình (bật khi chạy trực tiếp, tắt khi gateway đã thực thi). Đánh đổi: thêm một đoạn mã và một cờ cấu hình, nhưng NFR-008 kiểm chứng được ngay ở I1.
@@ -664,6 +667,7 @@ Bối cảnh: D0.5 giao rate limit (NFR-008) cho gateway. Cập nhật 2026-10-2
 | 2026-10-22 | Bổ sung mức xa thực tế (Gần/Xa) và cách thực tế làm cho các mục `[Chọn để học]` (D0.1, D0.4, D6, phần mở đầu) theo `system-design` nguyên tắc 6 mới; tự xây identity thay IdP có sẵn ghi là Xa có giới hạn (xác nhận sẵn ở ADR 0006) | Người dùng yêu cầu bám thực tế |
 | 2026-10-22 | Thêm mục 1.1 Thuật ngữ nâng cao (giải thích lần đầu theo `explain-terms.md`); không đổi quyết định | Rule explain-terms mới |
 | 2026-10-22 | Cập nhật mục 14 theo mẫu mới: tách giả định và câu hỏi mở; Q-FE và Q-F bổ sung lựa chọn, khuyến nghị kèm lý do, hậu quả; không đổi quyết định | LL-005 |
+| 2026-10-25 | design-review vòng 6 PASS: ghi xác nhận #9–#11 và Q-G = A (Confirm log #13); D5 thêm cờ rate limit; mục 11 thêm test cờ; status `confirmed` | Người dùng trả lời; xem Fix log |
 | 2026-10-22 | Thêm D0.5 đường vào qua gateway (người dùng chọn A, Confirm log #12); sửa sơ đồ mục 4, D5 (rate limit ở gateway, `X-Forwarded-For` từ gateway), claim `iss`, STRIDE; thêm Q-G | Người dùng phát hiện design bỏ qua gateway |
 
 ## 18. Confirm log
@@ -678,10 +682,11 @@ Bối cảnh: D0.5 giao rate limit (NFR-008) cho gateway. Cập nhật 2026-10-2
 | 6 | `design-review:identity-auth:assumptions-qa-qb-qc-qe` | Xác nhận `aud` chung, xoay khoá bằng CLI (ba lệnh), SLO, TTL mã 60 giây và dọn `login_attempt` 7 ngày | Chấp nhận cả bốn | 1 | 2026-10-22 |
 | 7 | `design-review:identity-auth:data-access-tech` | Truy cập dữ liệu: Dapper/Npgsql hay EF Core | EF Core + Npgsql, SQL thô cho thao tác nguyên tử | 1 | 2026-10-22 |
 | 8 | `design-review:identity-auth:d0-service-boundary` | Identity là service riêng, module trong board, hay Cognito; nhãn | A: service riêng, `[Chọn để học]` | 3 | 2026-10-22 |
-| 9 | `design-review:identity-auth:d0-database-isolation` | Mức cô lập DB: chung instance dev, instance riêng, hay chung DB với board | Nguyên văn: "Trên thực tế dự án microservice chọn cái nào hãy tham khảo". Áp dụng: database + user riêng, chung instance ở dev, instance riêng ở môi trường thật (D0.2); **chờ người dùng xác nhận lý do** | 3 | 2026-10-22 |
-| 10 | `design-review:identity-auth:d0-database-type` | PostgreSQL, SQL Server hay DynamoDB | Nguyên văn: "Chọn cái nào cũng được nhưng phải đưa ra lý do thuyết phục chứ không phải thích là chọn hay vì sự đa dạng". Áp dụng: PostgreSQL với lý do kỹ thuật và phần yếu nêu rõ (D0.3); **chờ người dùng xác nhận lý do** | 3 | 2026-10-22 |
-| 11 | `design-review:identity-auth:d0-internal-architecture` | Vertical Slice hay Clean Architecture hay layered | Nguyên văn: "Đưa ra lý do tại sao chọn kiến trúc này mà không chọn kiến trúc khác." Áp dụng: Vertical Slice với lý do và điểm yếu cần giảm (D0.4); **chờ người dùng xác nhận lý do** | 3 | 2026-10-22 |
+| 9 | `design-review:identity-auth:d0-database-isolation` | Mức cô lập DB: chung instance dev, instance riêng, hay chung DB với board | Nguyên văn: "Trên thực tế dự án microservice chọn cái nào hãy tham khảo". Áp dụng: database + user riêng, chung instance ở dev, instance riêng ở môi trường thật (D0.2); **người dùng xác nhận lý do, giữ A (2026-10-25)** | 3 | 2026-10-22 |
+| 10 | `design-review:identity-auth:d0-database-type` | PostgreSQL, SQL Server hay DynamoDB | Nguyên văn: "Chọn cái nào cũng được nhưng phải đưa ra lý do thuyết phục chứ không phải thích là chọn hay vì sự đa dạng". Áp dụng: PostgreSQL với lý do kỹ thuật và phần yếu nêu rõ (D0.3); **người dùng xác nhận lý do, giữ PostgreSQL (2026-10-25)** | 3 | 2026-10-22 |
+| 11 | `design-review:identity-auth:d0-internal-architecture` | Vertical Slice hay Clean Architecture hay layered | Nguyên văn: "Đưa ra lý do tại sao chọn kiến trúc này mà không chọn kiến trúc khác." Áp dụng: Vertical Slice với lý do và điểm yếu cần giảm (D0.4); **người dùng xác nhận lý do, giữ Vertical Slice (2026-10-25)** | 3 | 2026-10-22 |
 | 12 | `design-review:identity-auth:d0-entry-path-gateway` | Client vào identity bằng đường nào: qua gateway, host công khai riêng, hay lai (người dùng phát hiện design bỏ qua gateway) | A: qua gateway như mọi service (xem D0.5) | 5 | 2026-10-22 |
+| 13 | `design-review:identity-auth:q-g-rate-limit-without-gateway` | NFR-008 (rate limit) thực thi thế nào ở I1–I4 khi gateway chưa có lát 4 | A: identity bật `RateLimiter` ASP.NET bằng cờ cấu hình (bật khi chạy trực tiếp, tắt được khi gateway lát 4 thực thi); khuyến nghị của agent được chấp nhận | 6 | 2026-10-25 |
 
 ## 19. Review rounds
 
@@ -692,3 +697,13 @@ Bối cảnh: D0.5 giao rate limit (NFR-008) cho gateway. Cập nhật 2026-10-2
 | 3 | 2026-10-22 | Người dùng chỉ ra design thiếu lý do cấp service. Thêm D0 (ranh giới, DB riêng, loại DB, kiến trúc nội bộ) và Confirm log #8–#11; thêm tham chiếu ở 2.3 | 3 (#9, #10, #11: người dùng xác nhận lý do trong D0) | 0 | NEEDS_CONFIRM |
 | 4 | 2026-10-22 | Áp dụng quy tắc uỷ quyền mới (`review-loop.md` quy tắc 11) vào D2: quyết định #2 là "Agent chọn theo uỷ quyền", mở lại để người dùng xác nhận kết quả cụ thể | 4 → 3 (#2 đã xác nhận; còn #9, #10, #11 chờ xác nhận lý do D0.2–D0.4) | 0 | NEEDS_CONFIRM |
 | 5 | 2026-10-22 | Người dùng phát hiện identity không đi qua gateway. Thêm D0.5 (đường vào qua gateway), sửa sơ đồ, D5, claim `iss`, STRIDE, thêm Q-G; Confirm log #12 | 4 (#9, #10, #11 chờ xác nhận lý do; Q-G chờ chọn) | 0 | NEEDS_CONFIRM |
+| 6 | 2026-10-25 | Delta sau khi gateway lát 1 merge: bối cảnh Q-G và D0.5; người dùng xác nhận #9, #10, #11 và chọn Q-G = A (Confirm log #13); kiểm tái phát các finding cũ, link, mâu thuẫn với spec gateway | 0 | 4 (đã sửa, xem Fix log) | PASS (phạm vi I1–I4, I6) |
+
+## 20. Fix log
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|---|---|
+| 6 | `design-review:identity-auth:d5-stale-qg-reference` | CONFIRM #13 | D5 nhãn và khuyến nghị | Còn ghi Q-G là câu hỏi mở và RateLimiter chỉ "dự phòng" | Ghi Q-G = A, nêu cờ cấu hình bật khi chạy trực tiếp, tắt khi gateway thực thi và lý do (IP gateway làm chặn nhầm) | grep "Q-G" mục 5 |
+| 6 | `design-review:identity-auth:qg-status-open` | CONFIRM #13 | Mục 14 (bảng và phần Q-G) | Phần Q-G chưa ghi đã chốt | Ghi "Đã chốt: A" kèm Confirm log #13; bảng đã ghi từ trước | mục 14 |
+| 6 | `design-review:identity-auth:ratelimit-flag-untested` | CONFIRM #13 | Mục 11 | Cờ rate limit mới chưa có test | Thêm dòng test hai chế độ cờ (429 + `Retry-After`; cờ tắt không giới hạn) | mục 11 |
+| 6 | `design-review:identity-auth:status-front-matter` | PASS vòng 6 | Front matter | `status: draft` còn ghi chờ xác nhận lý do | Đổi `confirmed`, cập nhật ngày | đầu file |
