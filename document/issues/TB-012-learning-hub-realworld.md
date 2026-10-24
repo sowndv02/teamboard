@@ -1,13 +1,13 @@
 ---
 key: TB-012
 title: learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ
-status: review
+status: done
 phase: 0
 branch: feature/TB-012-learning-hub-realworld
 estimate: M
 created: 2026-10-23
 started: 2026-10-23
-closed: null
+closed: 2026-10-23
 ---
 
 # TB-012 — learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ
@@ -39,7 +39,7 @@ Ghi chú đầu tiên của skill `learning-hub` (TB-011) có mục real-world m
 - 2026-10-23 (đợt 3, theo yêu cầu "ghi rõ ràng từng cơ chế, đừng chung chung"): SKILL.md thêm mục 3.1 "Các cơ chế/biến thể/pattern chính" (mỗi cơ chế một mục con: ai làm gì, sơ đồ, ưu, nhược, khi dùng, mức nguồn) và nguyên tắc 6. `caching.md` có 6 cơ chế riêng (cache-aside, read-through, write-through, write-behind, write-around, refresh-ahead) + bảng so sánh; `api-gateway.md`, `container.md`, `microservice.md` cũng có mục 3.1. Nguồn tự mở: Azure Cache-Aside, AWS whitepaper caching patterns, Azure caching guidance. Write-behind chỉ có Azure nhắc tên; write-around và refresh-ahead chưa có nguồn định nghĩa nên ghi `Chưa kiểm`.
 - 2026-10-23 (đợt 4): rà các skill khác, chỉ `learning-hub` cần sửa (mô tả, chế độ `index`, bước nghiên cứu, cột mục lục, thêm "Checklist trước khi báo xong"). Phát hiện `.agents/rules/INDEX.md` chưa liệt kê `learning-hub` (thiếu từ TB-011); theo yêu cầu người dùng, đã thêm một dòng vào bảng skill (sau `angular-learning`).
 - 2026-10-23: push branch và mở PR [#9](https://github.com/sowndv02/teamboard/pull/9), chuyển sang review. Merge thử với `main` sạch; plan TB-001 đã có trên `main` nên link trong `docker-compose.md` sẽ hết gãy sau khi merge.
-- Còn lại, chưa làm: mở lại các nguồn mức Vừa (Zuul, AWS API Gateway, K8s Gateway API, Stack Overflow, Slack, Honeycomb, Netflix migration...); chạy thử ví dụ Valkey/C#/unshare; chưa commit.
+- Còn lại, chưa làm: mở lại các nguồn mức Vừa (Zuul, AWS API Gateway, K8s Gateway API, Stack Overflow, Slack, Honeycomb, Netflix migration...); chạy thử ví dụ Valkey/C#/unshare. Việc đổi sang lộ trình nhiều Part và dạy L1–L8 chuyển sang TB-013.
 - Điểm lệch ngoài phạm vi, báo riêng: `patterns-catalog.md` (dòng 38, 78, 91) viết "Redis" trong khi chính sách yêu cầu Valkey; `config/dependencies.yaml:58` ghi "ElastiCache dùng Valkey (kiểm tra)" chưa kiểm; client .NET Redis chưa có trong `dependencies.yaml`.
 
 ## Bài học (lessons learned)

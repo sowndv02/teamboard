@@ -22,4 +22,11 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-009](TB-009-commit-per-step.md) | Commit file của từng bước workflow ngay khi bước đạt | 0 | review |
 | [TB-010](TB-010-gateway-skeleton-routing.md) | Gateway lát 1, khung YARP, route boards, health và 404 problem+json (chờ TB-001) | 1 | todo |
 | [TB-011](TB-011-learning-hub.md) | Skill learning-hub gom kiến thức theo chủ đề vào document/learning | 0 | review |
-| [TB-012](TB-012-learning-hub-realworld.md) | learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ | 0 | review |
+| [TB-012](TB-012-learning-hub-realworld.md) | learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ | 0 | done |
+| [TB-013](TB-013-learning-roadmap-docker.md) | Lộ trình học hai chiều (Part × L1–L8) cho learning-hub, mẫu trên Docker | 0 | review |
+| [TB-014](TB-014-learning-roadmap-caching.md) | Lộ trình học Caching (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | review |
+| [TB-015](TB-015-learning-roadmap-valkey.md) | Lộ trình học Redis / Valkey (công cụ) theo Part 0–7 × L1–L8 | 0 | review |
+| [TB-016](TB-016-learning-roadmap-api-gateway.md) | Lộ trình học API Gateway và YARP theo Part 0–7 × L1–L8 | 0 | review |
+| [TB-017](TB-017-learning-roadmap-microservice.md) | Lộ trình học Microservice (khái niệm) theo Part 0–7 × L1–L8 | 0 | review |
+| [TB-018](TB-018-learning-roadmap-container.md) | Lộ trình học Container (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | review |
+| [TB-019](TB-019-learning-roadmap-redis.md) | Lộ trình học Redis (phần riêng) và ghi chú so sánh Redis với Valkey | 0 | review |
