@@ -54,6 +54,21 @@ public sealed class ComposeSteps
         Assert.Equal("f", result.Output.Trim());
     }
 
+    [Then("một người dùng cơ sở dữ liệu khác trong cùng instance không kết nối được vào database của identity")]
+    public void ThenOtherDatabaseUserCannotConnect()
+    {
+        // Role thứ hai mô phỏng user của service khác dùng chung instance (task-service sau này).
+        var created = _docker.ComposeExec(
+            "postgres", "psql", "-U", "postgres", "-d", "postgres", "-tAc",
+            "CREATE ROLE other_service LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE");
+        Assert.True(created.ExitCode == 0, $"Không tạo được role thử nghiệm: {created.Error}");
+
+        // Quyền CONNECT được kiểm bất kể cách xác thực nên socket trong container đủ để chứng minh.
+        var attempt = _docker.ComposeExec("postgres", "psql", "-U", "other_service", "-d", "identity", "-tAc", "SELECT 1");
+        Assert.True(attempt.ExitCode != 0, "Role khác vẫn kết nối được vào database identity.");
+        Assert.Contains("permission denied", attempt.Error, StringComparison.OrdinalIgnoreCase);
+    }
+
     [AfterScenario("docker")]
     public void Cleanup() => _docker.ComposeDown();
 }

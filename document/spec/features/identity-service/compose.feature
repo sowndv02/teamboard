@@ -17,3 +17,10 @@ Feature: Chạy identity-service bằng compose
     And image của identity-service đã được build bằng compose chính
     When tôi chạy identity-service cùng PostgreSQL bằng compose với tên dự án riêng
     Then người dùng cơ sở dữ liệu của identity không có quyền quản trị
+
+  @S10 @D02
+  Scenario: Người dùng cơ sở dữ liệu khác không kết nối được vào database của identity
+    Given Docker khả dụng
+    And image của identity-service đã được build bằng compose chính
+    When tôi chạy identity-service cùng PostgreSQL bằng compose với tên dự án riêng
+    Then một người dùng cơ sở dữ liệu khác trong cùng instance không kết nối được vào database của identity
