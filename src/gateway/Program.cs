@@ -1,4 +1,5 @@
 using Gateway;
+using OpenTelemetry.Metrics;
 using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
 
@@ -16,6 +17,9 @@ builder.Services
 
 // Needed for the route-level Timeout in the YARP configuration: without this middleware a route with Timeout fails with 500.
 builder.Services.AddRequestTimeouts();
+
+builder.Services.AddSingleton<GatewayMetrics>();
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(GatewayMetrics.MeterName));
 
 var app = builder.Build();
 

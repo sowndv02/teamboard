@@ -9,7 +9,7 @@ namespace Gateway;
 /// Turns forwarder failures that happen before the response starts into problem+json (design D4).
 /// It sits in front of YARP and reads <see cref="IForwarderErrorFeature"/> once the forwarder has returned.
 /// </summary>
-public sealed class UpstreamErrorMiddleware(RequestDelegate next, ILogger<UpstreamErrorMiddleware> logger, IOptions<UpstreamOptions> options)
+public sealed class UpstreamErrorMiddleware(RequestDelegate next, ILogger<UpstreamErrorMiddleware> logger, IOptions<UpstreamOptions> options, GatewayMetrics metrics)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -34,6 +34,11 @@ public sealed class UpstreamErrorMiddleware(RequestDelegate next, ILogger<Upstre
                 break;
             case UpstreamFailure.Timeout:
                 await WriteProblemAsync(context, GatewayErrorCodes.UpstreamTimeout, feature, retryAfter: false);
+                break;
+            case UpstreamFailure.AbortedAfterHeaders:
+                // Too late to change the status: YARP already cut the connection, so record it for the log and the counter.
+                logger.LogWarning(feature.Exception, "Upstream failed after the response started ({ForwarderError}); the connection was cut.", feature.Error);
+                metrics.UpstreamAborted();
                 break;
             case UpstreamFailure.ClientCancelled:
                 // The client is gone: nothing to answer and not an upstream failure.
