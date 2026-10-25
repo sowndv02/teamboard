@@ -12,7 +12,7 @@ public static class ProblemFactory
 
     public static ProblemDetails Create(ErrorDefinition error, HttpContext context, string? detail = null)
     {
-        // Chưa có middleware correlation (lát 2): correlationId tạm bằng traceId để trường luôn có mặt.
+        // correlationId do CorrelationMiddleware đặt; chưa chạy middleware (ví dụ unit test) thì tạm bằng traceId để trường luôn có mặt.
         var traceId = Activity.Current?.Id ?? context.TraceIdentifier;
 
         var problem = new ProblemDetails
@@ -24,7 +24,7 @@ public static class ProblemFactory
         };
         problem.Extensions["code"] = error.Code;
         problem.Extensions["traceId"] = traceId;
-        problem.Extensions["correlationId"] = traceId;
+        problem.Extensions["correlationId"] = context.Items[CorrelationHeaders.ItemKey] as string ?? traceId;
         return problem;
     }
 }
