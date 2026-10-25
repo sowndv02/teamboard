@@ -22,14 +22,14 @@ Lát 3 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
   - Timeout cấu hình được: tổng 30 giây theo `Timeout` của route và `ActivityTimeout` ≤ 30 giây của cluster (giả định A-03).
   - Ánh xạ lỗi của forwarder thành `problem+json` **trước khi gửi header**: `503 UPSTREAM_UNAVAILABLE` (không có đích khả dụng hoặc không kết nối được), `502 UPSTREAM_BAD_GATEWAY` (lỗi giao thức, upstream ngắt khi chưa trả header), `504 UPSTREAM_TIMEOUT` (quá timeout trước header); mã lỗi ở bảng mã của gateway, không lộ host nội bộ hay stack trace.
   - `Retry-After` trên `503` (mặc định 5 giây, cấu hình được; giả định DA-05).
-  - Upstream đã trả header rồi mới ngắt hoặc treo: gateway ngắt kết nối với client, ghi log và metric `gateway_upstream_aborted` kèm `correlationId` (không đổi được status đã gửi).
+  - Upstream đã trả header rồi mới ngắt hoặc treo: gateway ngắt kết nối với client, ghi log kèm `correlationId` và tăng metric `gateway_upstream_aborted` (metric chỉ đếm, không nhãn `correlationId`) (không đổi được status đã gửi).
 - Không làm: retry và circuit breaker (spec mục 4), rate limit (lát 4), body (lát 5), CORS (lát 6), metric độ trễ thêm vào, log retention và graceful shutdown (lát 7), smoke với endpoint boards thật (lát 8), sửa `board-service` hay `identity-service`.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
 - [ ] Upstream không kết nối được (cổng đóng) trả `503 problem+json` `UPSTREAM_UNAVAILABLE` kèm `Retry-After`, có `traceId` và `correlationId`.
 - [ ] Upstream ngắt kết nối hoặc trả lỗi giao thức trước khi trả header trả `502 problem+json` `UPSTREAM_BAD_GATEWAY`.
-- [ ] Upstream không trả header trong thời gian timeout (cấu hình ngắn trong test) trả `504 problem+json` `UPSTREAM_TIMEOUT`.
-- [ ] Upstream đã trả header rồi ngắt hoặc treo: client bị ngắt kết nối, có log và metric `gateway_upstream_aborted` với `correlationId`.
+- [ ] Upstream không trả header trong thời gian timeout (cấu hình ngắn trong test; timeout kết nối cũng là 504) trả `504 problem+json` `UPSTREAM_TIMEOUT`.
+- [ ] Upstream đã trả header rồi ngắt hoặc treo: client bị ngắt kết nối, có log Warning kèm `correlationId` và metric `gateway_upstream_aborted` (không nhãn).
 - [ ] Phản hồi lỗi không chứa host, cổng hay tên nội bộ của upstream, không có stack trace.
 - [ ] Giá trị timeout và `Retry-After` đọc từ cấu hình, không hardcode.
 - [ ] `/health/live` và `/health/ready` vẫn 200 khi upstream chết.
@@ -40,6 +40,7 @@ Plan chi tiết: `document/plans/TB-023-gateway-downstream-errors.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ lát 3 của bảng lát; branch tạo từ `main` (sau PR 15).
+- 2026-10-25: plan-review chốt 7 điểm; sửa spec FR-006 và design D4, 6.4, 9 (thêm `RequestTimeouts` sau `ExceptionHandler`, timeout kết nối là 504, metric không mang `correlationId`).
 
 ## Workflow
 
@@ -50,7 +51,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-023-gateway-downstream-errors.md` (draft), 4 bước B1-B4, 10 kịch bản @S01-@S10, 4 câu hỏi mở P-01..P-04, 5 giả định cần spike ở test-init |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-10-25 | plan `approved`; 7 quyết định (vị trí `UseRequestTimeouts`, metric không mang `correlationId`, timeout kết nối 504, lỗi lạ 502, client huỷ, giữ cỡ lát, khoảng `Retry-After`), 11 FIX; review độc lập kèm spike YARP |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -61,6 +62,13 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-023:p01-request-timeouts-position | Vị trí `UseRequestTimeouts` | Ngay sau `ExceptionHandler`, sửa design 6.4 | 1 | 2026-10-25 |
+| 2 | plan-review:TB-023:metric-correlationid | Metric có `correlationId`? | Chỉ ở log; sửa spec, design, issue | 1 | 2026-10-25 |
+| 3 | plan-review:TB-023:connect-timeout-mapping | Timeout kết nối 503 hay 504 | 504, ghi vào design và spec | 1 | 2026-10-25 |
+| 4 | plan-review:TB-023:p03-unmapped-forwarder-errors | Lỗi forwarder ngoài bảng trước header | 502 kèm log chi tiết | 1 | 2026-10-25 |
+| 5 | plan-review:TB-023:p02-client-cancel | Client huỷ request | Không ghi response, log Information | 1 | 2026-10-25 |
+| 6 | plan-review:TB-023:slice-size | Giữ hay chia lát | Giữ nguyên | 1 | 2026-10-25 |
+| 7 | plan-review:TB-023:retry-after-range | Khoảng `Retry-After` | Số nguyên 1..3600, mặc định 5 | 1 | 2026-10-25 |
 
 ## Kịch bản và TDD log
 
