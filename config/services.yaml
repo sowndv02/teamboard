@@ -21,10 +21,12 @@ services:
     health: none                # tĩnh; kiểm bằng smoke e2e
 
   identity-service:
-    status: planned
+    status: existing            # khung lát 1a (TB-021); chưa có route ở gateway (lát 19 của identity-auth)
+    path: src/identity-service
     architecture: vertical-slice
-    datastore: postgresql
-    local_port: TODO
+    datastore: postgresql       # service `postgres` dùng chung ở compose, database và user `identity` riêng (design D0.2)
+    local_port: 6061            # host; container nghe 7070 (docker-compose.yml)
+    container_port: 7070
     health: { live: /health/live, ready: /health/ready }
 
   board-service:

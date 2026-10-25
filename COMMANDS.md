@@ -23,7 +23,7 @@ Quy tắc đầy đủ: `.agents/rules/code-change-gate.md`. Chạy gate của t
 ```bash
 # .NET
 dotnet build src/teamboard.slnx -warnaserror
-dotnet test src/teamboard.slnx --filter "Category!=docker"   # nhanh; thêm test Docker bằng `--filter "Category=docker"` (cần Docker Desktop, cổng 6060 và 8080 trống)
+dotnet test src/teamboard.slnx --filter "Category!=docker"   # nhanh; thêm test Docker bằng `--filter "Category=docker"` (cần Docker Desktop, cổng 6060, 6061 và 8080 trống; test identity dùng Testcontainers nên cũng cần Docker)
 dotnet format src/teamboard.slnx --verify-no-changes
 
 # Angular (src/web), 🚧 chưa scaffold; dùng `npm ci` (không `npm install`) trong gate
@@ -42,7 +42,7 @@ gitleaks protect --staged --redact                # 🚧 chưa cài
 dotnet list src/teamboard.slnx package --vulnerable --include-transitive
 
 # Docker
-docker compose -f src/docker-compose.yml config -q
+docker compose -f src/docker-compose.yml --env-file src/.env.example config -q   # compose chính đòi biến mật khẩu; file mẫu đủ cho kiểm tra cú pháp
 
 # Terraform
 terraform -chdir=infra/envs/dev fmt -check        # 🚧
@@ -57,6 +57,8 @@ Chỉ chạy phần liên quan tới thay đổi (đổi .NET thì không cần 
 
 ## 3. Chạy local
 
+Lần đầu: `cp src/.env.example src/.env` rồi đặt mật khẩu riêng (`.env` đã bị gitignore). Compose chính đòi `POSTGRES_PASSWORD` và `IDENTITY_DB_PASSWORD` cho `postgres` và `identity-service`; thiếu thì mọi lệnh `docker compose -f src/docker-compose.yml` đều lỗi.
+
 ```bash
 docker compose -f src/docker-compose.yml up --build -d
 docker compose -f src/docker-compose.yml ps
@@ -64,7 +66,7 @@ docker compose -f src/docker-compose.yml logs -f <service>
 docker compose -f src/docker-compose.yml down
 ```
 
-Cổng hiện tại: `gateway` ở http://localhost:8080 (container 7070, điểm vào của client), `board-service` ở http://localhost:6060 (container 7070, chỉ để debug trực tiếp); health ở `/health/live`, `/health/ready`.
+Cổng hiện tại: `gateway` ở http://localhost:8080 (container 7070, điểm vào của client), `board-service` ở http://localhost:6060 (container 7070, chỉ để debug trực tiếp), `identity-service` ở http://localhost:6061 (container 7070, chưa có route ở gateway, gọi trực tiếp); PostgreSQL (`postgres`) không mở cổng ra host; health ở `/health/live`, `/health/ready`.
 Quan sát cục bộ (Jaeger, chỉ bind 127.0.0.1): `docker compose -f src/docker-compose.yml -f src/docker-compose.observability.yml up --build -d`, giao diện http://127.0.0.1:16686 (API truy vấn chỉ có v3).
 Compose theo môi trường: `src/docker-compose.develop.yml`, `src/docker-compose.stg.yml` (cần file `.env.*` tương ứng, xem mục Vấn đề đã biết trong `PROJECT.md`).
 

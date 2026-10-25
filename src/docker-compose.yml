@@ -22,3 +22,42 @@ services:
     ports:
       - "8080:7070"
     restart: unless-stopped
+
+  # Chưa có route ở gateway (lát 19 của identity-auth); gọi trực tiếp ở cổng 6061 để debug.
+  identity-service:
+    image: identity-service
+    build:
+      context: .
+      dockerfile: identity-service/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:7070
+      ConnectionStrings__IdentityDb: "Host=postgres;Port=5432;Database=identity;Username=identity;Password=${IDENTITY_DB_PASSWORD:?Đặt IDENTITY_DB_PASSWORD trong src/.env (mẫu: src/.env.example)}"
+      # Chỉ tự áp migration ở local và compose; mặc định của service là tắt (backend-engineering.md mục 7).
+      Database__MigrateOnStartup: "true"
+    ports:
+      - "6061:7070"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Một instance PostgreSQL dùng chung ở dev (design D0.2); mỗi service có database và user riêng, tạo bởi postgres/init.
+  # Không mở cổng ra host: chỉ các service trong mạng compose truy cập được.
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Đặt POSTGRES_PASSWORD trong src/.env (mẫu: src/.env.example)}"
+      IDENTITY_DB_PASSWORD: "${IDENTITY_DB_PASSWORD:?Đặt IDENTITY_DB_PASSWORD trong src/.env (mẫu: src/.env.example)}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Kiểm qua TCP (127.0.0.1): server tạm của bước khởi tạo chỉ nghe socket, nên chỉ khoẻ khi các script init đã chạy xong.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

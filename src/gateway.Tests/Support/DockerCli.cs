@@ -36,7 +36,8 @@ internal sealed class DockerCli
 
     public CommandResult Compose(TimeSpan timeout, params string[] args)
     {
-        var arguments = new List<string> { "compose", "-p", ProjectName };
+        // Compose chính có biến bắt buộc cho identity-service/postgres (TB-021); file mẫu đủ để compose đọc được, các service này không chạy ở đây.
+        var arguments = new List<string> { "compose", "-p", ProjectName, "--env-file", "src/.env.example" };
         foreach (var file in _composeFiles)
         {
             arguments.Add("-f");

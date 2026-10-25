@@ -1,12 +1,12 @@
 ---
 key: TB-021
 title: Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-021-identity-service-skeleton
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-10-25          # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
@@ -27,12 +27,12 @@ Lát 1a của `document/plans/identity-auth-slices.md` (`approved`; spec `docume
 - Không làm: đăng ký, băm mật khẩu, bảng `user` và các bảng nghiệp vụ (lát 1b trở đi), khoá ký và Secrets Manager (lát 4), rate limit (lát 3), route ở gateway (lát 19), `X-Correlation-Id` (chờ gateway lát 2).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] `GET /health/live` trả 200; `GET /health/ready` trả 200 khi PostgreSQL chạy và lỗi (không phải 200) khi DB dừng.
-- [ ] Migration nền áp dụng được trên PostgreSQL trống và tạo bảng lịch sử migration.
-- [ ] Compose chạy identity-service cùng PostgreSQL, `ready` đạt trong thời gian quy định ở plan.
-- [ ] Lỗi chưa xử lý trả `500 problem+json` có `code`, `traceId`, không có stack trace.
-- [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes`, `docker compose config -q` xanh.
-- [ ] `config/services.yaml`, compose, `PROJECT.md` khớp; không secret trong repo (có `*.example`).
+- [x] `GET /health/live` trả 200; `GET /health/ready` trả 200 khi PostgreSQL chạy và lỗi (không phải 200) khi DB dừng.
+- [x] Migration nền áp dụng được trên PostgreSQL trống và tạo bảng lịch sử migration.
+- [x] Compose chạy identity-service cùng PostgreSQL, `ready` đạt trong thời gian quy định ở plan.
+- [x] Lỗi chưa xử lý trả `500 problem+json` có `code`, `traceId`, không có stack trace.
+- [x] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes`, `docker compose config -q` xanh.
+- [x] `config/services.yaml`, compose, `PROJECT.md` khớp; không secret trong repo (có `*.example`).
 
 ## Kế hoạch
 Plan chi tiết: `document/plans/TB-021-identity-service-skeleton.md` (`approved`, plan-review PASS vòng 2).
@@ -46,15 +46,15 @@ Lệnh: `dotnet test src/identity-service.Tests --no-build` (bản đầu 7 test
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 live 200 khi DB không chạy (`health.feature`) | `Live trả 200 khi cơ sở dữ liệu không chạy` | Đỏ: mong 200, nhận 404 (chưa có endpoint) | – |
-| @S02 ready 200 khi DB chạy (`database.feature`) | `Ready trả 200 khi cơ sở dữ liệu chạy` | Đỏ: mong 200, nhận 404 | – |
-| @S03 ready 503 khi DB dừng, không lộ chuỗi kết nối | `Ready trả 503 khi cơ sở dữ liệu đã dừng` | Đỏ: mong 503, nhận 404 | – |
-| @S04 migration nền áp trên DB trống, áp hai lần không đổi | `Migration nền áp lên cơ sở dữ liệu trống và áp lần hai không đổi gì` | Đỏ: "Bảng lịch sử migration chưa được tạo" | – |
-| @S05 compose chạy identity-service + PostgreSQL, ready ≤ 30 giây (`compose.feature`) | `Compose chạy identity-service cùng PostgreSQL và ready đạt trong 30 giây` | Đỏ: `docker compose build` báo `no such service: identity-service` | – |
-| @S06 lỗi chưa xử lý trả `500 problem+json` (`errors.feature`) | `Lỗi chưa xử lý trả lỗi chuẩn không lộ chi tiết nội bộ` | Đỏ: yêu cầu ném lỗi chưa xử lý thay vì trả 500 (chưa có bộ xử lý lỗi) | – |
-| @S07 cờ tự áp tắt thì service vẫn sống và không áp migration (`database.feature`) | `Không tự áp migration khi cờ tự áp tắt` | Bản đầu xanh ngay (không từng đỏ); sau `test-review` (Confirm log 10) thêm kiểm `/health/live` 200 nên đỏ: mong 200, nhận 404 | – |
-| @S08 telemetry mang `service.name` đúng (`health.feature`) | `Telemetry của identity-service mang đúng tên service` | Đỏ: "identity-service chưa đăng ký OpenTelemetry" (thêm ở `test-review`) | – |
-| @S09 user DB của identity không có quyền quản trị (`compose.feature`) | `Người dùng cơ sở dữ liệu của identity không có quyền quản trị` | Đỏ: `no such service: identity-service` (thêm ở `test-review`) | – |
+| @S01 live 200 khi DB không chạy (`health.feature`) | `Live trả 200 khi cơ sở dữ liệu không chạy` | Đỏ: mong 200, nhận 404 (chưa có endpoint) | Xanh (coding-start) |
+| @S02 ready 200 khi DB chạy (`database.feature`) | `Ready trả 200 khi cơ sở dữ liệu chạy` | Đỏ: mong 200, nhận 404 | Xanh (coding-start) |
+| @S03 ready 503 khi DB dừng, không lộ chuỗi kết nối | `Ready trả 503 khi cơ sở dữ liệu đã dừng` | Đỏ: mong 503, nhận 404 | Xanh (coding-start) |
+| @S04 migration nền áp trên DB trống, áp hai lần không đổi | `Migration nền áp lên cơ sở dữ liệu trống và áp lần hai không đổi gì` | Đỏ: "Bảng lịch sử migration chưa được tạo" | Xanh (coding-start) |
+| @S05 compose chạy identity-service + PostgreSQL, ready ≤ 30 giây (`compose.feature`) | `Compose chạy identity-service cùng PostgreSQL và ready đạt trong 30 giây` | Đỏ: `docker compose build` báo `no such service: identity-service` | Xanh (coding-start) |
+| @S06 lỗi chưa xử lý trả `500 problem+json` (`errors.feature`) | `Lỗi chưa xử lý trả lỗi chuẩn không lộ chi tiết nội bộ` | Đỏ: yêu cầu ném lỗi chưa xử lý thay vì trả 500 (chưa có bộ xử lý lỗi) | Xanh (coding-start) |
+| @S07 cờ tự áp tắt thì service vẫn sống và không áp migration (`database.feature`) | `Không tự áp migration khi cờ tự áp tắt` | Bản đầu xanh ngay (không từng đỏ); sau `test-review` (Confirm log 10) thêm kiểm `/health/live` 200 nên đỏ: mong 200, nhận 404 | Xanh (coding-start) |
+| @S08 telemetry mang `service.name` đúng (`health.feature`) | `Telemetry của identity-service mang đúng tên service` | Đỏ: "identity-service chưa đăng ký OpenTelemetry" (thêm ở `test-review`) | Xanh (coding-start) |
+| @S09 user DB của identity không có quyền quản trị (`compose.feature`) | `Người dùng cơ sở dữ liệu của identity không có quyền quản trị` | Đỏ: `no such service: identity-service` (thêm ở `test-review`) | Xanh (coding-start) |
 
 Gate nhanh `Category!=docker`: 2 test (@S01, @S06) đỏ; 5 test còn lại thuộc nhóm `docker` (Testcontainers cần Docker daemon). `dotnet build src/teamboard.slnx -warnaserror` xanh; `dotnet format --verify-no-changes` không báo lỗi.
 
@@ -102,15 +102,15 @@ Chuẩn: `.agents/rules/test-review.md`, skill `test-review`. Làn lớn: đủ 
 
 | Kịch bản | Test thực thi | Kết quả chạy lại |
 |---|---|---|
-| @S01 | `Live trả 200 khi cơ sở dữ liệu không chạy` | ❌ đỏ đúng lý do (404) |
-| @S02 | `Ready trả 200 khi cơ sở dữ liệu chạy` | ❌ đỏ đúng lý do (404) |
-| @S03 | `Ready trả 503 khi cơ sở dữ liệu đã dừng` | ❌ đỏ đúng lý do (404) |
-| @S04 | `Migration nền áp lên cơ sở dữ liệu trống và áp lần hai không đổi gì` | ❌ đỏ đúng lý do (bảng chưa tạo) |
-| @S05 | `Compose chạy identity-service cùng PostgreSQL và ready đạt trong 30 giây` | ❌ đỏ đúng lý do (`no such service`) |
-| @S06 | `Lỗi chưa xử lý trả lỗi chuẩn không lộ chi tiết nội bộ` | ❌ đỏ đúng lý do (lỗi chưa xử lý) |
-| @S07 | `Không tự áp migration khi cờ tự áp tắt` | ❌ đỏ đúng lý do (404) |
-| @S08 | `Telemetry của identity-service mang đúng tên service` | ❌ đỏ đúng lý do (chưa đăng ký OpenTelemetry) |
-| @S09 | `Người dùng cơ sở dữ liệu của identity không có quyền quản trị` | ❌ đỏ đúng lý do (`no such service`) |
+| @S01 | `Live trả 200 khi cơ sở dữ liệu không chạy` | ✅ xanh (coding-start) |
+| @S02 | `Ready trả 200 khi cơ sở dữ liệu chạy` | ✅ xanh (coding-start) |
+| @S03 | `Ready trả 503 khi cơ sở dữ liệu đã dừng` | ✅ xanh (coding-start) |
+| @S04 | `Migration nền áp lên cơ sở dữ liệu trống và áp lần hai không đổi gì` | ✅ xanh (coding-start) |
+| @S05 | `Compose chạy identity-service cùng PostgreSQL và ready đạt trong 30 giây` | ✅ xanh (coding-start) |
+| @S06 | `Lỗi chưa xử lý trả lỗi chuẩn không lộ chi tiết nội bộ` | ✅ xanh (coding-start) |
+| @S07 | `Không tự áp migration khi cờ tự áp tắt` | ✅ xanh (coding-start) |
+| @S08 | `Telemetry của identity-service mang đúng tên service` | ✅ xanh (coding-start) |
+| @S09 | `Người dùng cơ sở dữ liệu của identity không có quyền quản trị` | ✅ xanh (coding-start) |
 
 Lệnh: `dotnet test src/identity-service.Tests --no-build` cho 9 test, 9 đỏ, không lỗi biên dịch hay môi trường; `dotnet build src/teamboard.slnx -warnaserror` xanh; `dotnet format --verify-no-changes` không báo lỗi.
 
@@ -122,6 +122,31 @@ Lệnh: `dotnet test src/identity-service.Tests --no-build` cho 9 test, 9 đỏ,
 - Không có unit test riêng ở lát này (logic mỏng, phần lớn là cấu hình); không có contract test vì chưa có API nghiệp vụ.
 - @S08 chỉ xanh khi B1 gọi `AddServiceDefaults("identity-service")` thay cho `Program.cs` rỗng.
 
+## Coding log
+
+Đỏ xác nhận trước khi viết code: 9/9 đỏ đúng lý do (commit `1880761`). Mỗi bước chạy lại test của bước, rồi gate.
+
+| Bước | Thay đổi chính | Test xanh |
+|---|---|---|
+| B1 | `identity-service.csproj` (tham chiếu `ServiceDefaults`, `Shared.Http`), `Program.cs` gọi `AddServiceDefaults("identity-service")` và `MapDefaultEndpoints()` | @S01, @S08 |
+| B2 | `UseExceptionHandler` trả `INTERNAL_ERROR` bằng `ProblemFactory` (không đưa ngoại lệ vào response) | @S06 |
+| B3 | `Persistence/` (`IdentityDbContext`, `DatabaseOptions`, `PersistenceExtensions`), migration nền `InitialBaseline`, check DB gắn tag `ready`, cờ `Database:MigrateOnStartup` mặc định tắt; gói `Npgsql.EntityFrameworkCore.PostgreSQL 10.0.3`, `Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore 10.0.13`, `Microsoft.EntityFrameworkCore.Design 10.0.13` | @S02, @S03, @S04, @S07 |
+| B4 | `Dockerfile`, compose chính (`identity-service` host 6061, `postgres` dùng chung không mở cổng, volume, healthcheck qua TCP), `src/postgres/init/01-identity.sh` (database và user `identity` không quyền quản trị), `config/services.yaml`, `PROJECT.md`, `COMMANDS.md`, `config/dependencies.yaml`, `docker-compose.dcproj` | @S05, @S09 |
+
+Lệnh và kết quả (2026-10-25, Docker 29.5.3):
+- `dotnet test src/identity-service.Tests`: 9/9 xanh (3 test nhanh, 6 test nhóm `docker`; @S05 ready trong 7 giây, ngưỡng 30 giây).
+- `dotnet build src/teamboard.slnx -warnaserror` xanh; `dotnet format --verify-no-changes` không báo lỗi; `dotnet list package --vulnerable --include-transitive` không có gói lỗ hổng; `docker compose -f src/docker-compose.yml --env-file src/.env.example config -q` ok.
+- `dotnet test src/teamboard.slnx --filter "Category!=docker"`: xanh ở cả 5 project test (7, 3, 11, 17, 21 test).
+- Hồi quy docker: `gateway.Tests` (1 test) và `board-service.Tests` (2 test) nhóm `docker` xanh sau khi truyền `--env-file`.
+- Quét secret thô (`git diff | grep`): chỉ tên biến và `*.example`, không có giá trị thật. `gitleaks` chưa cài nên chưa chạy.
+
+Điểm đáng nhớ và việc ngoài plan (người dùng đồng ý hoặc cần `coding-review` xem):
+- **Hồi quy compose:** biến mật khẩu bắt buộc (Confirm log 8 của plan) làm mọi lệnh `docker compose` trên file chính lỗi nếu thiếu `src/.env`. Người dùng chọn sửa test của gateway và board truyền `--env-file src/.env.example` (hai file `Support/DockerCli.cs`) và cập nhật `COMMANDS.md`; người chạy local phải tạo `src/.env` một lần.
+- `.gitattributes` thêm `*.sh text eol=lf`: script khởi tạo DB chạy trong container Linux, CRLF của checkout Windows sẽ làm nó lỗi.
+- Exception handler nằm trong `Program.cs` của identity, chưa ở `src/shared` như `backend-engineering.md` mục 1 mong muốn; gateway lát 2 sẽ đưa middleware dùng chung vào `src/shared`, lúc đó chuyển sang dùng chung.
+- Migration nền sinh bằng `dotnet-ef 10.0.13` cài vào thư mục tạm (không cài toàn cục, không thêm vào repo).
+- `Microsoft.EntityFrameworkCore.Design` giữ `PrivateAssets=all`, giống `board-service`.
+
 ## Workflow
 
 Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đạt.
@@ -132,4 +157,4 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | done | 2 | 2026-10-25 | PASS; plan `approved`, Confirm log #1–#8 |
 | test-init | done | – | 2026-10-25 | Đỏ: 6/7 test (bản đầu), xanh 1; xem "Kịch bản và TDD log" |
 | test-review | done | 1 | 2026-10-25 | PASS (Sẵn sàng code); 9 test đỏ đúng lý do; xem "Test review rounds" |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-10-25 | Xanh 9/9; gate đầy đủ xanh (trừ gitleaks chưa cài); xem "Coding log" |
