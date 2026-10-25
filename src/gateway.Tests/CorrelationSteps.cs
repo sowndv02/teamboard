@@ -12,6 +12,8 @@ public sealed class CorrelationSteps(GatewayContext context)
     private const string CorrelationHeader = "X-Correlation-Id";
     private const string TraceParentHeader = "traceparent";
 
+    private static readonly string[] AllowedProblemProperties = ["type", "title", "status", "detail", "code", "traceId", "correlationId"];
+
     private string _clientTraceId = string.Empty;
     private string _clientSpanId = string.Empty;
     private string _sentTraceParent = string.Empty;
@@ -136,9 +138,13 @@ public sealed class CorrelationSteps(GatewayContext context)
     [Then("the response contains no exception name or stack trace")]
     public void ThenNoExceptionDetails()
     {
+        // Property-name allowlist: any extra property (stack trace, exception) fails regardless of its name.
+        using var document = JsonDocument.Parse(context.Body);
+        Assert.All(document.RootElement.EnumerateObject(), property => Assert.Contains(property.Name, AllowedProblemProperties));
         Assert.DoesNotContain("Exception", context.Body);
+        Assert.DoesNotContain("StackTrace", context.Body);
+        Assert.DoesNotContain("   at ", context.Body);
         Assert.DoesNotContain("secret-forwarder-failure", context.Body);
-        Assert.DoesNotContain(" at ", context.Body);
     }
 
     /// <summary>Exactly one X-Correlation-Id value in the response (Single throws if there are zero or several).</summary>

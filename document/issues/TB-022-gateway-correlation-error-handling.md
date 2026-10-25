@@ -27,14 +27,14 @@ Lát 2 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
 - Không làm: timeout và ánh xạ `502/503/504` (lát 3), rate limit và `ForwardedHeaders` (lát 4), body (lát 5), CORS (lát 6), metric độ trễ thêm vào, log retention, graceful shutdown (lát 7), correlation ở phía `board-service`, smoke với endpoint boards thật (lát 8).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Request không có `X-Correlation-Id` nhận id mới trong response, upstream nhận đúng id đó.
-- [ ] Request có id hợp lệ (gồm độ dài 64) được giữ nguyên ở upstream và response.
-- [ ] Id không hợp lệ (ký tự lạ, dài 65 ký tự) bị thay bằng id mới.
-- [ ] Upstream nhận `traceparent` cùng trace id với client gửi.
-- [ ] `404` và `500` `problem+json` mang `correlationId` bằng header response; lỗi chưa lường không lộ stack trace.
-- [ ] Upstream trả `X-Correlation-Id` khác thì response tới client chỉ có đúng một giá trị (của gateway).
-- [ ] Trace của một request qua gateway có span của `gateway` và `board-service` trong cùng một trace ở Jaeger.
-- [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
+- [x] Request không có `X-Correlation-Id` nhận id mới trong response, upstream nhận đúng id đó.
+- [x] Request có id hợp lệ (gồm độ dài 64) được giữ nguyên ở upstream và response.
+- [x] Id không hợp lệ (ký tự lạ, dài 65 ký tự) bị thay bằng id mới.
+- [x] Upstream nhận `traceparent` cùng trace id với client gửi.
+- [x] `404` và `500` `problem+json` mang `correlationId` bằng header response; lỗi chưa lường không lộ stack trace.
+- [x] Upstream trả `X-Correlation-Id` khác thì response tới client chỉ có đúng một giá trị (của gateway).
+- [x] Trace của một request qua gateway có span của `gateway` và `board-service` trong cùng một trace ở Jaeger.
+- [x] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
 
 ## Kế hoạch
 Plan chi tiết: `document/plans/TB-022-gateway-correlation-error-handling.md`.
@@ -57,7 +57,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-10-25 | 18 test thư viện + 16 test host gateway + @S06 Docker đỏ đúng lý do; spike A-03 đạt (thay `IHttpForwarder`); trace-by-id Jaeger kiểm tay: `GET /api/v3/traces/{traceId}` |
 | test-review | PASS | 2 | 2026-10-25 | 14 FIX vòng 1 + 4 quyết định (traceparent thiếu/sai, giữ bảng id, không test log gateway); test tiếng Anh ASCII theo quy tắc mới; review độc lập (sub-agent); 33 + 26 test đỏ ở hành vi, @S06 đỏ đúng lý do |
 | coding-start | done | – | 2026-10-25 | xanh 40/40 (Http) + 46/46 (gateway) + @S06; 4 commit cục bộ B1a (7707480), B1b (e6eca95), B2 (04a5b5e), B3 (bd76e52); toàn solution non-docker xanh, nhóm docker từng assembly xanh (gateway 2, board-service 2, identity 7); format, vulnerable, compose config sạch; gitleaks chưa cài |
-| coding-review | pending | | | |
+| coding-review | PASS | 1 | 2026-10-25 | review độc lập (sub-agent), không P0-P2; 3 CONFIRM đã chốt (phạm vi PR, log console, theo dõi ngoài phạm vi), 2 FIX P3 đã sửa; test, build, format, compose config xanh lại sau sửa |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -72,6 +72,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 6 | test-review:TB-022:traceparent-malformed-behavior | Hành vi khi `traceparent` sai định dạng | Bỏ qua, bắt đầu trace mới, vẫn chuyển tiếp (không trả lỗi) | 1 | 2026-10-25 |
 | 7 | test-review:TB-022:pyramid-grammar-duplication | Bảng ngữ pháp id lặp ở `.feature` và unit test | Giữ cả hai | 1 | 2026-10-25 |
 | 8 | test-review:TB-022:gateway-log-scope-untested | Test log/scope ở gateway thật | Không cần, unit đủ | 1 | 2026-10-25 |
+| 9 | coding-review:TB-022:out-of-scope-test-translation | Commit 41e358a dịch test và `.feature` của các issue khác nằm trong PR TB-022 | Giữ trong PR, ghi rõ trong issue và mô tả PR (dịch theo quy tắc test tiếng Anh, không đổi hành vi) | 1 | 2026-10-25 |
+| 10 | coding-review:TB-022:console-log-lacks-correlation | Log console không in scope correlationId (scope chỉ tới OTLP) | Để lát 7 (access log có correlationId), ghi giới hạn đã biết | 1 | 2026-10-25 |
+| 11 | coding-review:TB-022:followups-out-of-scope | identity-service còn UseExceptionHandler riêng, board-service chưa dùng UseCorrelation | Ghi nhận, tạo issue sau (đề xuất khi mở PR), không sửa ngoài phạm vi | 1 | 2026-10-25 |
 
 ## Kịch bản và TDD log
 
@@ -123,6 +126,23 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-25 | 69e940c | Sẵn sàng merge sau khi chốt 3 CONFIRM và sửa 2 FIX P3 | 0 (CONFIRM #9-#11 đã chốt; FIX `criteria-unticked`, `weak-assert` đã sửa) |
+
+
+### Fix log coding-review
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | gateway:CorrelationSteps.ThenNoExceptionDetails:weak-assert | FIX | `src/gateway.Tests/CorrelationSteps.cs` | `DoesNotContain(" at ")` yếu | Allowlist tên thuộc tính của problem+json, thêm `StackTrace` và `   at ` | gateway.Tests 46/46 xanh |
+| 1 | gateway:Issue-TB-022:criteria-unticked | FIX | issue, Tiêu chí hoàn thành | 8 tiêu chí chưa tick dù đã có evidence | Tick cả 8 (test ở bảng TDD log; @S06 xanh ở coding-start) | Issue |
+
+### Giới hạn đã biết (coding-review)
+
+- Console logger không in scope `correlationId`; scope chỉ tới OTLP exporter (bật khi có `OTEL_EXPORTER_OTLP_ENDPOINT`). Access log có `correlationId` thuộc lát 7 (Confirm log #10).
+- `ExceptionHandler` có thể biến ngoại lệ có status riêng của framework (ví dụ `BadHttpRequestException`) thành 500; kiểm bằng test ở lát 3 và 5 (chưa chạy thử, suy luận từ hành vi framework).
+- board-service chưa dùng `UseCorrelation`: lỗi do board-service tạo có `correlationId` trong body bằng traceId của board, header response là id của gateway. identity-service còn `UseExceptionHandler` riêng và comment cũ. Đề xuất issue riêng cho cả hai (Confirm log #11).
+- Không có test log scope ở gateway thật (Confirm log #8); không có test khi client ngắt kết nối hay response đã bắt đầu (lát 3).
+- `gitleaks` chưa cài; chỉ grep thô diff (sạch).
 
 ## Bài học (lessons learned)
 
