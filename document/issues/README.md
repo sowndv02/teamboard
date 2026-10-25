@@ -7,6 +7,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 - **Trạng thái:** `todo` → `in-progress` → `review` → `done` (hoặc `dropped`). Ghi trong front matter của file và trong bảng dưới.
 - **Branch:** `feature/TB-001-<slug>`. **Commit:** `feat(TB-001): <tóm tắt>`. **PR:** tiêu đề `TB-001: <tóm tắt>`.
 - Tạo issue mới: copy `_template.md`, lấy số kế tiếp trong bảng, thêm một dòng vào bảng.
+- Tính năng chia lát: key của mọi lát được cấp một lần khi bảng lát được duyệt (issue khung `todo` + dòng trong bảng này); xem `.agents/skills/workflow/references/slicing.md`.
 - Đổi trạng thái thì cập nhật cả file issue và bảng này trong cùng commit.
 
 ## Danh sách
@@ -34,3 +35,27 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-020](TB-020-learning-roadmap-identity.md) | Lộ trình học Identity (xác thực và ủy quyền) theo Part 0–7 × L1–L8 | 0 | review |
 | [TB-021](TB-021-identity-service-skeleton.md) | Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền | 1 | review |
 | [TB-022](TB-022-gateway-correlation-error-handling.md) | Gateway lát 2, correlation, trace nối xuyên service và 500 problem+json | 1 | review |
+| [TB-023](TB-023-gateway-downstream-errors.md) | Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng) | 1 | in-progress |
+| [TB-024](TB-024-gateway-rate-limit.md) | Gateway lát 4, rate limit theo IP và 429 problem+json | 1 | todo |
+| [TB-025](TB-025-gateway-body-limit.md) | Gateway lát 5, giới hạn body 1 MiB | 1 | todo |
+| [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | todo |
+| [TB-027](TB-027-gateway-observability-ops.md) | Gateway lát 7, quan sát và vận hành | 1 | todo |
+| [TB-028](TB-028-gateway-smoke-board-service.md) | Gateway lát 8, smoke với board-service thật (hoãn) | 1 | todo |
+| [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | todo |
+| [TB-030](TB-030-identity-login.md) | Identity lát 2, đăng nhập với lỗi chung không lộ email | 1 | todo |
+| [TB-031](TB-031-identity-lockout-rate-limit.md) | Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập | 1 | todo |
+| [TB-032](TB-032-identity-access-token.md) | Identity lát 4, phát access token JWT khi đăng nhập | 1 | todo |
+| [TB-033](TB-033-auth-token-validation-library.md) | Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth | 1 | todo |
+| [TB-034](TB-034-identity-jwks.md) | Identity lát 6, công bố JWKS | 1 | todo |
+| [TB-035](TB-035-identity-signing-key-rotation.md) | Identity lát 7, xoay khoá ký không hỏng token còn hạn | 1 | todo |
+| [TB-036](TB-036-identity-refresh-token.md) | Identity lát 8, refresh token xoay vòng | 1 | todo |
+| [TB-037](TB-037-identity-refresh-reuse-detection.md) | Identity lát 9, phát hiện dùng lại refresh token | 1 | todo |
+| [TB-038](TB-038-identity-logout.md) | Identity lát 10, đăng xuất thu hồi phiên | 1 | todo |
+| [TB-039](TB-039-identity-change-password.md) | Identity lát 11, đổi mật khẩu và thu hồi refresh | 1 | todo |
+| [TB-040](TB-040-identity-client-registry.md) | Identity lát 12, quản lý client đăng ký | 1 | todo |
+| [TB-041](TB-041-identity-client-credentials.md) | Identity lát 13, Client Credentials và token máy | 1 | todo |
+| [TB-042](TB-042-identity-authorize-pkce.md) | Identity lát 14, Authorization Code + PKCE: authorize và trang đăng nhập | 1 | todo |
+| [TB-043](TB-043-identity-token-endpoint-code-exchange.md) | Identity lát 15, endpoint token đổi mã (code_verifier) | 1 | todo |
+| [TB-044](TB-044-identity-oidc.md) | Identity lát 16, OIDC: id_token, userinfo, discovery | 1 | todo |
+| [TB-045](TB-045-identity-scope-authorization.md) | Identity lát 17, ủy quyền theo scope | 1 | todo |
+| [TB-046](TB-046-identity-revocation-introspection.md) | Identity lát 18, thu hồi token và introspection tối thiểu | 1 | todo |

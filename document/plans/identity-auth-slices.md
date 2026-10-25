@@ -15,24 +15,24 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | # | GĐ | Lát (hành vi giao được) | FR/NFR | Phụ thuộc | Ước lượng | Issue | Trạng thái |
 |---|---|---|---|---|---|---|---|
 | 1a | I1 | Khung identity-service chạy được: health live/ready (ready kiểm DB), OTel, PostgreSQL + EF Core, migration nền, Dockerfile và compose | NFR-001, NFR-003, NFR-009 (một phần NFR-004: `traceparent`) | TB-001 (ServiceDefaults, xong), `shared/Http` (xong) | 2–3 ngày | TB-021 | review |
-| 1b | I1 | Đăng ký bằng email/mật khẩu băm PBKDF2, benchmark số vòng và vCPU | FR-001, FR-004, BR-001, BR-002, NFR-002, NFR-007 (metric băm) | 1a | 2–3 ngày | – | todo |
-| 2 | I1 | Đăng nhập, lỗi chung không lộ email | FR-002, BR-003 | 1b | 2–3 ngày | – | todo |
-| 3 | I1 | Khoá tạm theo (email, IP) và giới hạn tốc độ (cờ `RateLimiter`, Q-G = A) | FR-003, NFR-008 | 2 | 2–3 ngày | – | todo |
-| 4 | I2 | Phát access token JWT khi đăng nhập (ADR RS256 + Secrets Manager tạo trước lát này) | FR-005, BR-004 | 2, ADR thuật toán ký | 2–3 ngày | – | todo |
-| 5 | I2 | Bộ kiểm tra token dùng chung `Teamboard.Auth` (JWKS, cache) và test tấn công (ADR thư viện token) | FR-006, NFR-006 | 4, JWKS (6) | 3–4 ngày | – | todo |
-| 6 | I3 | Công bố JWKS | FR-007 | 4 | 1–2 ngày | – | todo |
-| 7 | I3 | Xoay khoá ký không hỏng token còn hạn (CLI, D7) | FR-008 | 6, ADR xoay khoá | 2–3 ngày | – | todo |
-| 8 | I4 | Refresh token xoay vòng (ADR refresh nguyên tử) | FR-009 | 4 | 2–3 ngày | – | todo |
-| 9 | I4 | Phát hiện dùng lại refresh token, thu hồi chuỗi | FR-010 | 8 | 2 ngày | – | todo |
-| 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 8 | 1 ngày | – | todo |
-| 11 | I1 | Đổi mật khẩu (thu hồi refresh) | FR-022 | 3, 8 | 1–2 ngày | – | todo |
-| 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | – | todo |
-| 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | – | todo |
-| 14 | I5 | Authorization Code + PKCE: authorize và trang đăng nhập (chưa có design, chờ spec FE) | FR-012, FR-019, BR-005 | 2, 12, ADR trang đăng nhập | 4–5 ngày | – | todo |
-| 15 | I5 | Endpoint token đổi mã (code_verifier) | FR-013 | 14 | 2–3 ngày | – | todo |
-| 16 | I7 | OIDC: id_token, userinfo, discovery | FR-016–018 | 15 | 3–4 ngày | – | todo (Could) |
-| 17 | I8 | Ủy quyền theo scope | FR-020 | 5 | 2 ngày | – | todo |
-| 18 | I8 | Thu hồi token và introspection tối thiểu | FR-021, BR-006 | 13, 17 | 2–3 ngày | – | todo |
+| 1b | I1 | Đăng ký bằng email/mật khẩu băm PBKDF2, benchmark số vòng và vCPU | FR-001, FR-004, BR-001, BR-002, NFR-002, NFR-007 (metric băm) | 1a | 2–3 ngày | [TB-029](../issues/TB-029-identity-register.md) | todo |
+| 2 | I1 | Đăng nhập, lỗi chung không lộ email | FR-002, BR-003 | 1b | 2–3 ngày | [TB-030](../issues/TB-030-identity-login.md) | todo |
+| 3 | I1 | Khoá tạm theo (email, IP) và giới hạn tốc độ (cờ `RateLimiter`, Q-G = A) | FR-003, NFR-008 | 2 | 2–3 ngày | [TB-031](../issues/TB-031-identity-lockout-rate-limit.md) | todo |
+| 4 | I2 | Phát access token JWT khi đăng nhập (ADR RS256 + Secrets Manager tạo trước lát này) | FR-005, BR-004 | 2, ADR thuật toán ký | 2–3 ngày | [TB-032](../issues/TB-032-identity-access-token.md) | todo |
+| 5 | I2 | Bộ kiểm tra token dùng chung `Teamboard.Auth` (JWKS, cache) và test tấn công (ADR thư viện token) | FR-006, NFR-006 | 4, JWKS (6) | 3–4 ngày | [TB-033](../issues/TB-033-auth-token-validation-library.md) | todo |
+| 6 | I3 | Công bố JWKS | FR-007 | 4 | 1–2 ngày | [TB-034](../issues/TB-034-identity-jwks.md) | todo |
+| 7 | I3 | Xoay khoá ký không hỏng token còn hạn (CLI, D7) | FR-008 | 6, ADR xoay khoá | 2–3 ngày | [TB-035](../issues/TB-035-identity-signing-key-rotation.md) | todo |
+| 8 | I4 | Refresh token xoay vòng (ADR refresh nguyên tử) | FR-009 | 4 | 2–3 ngày | [TB-036](../issues/TB-036-identity-refresh-token.md) | todo |
+| 9 | I4 | Phát hiện dùng lại refresh token, thu hồi chuỗi | FR-010 | 8 | 2 ngày | [TB-037](../issues/TB-037-identity-refresh-reuse-detection.md) | todo |
+| 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 8 | 1 ngày | [TB-038](../issues/TB-038-identity-logout.md) | todo |
+| 11 | I1 | Đổi mật khẩu (thu hồi refresh) | FR-022 | 3, 8 | 1–2 ngày | [TB-039](../issues/TB-039-identity-change-password.md) | todo |
+| 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | [TB-040](../issues/TB-040-identity-client-registry.md) | todo |
+| 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | [TB-041](../issues/TB-041-identity-client-credentials.md) | todo |
+| 14 | I5 | Authorization Code + PKCE: authorize và trang đăng nhập (chưa có design, chờ spec FE) | FR-012, FR-019, BR-005 | 2, 12, ADR trang đăng nhập | 4–5 ngày | [TB-042](../issues/TB-042-identity-authorize-pkce.md) | todo |
+| 15 | I5 | Endpoint token đổi mã (code_verifier) | FR-013 | 14 | 2–3 ngày | [TB-043](../issues/TB-043-identity-token-endpoint-code-exchange.md) | todo |
+| 16 | I7 | OIDC: id_token, userinfo, discovery | FR-016–018 | 15 | 3–4 ngày | [TB-044](../issues/TB-044-identity-oidc.md) | todo (Could) |
+| 17 | I8 | Ủy quyền theo scope | FR-020 | 5 | 2 ngày | [TB-045](../issues/TB-045-identity-scope-authorization.md) | todo |
+| 18 | I8 | Thu hồi token và introspection tối thiểu | FR-021, BR-006 | 13, 17 | 2–3 ngày | [TB-046](../issues/TB-046-identity-revocation-introspection.md) | todo |
 | 19 | I9 | **Giữ chỗ:** tích hợp gateway: route công khai của identity, gateway kiểm JWT, `board-service` yêu cầu đăng nhập | FR-006 (phía gateway), NFR-008 (nếu chuyển rate limit sang gateway) | 4–6, gateway lát 2 và 4 | Chưa ước lượng | – | todo (chưa thiết kế) |
 
 Tổng khoảng 42–58 ngày công (chưa tính lát 19); mỗi lát ≤ ~3 ngày trừ lát 14 (cần cân nhắc chia thêm sau design I5).
