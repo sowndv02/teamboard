@@ -1,13 +1,13 @@
 ---
 key: TB-023
 title: Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng)
-status: review
+status: done
 phase: 1
 branch: feature/TB-023-gateway-downstream-errors
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-10-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-10-25     # ngày done/dropped (PR 16 merge)
 ---
 
 # TB-023 — Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng)
@@ -59,7 +59,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 2 | 2026-10-25 | 16 finding vòng 1 (1 P1, 7 P2, 8 P3) đã sửa, 3 quyết định (client huỷ kiểm ở host test xUnit, @S08 thành xUnit, log YARP để lát 7); review độc lập (sub-agent) kèm cài đặt tham chiếu 105/105 xanh và 4 đột biến bị bắt; @S10 chưa chạy được (Docker tắt) |
 | coding-start | done | – | 2026-10-25 | xanh 105/105 gateway (10 lần liên tiếp) và toàn solution không docker; nhóm docker từng assembly xanh (gateway 3 gồm @S10, board-service 2, identity 7); 4 commit cục bộ B1 ae73c92, B2 1577fab, B3 a50ac6b, B4 (ghi nhật ký); build, format, vulnerable, compose config sạch; gitleaks chưa cài |
 | coding-review | PASS | 2 | 2026-10-25 | review độc lập (sub-agent) 2 vòng, không P0-P1; 4 CONFIRM đã chốt (bỏ Response.Clear(), log ngoại lệ, danh sách SocketError, AddMeter), 6 FIX đã sửa, 3 P3 vòng 2 đã sửa; test, build, format, compose config xanh sau sửa |
-| create-pr | done | – | 2026-10-25 | PR https://github.com/sowndv02/teamboard/pull/16 (base main); chờ review người thật và CI, merge do người dùng |
+| create-pr | done | – | 2026-10-25 | PR https://github.com/sowndv02/teamboard/pull/16 (base main); đã merge 2026-10-25 (10:38 UTC) |
 
 ## Confirm log
 

@@ -1,12 +1,12 @@
 ---
 key: TB-024
 title: Gateway lát 4, rate limit theo IP và 429 problem+json
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-024-gateway-rate-limit
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-10-25     # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
@@ -22,13 +22,21 @@ Issue khung cấp key khi duyệt bảng lát: lát 4 của `document/plans/api-
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Request ghi thứ N+1 trong cửa sổ nhận `429 problem+json` `RATE_LIMIT_EXCEEDED` kèm `Retry-After` và `X-Correlation-Id`; request ngay trong ngưỡng thành công (ngưỡng mặc định 120 đọc và 30 ghi mỗi phút, cấu hình được).
+- [ ] `GET` và `HEAD` dùng chung bộ đếm đọc; đọc và ghi đếm riêng.
+- [ ] IP khác không bị ảnh hưởng; hai địa chỉ IPv6 cùng /64 dùng chung bộ đếm; IPv4 tính theo địa chỉ đầy đủ.
+- [ ] `X-Forwarded-For` từ nguồn không tin cậy không né được giới hạn; proxy trong danh sách cấu hình thì IP lấy từ header.
+- [ ] Upstream nhận `X-Forwarded-*` do gateway xác định, không mang giá trị giả của client.
+- [ ] `/health/live`, `/health/ready` và fallback `404` không bị giới hạn.
+- [ ] `429` không lộ IP hay khoá; ngưỡng và proxy tin cậy nằm trong cấu hình; compose không bật `ASPNETCORE_FORWARDEDHEADERS_ENABLED`.
+- [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan chi tiết: `document/plans/TB-024-gateway-rate-limit.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-10-25: bắt đầu lát 4; nhánh tạo từ `main` sau PR 16; đồng bộ lát 3 (TB-023) sang `done` cùng lúc (LL-006).
 
 ## Workflow
 
@@ -36,7 +44,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-10-25 | `document/plans/TB-024-gateway-rate-limit.md` (draft), 4 bước B1-B4, 11 kịch bản @S01-@S11, 5 câu hỏi mở P-01..P-05, 6 giả định cần spike ở test-init |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
