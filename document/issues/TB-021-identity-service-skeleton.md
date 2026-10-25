@@ -1,7 +1,7 @@
 ---
 key: TB-021
 title: Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-021-identity-service-skeleton
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -39,6 +39,7 @@ Plan chi tiết: `document/plans/TB-021-identity-service-skeleton.md` (`approved
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ hàng 1a của bảng lát; nhánh từ `main` `e79560d`.
+- 2026-10-25: mở PR [sowndv02/teamboard#14](https://github.com/sowndv02/teamboard/pull/14); issue chuyển `review`.
 
 ## Kịch bản và TDD log
 
@@ -207,3 +208,4 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | done | 1 | 2026-10-25 | PASS (Sẵn sàng code); 9 test đỏ đúng lý do; xem "Test review rounds" |
 | coding-start | done | – | 2026-10-25 | Xanh 9/9; gate đầy đủ xanh (trừ gitleaks chưa cài); xem "Coding log" |
 | coding-review | done | 2 | 2026-10-25 | PASS (Sẵn sàng merge); 4 finding đã sửa, 1 CONFIRM đã chốt; xem "Review rounds (coding-review)" |
+| create-pr | done | – | 2026-10-25 | PR [#14](https://github.com/sowndv02/teamboard/pull/14) |
