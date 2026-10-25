@@ -21,7 +21,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.2-preview.1" />
-    <!-- Ghim trực tiếp bản đã vá: Microsoft.Data.SqlClient 6.1.7 kéo bản 9.0.11 có lỗ hổng (NU1902, NU1903). Bỏ khi SqlClient nâng. -->
+    <!-- Pin the patched version directly: Microsoft.Data.SqlClient 6.1.7 pulls in 9.0.11, which has known vulnerabilities (NU1902, NU1903). Remove once SqlClient is upgraded. -->
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
   </ItemGroup>

@@ -10,9 +10,9 @@ var app = builder.Build();
 
 await app.ApplyMigrationsIfEnabledAsync();
 
-// Thứ tự middleware đích (backend-engineering.md mục 5): correlation, exception handler, xác thực, phân quyền, endpoint.
-// Lát 1a mới có exception handler và health; correlation dùng chung chờ gateway lát 2.
-// Handler trả INTERNAL_ERROR dạng problem+json; ngoại lệ chỉ vào log của server, không vào response.
+// Target middleware order (backend-engineering.md section 5): correlation, exception handler, authentication, authorization, endpoint.
+// Slice 1a only has the exception handler and health; the shared correlation waits for gateway slice 2.
+// The handler returns INTERNAL_ERROR as problem+json; the exception goes only to the server log, never to the response.
 app.UseExceptionHandler(errorApp => errorApp.Run(context =>
     Results.Problem(ProblemFactory.Create(SharedErrors.InternalError, context)).ExecuteAsync(context)));
 
@@ -20,5 +20,5 @@ app.MapDefaultEndpoints();
 
 app.Run();
 
-// Để test dùng WebApplicationFactory<Program>.
+// Exposed so tests can use WebApplicationFactory<Program>.
 public partial class Program;

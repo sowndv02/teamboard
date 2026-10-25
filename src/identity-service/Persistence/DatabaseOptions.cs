@@ -4,6 +4,6 @@ public sealed class DatabaseOptions
 {
     public const string SectionName = "Database";
 
-    /// <summary>Chỉ bật ở local và compose; ở môi trường thật migration chạy bằng bước riêng (backend-engineering.md mục 7).</summary>
+    /// <summary>Enabled only locally and in compose; in real environments migrations run as a separate step (backend-engineering.md section 7).</summary>
     public bool MigrateOnStartup { get; init; }
 }

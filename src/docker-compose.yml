@@ -10,7 +10,7 @@ services:
       - "6060:7070"
     restart: unless-stopped
 
-  # Điểm vào duy nhất của client. Không có depends_on: gateway phải sống và ready độc lập với upstream (FR-002).
+  # Single entry point for clients. No depends_on: the gateway must be live and ready independently of its upstreams (FR-002).
   gateway:
     image: gateway
     build:
@@ -23,7 +23,7 @@ services:
       - "8080:7070"
     restart: unless-stopped
 
-  # Chưa có route ở gateway (lát 19 của identity-auth); gọi trực tiếp ở cổng 6061 để debug.
+  # No gateway route yet (slice 19 of identity-auth); call it directly on port 6061 for debugging.
   identity-service:
     image: identity-service
     build:
@@ -31,8 +31,8 @@ services:
       dockerfile: identity-service/Dockerfile
     environment:
       ASPNETCORE_URLS: http://+:7070
-      ConnectionStrings__IdentityDb: "Host=postgres;Port=5432;Database=identity;Username=identity;Password=${IDENTITY_DB_PASSWORD:?Đặt IDENTITY_DB_PASSWORD trong src/.env (mẫu: src/.env.example)}"
-      # Chỉ tự áp migration ở local và compose; mặc định của service là tắt (backend-engineering.md mục 7).
+      ConnectionStrings__IdentityDb: "Host=postgres;Port=5432;Database=identity;Username=identity;Password=${IDENTITY_DB_PASSWORD:?Set IDENTITY_DB_PASSWORD in src/.env (template: src/.env.example)}"
+      # Migrations are applied automatically only locally and in compose; the service default is off (backend-engineering.md section 7).
       Database__MigrateOnStartup: "true"
     ports:
       - "6061:7070"
@@ -41,18 +41,18 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # Một instance PostgreSQL dùng chung ở dev (design D0.2); mỗi service có database và user riêng, tạo bởi postgres/init.
-  # Không mở cổng ra host: chỉ các service trong mạng compose truy cập được.
+  # One shared PostgreSQL instance in dev (design D0.2); each service has its own database and user, created by postgres/init.
+  # No port is published to the host: only services on the compose network can reach it.
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Đặt POSTGRES_PASSWORD trong src/.env (mẫu: src/.env.example)}"
-      IDENTITY_DB_PASSWORD: "${IDENTITY_DB_PASSWORD:?Đặt IDENTITY_DB_PASSWORD trong src/.env (mẫu: src/.env.example)}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in src/.env (template: src/.env.example)}"
+      IDENTITY_DB_PASSWORD: "${IDENTITY_DB_PASSWORD:?Set IDENTITY_DB_PASSWORD in src/.env (template: src/.env.example)}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      # Kiểm qua TCP (127.0.0.1): server tạm của bước khởi tạo chỉ nghe socket, nên chỉ khoẻ khi các script init đã chạy xong.
+      # Check over TCP (127.0.0.1): the temporary server used during initialization listens only on a socket, so it is healthy only after the init scripts have finished.
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
       interval: 3s
       timeout: 3s

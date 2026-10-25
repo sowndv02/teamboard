@@ -2,7 +2,7 @@ using Yarp.ReverseProxy.Forwarder;
 
 namespace Gateway;
 
-/// <summary>Việc gateway làm với một lỗi của forwarder.</summary>
+/// <summary>What the gateway does about a forwarder error.</summary>
 public enum UpstreamFailure
 {
     None,
@@ -13,7 +13,7 @@ public enum UpstreamFailure
     AbortedAfterHeaders,
 }
 
-// Khung tối thiểu để test biên dịch được (TB-023, test-init): chưa có hành vi. Ánh xạ thật được viết ở B1/B2.
+// Minimal skeleton so the tests compile (TB-023, test-init): no behavior yet. The real mapping is written in B1/B2.
 public static class UpstreamErrorClassifier
 {
     public static UpstreamFailure Classify(ForwarderError error, Exception? exception, bool routeTimeoutFired, bool responseStarted)

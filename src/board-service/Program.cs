@@ -31,5 +31,5 @@ app.MapDefaultEndpoints();
 
 app.Run();
 
-// Để test dùng WebApplicationFactory<Program>.
+// Exposed so tests can use WebApplicationFactory<Program>.
 public partial class Program;

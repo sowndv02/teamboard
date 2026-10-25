@@ -1,4 +1,4 @@
 namespace Teamboard.Shared.Http;
 
-/// <summary>Một mã lỗi API ổn định kèm status HTTP và message mặc định (tiếng Anh, không lộ chi tiết nội bộ).</summary>
+/// <summary>A stable API error code with its HTTP status and default message (English, no internal details leaked).</summary>
 public sealed record ErrorDefinition(string Code, int Status, string Message);

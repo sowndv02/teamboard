@@ -10,7 +10,7 @@ public static class PersistenceExtensions
 
     public static WebApplicationBuilder AddIdentityPersistence(this WebApplicationBuilder builder)
     {
-        // Thiếu chuỗi kết nối thì dừng ngay lúc khởi động; thông báo không chứa giá trị cấu hình.
+        // Fail fast at startup when the connection string is missing; the message does not contain configuration values.
         var connectionString = builder.Configuration.GetConnectionString(ConnectionStringName);
         if (string.IsNullOrWhiteSpace(connectionString))
         {
@@ -20,7 +20,7 @@ public static class PersistenceExtensions
         builder.Services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.SectionName).ValidateOnStart();
         builder.Services.AddDbContext<IdentityDbContext>(options => options.UseNpgsql(connectionString));
 
-        // Ready phụ thuộc DB (design 6.3): trả 503 khi không kết nối được, body không có chi tiết.
+        // Ready depends on the DB (design 6.3): returns 503 when it cannot connect, with no detail in the body.
         builder.Services.AddHealthChecks().AddDbContextCheck<IdentityDbContext>("database", tags: [ServiceDefaultsExtensions.ReadyTag]);
         return builder;
     }
