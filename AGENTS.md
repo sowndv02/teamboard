@@ -27,7 +27,7 @@ Các rule dưới đây áp dụng cho mọi dự án. Thông tin riêng của t
 - Theo style và quy ước sẵn có của repo; không thêm dependency hoặc abstraction khi chưa cần.
 - Code mới đi kèm test; logic quan trọng (xử lý lỗi, idempotency, bảo mật, tiền) bắt buộc có test.
 - Không nuốt lỗi âm thầm; không bỏ qua test hoặc hook đang fail, hãy tìm nguyên nhân.
-- Tên code/identifier tiếng Anh. Comment chỉ giải thích "vì sao", không mô tả "cái gì".
+- Tên code/identifier và comment trong source code viết tiếng Anh; tài liệu viết tiếng Việt (theo `PROJECT.md`). Comment chỉ giải thích "vì sao", không mô tả "cái gì".
 
 ## Kiến trúc và quyết định
 
