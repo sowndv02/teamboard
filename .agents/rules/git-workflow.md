@@ -13,4 +13,5 @@ Giá trị cụ thể (prefix, mẫu branch, repo) lấy từ `config/project.ya
 - Trước khi merge PR: chạy review theo `code-review.md` (mặc định report-only).
 - Trước khi mở PR: build + test xanh, diff không có secret, file sinh ra, hay thay đổi ngoài phạm vi.
 - Đổi trạng thái issue (file + bảng `document/issues/README.md`) trong cùng thay đổi.
+- Issue thuộc một lát của `document/plans/<feature>-slices.md` thì đổi luôn cột Trạng thái của hàng lát đó trong cùng thay đổi (`workflow/references/slicing.md`).
 - Cập nhật `PROJECT.md` → "Trạng thái hiện tại" khi hoàn thành một giai đoạn.

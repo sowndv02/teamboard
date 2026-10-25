@@ -49,6 +49,7 @@ Rule liên quan: `git-workflow.md`, `git-commit.md`, `code-change-gate.md`, `qua
 - [ ] Gate và test xanh ngay trước khi tạo
 - [ ] Người dùng đã xác nhận nội dung và nhánh đích
 - [ ] PR mở (hoặc cập nhật) đúng repo/nhánh; URL ghi vào issue; trạng thái issue `review`
+- [ ] Tính năng lớn: hàng lát trong `<feature>-slices.md` đổi `review` (cùng commit ghi URL PR); sau merge đổi `done`
 - [ ] Workflow `create-pr: done`; báo cáo cho người dùng
 
 ## Ghi trạng thái workflow

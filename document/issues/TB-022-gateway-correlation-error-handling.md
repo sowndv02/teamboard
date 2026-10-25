@@ -41,6 +41,7 @@ Plan chi tiết: `document/plans/TB-022-gateway-correlation-error-handling.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ lát 2 của bảng lát; branch tạo từ `main` (sau PR 11).
+- 2026-10-25: người dùng hỏi vì sao bảng lát không cập nhật khi hoàn thành lát; đồng bộ hai bảng lát với issue và nối việc cập nhật vào checklist `plan-init`, `coding-start`, `create-pr`, `git-workflow.md`, `slicing.md` (LL-006).
 
 ## Workflow
 
@@ -126,4 +127,4 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 Liên kết lesson sinh ra từ issue này (`document/lessons/LL-NNN-*.md`), hoặc ghi "không có". Skill `lesson-learned`.
 
--
+- [LL-006](../lessons/LL-006-slice-table-status-not-synced-with-issues.md): bảng lát không được cập nhật theo trạng thái issue.
