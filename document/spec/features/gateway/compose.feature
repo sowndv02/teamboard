@@ -1,13 +1,13 @@
 @TB-010 @gateway
-Feature: Gateway chạy trong compose
-  Là lập trình viên
-  Tôi muốn chạy gateway bằng docker compose
-  Để thử điểm vào của hệ thống ở máy local
+Feature: Gateway runs in compose
+  As a developer
+  I want to run the gateway with docker compose
+  So that I can try the system entry point locally
 
   @S05 @FR-002 @NFR-005 @docker
-  Scenario: Compose chạy riêng gateway và gateway sẵn sàng trong 10 giây
-    Given Docker khả dụng
-    And image của gateway đã được build bằng compose chính
-    When tôi chạy riêng service gateway bằng compose với tên dự án riêng
-    Then cổng host 8080 trả 200 cho "/health/live"
-    And "/health/ready" trả 200 trong vòng 10 giây kể từ lệnh chạy
+  Scenario: Compose starts the gateway alone and it is ready within 10 seconds
+    Given Docker is available
+    And the gateway image has been built with the main compose file
+    When I start only the gateway service with compose under a dedicated project name
+    Then host port 8080 returns 200 for "/health/live"
+    And "/health/ready" returns 200 within 10 seconds of the start command

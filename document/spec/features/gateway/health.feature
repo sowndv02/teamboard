@@ -1,21 +1,21 @@
 @TB-010 @gateway
-Feature: Health của gateway
-  Là vận hành
-  Tôi muốn gateway có /health/live và /health/ready độc lập với upstream
-  Để orchestrator kiểm tra gateway mà không bị kéo theo lỗi của service phía sau
+Feature: Gateway health
+  As an operator
+  I want the gateway to expose /health/live and /health/ready independent of the upstream
+  So that the orchestrator can check the gateway without inheriting failures of the services behind it
 
   @S03 @FR-002 @BR-003
-  Scenario: Live trả 200
-    Given một upstream giả đang chạy
-    And gateway được cấu hình trỏ tới upstream giả
-    When tôi gửi "GET" tới "/health/live"
-    Then mã trạng thái là 200
-    And upstream giả không nhận request nào
+  Scenario: Live returns 200
+    Given a fake upstream is running
+    And the gateway is configured to point at the fake upstream
+    When I send "GET" to "/health/live"
+    Then the status code is 200
+    And the fake upstream receives no request
 
   @S04 @FR-002
-  Scenario: Ready trả 200 khi upstream đã dừng
-    Given một upstream giả đang chạy
-    And gateway được cấu hình trỏ tới upstream giả
-    And upstream giả đã dừng
-    When tôi gửi "GET" tới "/health/ready"
-    Then mã trạng thái là 200
+  Scenario: Ready returns 200 when the upstream has stopped
+    Given a fake upstream is running
+    And the gateway is configured to point at the fake upstream
+    And the fake upstream has stopped
+    When I send "GET" to "/health/ready"
+    Then the status code is 200

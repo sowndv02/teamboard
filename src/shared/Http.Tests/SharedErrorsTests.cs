@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Teamboard.Shared.Http.Tests;
 
-/// <summary>Test chính sách cho bảng mã lỗi dùng chung (`backend-engineering.md` mục 1).</summary>
+/// <summary>Policy tests for the shared error-code table (`backend-engineering.md` section 1).</summary>
 public sealed partial class SharedErrorsTests
 {
     [Fact]

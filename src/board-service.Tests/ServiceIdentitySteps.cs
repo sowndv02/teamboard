@@ -9,10 +9,10 @@ namespace BoardService.Tests;
 [Binding]
 public sealed class ServiceIdentitySteps
 {
-    // Ghép từ hai nửa để chính tệp test này không chứa tên cũ và không tự bắt lỗi của mình.
+    // Built from two halves so this test file itself does not contain the old name and does not flag itself.
     private static readonly string[] LegacyNames = ["teamboard" + "-api", "teamboard" + "_api"];
 
-    // Thư mục lịch sử bất biến: issue, plan, workflow, lesson, ADR (theo docs-update-specs.md).
+    // Immutable history folders: issue, plan, workflow, lesson, ADR (per docs-update-specs.md).
     private static readonly string[] HistoricalDirectories =
     [
         Path.Combine("document", "issues"),
@@ -34,13 +34,13 @@ public sealed class ServiceIdentitySteps
     private List<string> _violations = [];
     private CommandResult? _composeResult;
 
-    [Given("Docker khả dụng")]
+    [Given("Docker is available")]
     public void GivenDocker() => DockerCli.RequireDocker();
 
-    [When("tôi kiểm tra assembly của service")]
+    [When("I inspect the service assembly")]
     public void WhenInspectAssembly() => _assembly = typeof(Program).Assembly;
 
-    [When("tôi quét mã nguồn, cấu hình và tài liệu hiện hành")]
+    [When("I scan the current source code, configuration and documentation")]
     public void WhenScan()
     {
         var root = RepoRoot.Find();
@@ -63,31 +63,31 @@ public sealed class ServiceIdentitySteps
             .ToList();
     }
 
-    [When("tôi chạy compose chính với tên dự án riêng")]
+    [When("I run the main compose under a dedicated project name")]
     public void WhenComposeUp()
     {
         _composeResult = _docker.ComposeUp([Path.Combine("src", "docker-compose.yml")], "board-service");
-        Assert.True(_composeResult.ExitCode == 0, $"docker compose up lỗi: {_composeResult.Error}");
+        Assert.True(_composeResult.ExitCode == 0, $"docker compose up failed: {_composeResult.Error}");
     }
 
-    [Then("tên assembly là {string}")]
+    [Then("the assembly name is {string}")]
     public void ThenAssemblyName(string expected) => Assert.Equal(expected, _assembly!.GetName().Name);
 
-    [Then("namespace gốc của dự án service là {string}")]
+    [Then("the root namespace of the service project is {string}")]
     public void ThenRootNamespace(string expected)
     {
         const string projectPath = "src/board-service/board-service.csproj";
         var path = Path.Combine(RepoRoot.Find(), projectPath.Replace('/', Path.DirectorySeparatorChar));
-        Assert.True(File.Exists(path), $"Không có dự án {projectPath}.");
+        Assert.True(File.Exists(path), $"Project not found: {projectPath}.");
         var rootNamespace = XDocument.Load(path).Descendants("RootNamespace").Select(e => e.Value).FirstOrDefault();
         Assert.Equal(expected, rootNamespace);
     }
 
-    [Then("không tệp nào chứa tên cũ của service")]
+    [Then("no file contains the old service name")]
     public void ThenNoLegacyName() =>
-        Assert.True(_violations.Count == 0, "Còn tên cũ trong: " + string.Join(", ", _violations));
+        Assert.True(_violations.Count == 0, "Old name still present in: " + string.Join(", ", _violations));
 
-    [Then("danh sách service đang chạy gồm {string}")]
+    [Then("the list of running services includes {string}")]
     public void ThenServiceRunning(string service)
     {
         var result = _docker.Compose(TimeSpan.FromMinutes(1), "ps", "--services", "--status", "running");
@@ -95,7 +95,7 @@ public sealed class ServiceIdentitySteps
         Assert.Contains(service, services);
     }
 
-    [Then("cổng host 6060 phản hồi một mã HTTP")]
+    [Then("host port 6060 responds with an HTTP status code")]
     public async Task ThenPortResponds()
     {
         var status = await HttpWait.GetStatusAsync("http://127.0.0.1:6060/", TimeSpan.FromSeconds(60));

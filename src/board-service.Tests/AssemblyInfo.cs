@@ -1,4 +1,4 @@
 using Xunit;
 
-// Hai kịch bản docker dùng chung cổng host 6060 và tên dự án compose, nên không được chạy song song.
+// The docker scenarios share host port 6060 and the compose project name, so they must not run in parallel.
 [assembly: CollectionBehavior(DisableTestParallelization = true)]

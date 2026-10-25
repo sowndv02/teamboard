@@ -9,7 +9,7 @@ using Yarp.ReverseProxy.Forwarder;
 
 namespace Gateway.Tests;
 
-/// <summary>Trạng thái dùng chung giữa các lớp step của một scenario (Reqnroll tiêm theo scenario).</summary>
+/// <summary>State shared between the step classes of one scenario (Reqnroll injects it per scenario).</summary>
 public sealed class GatewayContext : IAsyncDisposable
 {
     private const string UpstreamAddressKey = "ReverseProxy:Clusters:board-service:Destinations:d1:Address";
@@ -19,7 +19,7 @@ public sealed class GatewayContext : IAsyncDisposable
 
     internal UpstreamStub? UpstreamOrNull { get; set; }
 
-    internal UpstreamStub Upstream => UpstreamOrNull ?? throw new InvalidOperationException("Chưa có upstream giả.");
+    internal UpstreamStub Upstream => UpstreamOrNull ?? throw new InvalidOperationException("No fake upstream yet.");
 
     public HttpResponseMessage? Response { get; private set; }
 
@@ -29,18 +29,18 @@ public sealed class GatewayContext : IAsyncDisposable
 
     public string Path { get; private set; } = string.Empty;
 
-    /// <summary>Giá trị X-Correlation-Id test đã gửi; null nghĩa là không gửi header.</summary>
+    /// <summary>The X-Correlation-Id value the test sent; null means the header was not sent.</summary>
     public string? SentCorrelationId { get; set; }
 
     internal void StartGateway(bool forceUnhandledError = false)
     {
-        // Địa chỉ upstream đi qua cấu hình (NFR-004), không hardcode trong gateway.
+        // The upstream address comes from configuration (NFR-004), not hardcoded in the gateway.
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
             builder.UseSetting(UpstreamAddressKey, Upstream.Address);
             if (forceUnhandledError)
             {
-                // Ép lỗi chưa lường ở tầng chuyển tiếp để chứng minh ExceptionHandler (plan A-03).
+                // Force an unexpected error in the forwarding layer to exercise the ExceptionHandler (plan A-03).
                 builder.ConfigureTestServices(services => services.AddSingleton<IHttpForwarder, ThrowingForwarder>());
             }
         });

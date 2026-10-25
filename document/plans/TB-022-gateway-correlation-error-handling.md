@@ -35,7 +35,7 @@ Lát 2 trong [`api-gateway-slices.md`](api-gateway-slices.md) (`approved`). Làn
 |---|---|---|---|---|
 | FR-003 tạo/giữ `X-Correlation-Id`, trả trong response, ghi đè xuống upstream | D5, 6.4 | B1a, B2 | @S01, @S02 | Unit middleware; host test với upstream giả ghi header nhận được |
 | FR-003 id từ upstream không làm response có hai giá trị | 6.4 | B2 | @S07 | Upstream giả trả `X-Correlation-Id` khác; response chỉ có id của gateway |
-| FR-003 `traceparent` truyền xuống, cùng trace | 6.4, 9 | B2 | @S03 | Upstream giả ghi `traceparent`; so trace id với client |
+| FR-003 `traceparent` truyền xuống, cùng trace | 6.4, 9 | B2 | @S03, @S11, @S12 | Upstream giả ghi `traceparent`; so trace id với client |
 | FR-001 `404 problem+json` mang `correlationId` thật | 6.3, D5 | B1a, B2 | @S04 | Host test: `correlationId` trong body bằng header response |
 | Lỗi chưa lường → `500 INTERNAL_ERROR` (gán lát 2) | 6.3, 6.4 | B1b, B2 | @S05 | Unit handler; host test ép lỗi (A-03) |
 | NFR-002 trace xuyên gateway → service trong Jaeger | 9 | B3 | @S06 | Test Docker: một trace (theo trace id do test sinh) có span `gateway` và `board-service` |
@@ -51,6 +51,11 @@ Kịch bản (ID duy nhất trong từng file, tag `@TB-022 @gateway`):
 - @S05 Lỗi chưa lường trả `500 problem+json` mã `INTERNAL_ERROR`, có `X-Correlation-Id` và `correlationId`, body không chứa tên exception hay stack trace.
 - @S06 (`@docker`) Compose chạy `gateway`, `board-service`, `jaeger`: request qua gateway mang `traceparent` do test sinh; trace có đúng trace id đó trong Jaeger chứa span của cả `gateway` và `board-service`.
 - @S07 Upstream tự trả `X-Correlation-Id` khác: response tới client chỉ có đúng một giá trị, là id của gateway.
+- @S08 Hai giá trị `X-Correlation-Id` trong request: coi là không hợp lệ, gateway thay bằng id mới (P-01; tách khỏi @S02 để ID duy nhất).
+- @S09 `/health/live` trả đúng một header `X-Correlation-Id` (GUID); tách khỏi @S04.
+- @S10 (Outline) `HEAD`, `POST`, `DELETE` qua gateway đều có đúng một `X-Correlation-Id` ở phản hồi, bằng id upstream nhận.
+- @S11 Thiếu `traceparent`: upstream vẫn nhận `traceparent` hợp lệ của trace mới (người dùng chốt ở test-review vòng 1).
+- @S12 `traceparent` sai định dạng: bị bỏ qua, request vẫn qua, upstream nhận `traceparent` hợp lệ khác giá trị gửi (người dùng chốt ở test-review vòng 1; đúng W3C Trace Context).
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 

@@ -1,4 +1,4 @@
 using Xunit;
 
-// Test docker dùng chung cổng host 6061 và tên dự án compose, nên không chạy song song.
+// Docker tests share host port 6061 and the compose project name, so they must not run in parallel.
 [assembly: CollectionBehavior(DisableTestParallelization = true)]

@@ -1,14 +1,14 @@
 @TB-021 @identity-service
-Feature: Lỗi không lường trước của identity-service
-  Là người gọi API
-  Tôi muốn nhận lỗi theo định dạng chuẩn của hệ thống mà không lộ chi tiết nội bộ
-  Để xử lý lỗi thống nhất và không giúp kẻ tấn công biết cấu trúc bên trong
+Feature: Unexpected identity-service errors
+  As an API caller
+  I want to receive errors in the system's standard format without internal details leaking
+  So that I can handle errors consistently and an attacker learns nothing about the internal structure
 
   @S06 @NFR-003
-  Scenario: Lỗi chưa xử lý trả lỗi chuẩn không lộ chi tiết nội bộ
-    Given identity-service có một thao tác gây lỗi không lường trước
-    When tôi kích hoạt thao tác gây lỗi đó
-    Then mã trạng thái là 500
-    And lỗi theo định dạng chuẩn có mã "INTERNAL_ERROR" và mã vết
-    And lỗi có mã tương quan
-    And nội dung lỗi không chứa dấu vết ngăn xếp hay tên máy
+  Scenario: An unhandled error returns the standard error without leaking internal details
+    Given identity-service has an operation that causes an unexpected error
+    When I trigger that operation
+    Then the status code is 500
+    And the error follows the standard format with code "INTERNAL_ERROR" and a trace id
+    And the error has a correlation id
+    And the error body contains no stack trace or machine name

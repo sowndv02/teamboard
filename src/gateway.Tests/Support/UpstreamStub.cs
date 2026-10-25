@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Gateway.Tests.Support;
 
 /// <summary>
-/// Upstream giả: Kestrel thật ở cổng ngẫu nhiên để YARP gọi qua socket thật; ghi lại method và đường dẫn (kèm query) nhận được.
+/// Fake upstream: a real Kestrel on a random port so YARP calls it over a real socket; records the method and path (with query) it receives.
 /// </summary>
 internal sealed class UpstreamStub : IAsyncDisposable
 {
@@ -25,7 +25,7 @@ internal sealed class UpstreamStub : IAsyncDisposable
 
     public string Address { get; }
 
-    /// <summary>Status upstream giả trả theo method, giống API thật: tạo mới 201, xoá 204, còn lại 200.</summary>
+    /// <summary>Status the fake upstream returns per method, like the real API: create 201, delete 204, otherwise 200.</summary>
     public static int ExpectedStatus(string method) => method switch
     {
         "POST" => StatusCodes.Status201Created,
@@ -37,10 +37,10 @@ internal sealed class UpstreamStub : IAsyncDisposable
 
     public ConcurrentQueue<(string Method, string PathAndQuery)> Received { get; } = new();
 
-    /// <summary>Header X-Correlation-Id và traceparent mỗi request nhận được (chuỗi rỗng nếu không có; nhiều giá trị nối bằng dấu phẩy).</summary>
+    /// <summary>X-Correlation-Id and traceparent headers each request received (empty string if absent; multiple values joined by commas).</summary>
     public ConcurrentQueue<(string CorrelationId, string TraceParent)> ReceivedHeaders { get; } = new();
 
-    /// <summary>Nếu đặt, upstream trả kèm X-Correlation-Id này (kiểm gateway không để response có hai giá trị).</summary>
+    /// <summary>If set, the upstream returns this X-Correlation-Id (checks the gateway does not leave two values in the response).</summary>
     public string? ResponseCorrelationId { get; set; }
 
     public const string UpstreamTraceId = "upstream-trace-id";

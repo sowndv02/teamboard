@@ -1,16 +1,16 @@
 @TB-010 @gateway
-Feature: Gateway chuyển tiếp API boards tới board-service
-  Là client
-  Tôi muốn gọi /api/v1/boards qua gateway
-  Để không cần biết địa chỉ của board-service
+Feature: Gateway forwards the boards API to board-service
+  As a client
+  I want to call /api/v1/boards through the gateway
+  So that I do not need to know the address of board-service
 
   @S01 @FR-001 @BR-001 @NFR-004
-  Scenario Outline: Request tới API boards được chuyển tới upstream với đúng method và đường dẫn
-    Given một upstream giả đang chạy
-    And gateway được cấu hình trỏ tới upstream giả
-    When tôi gửi "<method>" tới "<path>"
-    Then upstream giả nhận đúng method "<method>" và đường dẫn "<path>"
-    And phản hồi của upstream được trả nguyên về client
+  Scenario Outline: A request to the boards API is forwarded to the upstream with the same method and path
+    Given a fake upstream is running
+    And the gateway is configured to point at the fake upstream
+    When I send "<method>" to "<path>"
+    Then the fake upstream receives exactly method "<method>" and path "<path>"
+    And the upstream response is returned unchanged to the client
 
     Examples:
       | method | path |
@@ -24,15 +24,15 @@ Feature: Gateway chuyển tiếp API boards tới board-service
       | DELETE | /api/v1/boards/3f2b1c4e                |
 
   @S02 @FR-001
-  Scenario Outline: Request không khớp route nhận 404 problem+json và không tới upstream
-    Given một upstream giả đang chạy
-    And gateway được cấu hình trỏ tới upstream giả
-    When tôi gửi "<method>" tới "<path>"
-    Then phản hồi là 404 problem+json với mã "ROUTE_NOT_FOUND"
-    And phản hồi có type và title theo mã lỗi của gateway
-    And phản hồi có traceId và correlationId
-    And phản hồi không chứa địa chỉ hay tên nội bộ của upstream
-    And upstream giả không nhận request nào
+  Scenario Outline: A request matching no route gets 404 problem+json and never reaches the upstream
+    Given a fake upstream is running
+    And the gateway is configured to point at the fake upstream
+    When I send "<method>" to "<path>"
+    Then the response is 404 problem+json with code "ROUTE_NOT_FOUND"
+    And the response has type and title matching the gateway error code
+    And the response has traceId and correlationId
+    And the response contains no internal address or name of the upstream
+    And the fake upstream receives no request
 
     Examples:
       | method | path |
@@ -42,9 +42,9 @@ Feature: Gateway chuyển tiếp API boards tới board-service
       | TRACE  | /api/v1/boards      |
 
   @S06 @FR-001
-  Scenario: Lỗi do upstream trả về được chuyển nguyên, không bị thay bằng lỗi của gateway
-    Given một upstream giả đang chạy và trả 404 problem+json với mã "BOARD_NOT_FOUND" cho đường dẫn "/api/v1/boards/3f2b1c4e"
-    And gateway được cấu hình trỏ tới upstream giả
-    When tôi gửi "GET" tới "/api/v1/boards/3f2b1c4e"
-    Then phản hồi là 404 problem+json với mã "BOARD_NOT_FOUND"
-    And phản hồi giữ nguyên nội dung do upstream trả
+  Scenario: An error returned by the upstream is passed through, not replaced by a gateway error
+    Given a fake upstream is running and returns 404 problem+json with code "BOARD_NOT_FOUND" for path "/api/v1/boards/3f2b1c4e"
+    And the gateway is configured to point at the fake upstream
+    When I send "GET" to "/api/v1/boards/3f2b1c4e"
+    Then the response is 404 problem+json with code "BOARD_NOT_FOUND"
+    And the response keeps the content returned by the upstream

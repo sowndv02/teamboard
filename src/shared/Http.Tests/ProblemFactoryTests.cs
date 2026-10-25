@@ -50,6 +50,7 @@ public sealed class ProblemFactoryTests
     }
 
     [Fact]
+    [Trait("Scenario", "S04")]
     public void Create_ContextHasCorrelationId_UsesItAndKeepsTraceId()
     {
         using var source = new ActivitySource("Teamboard.Shared.Http.Tests");

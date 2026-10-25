@@ -1,15 +1,15 @@
 @TB-022 @gateway
-Feature: Gateway trả 500 problem+json cho lỗi chưa lường
-  Là client của API
-  Tôi muốn lỗi nội bộ luôn có dạng problem+json thống nhất và không lộ chi tiết
-  Để xử lý lỗi đồng nhất và không biết được cấu trúc bên trong hệ thống
+Feature: Gateway returns 500 problem+json for unexpected errors
+  As an API client
+  I want internal errors to always be a uniform problem+json that leaks no details
+  So that I can handle errors uniformly and learn nothing about the system internals
 
   @S05 @NFR-006
-  Scenario: Lỗi chưa lường trả 500 INTERNAL_ERROR kèm correlation id
-    Given một upstream giả đang chạy
-    And gateway có lỗi chưa lường khi chuyển tiếp
-    When tôi gửi "GET" tới "/api/v1/boards" với X-Correlation-Id "client-id-500"
-    Then phản hồi là 500 problem+json với mã "INTERNAL_ERROR"
-    And correlationId trong body bằng header X-Correlation-Id của phản hồi
-    And header X-Correlation-Id của phản hồi là "client-id-500"
-    And phản hồi không chứa tên exception hay stack trace
+  Scenario: An unexpected error returns 500 INTERNAL_ERROR with a correlation id
+    Given a fake upstream is running
+    And the gateway hits an unexpected error while forwarding
+    When I send "GET" to "/api/v1/boards" with X-Correlation-Id "client-id-500"
+    Then the response is 500 problem+json with code "INTERNAL_ERROR"
+    And the correlationId in the body equals the X-Correlation-Id header of the response
+    And the response has exactly one X-Correlation-Id header equal to "client-id-500"
+    And the response contains no exception name or stack trace

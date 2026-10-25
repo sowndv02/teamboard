@@ -1,17 +1,17 @@
 @TB-021 @identity-service
-Feature: Health của identity-service
-  Là vận hành
-  Tôi muốn identity-service có /health/live và /health/ready
-  Để orchestrator biết service còn sống và khi nào nó sẵn sàng nhận request
+Feature: identity-service health
+  As an operator
+  I want identity-service to expose /health/live and /health/ready
+  So that the orchestrator knows the service is alive and when it is ready to accept requests
 
   @S01 @NFR-001
-  Scenario: Live trả 200 khi cơ sở dữ liệu không chạy
-    Given identity-service được cấu hình trỏ tới một cơ sở dữ liệu không chạy
-    When tôi gửi "GET" tới "/health/live"
-    Then mã trạng thái là 200
+  Scenario: Live returns 200 when the database is not running
+    Given identity-service is configured to use a database that is not running
+    When I send "GET" to "/health/live"
+    Then the status code is 200
 
   @S08 @NFR-001
-  Scenario: Telemetry của identity-service mang đúng tên service
-    Given identity-service được cấu hình trỏ tới một cơ sở dữ liệu không chạy
-    When tôi gửi "GET" tới "/health/live"
-    Then telemetry của service mang tên "identity-service"
+  Scenario: identity-service telemetry carries the correct service name
+    Given identity-service is configured to use a database that is not running
+    When I send "GET" to "/health/live"
+    Then the service telemetry is named "identity-service"

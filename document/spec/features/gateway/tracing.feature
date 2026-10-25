@@ -1,13 +1,12 @@
 @TB-022 @gateway
-Feature: Trace nối xuyên gateway và board-service
-  Là người vận hành
-  Tôi muốn thấy một request đi qua gateway và service trong cùng một trace
-  Để định vị chậm hoặc lỗi ở đúng service
+Feature: Trace spans gateway and board-service
+  As an operator
+  I want to see a request passing through the gateway and a service in a single trace
+  So that I can locate slowness or errors in the right service
 
   @S06 @NFR-002 @NFR-004 @docker
-  Scenario: Một trace trong Jaeger có span của cả gateway và board-service
-    Given Docker khả dụng
-    And image của gateway và board-service đã được build bằng compose chính và observability
-    When tôi chạy gateway, board-service và jaeger bằng compose với tên dự án riêng
-    And tôi gọi "GET /api/v1/boards" qua cổng host 8080 với traceparent do test sinh
-    Then Jaeger có trace theo trace id đó chứa span của service "gateway" và "board-service"
+  Scenario: One trace in Jaeger has spans of both gateway and board-service
+    Given Docker is available
+    And gateway, board-service and jaeger are running with compose under a dedicated project name
+    When I call "GET /api/v1/boards" through host port 8080 with a test-generated traceparent
+    Then Jaeger has a trace for that trace id containing spans of services "gateway" and "board-service"

@@ -1,46 +1,46 @@
 @TB-001 @shared
-Feature: Telemetry OpenTelemetry của ServiceDefaults
-  Là lập trình viên
-  Tôi muốn trace, metric, log xuất bằng OpenTelemetry
-  Để debug nhiều service mà không lộ dữ liệu nhạy cảm
+Feature: ServiceDefaults OpenTelemetry telemetry
+  As a developer
+  I want traces, metrics and logs exported through OpenTelemetry
+  So that I can debug several services without leaking sensitive data
 
   @S08 @FR-003
-  Scenario: Request tạo span có tên service board-service
-    Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
-    When tôi gọi "GET /health/live"
-    Then có một span của request với service.name "board-service"
+  Scenario: A request creates a span named after the board-service service
+    Given a host using AddServiceDefaults with service name "board-service" that has started
+    When I call "GET /health/live"
+    Then there is a request span with service.name "board-service"
 
   @S09 @FR-003
-  Scenario: Thiếu endpoint OTLP thì service vẫn khởi động
-    Given biến môi trường endpoint OTLP không được đặt
-    And một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
-    When tôi gọi "GET /health/live"
-    Then mã trạng thái là 200
+  Scenario: The service still starts when the OTLP endpoint is missing
+    Given the OTLP endpoint environment variable is not set
+    And a host using AddServiceDefaults with service name "board-service" that has started
+    When I call "GET /health/live"
+    Then the status code is 200
 
   @S10 @NFR-004
-  Scenario: Telemetry không chứa Authorization hay body
-    Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
-    When tôi gửi một yêu cầu ghi dữ liệu với header Authorization "Bearer token-bi-mat-123", cookie "phien=cookie-bi-mat-789", query "ma=query-bi-mat-321" và body "noi-dung-bi-mat-456"
-    Then telemetry đã ghi nhận ít nhất một span
-    And không span hay bản ghi log nào chứa "token-bi-mat-123"
-    And không span hay bản ghi log nào chứa "cookie-bi-mat-789"
-    And không span hay bản ghi log nào chứa "query-bi-mat-321"
-    And không span hay bản ghi log nào chứa "noi-dung-bi-mat-456"
+  Scenario: Telemetry contains neither Authorization nor body
+    Given a host using AddServiceDefaults with service name "board-service" that has started
+    When I send a write request with Authorization header "Bearer secret-token-123", cookie "session=secret-cookie-789", query "code=secret-query-321" and body "secret-content-456"
+    Then telemetry has recorded at least one span
+    And no span or log record contains "secret-token-123"
+    And no span or log record contains "secret-cookie-789"
+    And no span or log record contains "secret-query-321"
+    And no span or log record contains "secret-content-456"
 
   @S12 @FR-003
-  Scenario: Request tạo metric của máy chủ web
-    Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
-    When tôi gọi "GET /health/live"
-    Then telemetry đã ghi nhận ít nhất một metric
+  Scenario: A request creates a web server metric
+    Given a host using AddServiceDefaults with service name "board-service" that has started
+    When I call "GET /health/live"
+    Then telemetry has recorded at least one metric
 
   @S13 @FR-003
-  Scenario: Request tạo bản ghi log
-    Given một host dùng AddServiceDefaults với tên service "board-service" đã khởi động
-    When tôi gọi "GET /health/live"
-    Then telemetry đã ghi nhận ít nhất một bản ghi log
+  Scenario: A request creates a log record
+    Given a host using AddServiceDefaults with service name "board-service" that has started
+    When I call "GET /health/live"
+    Then telemetry has recorded at least one log record
 
   @S16 @FR-003
-  Scenario: Endpoint OTLP không tới được thì service vẫn chạy
-    Given một host dùng AddServiceDefaults với tên service "board-service" và endpoint OTLP không có dịch vụ lắng nghe đã khởi động
-    When tôi gọi "GET /health/live"
-    Then mã trạng thái là 200
+  Scenario: The service keeps running when the OTLP endpoint is unreachable
+    Given a host using AddServiceDefaults with service name "board-service" and an OTLP endpoint with no listener that has started
+    When I call "GET /health/live"
+    Then the status code is 200

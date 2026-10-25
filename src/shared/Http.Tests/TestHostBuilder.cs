@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Teamboard.Shared.Http.Tests;
 
-/// <summary>Host in-process tối thiểu cho unit test pipeline: correlation, ExceptionHandler, endpoint thử, thu log/scope/Activity.</summary>
+/// <summary>Minimal in-process host for pipeline unit tests: correlation, exception handler, probe endpoints, and capture of logs, scopes and Activity.</summary>
 internal sealed class TestHostBuilder : IAsyncDisposable
 {
     public const string SecretDetail = "secret-detail-xyz";
@@ -18,21 +18,21 @@ internal sealed class TestHostBuilder : IAsyncDisposable
 
     private TestHostBuilder()
     {
-        // Hosting chỉ tạo Activity khi có listener nên test tự đăng ký (không có ServiceDefaults ở đây).
+        // Hosting only creates an Activity when a listener exists, so the test registers one (no ServiceDefaults here).
         _listener = new ActivityListener
         {
             ShouldListenTo = source => source.Name == "Microsoft.AspNetCore",
             Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
-            ActivityStopped = activity => StoppedActivities.Add(activity),
         };
         ActivitySource.AddActivityListener(_listener);
     }
 
-    public ConcurrentBag<Activity> StoppedActivities { get; } = [];
+    /// <summary>The correlationId tag of the current Activity as seen by the probe endpoint (read during the request, not after the Activity stops).</summary>
+    public ConcurrentQueue<string?> SeenTag { get; } = new();
 
     public CapturingLoggerProvider Logs { get; } = new();
 
-    /// <summary>Header X-Correlation-Id mà endpoint thử nhìn thấy sau middleware.</summary>
+    /// <summary>The X-Correlation-Id header as seen by the probe endpoint after the middleware.</summary>
     public ConcurrentQueue<string?> SeenHeader { get; } = new();
 
     public WebApplication App { get; private set; } = null!;
@@ -48,17 +48,19 @@ internal sealed class TestHostBuilder : IAsyncDisposable
         builder.Logging.AddProvider(host.Logs);
 
         host.App = builder.Build();
-        host.App.UseTeamboardExceptionHandler();
+        // Target order per design 6.4: Correlation outside, ExceptionHandler inside (so the error log stays within the correlationId scope).
         host.App.UseCorrelation();
+        host.App.UseTeamboardExceptionHandler();
         host.App.MapGet("/ok", (HttpContext context, ILogger<TestHostBuilder> logger) =>
         {
             host.SeenHeader.Enqueue(context.Request.Headers[CorrelationHeaders.Name].ToString());
-            logger.LogInformation("endpoint thử đã chạy");
+            host.SeenTag.Enqueue((string?)Activity.Current?.GetTagItem("correlationId"));
+            logger.LogInformation("test endpoint ran");
             return Results.Ok();
         });
         host.App.MapGet("/boom", (ILogger<TestHostBuilder> logger) =>
         {
-            logger.LogInformation("sắp ném lỗi");
+            logger.LogInformation("about to throw");
             throw new InvalidOperationException(SecretDetail);
         });
         await host.App.StartAsync();
@@ -73,7 +75,7 @@ internal sealed class TestHostBuilder : IAsyncDisposable
     }
 }
 
-/// <summary>Bắt mọi bản ghi log kèm các scope đang hiệu lực, để kiểm correlation và không lộ id sai.</summary>
+/// <summary>Captures every log record with its active scopes, to check correlation and that invalid ids never leak.</summary>
 internal sealed class CapturingLoggerProvider : ILoggerProvider, ISupportExternalScope
 {
     private IExternalScopeProvider _scopes = new LoggerExternalScopeProvider();

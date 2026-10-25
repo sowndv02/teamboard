@@ -9,23 +9,23 @@ namespace Gateway.Tests;
 [Binding]
 public sealed class GatewaySteps(GatewayContext context)
 {
-    [Given("một upstream giả đang chạy")]
+    [Given("a fake upstream is running")]
     public async Task GivenUpstream() => context.UpstreamOrNull = await UpstreamStub.StartAsync();
 
-    [Given("một upstream giả đang chạy và trả 404 problem+json với mã {string} cho đường dẫn {string}")]
+    [Given("a fake upstream is running and returns 404 problem+json with code {string} for path {string}")]
     public async Task GivenUpstreamWithProblem(string code, string path) =>
         context.UpstreamOrNull = await UpstreamStub.StartAsync(path, code);
 
-    [Given("gateway được cấu hình trỏ tới upstream giả")]
+    [Given("the gateway is configured to point at the fake upstream")]
     public void GivenGatewayPointsToUpstream() => context.StartGateway();
 
-    [Given("upstream giả đã dừng")]
+    [Given("the fake upstream has stopped")]
     public async Task GivenUpstreamStopped() => await context.Upstream.StopAsync();
 
-    [When("tôi gửi {string} tới {string}")]
+    [When("I send {string} to {string}")]
     public async Task WhenSend(string method, string path) => await context.SendAsync(method, path);
 
-    [Then("upstream giả nhận đúng method {string} và đường dẫn {string}")]
+    [Then("the fake upstream receives exactly method {string} and path {string}")]
     public void ThenUpstreamReceived(string method, string path)
     {
         var received = Assert.Single(context.Upstream.Received);
@@ -33,7 +33,7 @@ public sealed class GatewaySteps(GatewayContext context)
         Assert.Equal(path, received.PathAndQuery);
     }
 
-    [Then("phản hồi của upstream được trả nguyên về client")]
+    [Then("the upstream response is returned unchanged to the client")]
     public void ThenUpstreamResponseReturned()
     {
         Assert.Equal((HttpStatusCode)UpstreamStub.ExpectedStatus(context.Method), context.Response!.StatusCode);
@@ -45,10 +45,10 @@ public sealed class GatewaySteps(GatewayContext context)
         }
     }
 
-    [Then("mã trạng thái là {int}")]
+    [Then("the status code is {int}")]
     public void ThenStatus(int status) => Assert.Equal((HttpStatusCode)status, context.Response!.StatusCode);
 
-    [Then("phản hồi là 404 problem+json với mã {string}")]
+    [Then("the response is 404 problem+json with code {string}")]
     public void ThenProblemNotFound(string code)
     {
         Assert.Equal(HttpStatusCode.NotFound, context.Response!.StatusCode);
@@ -58,7 +58,7 @@ public sealed class GatewaySteps(GatewayContext context)
         Assert.Equal(404, document.RootElement.GetProperty("status").GetInt32());
     }
 
-    [Then("phản hồi có type và title theo mã lỗi của gateway")]
+    [Then("the response has type and title matching the gateway error code")]
     public void ThenTypeAndTitle()
     {
         using var document = JsonDocument.Parse(context.Body);
@@ -66,7 +66,7 @@ public sealed class GatewaySteps(GatewayContext context)
         Assert.Equal("Not Found", document.RootElement.GetProperty("title").GetString());
     }
 
-    [Then("phản hồi có traceId và correlationId")]
+    [Then("the response has traceId and correlationId")]
     public void ThenHasTraceAndCorrelation()
     {
         using var document = JsonDocument.Parse(context.Body);
@@ -74,7 +74,7 @@ public sealed class GatewaySteps(GatewayContext context)
         Assert.False(string.IsNullOrWhiteSpace(document.RootElement.GetProperty("correlationId").GetString()));
     }
 
-    [Then("phản hồi không chứa địa chỉ hay tên nội bộ của upstream")]
+    [Then("the response contains no internal address or name of the upstream")]
     public void ThenNoInternalNames()
     {
         Assert.DoesNotContain(new Uri(context.Upstream.Address).Authority, context.Body);
@@ -83,7 +83,7 @@ public sealed class GatewaySteps(GatewayContext context)
         Assert.DoesNotContain(context.Path, context.Body);
     }
 
-    [Then("phản hồi giữ nguyên nội dung do upstream trả")]
+    [Then("the response keeps the content returned by the upstream")]
     public void ThenBodyIsUpstreams()
     {
         using var document = JsonDocument.Parse(context.Body);
@@ -91,6 +91,6 @@ public sealed class GatewaySteps(GatewayContext context)
         Assert.Single(context.Upstream.Received);
     }
 
-    [Then("upstream giả không nhận request nào")]
+    [Then("the fake upstream receives no request")]
     public void ThenUpstreamReceivedNothing() => Assert.Empty(context.Upstream.Received);
 }

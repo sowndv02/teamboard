@@ -3,7 +3,7 @@ using Xunit;
 
 namespace BoardService.Tests;
 
-/// <summary>Unit test cho các luật quét của @S14 và @S15, để chứng minh luật bắt được vi phạm (không phải test luôn xanh).</summary>
+/// <summary>Unit tests for the @S14 and @S15 scan rules, proving the rules catch violations (not an always-green test).</summary>
 public sealed class RepositoryPoliciesTests
 {
     [Theory]

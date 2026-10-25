@@ -14,14 +14,18 @@ public sealed class CorrelationSteps(GatewayContext context)
 
     private string _clientTraceId = string.Empty;
     private string _clientSpanId = string.Empty;
+    private string _sentTraceParent = string.Empty;
 
-    [Given("upstream giả luôn trả X-Correlation-Id {string}")]
+    private static void AssertValidTraceParent(string traceParent) =>
+        Assert.Matches("^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$", traceParent);
+
+    [Given("the fake upstream always returns X-Correlation-Id {string}")]
     public void GivenUpstreamEchoes(string id) => context.Upstream.ResponseCorrelationId = id;
 
-    [Given("gateway có lỗi chưa lường khi chuyển tiếp")]
+    [Given("the gateway hits an unexpected error while forwarding")]
     public void GivenGatewayFailsUnexpectedly() => context.StartGateway(forceUnhandledError: true);
 
-    [When(@"(?s)^tôi gửi ""(.*)"" tới ""(.*)"" với X-Correlation-Id (.*)$")]
+    [When(@"(?s)^I send ""(.*)"" to ""(.*)"" with X-Correlation-Id (.*)$")]
     public async Task WhenSendWithCorrelationId(string method, string path, string token)
     {
         var value = Decode(token);
@@ -35,7 +39,7 @@ public sealed class CorrelationSteps(GatewayContext context)
         });
     }
 
-    [When("tôi gửi {string} tới {string} với hai header X-Correlation-Id {string} và {string}")]
+    [When("I send {string} to {string} with two X-Correlation-Id headers {string} and {string}")]
     public async Task WhenSendWithTwoValues(string method, string path, string first, string second)
     {
         context.SentCorrelationId = first;
@@ -43,7 +47,7 @@ public sealed class CorrelationSteps(GatewayContext context)
             request.Headers.TryAddWithoutValidation(CorrelationHeader, [first, second]));
     }
 
-    [When("tôi gửi {string} tới {string} với traceparent hợp lệ")]
+    [When("I send {string} to {string} with a valid traceparent")]
     public async Task WhenSendWithTraceParent(string method, string path)
     {
         _clientTraceId = Guid.NewGuid().ToString("N");
@@ -52,7 +56,7 @@ public sealed class CorrelationSteps(GatewayContext context)
             request.Headers.TryAddWithoutValidation(TraceParentHeader, $"00-{_clientTraceId}-{_clientSpanId}-01"));
     }
 
-    [Then("upstream giả và phản hồi nhận cùng đúng một correlation id")]
+    [Then("the fake upstream and the response get exactly the same single correlation id")]
     public void ThenSameSingleId()
     {
         var upstreamId = Assert.Single(context.Upstream.ReceivedHeaders).CorrelationId;
@@ -61,49 +65,65 @@ public sealed class CorrelationSteps(GatewayContext context)
         Assert.Equal(upstreamId, responseId);
     }
 
-    [Then("correlation id đó là {string}")]
+    [Then("that correlation id is {string}")]
     public void ThenIdIs(string expectation)
     {
         var id = ResponseId();
-        if (expectation == "giữ nguyên")
+        if (expectation == "preserved")
         {
             Assert.Equal(context.SentCorrelationId, id);
             return;
         }
 
-        Assert.Equal("GUID mới", expectation);
-        Assert.True(Guid.TryParse(id, out _), $"Không phải GUID: {id}");
+        Assert.Equal("new GUID", expectation);
+        Assert.True(Guid.TryParseExact(id, "D", out _), $"Not a D-format GUID: {id}");
         Assert.NotEqual(context.SentCorrelationId, id);
     }
 
-    [Then("upstream giả nhận traceparent cùng trace id với client nhưng span id khác")]
+    [When("I send {string} to {string} with traceparent {string}")]
+    public async Task WhenSendWithRawTraceParent(string method, string path, string traceParent)
+    {
+        _sentTraceParent = traceParent;
+        await context.SendAsync(method, path, request =>
+            request.Headers.TryAddWithoutValidation(TraceParentHeader, traceParent));
+    }
+
+    [Then("the fake upstream receives a valid traceparent")]
+    public void ThenUpstreamGotValidTraceParent() => AssertValidTraceParent(Assert.Single(context.Upstream.ReceivedHeaders).TraceParent);
+
+    [Then("the fake upstream receives a valid traceparent different from the value the client sent")]
+    public void ThenUpstreamGotNewValidTraceParent()
+    {
+        var received = Assert.Single(context.Upstream.ReceivedHeaders).TraceParent;
+        AssertValidTraceParent(received);
+        Assert.NotEqual(_sentTraceParent, received);
+    }
+
+    [Then("the fake upstream receives a traceparent with the same trace id as the client but a different span id")]
     public void ThenTraceParentPropagated()
     {
         var traceParent = Assert.Single(context.Upstream.ReceivedHeaders).TraceParent;
         var parts = traceParent.Split('-');
         Assert.Equal(4, parts.Length);
         Assert.Equal(_clientTraceId, parts[1]);
-        // Span ở upstream là span đi ra của HttpClient/YARP, không phải span của client.
+        // The upstream span is the outgoing HttpClient/YARP span, not the client span.
         Assert.NotEqual(_clientSpanId, parts[2]);
     }
 
-    [Then("correlationId trong body bằng header X-Correlation-Id của phản hồi")]
+    [Then("the correlationId in the body equals the X-Correlation-Id header of the response")]
     public void ThenBodyIdEqualsHeader()
     {
         using var document = JsonDocument.Parse(context.Body);
         Assert.Equal(ResponseId(), document.RootElement.GetProperty("correlationId").GetString());
     }
 
-    [Then("header X-Correlation-Id của phản hồi là {string}")]
-    public void ThenHeaderIs(string expected) => Assert.Equal(expected, ResponseId());
+    [Then("the response has exactly one X-Correlation-Id header that is a GUID")]
+    public void ThenHeaderIsGuid() => Assert.True(Guid.TryParseExact(ResponseId(), "D", out _));
 
-    [Then("phản hồi có đúng một header X-Correlation-Id là GUID")]
-    public void ThenHeaderIsGuid() => Assert.True(Guid.TryParse(ResponseId(), out _));
-
-    [Then("phản hồi có đúng một header X-Correlation-Id là {string}")]
+    [Then("the response has exactly one X-Correlation-Id header equal to {string}")]
     public void ThenSingleHeaderIs(string expected) => Assert.Equal(expected, ResponseId());
 
-    [Then("phản hồi là 500 problem+json với mã {string}")]
+    [Then("the response is 500 problem+json with code {string}")]
     public void ThenProblem500(string code)
     {
         Assert.Equal(HttpStatusCode.InternalServerError, context.Response!.StatusCode);
@@ -113,7 +133,7 @@ public sealed class CorrelationSteps(GatewayContext context)
         Assert.Equal(500, document.RootElement.GetProperty("status").GetInt32());
     }
 
-    [Then("phản hồi không chứa tên exception hay stack trace")]
+    [Then("the response contains no exception name or stack trace")]
     public void ThenNoExceptionDetails()
     {
         Assert.DoesNotContain("Exception", context.Body);
@@ -121,23 +141,29 @@ public sealed class CorrelationSteps(GatewayContext context)
         Assert.DoesNotContain(" at ", context.Body);
     }
 
-    /// <summary>Đúng một giá trị X-Correlation-Id trong phản hồi (Single ném lỗi nếu 0 hoặc nhiều hơn một).</summary>
+    /// <summary>Exactly one X-Correlation-Id value in the response (Single throws if there are zero or several).</summary>
     private string ResponseId() => Assert.Single(context.Response!.Headers.GetValues(CorrelationHeader));
 
-    /// <summary>Giải mã ký hiệu trong bảng Examples: "chuỗi" (hỗ trợ \t, \n, x*N), (không gửi) → null, (rỗng) → "".</summary>
+    /// <summary>Decodes the Examples table notation: "text" (supports backslash-t and x*N; Gherkin already converts backslash-n and double backslash), (not sent) -> null, (empty) -> "", (arabic-indic digits) -> U+0661 U+0662 U+0663.</summary>
     private static string? Decode(string token)
     {
-        if (token == "(không gửi)")
+        if (token == "(not sent)")
         {
             return null;
         }
 
-        if (token == "(rỗng)")
+        // Escapes keep this file ASCII-only; the digits are non-ASCII on purpose (the id charset is ASCII).
+        if (token == "(arabic-indic digits)")
+        {
+            return "\u0661\u0662\u0663";
+        }
+
+        if (token == "(empty)")
         {
             return string.Empty;
         }
 
-        var text = token.Trim('"').Replace("\\t", "\t", StringComparison.Ordinal).Replace("\\n", "\n", StringComparison.Ordinal);
+        var text = token.Trim('"').Replace("\\t", "\t", StringComparison.Ordinal);
         var repeat = Regex.Match(text, @"^(.)\*(\d+)$");
         return repeat.Success ? new string(repeat.Groups[1].Value[0], int.Parse(repeat.Groups[2].Value)) : text;
     }

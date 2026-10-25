@@ -1,17 +1,17 @@
 @TB-001 @shared
-Feature: ServiceDefaults dùng chung cho mọi service
-  Là lập trình viên
-  Tôi muốn một thư viện ServiceDefaults dùng lại được
-  Để mọi service có cùng health và telemetry mà không copy code
+Feature: ServiceDefaults shared by every service
+  As a developer
+  I want a reusable ServiceDefaults library
+  So that every service gets the same health and telemetry without copying code
 
   @S06 @FR-002
-  Scenario: Check sẵn sàng báo không khoẻ trước khi ứng dụng khởi động xong
-    Given một host dùng AddServiceDefaults chưa khởi động
-    When tôi chạy các health check có tag "ready"
-    Then kết quả là Unhealthy
+  Scenario: Readiness check reports unhealthy before the application has finished starting
+    Given a host using AddServiceDefaults that has not started
+    When I run the health checks tagged "ready"
+    Then the result is Unhealthy
 
   @S07 @FR-004
-  Scenario: Một service khác dùng ServiceDefaults nhận cùng health
-    Given một host tối thiểu gọi AddServiceDefaults và MapDefaultEndpoints đã khởi động
-    When tôi gọi cả "GET /health/live" và "GET /health/ready"
-    Then cả hai phản hồi có mã 200
+  Scenario: Another service using ServiceDefaults gets the same health endpoints
+    Given a minimal host calling AddServiceDefaults and MapDefaultEndpoints that has started
+    When I call both "GET /health/live" and "GET /health/ready"
+    Then both responses have status 200
