@@ -37,6 +37,12 @@ internal sealed class UpstreamStub : IAsyncDisposable
 
     public ConcurrentQueue<(string Method, string PathAndQuery)> Received { get; } = new();
 
+    /// <summary>Header X-Correlation-Id và traceparent mỗi request nhận được (chuỗi rỗng nếu không có; nhiều giá trị nối bằng dấu phẩy).</summary>
+    public ConcurrentQueue<(string CorrelationId, string TraceParent)> ReceivedHeaders { get; } = new();
+
+    /// <summary>Nếu đặt, upstream trả kèm X-Correlation-Id này (kiểm gateway không để response có hai giá trị).</summary>
+    public string? ResponseCorrelationId { get; set; }
+
     public const string UpstreamTraceId = "upstream-trace-id";
 
     public static async Task<UpstreamStub> StartAsync(string? problemPath = null, string? problemCode = null)
@@ -49,6 +55,14 @@ internal sealed class UpstreamStub : IAsyncDisposable
         app.Run(async context =>
         {
             stub!.Received.Enqueue((context.Request.Method, context.Request.Path + context.Request.QueryString));
+            stub.ReceivedHeaders.Enqueue((
+                context.Request.Headers["X-Correlation-Id"].ToString(),
+                context.Request.Headers["traceparent"].ToString()));
+            if (stub.ResponseCorrelationId is not null)
+            {
+                context.Response.Headers["X-Correlation-Id"] = stub.ResponseCorrelationId;
+            }
+
             if (problemPath is not null && context.Request.Path == problemPath)
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;

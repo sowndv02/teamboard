@@ -52,7 +52,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-022-gateway-correlation-error-handling.md` (draft), 3 bước B1–B3, 1 câu hỏi mở P-01 |
 | plan-review | PASS | 2 | 2026-10-25 | plan `approved`; 4 quyết định (nhiều giá trị id, spike ép lỗi, không log khi thay id, cổng Docker), 12 FIX; review độc lập (sub-agent) |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-10-25 | 18 test thư viện + 16 test host gateway + @S06 Docker đỏ đúng lý do; spike A-03 đạt (thay `IHttpForwarder`); trace-by-id Jaeger kiểm tay: `GET /api/v3/traces/{traceId}` |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -73,6 +73,13 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | `CorrelationMiddlewareTests` (id hợp lệ, 64 ký tự, thiếu id); `correlation.feature` @S01 | Đỏ: stub ném `NotImplementedException` (thư viện); chưa có header `X-Correlation-Id` (gateway) | – |
+| @S02 | `CorrelationMiddlewareTests` (8 id sai, 65 ký tự, hai giá trị, id sai không lộ trong log/tag); `correlation.feature` @S02 | Đỏ như @S01; riêng `"١٢٣"` đỏ vì YARP không chuyển được header không phải ASCII (upstream không nhận request), sẽ xanh khi middleware ghi đè id | – |
+| @S03 | `correlation.feature` @S03 | Xanh sẵn: YARP đã truyền `traceparent` (A-02 đúng); giữ làm test hồi quy | – |
+| @S04 | `ProblemFactoryTests.Create_ContextHasCorrelationId_UsesItAndKeepsTraceId`; `correlation.feature` @S04 (404 và `/health/live`) | Đỏ: `correlationId` chưa lấy từ context, chưa có header | – |
+| @S05 | `ExceptionHandlerTests` (3 test); `error-handling.feature` @S05 | Đỏ: 500 `text/plain`, chưa có handler. Spike A-03 đạt: `ConfigureTestServices` thay được `IHttpForwarder`, không cần phương án dự phòng | – |
+| @S06 | `tracing.feature` @S06 (`@docker`) | Đỏ: trace theo id chỉ có `board-service`, chưa có `gateway` (kiểm tay: gateway chưa nối OTLP; `GET /api/v3/traces/{traceId}` trả đúng trace) | – |
+| @S07 | `correlation.feature` @S07 | Đỏ: phản hồi mang id của upstream (`from-upstream`) thay vì của gateway | – |
 
 ## Test review rounds
 
