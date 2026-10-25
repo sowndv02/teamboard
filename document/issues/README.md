@@ -35,7 +35,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-020](TB-020-learning-roadmap-identity.md) | Lộ trình học Identity (xác thực và ủy quyền) theo Part 0–7 × L1–L8 | 0 | review |
 | [TB-021](TB-021-identity-service-skeleton.md) | Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền | 1 | review |
 | [TB-022](TB-022-gateway-correlation-error-handling.md) | Gateway lát 2, correlation, trace nối xuyên service và 500 problem+json | 1 | done |
-| [TB-023](TB-023-gateway-downstream-errors.md) | Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng) | 1 | in-progress |
+| [TB-023](TB-023-gateway-downstream-errors.md) | Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng) | 1 | review |
 | [TB-024](TB-024-gateway-rate-limit.md) | Gateway lát 4, rate limit theo IP và 429 problem+json | 1 | todo |
 | [TB-025](TB-025-gateway-body-limit.md) | Gateway lát 5, giới hạn body 1 MiB | 1 | todo |
 | [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | todo |

@@ -1,7 +1,7 @@
 ---
 key: TB-023
 title: Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng)
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-023-gateway-downstream-errors
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -40,6 +40,7 @@ Plan chi tiết: `document/plans/TB-023-gateway-downstream-errors.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ lát 3 của bảng lát; branch tạo từ `main` (sau PR 15).
+- 2026-10-25: mở PR https://github.com/sowndv02/teamboard/pull/16; nhóm docker chưa chạy lại sau các sửa của coding-review (Docker Desktop tắt lúc tạo PR).
 - 2026-10-25: coding-start xong B1-B4 (cục bộ, chưa push). @S10 xác nhận đỏ trên bản mã trước B1 rồi xanh sau B1. `gitleaks` chưa cài, chỉ grep thô diff.
 - 2026-10-25: test-review chấp nhận rủi ro log `Proxying to ...` của YARP chứa query string trong lát này; đề xuất hạ `Logging:LogLevel:Yarp.ReverseProxy` xuống Warning ở lát 7 (TB-027).
 - 2026-10-25: plan-review chốt 7 điểm; sửa spec FR-006 và design D4, 6.4, 9 (thêm `RequestTimeouts` sau `ExceptionHandler`, timeout kết nối là 504, metric không mang `correlationId`).
@@ -58,7 +59,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 2 | 2026-10-25 | 16 finding vòng 1 (1 P1, 7 P2, 8 P3) đã sửa, 3 quyết định (client huỷ kiểm ở host test xUnit, @S08 thành xUnit, log YARP để lát 7); review độc lập (sub-agent) kèm cài đặt tham chiếu 105/105 xanh và 4 đột biến bị bắt; @S10 chưa chạy được (Docker tắt) |
 | coding-start | done | – | 2026-10-25 | xanh 105/105 gateway (10 lần liên tiếp) và toàn solution không docker; nhóm docker từng assembly xanh (gateway 3 gồm @S10, board-service 2, identity 7); 4 commit cục bộ B1 ae73c92, B2 1577fab, B3 a50ac6b, B4 (ghi nhật ký); build, format, vulnerable, compose config sạch; gitleaks chưa cài |
 | coding-review | PASS | 2 | 2026-10-25 | review độc lập (sub-agent) 2 vòng, không P0-P1; 4 CONFIRM đã chốt (bỏ Response.Clear(), log ngoại lệ, danh sách SocketError, AddMeter), 6 FIX đã sửa, 3 P3 vòng 2 đã sửa; test, build, format, compose config xanh sau sửa |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-10-25 | PR https://github.com/sowndv02/teamboard/pull/16 (base main); chờ review người thật và CI, merge do người dùng |
 
 ## Confirm log
 
