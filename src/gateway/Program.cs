@@ -23,7 +23,7 @@ builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(Gate
 
 var app = builder.Build();
 
-// Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, RequestTimeouts, CORS, RateLimiter, BodyLimit, YARP.
+// Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, RequestTimeouts, UpstreamError, CORS, RateLimiter, BodyLimit, YARP.
 // This slice has Correlation, ExceptionHandler, routing, health and fallback; the remaining middleware are added in later slices.
 // UseRouting is added at the start of the pipeline by minimal hosting, so it is not called explicitly.
 app.UseCorrelation();

@@ -1,6 +1,7 @@
 using System.Diagnostics.Metrics;
 using System.Net;
 using Gateway.Tests.Support;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -47,6 +48,9 @@ public sealed class GatewayContext : IAsyncDisposable
 
     internal CapturingLoggerProvider Logs { get; } = new();
 
+    /// <summary>When set, a middleware in front of the whole gateway pipeline adds this header to every response (stands in for CORS, slice 6).</summary>
+    internal (string Name, string Value)? OuterResponseHeader { get; set; }
+
     /// <summary>Error raised while reading the response body (for example when the gateway cuts the connection after the headers).</summary>
     public Exception? BodyReadError { get; private set; }
 
@@ -70,6 +74,11 @@ public sealed class GatewayContext : IAsyncDisposable
             }
 
             builder.ConfigureLogging(logging => logging.AddProvider(Logs));
+            if (OuterResponseHeader is { } outer)
+            {
+                builder.ConfigureTestServices(services => services.AddSingleton<IStartupFilter>(new OuterHeaderStartupFilter(outer.Name, outer.Value)));
+            }
+
             builder.ConfigureTestServices(services =>
             {
                 if (forceUnhandledError)
@@ -169,4 +178,18 @@ public sealed class GatewayContext : IAsyncDisposable
         public ValueTask<ForwarderError> SendAsync(HttpContext context, string destinationPrefix, HttpMessageInvoker httpClient, ForwarderRequestConfig requestConfig, HttpTransformer transformer, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("secret-forwarder-failure");
     }
+}
+
+/// <summary>Adds a header with a plain assignment before the rest of the pipeline runs, the way a CORS middleware does.</summary>
+internal sealed class OuterHeaderStartupFilter(string name, string value) : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+    {
+        app.Use((context, nextMiddleware) =>
+        {
+            context.Response.Headers[name] = value;
+            return nextMiddleware(context);
+        });
+        next(app);
+    };
 }

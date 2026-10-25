@@ -1,12 +1,12 @@
 ---
 id: LL-006
 title: Bảng lát phải đổi trạng thái cùng lúc với issue của lát, không chỉ ghi trong tài liệu tham khảo
-status: partial         # open | partial | prevented | recurred
+status: recurred        # open | partial | prevented | recurred
 tags: [process, workflow, docs]
 issue: TB-022
 date: 2026-10-25
 severity: low           # low | medium | high (tác động thực tế hoặc tiềm tàng)
-recurrence: 0           # số lần lặp lại sau khi đã ghi
+recurrence: 1           # số lần lặp lại sau khi đã ghi
 ---
 
 # LL-006 — Bảng lát phải đổi trạng thái cùng lúc với issue của lát, không chỉ ghi trong tài liệu tham khảo
@@ -35,7 +35,8 @@ Người dùng hỏi vì sao hoàn thành một lát mà bảng lát không đư
 |---|---|---|---|---|
 | 1 | rule | Hàng lát đổi trạng thái cùng commit với issue | `.agents/rules/git-workflow.md`, `.agents/skills/workflow/references/slicing.md` | done |
 | 2 | checklist | Mục "hàng lát đổi `planning`/`in-progress`/`review`" trong "Hoàn thành khi" | `.agents/skills/plan-init/SKILL.md`, `coding-start/SKILL.md`, `create-pr/SKILL.md` | done |
-| 3 | kiểm chứng | Lát kế tiếp (lát 3 gateway): bảng đổi đúng ở từng bước | issue lát 3 | todo |
+| 3 | kiểm chứng | Lát kế tiếp (lát 3 gateway): bảng đổi đúng ở từng bước | issue lát 3 | done: `planning` và `in-progress` đúng, nhưng bước `done` sau merge của lát trước (TB-022) bị bỏ sót; coding-review TB-023 bắt được (`gateway:slice-table:TB-022-status-not-synced`) |
+| 4 | checklist | Đầu `plan-init` (hoặc `coding-start`) của lát kế tiếp kiểm lát trước đã merge chưa và đổi `done` (issue, `document/issues/README.md`, bảng lát) | `.agents/skills/plan-init/SKILL.md`, `.agents/skills/coding-start/SKILL.md` | todo: cần người dùng đồng ý sửa `.agents` |
 
 ## Cách kiểm chứng biện pháp hiệu quả
 Ở lát kế tiếp, so cột Trạng thái của bảng lát với trạng thái issue sau mỗi bước; hai bên phải khớp ở mọi commit đổi trạng thái.

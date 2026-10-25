@@ -16,6 +16,7 @@ Feature: Gateway reports downstream failures clearly
     And the response has exactly one X-Correlation-Id header that is a GUID
     And the response reveals no host, port or internal name of the upstream
     And the gateway logged a warning in the correlation scope of the response
+    And that gateway warning carries no exception details
 
     Examples:
       | method |
@@ -54,6 +55,7 @@ Feature: Gateway reports downstream failures clearly
     And the response has exactly one X-Correlation-Id header equal to "client-id-504"
     And the response reveals no host, port or internal name of the upstream
     And the gateway logged a warning in the correlation scope of the response
+    And that gateway warning carries no exception details
 
   @S05 @FR-006 @NFR-003
   Scenario: An upstream that stays silent too long is reported as 504

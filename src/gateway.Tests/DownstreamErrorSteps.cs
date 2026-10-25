@@ -129,6 +129,16 @@ public sealed class DownstreamErrorSteps(GatewayContext context)
         Assert.All(warnings, w => AssertNoInternalNames(w.Message));
     }
 
+    [Then("that gateway warning carries no exception details")]
+    public void ThenWarningHasNoException()
+    {
+        var id = Assert.Single(context.Response!.Headers.GetValues("X-Correlation-Id"));
+        var warnings = GatewayWarnings(id).ToList();
+        Assert.NotEmpty(warnings);
+        // 503 and 504 are routine while an upstream is down; YARP already logs the exception, so repeating the stack here only adds noise.
+        Assert.All(warnings, w => Assert.Null(w.Exception));
+    }
+
     [Then("no log written by the gateway itself contains {string}, {string} or {string}")]
     public void ThenNoSecretsInLogs(string first, string second, string third)
     {

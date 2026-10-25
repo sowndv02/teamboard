@@ -35,6 +35,35 @@ public sealed class UpstreamErrorClassifierTests
     public void Request_ConnectionResetBeforeHeaders_IsBadGateway() =>
         Assert.Equal(UpstreamFailure.BadGateway, Classify(ForwarderError.Request, ConnectionReset));
 
+    [Theory]
+    [InlineData(SocketError.TryAgain)]
+    [InlineData(SocketError.NoData)]
+    [InlineData(SocketError.NetworkUnreachable)]
+    [InlineData(SocketError.HostUnreachable)]
+    public void Request_NothingToConnectTo_IsUnavailable(SocketError socketError)
+    {
+        var exception = new HttpRequestException(HttpRequestError.ConnectionError, "connect", new SocketException((int)socketError));
+
+        Assert.Equal(UpstreamFailure.Unavailable, Classify(ForwarderError.Request, exception));
+    }
+
+    [Theory]
+    [InlineData(SocketError.AddressNotAvailable)]
+    [InlineData(SocketError.AccessDenied)]
+    [InlineData(SocketError.NetworkDown)]
+    [InlineData(SocketError.ConnectionAborted)]
+    public void Request_ConnectionErrorWithOtherSocketError_IsBadGateway(SocketError socketError)
+    {
+        // Only "nothing is listening or reachable" is a 503; anything else that went wrong while connecting is a bad gateway.
+        var exception = new HttpRequestException(HttpRequestError.ConnectionError, "connect", new SocketException((int)socketError));
+
+        Assert.Equal(UpstreamFailure.BadGateway, Classify(ForwarderError.Request, exception));
+    }
+
+    [Fact]
+    public void Request_ConnectionErrorWithoutSocketException_IsBadGateway() =>
+        Assert.Equal(UpstreamFailure.BadGateway, Classify(ForwarderError.Request, new HttpRequestException(HttpRequestError.ConnectionError, "connect")));
+
     [Fact]
     public void Request_WithoutException_IsBadGateway() =>
         Assert.Equal(UpstreamFailure.BadGateway, Classify(ForwarderError.Request));
