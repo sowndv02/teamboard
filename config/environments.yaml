@@ -5,7 +5,7 @@ environments:
     runtime: docker-compose
     compose_files: [src/docker-compose.yml]
     aws: localstack              # SNS/SQS/DynamoDB giả lập (giai đoạn 2+)
-    secrets: local/ hoặc src/.env.develop (gitignore; mẫu src/.env.develop.example)
+    secrets: local/, src/.env (mật khẩu PostgreSQL; mẫu src/.env.example) hoặc src/.env.develop (gitignore; mẫu src/.env.develop.example)
 
   dev:
     runtime: ecs-fargate         # xem ADR 0003

@@ -61,3 +61,6 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# Script shell chạy trong container Linux phải dùng LF dù checkout trên Windows.
+*.sh text eol=lf
