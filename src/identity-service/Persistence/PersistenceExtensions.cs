@@ -34,6 +34,6 @@ public static class PersistenceExtensions
 
         await using var scope = app.Services.CreateAsyncScope();
         var database = scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database;
-        await database.MigrateAsync();
+        await database.MigrateAsync(app.Lifetime.ApplicationStopping);
     }
 }
