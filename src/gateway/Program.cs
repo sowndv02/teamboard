@@ -1,29 +1,44 @@
 using Gateway;
+using OpenTelemetry.Metrics;
 using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults("gateway");
 
-// Route và địa chỉ upstream nằm trong cấu hình "ReverseProxy" (NFR-004), không hardcode trong mã.
+// Routes and upstream addresses live in the "ReverseProxy" configuration (NFR-004), not hardcoded.
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+builder.Services
+    .AddOptions<UpstreamOptions>()
+    .BindConfiguration(UpstreamOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Needed for the route-level Timeout in the YARP configuration: without this middleware a route with Timeout fails with 500.
+builder.Services.AddRequestTimeouts();
+
+builder.Services.AddSingleton<GatewayMetrics>();
+builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(GatewayMetrics.MeterName));
 
 var app = builder.Build();
 
-// Thứ tự middleware đích (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, CORS, RateLimiter, BodyLimit, YARP.
-// Lát này có Correlation, ExceptionHandler, routing, health và fallback; các middleware còn lại thêm ở các lát sau.
-// UseRouting do minimal hosting tự thêm ở đầu pipeline nên không gọi tường minh.
+// Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, RequestTimeouts, UpstreamError, CORS, RateLimiter, BodyLimit, YARP.
+// This slice has Correlation, ExceptionHandler, routing, health and fallback; the remaining middleware are added in later slices.
+// UseRouting is added at the start of the pipeline by minimal hosting, so it is not called explicitly.
 app.UseCorrelation();
 app.UseTeamboardExceptionHandler();
+app.UseRequestTimeouts();
+app.UseMiddleware<UpstreamErrorMiddleware>();
 
 app.MapDefaultEndpoints();
 app.MapReverseProxy();
 
-// Mặc định của MapFallback có ràng buộc `nonfile` nên path kiểu tệp (/foo.txt) lọt ra ngoài; dùng mẫu catch-all rõ ràng.
+// MapFallback's default has a `nonfile` constraint, so file-like paths (/foo.txt) slip through; use an explicit catch-all pattern.
 app.MapFallback("{**path}", (HttpContext context) =>
     Results.Problem(ProblemFactory.Create(GatewayErrorCodes.RouteNotFound, context)));
 
 app.Run();
 
-// Để test dùng WebApplicationFactory<Program>.
+// Exposed so tests can use WebApplicationFactory<Program>.
 public partial class Program;

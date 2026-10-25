@@ -16,3 +16,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [identity-auth-slices](identity-auth-slices.md) | TB-004 (bảng lát; lát 1a = TB-021) | approved |
 | [TB-021-identity-service-skeleton](TB-021-identity-service-skeleton.md) | TB-021 (lát 1a identity) | approved |
 | [TB-022-gateway-correlation-error-handling](TB-022-gateway-correlation-error-handling.md) | TB-022 (lát 2 gateway) | approved |
+| [TB-023-gateway-downstream-errors](TB-023-gateway-downstream-errors.md) | TB-023 (lát 3 gateway) | approved |

@@ -1,6 +1,6 @@
 namespace Teamboard.Shared.Http;
 
-/// <summary>Bảng mã lỗi dùng chung cho mọi service. Mã riêng của service nằm ở bảng của service đó, cùng kiểu <see cref="ErrorDefinition"/>.</summary>
+/// <summary>Error codes shared by every service. Service-specific codes live in that service's own table, using the same <see cref="ErrorDefinition"/> type.</summary>
 public static class SharedErrors
 {
     public static readonly ErrorDefinition ValidationFailed = new("VALIDATION_FAILED", 400, "One or more fields are invalid.");

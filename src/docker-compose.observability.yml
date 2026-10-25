@@ -1,10 +1,10 @@
-# Quan sát cục bộ: Jaeger nhận trace qua OTLP. Chạy kèm file chính:
+# Local observability: Jaeger receives traces over OTLP. Run alongside the main file:
 #   docker compose -f src/docker-compose.yml -f src/docker-compose.observability.yml up --build -d
 services:
   jaeger:
     image: cr.jaegertracing.io/jaegertracing/jaeger:2.22.0
     ports:
-      # Chỉ bind loopback: giao diện và cổng OTLP không mở ra mạng ngoài (docker.md).
+      # Bind to loopback only: the UI and OTLP ports are not exposed to the outside network (docker.md).
       - "127.0.0.1:16686:16686"
       - "127.0.0.1:4317:4317"
       - "127.0.0.1:4318:4318"

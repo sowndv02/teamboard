@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 namespace Teamboard.Shared.Http;
 
 /// <summary>
-/// Gắn một correlation id đã kiểm cho mỗi request: giữ id hợp lệ của client, thay mọi giá trị khác bằng GUID mới.
-/// Không bao giờ tin hay ghi lại giá trị thô của client (chống log injection).
+/// Attaches a validated correlation id to every request: keeps a valid client id, replaces any other value with a new GUID.
+/// Never trusts or logs the raw client value (prevents log injection).
 /// </summary>
 internal sealed class CorrelationMiddleware(RequestDelegate next, ILogger<CorrelationMiddleware> logger)
 {
@@ -17,9 +17,9 @@ internal sealed class CorrelationMiddleware(RequestDelegate next, ILogger<Correl
         var id = ReadValidId(context) ?? Guid.NewGuid().ToString();
 
         context.Items[CorrelationHeaders.ItemKey] = id;
-        // Ghi đè header request để YARP chuyển đúng id đã kiểm xuống upstream.
+        // Overwrite the request header so YARP forwards the validated id to the upstream.
         context.Request.Headers[CorrelationHeaders.Name] = id;
-        // OnStarting: UseExceptionHandler gọi Response.Clear() nên header đặt trực tiếp sẽ mất; callback này chạy sau khi upstream đã chép header.
+        // OnStarting: UseExceptionHandler calls Response.Clear(), so a header set directly would be lost; this callback runs after the upstream has copied its headers.
         context.Response.OnStarting(static state =>
         {
             var (response, value) = ((HttpResponse, string))state;
@@ -34,7 +34,7 @@ internal sealed class CorrelationMiddleware(RequestDelegate next, ILogger<Correl
         }
     }
 
-    // Duyệt từng ký tự thay vì regex: `$` của .NET khớp trước "\n" cuối chuỗi nên regex sẽ nhận nhầm "abc\n".
+    // Iterate characters instead of using a regex: .NET's `$` matches before a trailing "\n", so a regex would wrongly accept "abc\n".
     private static string? ReadValidId(HttpContext context)
     {
         var values = context.Request.Headers[CorrelationHeaders.Name];

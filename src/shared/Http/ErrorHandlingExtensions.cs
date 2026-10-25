@@ -6,10 +6,10 @@ namespace Teamboard.Shared.Http;
 public static class ErrorHandlingExtensions
 {
     /// <summary>
-    /// Biến lỗi chưa lường thành 500 problem+json mã INTERNAL_ERROR, không lộ chi tiết nội bộ.
-    /// Ghi thẳng response trong <c>app.Run</c> (không dùng ExceptionHandlingPath, vốn chạy lại cả pipeline);
-    /// middleware của ASP.NET Core đã log exception, nằm trong scope correlation nếu <c>UseCorrelation</c> đặt trước.
-    /// Response đã bắt đầu gửi thì không ghi lại được (thuộc lát 3).
+    /// Turns an unexpected error into a 500 problem+json with code INTERNAL_ERROR, leaking no internal details.
+    /// Writes the response directly in <c>app.Run</c> (not ExceptionHandlingPath, which re-runs the whole pipeline);
+    /// the ASP.NET Core middleware already logs the exception, inside the correlation scope if <c>UseCorrelation</c> is placed first.
+    /// Once the response has started it cannot be rewritten (handled in slice 3).
     /// </summary>
     public static IApplicationBuilder UseTeamboardExceptionHandler(this IApplicationBuilder app)
         => app.UseExceptionHandler(errorApp => errorApp.Run(context =>

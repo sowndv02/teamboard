@@ -29,7 +29,7 @@ Không "đơn giản hoá" một service về CRUD layered: kiến trúc khác n
 - Giao tiếp: REST qua gateway; event qua SNS → SQS (+ DLQ). Producer dùng outbox, consumer idempotent theo `eventId`. Mọi request/event mang `correlationId` + `traceparent`.
 - Mọi service có `/health/live`, `/health/ready` và OpenTelemetry (trace, metric, log).
 - Infra trong `infra/` (modules + envs/dev, envs/stg).
-- Tài liệu và comment giải thích viết tiếng Việt.
+- Tài liệu (kể cả ghi chú của learning-hub trong `document/learning/`) viết tiếng Việt. Comment trong source code (C#, YAML, shell, SQL, csproj) viết tiếng Anh.
 
 ## Lệnh
 

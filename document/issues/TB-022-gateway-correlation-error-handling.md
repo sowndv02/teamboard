@@ -1,13 +1,13 @@
 ---
 key: TB-022
 title: Gateway lát 2, correlation, trace nối xuyên service và 500 problem+json
-status: review
+status: done
 phase: 1
 branch: feature/TB-022-gateway-correlation-error-handling
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-10-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-10-25     # ngày done/dropped (PR 15 merge)
 ---
 
 # TB-022 — Gateway lát 2, correlation, trace nối xuyên service và 500 problem+json
@@ -44,6 +44,7 @@ Plan chi tiết: `document/plans/TB-022-gateway-correlation-error-handling.md`.
 - 2026-10-25: coding-start xong B1a-B3 (4 commit cục bộ, chưa push); `gitleaks` chưa cài nên chưa quét secret bằng công cụ, chỉ grep diff thô (sạch). @S02 dòng chữ số Arabic-Indic từ đỏ thành xanh khi middleware ghi đè id (đúng dự đoán test-init).
 - 2026-10-25: tạo issue từ lát 2 của bảng lát; branch tạo từ `main` (sau PR 11).
 - 2026-10-25: người dùng hỏi vì sao bảng lát không cập nhật khi hoàn thành lát; đồng bộ hai bảng lát với issue và nối việc cập nhật vào checklist `plan-init`, `coding-start`, `create-pr`, `git-workflow.md`, `slicing.md` (LL-006).
+- 2026-10-25: người dùng đổi quy tắc commit của workflow: mỗi cặp bước làm + review chỉ commit một lần sau khi review PASS (không commit sau bước làm); sửa `workflow/SKILL.md`, `coding-start`, `state-protocol.md`, `git-workflow.md`. Đảo một phần TB-009.
 
 ## Workflow
 
@@ -59,7 +60,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 2 | 2026-10-25 | 14 FIX vòng 1 + 4 quyết định (traceparent thiếu/sai, giữ bảng id, không test log gateway); test tiếng Anh ASCII theo quy tắc mới; review độc lập (sub-agent); 33 + 26 test đỏ ở hành vi, @S06 đỏ đúng lý do |
 | coding-start | done | – | 2026-10-25 | xanh 40/40 (Http) + 46/46 (gateway) + @S06; 4 commit cục bộ B1a (7707480), B1b (e6eca95), B2 (04a5b5e), B3 (bd76e52); toàn solution non-docker xanh, nhóm docker từng assembly xanh (gateway 2, board-service 2, identity 7); format, vulnerable, compose config sạch; gitleaks chưa cài |
 | coding-review | PASS | 1 | 2026-10-25 | review độc lập (sub-agent), không P0-P2; 3 CONFIRM đã chốt (phạm vi PR, log console, theo dõi ngoài phạm vi), 2 FIX P3 đã sửa; test, build, format, compose config xanh lại sau sửa |
-| create-pr | done | – | 2026-10-25 | PR https://github.com/sowndv02/teamboard/pull/15 (base main); chờ review người thật và CI, merge do người dùng |
+| create-pr | done | – | 2026-10-25 | PR https://github.com/sowndv02/teamboard/pull/15 (base main); đã merge 2026-10-25 (07:10 UTC) |
 
 ## Confirm log
 

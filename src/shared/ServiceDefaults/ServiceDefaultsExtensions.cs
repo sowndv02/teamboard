@@ -23,7 +23,7 @@ public static class ServiceDefaultsExtensions
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serviceName);
 
-        // Singleton để mọi lần probe dùng cùng một check (không tạo instance và callback mới mỗi lần).
+        // Singleton so every probe uses the same check (no new instance and callback each time).
         builder.Services.AddSingleton<StartupHealthCheck>();
         builder.Services
             .AddHealthChecks()
@@ -33,7 +33,7 @@ public static class ServiceDefaultsExtensions
         return builder;
     }
 
-    /// <summary>`/health/live` không kiểm dependency; `/health/ready` kiểm các check có tag "ready".</summary>
+    /// <summary>`/health/live` does not check dependencies; `/health/ready` runs the checks tagged "ready".</summary>
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
         app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
@@ -41,7 +41,7 @@ public static class ServiceDefaultsExtensions
         return app;
     }
 
-    // Không bật ghi header/body của request vào span hay log (NFR-004, GDPR).
+    // Do not record request headers or body in spans or logs (NFR-004, GDPR).
     private static void AddOpenTelemetryDefaults<TBuilder>(this TBuilder builder, string serviceName)
         where TBuilder : IHostApplicationBuilder
     {
@@ -51,7 +51,7 @@ public static class ServiceDefaultsExtensions
             logging.IncludeScopes = true;
         });
 
-        // Log "Request starting" của ASP.NET Core ghi cả query string (có thể chứa token), nên không xuất sang telemetry.
+        // ASP.NET Core's "Request starting" log includes the query string (which may contain tokens), so it is not exported to telemetry.
         builder.Logging.AddFilter<OpenTelemetryLoggerProvider>("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 
         var telemetry = builder.Services
@@ -64,7 +64,7 @@ public static class ServiceDefaultsExtensions
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation());
 
-        // Chỉ xuất ra ngoài khi có endpoint OTLP; thiếu thì service vẫn chạy bình thường.
+        // Export only when an OTLP endpoint is configured; without one the service still runs normally.
         if (!string.IsNullOrWhiteSpace(builder.Configuration[OtlpEndpointKey]))
         {
             telemetry.UseOtlpExporter();

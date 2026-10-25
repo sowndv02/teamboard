@@ -30,8 +30,8 @@ updated: YYYY-MM-DD
 
 | # | Lát (hành vi giao được) | FR/NFR | Phụ thuộc | Ước lượng (khoảng + giả định) | Issue | Trạng thái |
 |---|---|---|---|---|---|---|
-| 1 | Khung + health + đăng ký tối thiểu | FR-001, NFR-02 | – | 1–2 ngày (đã có template service) | TB-0xx | todo |
-| 2 | Đăng nhập, cấp token | FR-002 | 1 | 2–3 ngày | TB-0xy | todo |
+| 1 | Khung + health + đăng ký tối thiểu | FR-001, NFR-02 | – | 1–2 ngày (đã có template service) | TB-031 | todo |
+| 2 | Đăng nhập, cấp token | FR-002 | 1 | 2–3 ngày | TB-032 | todo |
 
 ## Ngoài lát (hoãn/không làm)
 ## Thứ tự và lý do
@@ -47,7 +47,7 @@ Trạng thái lát: `todo` → `planning` → `in-progress` → `review` → `do
 1. Đọc spec + design `confirmed`; liệt kê FR/BR/NFR và quyết định design; xác định "xương sống".
 2. Đề xuất bảng lát theo mục 1; tự kiểm: mọi FR/NFR Must/Should có lát, không lát nào quá lớn, thứ tự theo phụ thuộc rồi giá trị.
 3. **Hỏi người dùng** (CONFIRM): duyệt thứ tự/ranh giới lát, lát nào hoãn, ưu tiên khi nhiều lát độc lập. Không tự chốt.
-4. Sau duyệt: `status: approved`; đề xuất tạo issue cho từng lát (người dùng đồng ý mới tạo, mỗi issue trỏ về hàng của bảng); ghi số issue vào bảng.
+4. Sau duyệt: `status: approved`; **cấp luôn key `TB-NNN` cho mọi lát** (số liên tiếp kế tiếp trong `document/issues/README.md`, không dùng placeholder `TB-0xx`) để gọi lát bằng key ngay từ đầu. Đề xuất tạo **issue khung** cho từng lát (copy `_template.md`: `status: todo`, tiêu đề + bối cảnh trỏ về hàng của bảng, phạm vi/tiêu chí lấy từ hàng đó; plan chi tiết vẫn để đến bước 5), thêm các dòng vào bảng `document/issues/README.md` và ghi key vào cột Issue; **người dùng đồng ý mới tạo**. Key đã cấp thì không tái sử dụng; lát bị bỏ thì issue `dropped`, không đổi số; lát giữ chỗ chưa thiết kế (không có plan được) chưa cấp key, cấp khi có design.
 5. **Chỉ lập plan cho lát kế tiếp** (`plan-init` đầu vào = một hàng của bảng). Không lập sẵn plan cho nhiều lát: lát đầu thường làm lộ điều sai ở lát sau. Lát N+1 chỉ bắt đầu plan khi lát N đã merge, hoặc người dùng đồng ý làm song song lát độc lập.
 6. Sau mỗi lát xong: cập nhật bảng (trạng thái, ước lượng vs thực tế), xem lại các lát sau còn đúng không. Điều học được làm đổi lát sau → CONFIRM, cập nhật bảng và Confirm log, không sửa im lặng.
 7. Spec/design đổi (phạm vi) → bảng bị ảnh hưởng đánh dấu cần xem lại (`workflow` mục đổi phạm vi); lát đã `done` không sửa, tạo lát/issue mới.
