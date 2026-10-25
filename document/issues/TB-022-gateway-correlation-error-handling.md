@@ -40,6 +40,7 @@ Lát 2 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
 Plan chi tiết: `document/plans/TB-022-gateway-correlation-error-handling.md`.
 
 ## Ghi chú / Nhật ký
+- 2026-10-25: coding-start xong B1a-B3 (4 commit cục bộ, chưa push); `gitleaks` chưa cài nên chưa quét secret bằng công cụ, chỉ grep diff thô (sạch). @S02 dòng chữ số Arabic-Indic từ đỏ thành xanh khi middleware ghi đè id (đúng dự đoán test-init).
 - 2026-10-25: tạo issue từ lát 2 của bảng lát; branch tạo từ `main` (sau PR 11).
 - 2026-10-25: người dùng hỏi vì sao bảng lát không cập nhật khi hoàn thành lát; đồng bộ hai bảng lát với issue và nối việc cập nhật vào checklist `plan-init`, `coding-start`, `create-pr`, `git-workflow.md`, `slicing.md` (LL-006).
 
@@ -55,7 +56,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 2 | 2026-10-25 | plan `approved`; 4 quyết định (nhiều giá trị id, spike ép lỗi, không log khi thay id, cổng Docker), 12 FIX; review độc lập (sub-agent) |
 | test-init | done | – | 2026-10-25 | 18 test thư viện + 16 test host gateway + @S06 Docker đỏ đúng lý do; spike A-03 đạt (thay `IHttpForwarder`); trace-by-id Jaeger kiểm tay: `GET /api/v3/traces/{traceId}` |
 | test-review | PASS | 2 | 2026-10-25 | 14 FIX vòng 1 + 4 quyết định (traceparent thiếu/sai, giữ bảng id, không test log gateway); test tiếng Anh ASCII theo quy tắc mới; review độc lập (sub-agent); 33 + 26 test đỏ ở hành vi, @S06 đỏ đúng lý do |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-10-25 | xanh 40/40 (Http) + 46/46 (gateway) + @S06; 4 commit cục bộ B1a (7707480), B1b (e6eca95), B2 (04a5b5e), B3 (bd76e52); toàn solution non-docker xanh, nhóm docker từng assembly xanh (gateway 2, board-service 2, identity 7); format, vulnerable, compose config sạch; gitleaks chưa cài |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -78,17 +79,17 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 | `CorrelationMiddlewareTests` (id hợp lệ ×3, 64 ký tự, tên header chữ thường, thiếu id, tag và scope); `correlation.feature` @S01 | Đỏ ở hành vi: `The given header was not found` (chưa có `X-Correlation-Id`), cả thư viện lẫn gateway | – |
-| @S02 | `CorrelationMiddlewareTests` (17 id sai gồm ký tự sát biên `[ \ ] ^ ` / : @ { ~`, 65 ký tự, id sai không lộ trong log/tag có đối chứng dương); `correlation.feature` @S02 (15 dòng) | Đỏ như @S01; riêng `"١٢٣"` đỏ vì YARP không chuyển được header không phải ASCII (upstream không nhận request), sẽ xanh khi middleware ghi đè id | – |
-| @S08 | `CorrelationMiddlewareTests.Request_TwoHeaderValues_IsReplaced`; `correlation.feature` @S08 | Đỏ như @S01 | – |
-| @S03 | `correlation.feature` @S03 | Xanh sẵn: YARP đã truyền `traceparent` (A-02 đúng); giữ làm test hồi quy | – |
-| @S11, @S12 | `correlation.feature` @S11, @S12 | Xanh sẵn: ASP.NET và YARP đã tạo trace mới khi thiếu hoặc sai `traceparent`; giữ làm test hồi quy (bỏ qua rồi bắt đầu trace mới đúng W3C) | – |
-| @S04 | `ProblemFactoryTests.Create_ContextHasCorrelationId_UsesItAndKeepsTraceId`; `correlation.feature` @S04 | Đỏ: `correlationId` chưa lấy từ context, chưa có header | – |
-| @S09 | `correlation.feature` @S09 (`/health/live`) | Đỏ: chưa có header | – |
-| @S10 | `correlation.feature` @S10 (HEAD, POST, DELETE) | Đỏ: chưa có header | – |
-| @S05 | `ExceptionHandlerTests` (5 test: hợp đồng đầy đủ, allowlist thuộc tính, header và id, không gửi id, log scope); `error-handling.feature` @S05 | Đỏ: 500 `text/plain` ở gateway; ở thư viện exception chưa có handler lọt tới client. Spike A-03 đạt: `ConfigureTestServices` thay được `IHttpForwarder` | – |
-| @S06 | `tracing.feature` @S06 (`@docker`, project `tb022-tests`, một `When`) | Đỏ: trace theo id chỉ có `board-service`, chưa có `gateway` (đã chạy lại sau vòng 1; endpoint `GET /api/v3/traces/{traceId}` kiểm tay) | – |
-| @S07 | `correlation.feature` @S07 | Đỏ: phản hồi mang id của upstream (`from-upstream`) thay vì của gateway | – |
+| @S01 | `CorrelationMiddlewareTests` (id hợp lệ ×3, 64 ký tự, tên header chữ thường, thiếu id, tag và scope); `correlation.feature` @S01 | Đỏ ở hành vi: `The given header was not found` (chưa có `X-Correlation-Id`), cả thư viện lẫn gateway | Xanh 2026-10-25 (B1a-B3) |
+| @S02 | `CorrelationMiddlewareTests` (17 id sai gồm ký tự sát biên `[ \ ] ^ ` / : @ { ~`, 65 ký tự, id sai không lộ trong log/tag có đối chứng dương); `correlation.feature` @S02 (15 dòng) | Đỏ như @S01; riêng `"١٢٣"` đỏ vì YARP không chuyển được header không phải ASCII (upstream không nhận request), sẽ xanh khi middleware ghi đè id | Xanh 2026-10-25 (B1a-B3) |
+| @S08 | `CorrelationMiddlewareTests.Request_TwoHeaderValues_IsReplaced`; `correlation.feature` @S08 | Đỏ như @S01 | Xanh 2026-10-25 (B1a-B3) |
+| @S03 | `correlation.feature` @S03 | Xanh sẵn: YARP đã truyền `traceparent` (A-02 đúng); giữ làm test hồi quy | Xanh sẵn, vẫn xanh sau B2 |
+| @S11, @S12 | `correlation.feature` @S11, @S12 | Xanh sẵn: ASP.NET và YARP đã tạo trace mới khi thiếu hoặc sai `traceparent`; giữ làm test hồi quy (bỏ qua rồi bắt đầu trace mới đúng W3C) | Xanh sẵn, vẫn xanh sau B2 |
+| @S04 | `ProblemFactoryTests.Create_ContextHasCorrelationId_UsesItAndKeepsTraceId`; `correlation.feature` @S04 | Đỏ: `correlationId` chưa lấy từ context, chưa có header | Xanh 2026-10-25 (B1a-B3) |
+| @S09 | `correlation.feature` @S09 (`/health/live`) | Đỏ: chưa có header | Xanh 2026-10-25 (B1a-B3) |
+| @S10 | `correlation.feature` @S10 (HEAD, POST, DELETE) | Đỏ: chưa có header | Xanh 2026-10-25 (B1a-B3) |
+| @S05 | `ExceptionHandlerTests` (5 test: hợp đồng đầy đủ, allowlist thuộc tính, header và id, không gửi id, log scope); `error-handling.feature` @S05 | Đỏ: 500 `text/plain` ở gateway; ở thư viện exception chưa có handler lọt tới client. Spike A-03 đạt: `ConfigureTestServices` thay được `IHttpForwarder` | Xanh 2026-10-25 (B1a-B3) |
+| @S06 | `tracing.feature` @S06 (`@docker`, project `tb022-tests`, một `When`) | Đỏ: trace theo id chỉ có `board-service`, chưa có `gateway` (đã chạy lại sau vòng 1; endpoint `GET /api/v3/traces/{traceId}` kiểm tay) | Xanh 2026-10-25 (B1a-B3) |
+| @S07 | `correlation.feature` @S07 | Đỏ: phản hồi mang id của upstream (`from-upstream`) thay vì của gateway | Xanh 2026-10-25 (B1a-B3) |
 
 ## Test review rounds
 
