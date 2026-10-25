@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Gateway.Tests;
@@ -13,11 +14,15 @@ public sealed class UpstreamOptionsTests
     [InlineData("-1")]
     [InlineData("3601")]
     [InlineData("abc")]
-    public void Start_WithInvalidRetryAfter_Fails(string value)
+    public void Start_WithInvalidRetryAfter_FailsOnOptionsValidation(string value)
     {
         using var factory = FactoryWith(value);
 
-        Assert.ThrowsAny<Exception>(() => factory.CreateClient());
+        var exception = Record.Exception(() => factory.CreateClient());
+
+        // Any startup failure would pass a looser check; the cause must be the options validation itself.
+        Assert.NotNull(exception);
+        Assert.Contains(Chain(exception), e => e is OptionsValidationException || e.Message.Contains("RetryAfterSeconds", StringComparison.Ordinal));
     }
 
     [Theory]
@@ -30,6 +35,14 @@ public sealed class UpstreamOptionsTests
 
         using var client = factory.CreateClient();
         Assert.NotNull(client);
+    }
+
+    private static IEnumerable<Exception> Chain(Exception exception)
+    {
+        for (var current = exception; current is not null; current = current.InnerException)
+        {
+            yield return current;
+        }
     }
 
     private static WebApplicationFactory<Program> FactoryWith(string value) =>

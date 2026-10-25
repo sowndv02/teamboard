@@ -14,7 +14,8 @@ public sealed class DownstreamComposeSteps
     // Own project name: containers left behind by other Docker tests never mix into this one.
     private readonly DockerCli _docker = new("tb023-tests");
     private string? _overrideDirectory;
-    private string _lastPath = string.Empty;
+    private int _status;
+    private string _body = string.Empty;
 
     [Given("the gateway runs alone in compose with its upstream address pointing at a closed port")]
     public void GivenGatewayWithClosedUpstream()
@@ -36,18 +37,21 @@ public sealed class DownstreamComposeSteps
     [When("I call {string} on host port 8080")]
     public async Task WhenCallHostPort(string request)
     {
-        _lastPath = request.Split(' ', 2)[1];
+        var path = request.Split(' ', 2)[1];
         var ready = await HttpWait.GetStatusUntilAsync($"{GatewayUrl}/health/ready", 200, TimeSpan.FromSeconds(60));
         Assert.True(ready is not null, "The gateway did not become ready within 60 seconds.");
+
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+        using var response = await client.GetAsync($"{GatewayUrl}{path}");
+        _status = (int)response.StatusCode;
+        _body = await response.Content.ReadAsStringAsync();
     }
 
-    [Then("the gateway answers on host port 8080 with status {int} and problem+json code {string}")]
-    public async Task ThenAnswers(int status, string code)
+    [Then("the gateway answered on host port 8080 with status {int} and problem+json code {string}")]
+    public void ThenAnswered(int status, string code)
     {
-        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-        using var response = await client.GetAsync($"{GatewayUrl}{_lastPath}");
-        Assert.Equal(status, (int)response.StatusCode);
-        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(status, _status);
+        using var document = JsonDocument.Parse(_body);
         Assert.Equal(code, document.RootElement.GetProperty("code").GetString());
     }
 

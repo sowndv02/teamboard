@@ -56,7 +56,7 @@ Sau header, YARP tự ngắt kết nối với client; client thấy lỗi đọ
 | FR-006 timeout kết nối → `504` | D4 (cập nhật) | B2 | (unit của bộ phân loại) | Unit: `RequestTimedOut` với ngoại lệ `TimeoutException` → 504; `ConnectTimeout` thật (15 giây) không chạy trong CI |
 | FR-006 không lộ host nội bộ hay stack trace; 5xx mang `X-Correlation-Id` | D4, mục 8, 11 | B1, B2 | @S01–@S05 (bước chung) | Mọi phản hồi lỗi: không chứa địa chỉ upstream, tên service, tên exception; allowlist thuộc tính; header `X-Correlation-Id` bằng `correlationId` của body (HEAD: chỉ header) |
 | FR-006 header đã gửi rồi mới ngắt/treo → ngắt kết nối + log + metric | D4, mục 9 | B3 | @S06, @S07 | Host test (Outline S07: treo vượt `Timeout` của route / vượt `ActivityTimeout`): client lỗi đọc thân; `MeterListener` thấy `gateway_upstream_aborted`; log Warning có `correlationId` |
-| NFR-003 timeout cấu hình được, không hardcode | D4 | B2, B4 | @S04, @S05, @S08 | Test dùng giá trị ghi đè ngắn qua cấu hình; test đọc `appsettings.json` thật: 30 giây |
+| NFR-003 timeout cấu hình được, không hardcode | D4 | B2, B4 | @S04, @S05, `ConfigurationTests` | Test dùng giá trị ghi đè ngắn qua cấu hình; test đọc `appsettings.json` thật: 30 giây |
 | `Retry-After` cấu hình được, có khoảng hợp lệ | D4, `api-endpoints.md` §6 | B1 | @S01, @S11 | Ghi đè 7 giây → header `7`; giá trị 0 hoặc 3601 làm khởi động thất bại (unit `UpstreamOptions`) |
 | Gateway sống khi upstream chết (spec FR-002) | spec | B4 | @S09 | `/health/live` và `/health/ready` 200 khi upstream đã dừng |
 | FR-006 không kết nối được trong môi trường thật | D4 | B4 | @S10 | `@docker`: gateway chạy riêng, `GET /api/v1/boards` → 503 `UPSTREAM_UNAVAILABLE` |
@@ -70,10 +70,12 @@ Kịch bản (ID duy nhất trong file `.feature`; viết ở test-init):
 - @S05 Upstream im lặng vượt `ActivityTimeout` của cluster (ngắn hơn `Timeout`): `504` `UPSTREAM_TIMEOUT`.
 - @S06 Upstream trả header rồi đóng kết nối giữa chừng: client bị ngắt, metric `gateway_upstream_aborted` tăng 1, có log Warning mang `correlationId`.
 - @S07 (Outline) Upstream trả header rồi treo vượt `Timeout` của route / vượt `ActivityTimeout`: client bị ngắt, metric tăng.
-- @S08 Cấu hình: timeout mặc định trong `appsettings.json` là 30 giây (route và cluster).
+- @S08 (đã chuyển thành test xUnit `ConfigurationTests`, không còn kịch bản `.feature`: kịch bản không có hành vi nhìn thấy được; người dùng chốt ở test-review) timeout mặc định trong `appsettings.json` là 30 giây (route và cluster).
 - @S09 `/health/live` và `/health/ready` trả 200 khi upstream đã dừng.
 - @S10 (`@docker`) Gateway chạy riêng trong compose, `GET /api/v1/boards` trả `503` `UPSTREAM_UNAVAILABLE`.
 - @S11 `Retry-After` đọc từ cấu hình (ghi đè 7 giây → header `7`); tách khỏi @S08 ở test-init để ID kịch bản duy nhất và mỗi kịch bản một hành vi.
+- @S12 Thông tin nhạy cảm (header `Authorization`, giá trị query, thân request) không bao giờ vào log của gateway (NFR-006; thêm ở test-review vòng 1).
+- Test xUnit không qua feature (hành vi nội bộ, không phải thứ người gọi quan sát): `ClientCancellationTests` (client huỷ: không ghi response, log Information, không tính metric lỗi; người dùng chốt P-02 và chọn kiểm ở mức host test), `ConfigurationTests` (@S08), `UpstreamOptionsTests`, `UpstreamErrorClassifierTests` (gồm quy tắc theo hậu tố `*Client`/`*Destination` và mọi giá trị `ForwarderError` chưa có quy tắc riêng là 502, theo P-03), `GatewayErrorCodesTests` (ba mã mới với status).
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 
@@ -84,7 +86,7 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗ
 | Điều kiện (response chưa bắt đầu) | Kết quả |
 |---|---|
 | `NoAvailableDestinations` | 503 `UPSTREAM_UNAVAILABLE` + `Retry-After` |
-| `Request` với ngoại lệ gốc `ConnectionError` / `NameResolutionError` / `SocketException` (từ chối kết nối, không phân giải tên) | 503 `UPSTREAM_UNAVAILABLE` + `Retry-After` |
+| `Request` với `HttpRequestError.ConnectionError` / `NameResolutionError` (gốc `SocketException` ConnectionRefused / HostNotFound; reset giữa chừng, gốc `SocketException` ConnectionReset, là 502) | 503 `UPSTREAM_UNAVAILABLE` + `Retry-After` |
 | `RequestTimedOut` (gồm timeout kết nối) | 504 `UPSTREAM_TIMEOUT` |
 | `RequestCanceled` / `RequestBodyCanceled` mà `RequestTimeoutToken` đã cancel (timeout theo route) | 504 `UPSTREAM_TIMEOUT` |
 | `RequestCanceled` / `RequestBodyCanceled` / `*Client` không do timeout (client huỷ) | không ghi response; log Information |
@@ -119,12 +121,12 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗ
 - **Phụ thuộc:** B1 (middleware), B2 (timeout cho S07).
 
 ### B4. Cấu hình, sức khoẻ khi upstream chết và test Docker
-- **Kịch bản/test sẽ viết (đỏ trước):** @S08 (đọc `appsettings.json` thật), @S09, @S10 (`@docker`, tái dùng `ComposeSteps`/`DockerCli` với tên dự án riêng `tb023-tests`, chạy riêng service `gateway`; để xác định, ghi đè địa chỉ cluster về cổng đóng trong container (ví dụ `http://127.0.0.1:1`) thay vì dựa vào việc `board-service` không phân giải được: DNS wildcard hoặc search domain của máy có thể làm tên đó phân giải được). Có thể xanh sẵn (S09) nếu hành vi đã đúng từ lát 1: ghi vào TDD log là test hồi quy.
+- **Kịch bản/test sẽ viết (đỏ trước):** `ConfigurationTests` (đọc `appsettings.json` thật), @S09, @S10 (`@docker`, tái dùng `ComposeSteps`/`DockerCli` với tên dự án riêng `tb023-tests`, chạy riêng service `gateway`; để xác định, ghi đè địa chỉ cluster về cổng đóng trong container (ví dụ `http://127.0.0.1:1`) thay vì dựa vào việc `board-service` không phân giải được: DNS wildcard hoặc search domain của máy có thể làm tên đó phân giải được). Có thể xanh sẵn (S09) nếu hành vi đã đúng từ lát 1: ghi vào TDD log là test hồi quy.
 - **File/module dự kiến chạm:** `src/gateway.Tests/` (step, feature), `document/spec/features/gateway/`, `COMMANDS.md` (kiểm nhắc nhóm docker mỗi lần một assembly; đã có từ TB-022).
 - **Hợp đồng thay đổi:** không có.
 - **Migration / cấu hình:** không có.
 - **Tài liệu cần cập nhật:** bảng lát và `document/issues/README.md` theo LL-006: lát 3 → `in-progress` khi bắt đầu coding, `review` khi mở PR, `done` sau merge; sửa luôn hàng lát 2 và TB-022 (đã merge) thành `done` nếu chưa đồng bộ (cùng thay đổi, vì thuộc cùng bảng).
-- **Kiểm chứng:** @S08–@S10 xanh (S10 cần Docker Desktop, cổng 8080 trống); các test Docker khác (TB-001, TB-010, TB-021, TB-022) vẫn xanh khi chạy từng assembly; `docker compose -f src/docker-compose.yml --env-file src/.env.example config -q`.
+- **Kiểm chứng:** `ConfigurationTests`, @S09, @S10 xanh (S10 cần Docker Desktop, cổng 8080 trống); các test Docker khác (TB-001, TB-010, TB-021, TB-022) vẫn xanh khi chạy từng assembly; `docker compose -f src/docker-compose.yml --env-file src/.env.example config -q`.
 - **Phụ thuộc:** B1–B3.
 
 ## 4. Chiến lược test
@@ -212,3 +214,4 @@ Giả định đã kiểm bằng spike hộp đen của reviewer (YARP 2.3.0, .N
 | 2026-10-25 | Tạo bản nháp | plan-init cho TB-023 (lát 3 của gateway) |
 | 2026-10-25 | plan-review vòng 1: ghi 7 quyết định, sửa 11 FIX, sửa spec FR-006 và design D4, 6.4, 9; plan `approved` | plan-review TB-023 |
 | 2026-10-25 | test-init: tách @S11 (Retry-After từ cấu hình) khỏi @S08; không đổi hành vi | test-init TB-023 |
+| 2026-10-25 | test-review vòng 1: @S08 thành `ConfigurationTests`, thêm @S12, `ClientCancellationTests`, quy tắc `ForwarderError` chưa liệt kê là 502; không đổi hành vi đã chốt | test-review TB-023 |

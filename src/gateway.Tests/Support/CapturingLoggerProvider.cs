@@ -10,7 +10,7 @@ internal sealed class CapturingLoggerProvider : ILoggerProvider, ISupportExterna
 
     public ConcurrentQueue<LogEntry> Entries { get; } = new();
 
-    public ILogger CreateLogger(string categoryName) => new CapturingLogger(this);
+    public ILogger CreateLogger(string categoryName) => new CapturingLogger(this, categoryName);
 
     public void SetScopeProvider(IExternalScopeProvider scopeProvider) => _scopes = scopeProvider;
 
@@ -18,9 +18,9 @@ internal sealed class CapturingLoggerProvider : ILoggerProvider, ISupportExterna
     {
     }
 
-    internal sealed record LogEntry(LogLevel Level, string Message, string Scopes, Exception? Exception);
+    internal sealed record LogEntry(string Category, LogLevel Level, string Message, string Scopes, Exception? Exception);
 
-    private sealed class CapturingLogger(CapturingLoggerProvider owner) : ILogger
+    private sealed class CapturingLogger(CapturingLoggerProvider owner, string category) : ILogger
     {
         public IDisposable? BeginScope<TState>(TState state)
             where TState : notnull => owner._scopes.Push(state);
@@ -35,7 +35,7 @@ internal sealed class CapturingLoggerProvider : ILoggerProvider, ISupportExterna
                     ? string.Join(',', pairs.Select(p => $"{p.Key}={p.Value}"))
                     : scope?.ToString() ?? string.Empty),
                 scopes);
-            owner.Entries.Enqueue(new LogEntry(logLevel, formatter(state, exception), string.Join('|', scopes), exception));
+            owner.Entries.Enqueue(new LogEntry(category, logLevel, formatter(state, exception), string.Join('|', scopes), exception));
         }
     }
 }

@@ -106,12 +106,12 @@ public sealed class GatewayContext : IAsyncDisposable
         _client.Timeout = TimeSpan.FromSeconds(20);
     }
 
-    public async Task SendAsync(string method, string path, Action<HttpRequestMessage>? configure = null)
+    public async Task SendAsync(string method, string path, Action<HttpRequestMessage>? configure = null, CancellationToken cancellationToken = default)
     {
         (Method, Path) = (method, path);
         using var request = new HttpRequestMessage(new HttpMethod(method), path);
         configure?.Invoke(request);
-        Response = await _client!.SendAsync(request);
+        Response = await _client!.SendAsync(request, cancellationToken);
         Body = await Response.Content.ReadAsStringAsync();
     }
 

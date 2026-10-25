@@ -40,6 +40,7 @@ Plan chi tiết: `document/plans/TB-023-gateway-downstream-errors.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ lát 3 của bảng lát; branch tạo từ `main` (sau PR 15).
+- 2026-10-25: test-review chấp nhận rủi ro log `Proxying to ...` của YARP chứa query string trong lát này; đề xuất hạ `Logging:LogLevel:Yarp.ReverseProxy` xuống Warning ở lát 7 (TB-027).
 - 2026-10-25: plan-review chốt 7 điểm; sửa spec FR-006 và design D4, 6.4, 9 (thêm `RequestTimeouts` sau `ExceptionHandler`, timeout kết nối là 504, metric không mang `correlationId`).
 
 ## Workflow
@@ -52,8 +53,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-023-gateway-downstream-errors.md` (draft), 4 bước B1-B4, 10 kịch bản @S01-@S10, 4 câu hỏi mở P-01..P-04, 5 giả định cần spike ở test-init |
 | plan-review | PASS | 1 | 2026-10-25 | plan `approved`; 7 quyết định (vị trí `UseRequestTimeouts`, metric không mang `correlationId`, timeout kết nối 504, lỗi lạ 502, client huỷ, giữ cỡ lát, khoảng `Retry-After`), 11 FIX; review độc lập kèm spike YARP |
-| test-init | done | – | 2026-10-25 | 34 test đỏ đúng lý do ở hành vi (host 12 dòng + bộ phân loại + khoảng Retry-After), 52 xanh (hồi quy và dữ liệu); @S10 Docker chưa chạy được vì Docker Desktop tắt; ổn định qua 3 lần chạy |
-| test-review | pending | | | |
+| test-init | done | – | 2026-10-25 | 34 test đỏ, 52 xanh ở lần đầu (sau test-review: 49 đỏ, 56 xanh, tổng 105); @S10 Docker chưa chạy được vì Docker Desktop tắt |
+| test-review | PASS | 2 | 2026-10-25 | 16 finding vòng 1 (1 P1, 7 P2, 8 P3) đã sửa, 3 quyết định (client huỷ kiểm ở host test xUnit, @S08 thành xUnit, log YARP để lát 7); review độc lập (sub-agent) kèm cài đặt tham chiếu 105/105 xanh và 4 đột biến bị bắt; @S10 chưa chạy được (Docker tắt) |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -69,6 +70,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 5 | plan-review:TB-023:p02-client-cancel | Client huỷ request | Không ghi response, log Information | 1 | 2026-10-25 |
 | 6 | plan-review:TB-023:slice-size | Giữ hay chia lát | Giữ nguyên | 1 | 2026-10-25 |
 | 7 | plan-review:TB-023:retry-after-range | Khoảng `Retry-After` | Số nguyên 1..3600, mặc định 5 | 1 | 2026-10-25 |
+| 8 | test-review:TB-023:client-cancel-no-host-test | Kiểm hành vi client huỷ ở đâu | Host test xUnit không qua feature (`ClientCancellationTests`) | 1 | 2026-10-25 |
+| 9 | test-review:TB-023:s08-config-scenario-placement | Kịch bản @S08 không có When | Chuyển thành test xUnit `ConfigurationTests`, bỏ @S08 khỏi feature | 1 | 2026-10-25 |
+| 10 | test-review:TB-023:yarp-log-leaks-query | Log Information của YARP ghi cả query string | Chỉ kiểm log của gateway; hạ log YARP xuống Warning ở lát 7 (NFR-006); rủi ro được chấp nhận trong lát này | 2 | 2026-10-25 |
 
 ## Kịch bản và TDD log
 
@@ -77,24 +81,30 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
 | @S01 (503, GET/HEAD/POST) | `downstream-errors.feature` @S01 (Outline 3 dòng) | Đỏ: mong 503, nhận 502 (YARP trả 502 mặc định khi cổng đóng) | – |
-| @S02 (cluster không có đích) | `downstream-errors.feature` @S02 | Đỏ: 503 của YARP không có thân `problem+json` (content-type và code sai) | – |
-| @S03 (502 đóng trước header) | `downstream-errors.feature` @S03 | Đỏ: thân không phải `problem+json` (status 502 mặc định đã đúng, thân rỗng) | – |
-| @S04 (504 vượt route Timeout) | `downstream-errors.feature` @S04 | Đỏ: route `Timeout` mà thiếu `UseRequestTimeouts` làm request 500 (đúng như spike) | – |
-| @S05 (504 vượt ActivityTimeout) | `downstream-errors.feature` @S05 | Đỏ: cùng lý do 500 (cấu hình `Timeout` của route có mặt, middleware chưa có) | – |
-| @S06 (header rồi đóng) | `downstream-errors.feature` @S06 | Đỏ ở metric: `gateway_upstream_aborted` là 0, mong 1 (client bị ngắt đã xanh sẵn vì YARP tự ngắt; log Warning chưa kiểm tới vì dừng ở bước metric) | – |
-| @S07 (header rồi treo, 2 dòng) | `downstream-errors.feature` @S07 Outline | Đỏ: 500 do route `Timeout` thiếu middleware nên client không bị ngắt (cùng lý do S04) | – |
-| @S08 (timeout mặc định 30 giây) | `downstream-errors.feature` @S08 | Đỏ: `appsettings.json` chưa có `Timeout` và `ActivityTimeout` | – |
+| @S02 (không có upstream khả dụng) | `downstream-errors.feature` @S02 | Đỏ: 503 của YARP không có thân `problem+json` | – |
+| @S03 (502 đóng trước header) | `downstream-errors.feature` @S03 | Đỏ: thân không phải `problem+json` (status 502 mặc định đã đúng) | – |
+| @S04 (504 vượt thời gian cả request) | `downstream-errors.feature` @S04 | Đỏ: route `Timeout` thiếu `UseRequestTimeouts` làm request 500 (đúng như spike) | – |
+| @S05 (504 upstream im lặng) | `downstream-errors.feature` @S05 | Đỏ: cùng lý do 500 | – |
+| @S06 (header rồi đóng) | `downstream-errors.feature` @S06 | Đỏ ở log Warning của gateway (client bị ngắt đã xanh sẵn vì YARP tự ngắt; cảnh báo của chính YARP không được tính) | – |
+| @S07 (header rồi treo, 2 dòng) | `downstream-errors.feature` @S07 Outline | Đỏ: 500 do route `Timeout` thiếu middleware nên client không bị ngắt | – |
 | @S09 (health khi upstream chết) | `downstream-errors.feature` @S09 Outline | Xanh sẵn: hành vi đúng từ lát 1; giữ làm test hồi quy | Xanh sẵn |
 | @S10 (`@docker`, compose, cổng đóng) | `downstream-errors.feature` @S10 | Chưa chạy được: Docker Desktop đang tắt (test bỏ qua, không phải đỏ) | – |
 | @S11 (Retry-After từ cấu hình) | `downstream-errors.feature` @S11 | Đỏ: mong 503 kèm `Retry-After` 7, nhận 502 | – |
-| Bộ phân loại lỗi | `UpstreamErrorClassifierTests` (19 ca) | Đỏ: khung trả `None` (assertion, chưa có ánh xạ); ca `None` xanh sẵn | – |
-| Khoảng `Retry-After` | `UpstreamOptionsTests` (4 ca sai, 3 ca đúng) | 4 ca sai đỏ: chưa kiểm tra giá trị khi khởi động; 3 ca đúng xanh sẵn | – |
-| Mã lỗi gateway | `GatewayErrorCodesTests` (có sẵn, nay phủ 4 mã) | Xanh sẵn: dữ liệu hợp đồng (ba mã mới) đi cùng khung biên dịch | Xanh sẵn |
+| @S12 (không lộ thông tin nhạy cảm vào log) | `downstream-errors.feature` @S12 | Đỏ: mong 503, nhận 502 (chưa tới bước kiểm log) | – |
+| Timeout mặc định 30 giây (@S08 cũ) | `ConfigurationTests` (2 test) | Đỏ: `appsettings.json` chưa có `Timeout` và `ActivityTimeout` | – |
+| Client huỷ request (P-02) | `ClientCancellationTests` | Đỏ: chưa có log Information của gateway | – |
+| Bộ phân loại lỗi | `UpstreamErrorClassifierTests` (31 ca, gồm quy tắc `*Client`, `*Destination`, giá trị chưa liệt kê) | Đỏ: khung trả `None`; ca `None` xanh sẵn | – |
+| Khoảng `Retry-After` | `UpstreamOptionsTests` (4 ca sai, 3 ca đúng) | 4 ca sai đỏ: chưa có kiểm tra khi khởi động; 3 ca đúng xanh sẵn | – |
+| Mã lỗi gateway | `GatewayErrorCodesTests` (có sẵn, thêm status và message của ba mã mới) | Xanh sẵn: dữ liệu hợp đồng đi cùng khung biên dịch | Xanh sẵn |
+
+Lệnh đã chạy (2026-10-25, sau test-review vòng 1): `dotnet build src/gateway.Tests/gateway.Tests.csproj -warnaserror`, `dotnet test src/gateway.Tests/gateway.Tests.csproj --no-build --filter "Category!=docker"` (3 lần liên tiếp: 49 đỏ, 56 xanh, tổng 105), `dotnet format src/teamboard.slnx --verify-no-changes` (sạch). Giới hạn đã biết: log `Proxying to ...` của YARP có thể chứa query string; kiểm log chỉ áp cho logger của gateway (namespace `Gateway.`), phần YARP thuộc NFR-006 ở lát 7.
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-25 | 82471e9 | Cần sửa feature | 1 P1 (`s04-undefined-step`), 7 P2, 8 P3 (gồm 2 CONFIRM) đã chốt (Confirm log #8, #9); review độc lập |
+| 2 | 2026-10-25 | working tree sau vòng 1 | PASS | 0; CONFIRM `yarp-log-leaks-query` đã chốt (#10); 2 P3 (`plan-stray-char`, `issue-rounds-not-updated`) đã sửa, `upgrade-cancel-rule` chấp nhận (hệ quả của P-03) |
 
 ## Review rounds
 

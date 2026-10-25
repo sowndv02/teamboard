@@ -15,8 +15,9 @@ public sealed class UpstreamErrorClassifierTests
     private static readonly HttpRequestException NameNotResolved = new(
         HttpRequestError.NameResolutionError, "dns", new SocketException((int)SocketError.HostNotFound));
 
+    // Real chain captured for an upstream that resets the connection before the headers (spike TB-023): the root is a reset, not a refusal.
     private static readonly HttpRequestException ConnectionReset = new(
-        HttpRequestError.Unknown, "reset", new IOException("connection closed"));
+        HttpRequestError.Unknown, "reset", new IOException("connection closed", new SocketException((int)SocketError.ConnectionReset)));
 
     [Fact]
     public void NoAvailableDestinations_IsUnavailable() =>
@@ -79,6 +80,59 @@ public sealed class UpstreamErrorClassifierTests
     [Fact]
     public void None_IsNone() =>
         Assert.Equal(UpstreamFailure.None, Classify(ForwarderError.None));
+
+    // Rule-based over every ForwarderError, so a value added by a YARP upgrade forces a decision here:
+    // "*Client" is the client going away, "*Destination" is the upstream failing (502 before headers, abort after).
+    public static TheoryData<ForwarderError> ClientErrors() => ToData(e => e.ToString().EndsWith("Client", StringComparison.Ordinal));
+
+    public static TheoryData<ForwarderError> DestinationErrors() => ToData(e => e.ToString().EndsWith("Destination", StringComparison.Ordinal));
+
+    [Theory]
+    [MemberData(nameof(ClientErrors))]
+    public void ClientErrors_AreClientCancelled_BeforeAndAfterHeaders(ForwarderError error)
+    {
+        Assert.Equal(UpstreamFailure.ClientCancelled, Classify(error));
+        Assert.Equal(UpstreamFailure.ClientCancelled, Classify(error, responseStarted: true));
+    }
+
+    [Theory]
+    [MemberData(nameof(DestinationErrors))]
+    public void DestinationErrors_AreBadGatewayBeforeHeadersAndAbortedAfter(ForwarderError error)
+    {
+        Assert.Equal(UpstreamFailure.BadGateway, Classify(error));
+        Assert.Equal(UpstreamFailure.AbortedAfterHeaders, Classify(error, responseStarted: true));
+    }
+
+    // Plan P-03 (user decision): any forwarder error without its own rule is a 502 before the headers, never a 500.
+    // Computed by exclusion, so values added by a YARP upgrade fall into this rule instead of passing unnoticed.
+    public static TheoryData<ForwarderError> UnlistedErrors()
+    {
+        var listed = new HashSet<ForwarderError>
+        {
+            ForwarderError.None, ForwarderError.Request, ForwarderError.RequestTimedOut, ForwarderError.RequestCanceled,
+            ForwarderError.RequestBodyCanceled, ForwarderError.ResponseHeaders, ForwarderError.ResponseBodyCanceled,
+            ForwarderError.NoAvailableDestinations,
+        };
+        return ToData(e => !listed.Contains(e)
+            && !e.ToString().EndsWith("Client", StringComparison.Ordinal)
+            && !e.ToString().EndsWith("Destination", StringComparison.Ordinal));
+    }
+
+    [Theory]
+    [MemberData(nameof(UnlistedErrors))]
+    public void UnlistedForwarderErrors_AreBadGatewayBeforeHeaders(ForwarderError error) =>
+        Assert.Equal(UpstreamFailure.BadGateway, Classify(error));
+
+    private static TheoryData<ForwarderError> ToData(Func<ForwarderError, bool> filter)
+    {
+        var data = new TheoryData<ForwarderError>();
+        foreach (var error in Enum.GetValues<ForwarderError>().Where(filter))
+        {
+            data.Add(error);
+        }
+
+        return data;
+    }
 
     public static TheoryData<Exception> TimeoutExceptions() =>
         new() { new TimeoutException("connect"), new TaskCanceledException("activity") };
