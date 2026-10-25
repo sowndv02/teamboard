@@ -17,13 +17,19 @@ public sealed class RateLimitSteps(GatewayContext context)
     [Given("the read limit is {int} requests per window")]
     public void GivenReadLimit(int limit) => context.Settings["RateLimiting:Read:PermitLimit"] = limit.ToString(CultureInfo.InvariantCulture);
 
+    [Given("the gateway trusts the network {string}")]
+    public void GivenTrustedNetwork(string network) => context.Settings["ForwardedHeaders:KnownIPNetworks:0"] = network;
+
+    [Given("the write window is {int} seconds")]
+    public void GivenWriteWindow(int seconds) => context.Settings["RateLimiting:Write:WindowSeconds"] = seconds.ToString(CultureInfo.InvariantCulture);
+
     [Given("the gateway trusts the proxy {string}")]
     public void GivenTrustedProxy(string address) => context.Settings["ForwardedHeaders:KnownProxies:0"] = address;
 
     [Given("a middleware in front of the gateway adds the header {string} with value {string}")]
     public void GivenOuterHeader(string name, string value) => context.OuterResponseHeader = (name, value);
 
-    [Given("client {string} has made {int} {string} requests to {string}")]
+    [Given("client {string} has made {int} {string} request(s) to {string}")]
     public async Task GivenClientMadeRequests(string client, int count, string method, string path) =>
         await SendManyAsync(client, count, method, path, forwardedFor: null, differentForwardedForEachTime: false);
 
@@ -46,6 +52,19 @@ public sealed class RateLimitSteps(GatewayContext context)
     [Given("the proxy {string} has made {int} {string} requests to {string} on behalf of {string}")]
     public async Task GivenProxyMadeRequests(string proxy, int count, string method, string path, string client) =>
         await SendManyAsync(proxy, count, method, path, forwardedFor: client, differentForwardedForEachTime: false);
+
+    [Given("an unidentified client has made {int} {string} requests to {string}")]
+    public async Task GivenUnidentifiedClientMadeRequests(int count, string method, string path)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            await context.SendAsync(method, path);
+            Assert.NotEqual(HttpStatusCode.TooManyRequests, context.Response!.StatusCode);
+        }
+    }
+
+    [When("an unidentified client sends {string} to {string}")]
+    public async Task WhenUnidentifiedClientSends(string method, string path) => await context.SendAsync(method, path);
 
     [When("client {string} sends {string} to {string}")]
     public async Task WhenClientSends(string client, string method, string path) =>

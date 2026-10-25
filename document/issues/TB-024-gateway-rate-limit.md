@@ -47,8 +47,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-024-gateway-rate-limit.md` (draft), 4 bước B1-B4, 11 kịch bản @S01-@S11, 5 câu hỏi mở P-01..P-05, 6 giả định cần spike ở test-init |
 | plan-review | PASS | 1 | 2026-10-25 | plan `approved`; 6 quyết định (cờ `ForwardedHeaders`, thứ tự Routing, giữ cỡ lát, `X-Forwarded-Host`, IP null, 6 đoạn), 8 FIX theo kết quả spike (KnownIPNetworks, Retry-After từ cửa sổ, YARP mặc định Set XFF, kịch bản cấu hình thật...); review độc lập kèm spike |
-| test-init | done | – | 2026-10-25 | 26 test đỏ đúng lý do (7 dòng host: mong 429; hàm khoá IP; cấu hình), 129 xanh (hồi quy, đặc trưng, dữ liệu hợp đồng); ổn định qua 3 lần chạy |
-| test-review | pending | | | |
+| test-init | done | – | 2026-10-25 | 26 đỏ, 129 xanh, tổng 155 (sau test-review: 31 đỏ, 135 xanh, tổng 166); đỏ đúng lý do ở hành vi |
+| test-review | PASS | 2 | 2026-10-25 | 1 P1 (proxy tin cậy) và 5 P2 vòng 1 đã sửa bằng @S11-@S14 và mở rộng @S02, @S03; 3 quyết định (khoá thứ tự quan sát được, bỏ cột Host, hoãn ForwardLimit); review độc lập kèm bản tham chiếu 166/166 xanh và đột biến bị bắt |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -63,6 +63,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 4 | plan-review:TB-024:forwarded-host | `X-Forwarded-Host` bằng `Host` client gửi | Chấp nhận, ghi giới hạn đã biết | 1 | 2026-10-25 |
 | 5 | plan-review:TB-024:null-remote | `RemoteIpAddress` null | Bộ đếm chung `unknown` | 1 | 2026-10-25 |
 | 6 | plan-review:TB-024:segments-default | Số đoạn của cửa sổ trượt | 6 đoạn (10 giây) | 1 | 2026-10-25 |
+| 7 | test-review:TB-024:middleware-order-lock | Khoá thứ tự middleware đến đâu | Chỉ khoá phần quan sát được; sửa lời design 6.4 | 1 | 2026-10-25 |
+| 8 | test-review:TB-024:forwarded-host-unused-column | Cột `X-Forwarded-Host` của upstream giả không có test đọc | Bỏ cột (YAGNI; giới hạn đã ghi) | 1 | 2026-10-25 |
+| 9 | test-review:TB-024:forward-limit-untested | `ForwardLimit` mặc định chưa có test | Hoãn đến giai đoạn ALB, ghi giới hạn đã biết | 1 | 2026-10-25 |
 
 ## Kịch bản và TDD log
 
@@ -71,24 +74,30 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
 | @S01 (429 khi ghi quá hạn mức) | `rate-limit.feature` @S01 | Đỏ: mong 429, nhận 201 (chưa có rate limiter) | – |
-| @S02 (đọc quá hạn mức, GET và HEAD chung) | `rate-limit.feature` @S02 | Đỏ: mong 429, nhận 200 | – |
-| @S03 (IP khác, nhóm khác, health, fallback không bị ảnh hưởng) | `rate-limit.feature` @S03 Outline (5 dòng) | Xanh sẵn: hành vi đúng khi chưa có limiter; giữ làm test hồi quy sau khi thêm limiter | Xanh sẵn |
+| @S02 (đọc quá hạn mức, GET và HEAD chung, Retry-After) | `rate-limit.feature` @S02 Outline (GET, HEAD) | Đỏ: mong 429, nhận 200 | – |
+| @S03 (IP khác, nhóm khác, health, fallback, sau khi cạn nhóm ghi hoặc nhóm đọc) | `rate-limit.feature` @S03 Outline (10 dòng) | Xanh sẵn: hành vi đúng khi chưa có limiter; step cạn hạn mức không tự assert (S01, S02, S08 chứng minh cạn); giữ làm test hồi quy, các đột biến "giới hạn health" và "gộp nhóm" làm các dòng này đỏ | Xanh sẵn |
 | @S04 (IPv6 cùng /64 chung hạn mức) | `rate-limit.feature` @S04 Outline (2 dòng) | Dòng cùng /64 đỏ (mong 429, nhận 201); dòng /64 khác xanh sẵn (hồi quy) | – |
-| @S05 (XFF từ nguồn không tin cậy) | `rate-limit.feature` @S05 | Đỏ: mong 429, nhận 201 (chưa có limiter) | – |
-| @S06 (proxy tin cậy dùng IP trong XFF) | `rate-limit.feature` @S06 Outline (2 dòng) | Dòng cùng client đỏ (mong 429, nhận 201); dòng client khác xanh sẵn (hồi quy) | – |
+| @S05 (XFF từ nguồn không tin cậy, chưa cấu hình danh sách) | `rate-limit.feature` @S05 | Đỏ: mong 429, nhận 201 (chưa có limiter) | – |
+| @S06 (proxy tin cậy dùng IP trong XFF) | `rate-limit.feature` @S06 Outline (2 dòng) | Dòng cùng client đỏ; dòng client khác xanh sẵn (hồi quy) | – |
 | @S07 (upstream nhận XFF/Proto do gateway xác định) | `rate-limit.feature` @S07 | Xanh sẵn: YARP mặc định đã Set (đúng như spike); test đặc trưng | Xanh sẵn |
 | @S08 (ngưỡng đóng gói 30/120) | `rate-limit.feature` @S08 Outline (2 dòng) | Đỏ: mong 429, nhận 201 và 200 | – |
-| @S09 (cấu hình hợp lệ, giá trị sai làm khởi động thất bại) | `RateLimitConfigurationTests` (2 test đóng gói, 8 ca sai, 4 ca đúng) | 10 test đỏ (thiếu mục `RateLimiting`, thiếu `RateLimiterPolicy` ở route, giá trị sai vẫn khởi động được); 4 ca đúng xanh sẵn | – |
-| @S10 (compose không bật `ASPNETCORE_FORWARDEDHEADERS_ENABLED`) | `ComposePolicyTests` | Xanh sẵn: chưa ai đặt biến này; test hồi quy | Xanh sẵn |
-| Hàm khoá IP | `ClientPartitionKeyTests` (9 ca: IPv4, IPv6 /64, khác /64, IPv4-mapped, `ScopeId`, `unknown`, không va chạm) | Đỏ: khung trả chuỗi rỗng (assertion); đã thêm kiểm khoá không rỗng để hai ca bằng nhau không xanh giả | – |
+| @S11 (có danh sách proxy, peer ngoài danh sách không né được) | `rate-limit.feature` @S11 | Đỏ: mong 429, nhận 201; đột biến "có danh sách thì tin mọi nguồn" làm test đỏ (thêm ở test-review, lỗ hổng P1 vòng 1) | – |
+| @S12 (mạng proxy tin cậy `KnownIPNetworks`) | `rate-limit.feature` @S12 Outline (2 dòng) | Dòng cùng client đỏ; dòng client khác xanh sẵn (hồi quy) | – |
+| @S13 (Retry-After theo cửa sổ cấu hình 120 giây) | `rate-limit.feature` @S13 | Đỏ: mong 429, nhận 201 | – |
+| @S14 (không có địa chỉ client dùng chung bộ đếm) | `rate-limit.feature` @S14 | Đỏ: mong 429, nhận 201 | – |
+| @S09 (cấu hình hợp lệ, giá trị sai làm khởi động thất bại và nêu tên khoá) | `RateLimitConfigurationTests` (2 test đóng gói, 8 ca sai, 4 ca đúng) | 10 test đỏ (thiếu mục `RateLimiting`, thiếu `RateLimiterPolicy`, giá trị sai vẫn khởi động được); 4 ca đúng xanh sẵn | – |
+| @S10 (compose không bật `ASPNETCORE_FORWARDEDHEADERS_ENABLED`) | `ComposePolicyTests` | Xanh sẵn: chưa ai đặt biến này; test hồi quy (quét mọi cấp thư mục trong `src`, bỏ qua comment) | Xanh sẵn |
+| Hàm khoá IP | `ClientPartitionKeyTests` (9 ca: IPv4, IPv6 /64, khác /64 gồm ca sát biên, IPv4-mapped, `ScopeId`, `unknown`) | Đỏ: khung trả chuỗi rỗng (assertion); kiểm khoá không rỗng để hai ca bằng nhau không xanh giả | – |
 | Mã lỗi `RATE_LIMIT_EXCEEDED` | `GatewayErrorCodesTests` (thêm 1 ca) | Xanh sẵn: dữ liệu hợp đồng đi cùng khung biên dịch | Xanh sẵn |
 
-Lệnh đã chạy (2026-10-25): `dotnet build src/gateway.Tests/gateway.Tests.csproj -warnaserror`; `dotnet test src/gateway.Tests/gateway.Tests.csproj --no-build --filter "Category!=docker"` (3 lần liên tiếp: 26 đỏ, 129 xanh, tổng 155); `dotnet format src/teamboard.slnx --verify-no-changes` (sạch). Spike lại trên mã repo: ngưỡng nhỏ trong cửa sổ 60 giây (không chờ đồng hồ); các giả định đã kiểm bằng spike của reviewer (YARP Set XFF, `ForwardedHeaders` mặc định `None`) được xác nhận bởi @S05, @S07 xanh sẵn.
+Lệnh đã chạy (2026-10-25, sau test-review vòng 1): `dotnet build src/gateway.Tests/gateway.Tests.csproj -warnaserror`; `dotnet test src/gateway.Tests/gateway.Tests.csproj --no-build --filter "Category!=docker"` (3 lần liên tiếp: 31 đỏ, 135 xanh, tổng 166); `dotnet format src/teamboard.slnx --verify-no-changes` (sạch). Test-init ban đầu: 26 đỏ, 129 xanh, tổng 155. Cài đặt tham chiếu của reviewer (thư mục tạm, không phải mã production) chứng minh 166/166 xanh được và bắt được các đột biến chính.
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-25 | 93444b6 | Cần sửa feature | 1 P1 (`trusted-list-untrusted-peer`), 5 P2, 9 P3 (gồm 3 CONFIRM đã chốt: Confirm log #7-#9); review độc lập kèm bản tham chiếu và đột biến |
+| 2 | 2026-10-25 | working tree sau vòng 1 | PASS | 0; các FIX vòng 2 (issue và plan) đã sửa; 3 P3 ghi nhận: `s03-exhaustion-unasserted` (xanh sẵn có lý do, ghi vào TDD log), `compose-test-minor` (đã sửa quét mọi cấp và comment cuối dòng), `program-cs-crlf-noise` (không đưa vào commit) |
 
 ## Review rounds
 

@@ -13,10 +13,10 @@ public sealed class RateLimitConfigurationTests
     {
         using var settings = LoadSettings();
 
-        var rateLimiting = settings.RootElement.GetProperty("RateLimiting");
+        Assert.True(settings.RootElement.TryGetProperty("RateLimiting", out var rateLimiting), "appsettings.json has no RateLimiting section.");
         foreach (var (group, permits) in new[] { ("Read", 120), ("Write", 30) })
         {
-            var section = rateLimiting.GetProperty(group);
+            Assert.True(rateLimiting.TryGetProperty(group, out var section), $"RateLimiting has no {group} section.");
             Assert.Equal(permits, section.GetProperty("PermitLimit").GetInt32());
             Assert.Equal(60, section.GetProperty("WindowSeconds").GetInt32());
             Assert.Equal(6, section.GetProperty("SegmentsPerWindow").GetInt32());
@@ -29,24 +29,31 @@ public sealed class RateLimitConfigurationTests
         using var settings = LoadSettings();
 
         var routes = settings.RootElement.GetProperty("ReverseProxy").GetProperty("Routes");
-        Assert.Equal("read", routes.GetProperty("boards-read").GetProperty("RateLimiterPolicy").GetString());
-        Assert.Equal("write", routes.GetProperty("boards-write").GetProperty("RateLimiterPolicy").GetString());
+        foreach (var (route, policy) in new[] { ("boards-read", "read"), ("boards-write", "write") })
+        {
+            Assert.True(routes.GetProperty(route).TryGetProperty("RateLimiterPolicy", out var value), $"Route {route} has no RateLimiterPolicy.");
+            Assert.Equal(policy, value.GetString());
+        }
     }
 
+    // The expected fragment pins the failure to the setting under test: any other startup error would otherwise pass this test.
     [Theory]
-    [InlineData("RateLimiting:Read:PermitLimit", "0")]
-    [InlineData("RateLimiting:Write:PermitLimit", "-5")]
-    [InlineData("RateLimiting:Write:PermitLimit", "abc")]
-    [InlineData("RateLimiting:Read:WindowSeconds", "0")]
-    [InlineData("RateLimiting:Write:SegmentsPerWindow", "0")]
-    [InlineData("ForwardedHeaders:KnownProxies:0", "not-an-address")]
-    [InlineData("ForwardedHeaders:KnownIPNetworks:0", "10.0.0.0/33")]
-    [InlineData("ForwardedHeaders:KnownIPNetworks:0", "garbage")]
-    public void Start_WithInvalidSetting_Fails(string key, string value)
+    [InlineData("RateLimiting:Read:PermitLimit", "0", "PermitLimit")]
+    [InlineData("RateLimiting:Write:PermitLimit", "-5", "PermitLimit")]
+    [InlineData("RateLimiting:Write:PermitLimit", "abc", "PermitLimit")]
+    [InlineData("RateLimiting:Read:WindowSeconds", "0", "WindowSeconds")]
+    [InlineData("RateLimiting:Write:SegmentsPerWindow", "0", "SegmentsPerWindow")]
+    [InlineData("ForwardedHeaders:KnownProxies:0", "not-an-address", "KnownProxies")]
+    [InlineData("ForwardedHeaders:KnownIPNetworks:0", "10.0.0.0/33", "KnownIPNetworks")]
+    [InlineData("ForwardedHeaders:KnownIPNetworks:0", "garbage", "KnownIPNetworks")]
+    public void Start_WithInvalidSetting_FailsAndNamesTheSetting(string key, string value, string expectedFragment)
     {
         using var factory = FactoryWith(key, value);
 
-        Assert.ThrowsAny<Exception>(() => factory.CreateClient());
+        var exception = Record.Exception(() => factory.CreateClient());
+
+        Assert.NotNull(exception);
+        Assert.Contains(Chain(exception), e => e.Message.Contains(expectedFragment, StringComparison.Ordinal));
     }
 
     [Theory]
@@ -60,6 +67,14 @@ public sealed class RateLimitConfigurationTests
 
         using var client = factory.CreateClient();
         Assert.NotNull(client);
+    }
+
+    private static IEnumerable<Exception> Chain(Exception exception)
+    {
+        for (var current = exception; current is not null; current = current.InnerException)
+        {
+            yield return current;
+        }
     }
 
     private static JsonDocument LoadSettings()

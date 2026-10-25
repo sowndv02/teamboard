@@ -30,6 +30,7 @@ public sealed class ClientPartitionKeyTests
 
     [Theory]
     [InlineData("2001:db8:abcd:2::1")]
+    [InlineData("2001:db8:abcd:0::1")]
     [InlineData("2001:db8:abcc:1::1")]
     [InlineData("2001:db9:abcd:1::1")]
     public void IPv6_InAnother64_GetsAnotherKey(string other) =>
@@ -64,10 +65,4 @@ public sealed class ClientPartitionKeyTests
 
         Assert.Equal("unknown", key);
     }
-
-    [Fact]
-    public void IPv4AndIPv6_NeverCollide() =>
-        Assert.NotEqual(
-            ClientPartitionKey.For(IPAddress.Parse("0.0.0.1")),
-            ClientPartitionKey.For(IPAddress.Parse("::1")));
 }

@@ -58,7 +58,11 @@ Lát 4 trong [`api-gateway-slices.md`](api-gateway-slices.md) (`approved`; phụ
 | FR-004 ngưỡng mặc định 120/30, NFR-004 trong cấu hình | D2 | B4 | @S08 | Kịch bản dùng đúng cấu hình đóng gói (không ghi đè ngưỡng): ghi thứ 30 qua, thứ 31 là 429; đọc thứ 120 qua, thứ 121 là 429 |
 | NFR-004 giá trị cấu hình hợp lệ, proxy tin cậy hợp lệ | D2, D5 | B1, B3, B4 | @S09 (xUnit) | `RateLimitOptions` và cấu hình proxy: giá trị ngoài khoảng, địa chỉ hay mạng sai làm khởi động thất bại; ngưỡng mặc định trong `appsettings.json` |
 | D5 cấm `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | D5 | B4 | @S10 (xUnit) | Test đọc các file compose (`src/docker-compose*.yml`), `.env.example`: biến không có mặt |
-| Thứ tự middleware khoá bằng test (design 6.4) | 6.4 | B3 | @S05, @S06, @S01 (kèm) | `ForwardedHeaders` chạy trước limiter (S05, S06); `Correlation` bao ngoài (S01) |
+| FR-004, D5 peer ngoài danh sách proxy tin cậy không né được giới hạn khi danh sách đã cấu hình | D5 | B3 | @S11 | Danh sách `KnownProxies` có giá trị; peer khác đổi `X-Forwarded-For` mỗi request vẫn bị đếm chung |
+| D5 mạng proxy tin cậy (`KnownIPNetworks`) | D5 | B3 | @S12 (Outline) | Peer trong mạng cấu hình được tin; client giả vẫn bị đếm theo IP trong header |
+| FR-004, D1 `Retry-After` theo cửa sổ cấu hình | D1 | B1 | @S13 | `WindowSeconds` 120 cho `Retry-After` 120 |
+| P-04 request không có địa chỉ client dùng một bộ đếm chung | D2 | B2 | @S14 | Hai request không có địa chỉ chung hạn mức, request vượt ngưỡng bị 429 |#
+| Thứ tự middleware: test khoá phần quan sát được (design 6.4; thứ tự Routing so với ForwardedHeaders không đổi hành vi nên không có test riêng, người dùng chốt ở test-review) | 6.4 | B3 | @S05, @S06, @S01 (kèm) | `ForwardedHeaders` chạy trước limiter (S05, S06); `Correlation` bao ngoài (S01) |
 
 Kịch bản (ID duy nhất trong file `.feature`; viết ở test-init; viết tiếng Anh, ASCII):
 - @S01 Ghi quá hạn mức: `429` `RATE_LIMIT_EXCEEDED` kèm `Retry-After` và `X-Correlation-Id`.
@@ -71,6 +75,7 @@ Kịch bản (ID duy nhất trong file `.feature`; viết ở test-init; viết 
 - @S08 Ngưỡng mặc định đóng gói: ghi 30 qua 31 chặn, đọc 120 qua 121 chặn.
 - @S09 (xUnit, không có `.feature`) Cấu hình hợp lệ: khoảng giá trị, proxy và mạng tin cậy, mặc định trong `appsettings.json`.
 - @S10 (xUnit, không có `.feature`) Compose không bật `ASPNETCORE_FORWARDEDHEADERS_ENABLED`.
+- Thêm ở test-review vòng 1 (feature): @S11 peer ngoài danh sách proxy tin cậy không né được giới hạn khi danh sách đã cấu hình; @S12 proxy trong mạng tin cậy (`KnownIPNetworks`) truyền IP client; @S13 `Retry-After` theo cửa sổ cấu hình (120 giây); @S14 request không có địa chỉ client dùng chung một bộ đếm. `@S02` thành Outline (GET và HEAD đều bị 429) và `@S03` thêm cột nhóm (đọc và ghi, kể cả health và fallback sau khi cạn hạn mức đọc).
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 
@@ -95,10 +100,10 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗ
 - **Phụ thuộc:** B1.
 
 ### B3. `ForwardedHeaders` an toàn và kiểm `X-Forwarded-*` xuống upstream
-- **Kịch bản/test sẽ viết (đỏ trước):** @S05, @S06, @S07 trong `rate-limit.feature` (hoặc `forwarded-headers.feature` nếu tách capability; quyết ở test-init theo `test-review.md` mục 1); `UpstreamStub` ghi thêm `X-Forwarded-For`, `X-Forwarded-Proto`, `X-Forwarded-Host`; test cấu hình proxy hợp lệ/sai. Đỏ thật: @S06 (cần cờ và danh sách proxy). @S05 có thể xanh sẵn khi `ForwardedHeaders` chưa bật (IP luôn là địa chỉ kết nối) và @S07 xanh sẵn nhờ mặc định của YARP: ghi vào TDD log là test đặc trưng/hồi quy, không bịa lý do đỏ.
+- **Kịch bản/test sẽ viết (đỏ trước):** @S05, @S06, @S07 trong `rate-limit.feature` (hoặc `forwarded-headers.feature` nếu tách capability; quyết ở test-init theo `test-review.md` mục 1); `UpstreamStub` ghi thêm `X-Forwarded-For`, `X-Forwarded-Proto`; test cấu hình proxy hợp lệ/sai. Đỏ thật: @S06 (cần cờ và danh sách proxy). @S05 có thể xanh sẵn khi `ForwardedHeaders` chưa bật (IP luôn là địa chỉ kết nối) và @S07 xanh sẵn nhờ mặc định của YARP: ghi vào TDD log là test đặc trưng/hồi quy, không bịa lý do đỏ.
 - **File/module dự kiến chạm:** `src/gateway/Program.cs` (`UseForwardedHeaders()` rồi `UseRouting()` tường minh, comment cập nhật), mới `src/gateway/ForwardedHeadersSetup.cs` (hoặc tương đương: bật `XForwardedFor | XForwardedProto`; bind `ForwardedHeaders:KnownProxies` bằng `IPAddress.Parse` và `ForwardedHeaders:KnownIPNetworks` bằng `System.Net.IPNetwork.Parse`; không dùng `KnownNetworks` obsolete; giữ loopback mặc định), `src/gateway.Tests/`.
 - **Hợp đồng thay đổi:** không đổi hợp đồng công khai.
-- **Migration / cấu hình:** khoá `ForwardedHeaders:KnownProxies` và `ForwardedHeaders:KnownIPNetworks` (mặc định rỗng: chỉ loopback); không biến môi trường mới và không bật `ASPNETCORE_FORWARDEDHEADERS_ENABLED`.
+- **Migration / cấu hình:** khoá `ForwardedHeaders:KnownProxies` và `ForwardedHeaders:KnownIPNetworks` (mặc định rỗng: chỉ loopback); không biến môi trường mới và không bật `ASPNETCORE_FORWARDEDHEADERS_ENABLED`. Phân tích cú pháp tự bọc (`TryParse`) và ném lỗi nêu đúng tên khoá (`KnownProxies`, `KnownIPNetworks`) vì test cấu hình kiểm thông báo; `IPAddress.Parse` trần cho thông báo không có tên khoá.
 - **Tài liệu cần cập nhật:** comment "Target middleware order" trong `Program.cs`; design 6.4 không đổi (giữ ForwardedHeaders đầu tiên).
 - **Kiểm chứng:** @S05–@S07 xanh; @S01–@S04 vẫn xanh.
 - **Phụ thuộc:** B2.
@@ -193,3 +198,4 @@ Giả định đã kiểm bằng spike hộp đen của reviewer (xem bảng đ�
 |---|---|---|
 | 2026-10-25 | Tạo bản nháp | plan-init cho TB-024 (lát 4 của gateway) |
 | 2026-10-25 | plan-review vòng 1: ghi 6 quyết định, sửa 8 FIX theo kết quả spike, gộp kịch bản (11 → 10), plan `approved` | plan-review TB-024 |
+| 2026-10-25 | test-review vòng 1: thêm @S11-@S14, @S02 và @S03 mở rộng; bỏ cột `X-Forwarded-Host` của upstream giả; hoãn kiểm `ForwardLimit` sang giai đoạn ALB; không đổi hành vi đã chốt | test-review TB-024 |
