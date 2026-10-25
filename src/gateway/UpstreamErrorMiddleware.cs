@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.Extensions.Options;
 using Teamboard.Shared.Http;
 using Yarp.ReverseProxy.Forwarder;
@@ -20,7 +21,9 @@ public sealed class UpstreamErrorMiddleware(RequestDelegate next, ILogger<Upstre
             return;
         }
 
-        var failure = UpstreamErrorClassifier.Classify(feature.Error, feature.Exception, routeTimeoutFired: false, context.Response.HasStarted);
+        // The route Timeout also cancels RequestAborted, so only this feature tells a timeout apart from a client that left.
+        var routeTimeoutFired = context.Features.Get<IHttpRequestTimeoutFeature>()?.RequestTimeoutToken.IsCancellationRequested == true;
+        var failure = UpstreamErrorClassifier.Classify(feature.Error, feature.Exception, routeTimeoutFired, context.Response.HasStarted);
         switch (failure)
         {
             case UpstreamFailure.Unavailable:
@@ -28,6 +31,9 @@ public sealed class UpstreamErrorMiddleware(RequestDelegate next, ILogger<Upstre
                 break;
             case UpstreamFailure.BadGateway:
                 await WriteProblemAsync(context, GatewayErrorCodes.UpstreamBadGateway, feature, retryAfter: false);
+                break;
+            case UpstreamFailure.Timeout:
+                await WriteProblemAsync(context, GatewayErrorCodes.UpstreamTimeout, feature, retryAfter: false);
                 break;
             case UpstreamFailure.ClientCancelled:
                 // The client is gone: nothing to answer and not an upstream failure.

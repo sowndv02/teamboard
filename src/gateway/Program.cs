@@ -14,13 +14,17 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+// Needed for the route-level Timeout in the YARP configuration: without this middleware a route with Timeout fails with 500.
+builder.Services.AddRequestTimeouts();
+
 var app = builder.Build();
 
-// Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, CORS, RateLimiter, BodyLimit, YARP.
+// Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, RequestTimeouts, CORS, RateLimiter, BodyLimit, YARP.
 // This slice has Correlation, ExceptionHandler, routing, health and fallback; the remaining middleware are added in later slices.
 // UseRouting is added at the start of the pipeline by minimal hosting, so it is not called explicitly.
 app.UseCorrelation();
 app.UseTeamboardExceptionHandler();
+app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();
 
 app.MapDefaultEndpoints();
