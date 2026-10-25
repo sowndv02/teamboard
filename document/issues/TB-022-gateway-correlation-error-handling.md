@@ -44,6 +44,7 @@ Plan chi tiết: `document/plans/TB-022-gateway-correlation-error-handling.md`.
 - 2026-10-25: coding-start xong B1a-B3 (4 commit cục bộ, chưa push); `gitleaks` chưa cài nên chưa quét secret bằng công cụ, chỉ grep diff thô (sạch). @S02 dòng chữ số Arabic-Indic từ đỏ thành xanh khi middleware ghi đè id (đúng dự đoán test-init).
 - 2026-10-25: tạo issue từ lát 2 của bảng lát; branch tạo từ `main` (sau PR 11).
 - 2026-10-25: người dùng hỏi vì sao bảng lát không cập nhật khi hoàn thành lát; đồng bộ hai bảng lát với issue và nối việc cập nhật vào checklist `plan-init`, `coding-start`, `create-pr`, `git-workflow.md`, `slicing.md` (LL-006).
+- 2026-10-25: người dùng đổi quy tắc commit của workflow: mỗi cặp bước làm + review chỉ commit một lần sau khi review PASS (không commit sau bước làm); sửa `workflow/SKILL.md`, `coding-start`, `state-protocol.md`, `git-workflow.md`. Đảo một phần TB-009.
 
 ## Workflow
 

@@ -125,7 +125,7 @@ Bước `invalidated` cần **review lại phần thay đổi (delta)**; không 
 ## 8. Định dạng và vị trí
 
 - Mẫu: `document/workflow/_template.yaml`; mục lục: `document/workflow/README.md`.
-- State file được commit **cùng** thay đổi của bước, ngay khi bước đạt (theo `git-workflow.md`, `git-commit.md` và mục "Commit theo bước" của skill `workflow`; chỉ commit khi người dùng đã cho phép). Khi chưa commit, state vẫn nằm trong working tree dùng chung bởi các agent cùng thư mục làm việc. Agent ở **worktree khác** không thấy thay đổi chưa commit: cần commit hoặc chuyển giao tường minh (ghi chú trong `next_action`).
+- State file được commit **cùng** thay đổi của bước, ngay sau khi bước review PASS của cặp bước (theo `git-workflow.md`, `git-commit.md` và mục "Commit theo bước" của skill `workflow`; chỉ commit khi người dùng đã cho phép). Khi chưa commit, state vẫn nằm trong working tree dùng chung bởi các agent cùng thư mục làm việc. Agent ở **worktree khác** không thấy thay đổi chưa commit: cần commit hoặc chuyển giao tường minh (ghi chú trong `next_action`).
 - Tuân `docs-update-specs.md`: state file theo issue chỉ sửa khi branch hiện tại khớp issue; state theo tính năng sửa khi đang làm tính năng đó.
 
 ## 9. Kiểm tra nhanh (checklist mỗi lần ghi)
