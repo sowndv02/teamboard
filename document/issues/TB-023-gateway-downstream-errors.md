@@ -36,7 +36,7 @@ Lát 3 của `document/plans/api-gateway-slices.md` (feature api-gateway; spec `
 - [ ] `dotnet build src/teamboard.slnx -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes` xanh.
 
 ## Kế hoạch
-Plan chi tiết: `document/plans/TB-023-gateway-downstream-errors.md` (chưa soạn; bước plan-init).
+Plan chi tiết: `document/plans/TB-023-gateway-downstream-errors.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ lát 3 của bảng lát; branch tạo từ `main` (sau PR 15).
@@ -49,7 +49,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-10-25 | `document/plans/TB-023-gateway-downstream-errors.md` (draft), 4 bước B1-B4, 10 kịch bản @S01-@S10, 4 câu hỏi mở P-01..P-04, 5 giả định cần spike ở test-init |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
