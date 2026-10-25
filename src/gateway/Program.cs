@@ -8,6 +8,12 @@ builder.AddServiceDefaults("gateway");
 // Routes and upstream addresses live in the "ReverseProxy" configuration (NFR-004), not hardcoded.
 builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
+builder.Services
+    .AddOptions<UpstreamOptions>()
+    .BindConfiguration(UpstreamOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 var app = builder.Build();
 
 // Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, CORS, RateLimiter, BodyLimit, YARP.
@@ -15,6 +21,7 @@ var app = builder.Build();
 // UseRouting is added at the start of the pipeline by minimal hosting, so it is not called explicitly.
 app.UseCorrelation();
 app.UseTeamboardExceptionHandler();
+app.UseMiddleware<UpstreamErrorMiddleware>();
 
 app.MapDefaultEndpoints();
 app.MapReverseProxy();
