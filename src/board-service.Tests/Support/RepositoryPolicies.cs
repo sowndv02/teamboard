@@ -2,18 +2,18 @@ using System.Text.RegularExpressions;
 
 namespace BoardService.Tests.Support;
 
-/// <summary>Luật kiểm tra repo dùng cho @S14 (pin phiên bản) và @S15 (không secret viết cứng); có unit test riêng.</summary>
+/// <summary>Repo check rules used by @S14 (version pinning) and @S15 (no hard-coded secrets); covered by their own unit tests.</summary>
 internal static partial class RepositoryPolicies
 {
-    /// <summary>Phiên bản chính xác: số chấm số, có thể kèm hậu tố tiền phát hành; không dải, không dấu sao.</summary>
+    /// <summary>Exact version: dotted numbers, optionally with a prerelease suffix; no ranges, no wildcards.</summary>
     public static bool IsPinnedVersion(string? version) =>
         !string.IsNullOrWhiteSpace(version) && PinnedVersion().IsMatch(version);
 
     /// <summary>
-    /// Dòng có giá trị bí mật viết cứng ở một trong hai dạng:
-    /// khoá nhạy cảm có giá trị không phải tham chiếu `${...}` (`MSSQL_SA_PASSWORD: abc`),
-    /// hoặc cặp `Password=`/`Pwd=`/`Secret=` nằm trong chuỗi (connection string).
-    /// Giá trị mặc định `${VAR:-literal}` cũng bị coi là viết cứng.
+    /// A line with a hard-coded secret value in one of two forms:
+    /// a sensitive key whose value is not a `${...}` (`MSSQL_SA_PASSWORD: abc`),
+    /// or a `Password=`/`Pwd=`/`Secret=` pair inside a string (connection string).
+    /// A default value `${VAR:-literal}` also counts as hard-coded.
     /// </summary>
     public static bool IsHardcodedSecret(string line) =>
         HasHardcodedKeyValue(line) || HasHardcodedPair(line) || DefaultLiteral().IsMatch(line) && SensitiveWord().IsMatch(line);

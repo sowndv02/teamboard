@@ -16,7 +16,7 @@ Rule liên quan: `test-review.md` (chuẩn `.feature`, tag, reconcile), `testing
 
 ## Quy trình
 1. **Đọc** spec (tiêu chí chấp nhận), plan (bảng truy vết, kịch bản dự kiến), design (hợp đồng, chế độ lỗi) và code hiện có/test hiện có để theo style.
-2. **Viết `.feature`** tại `document/spec/features/<service>/<ten>.feature` theo `test-review.md` mục 1–2: khai báo, ngôn ngữ nghiệp vụ, một `When`, tag issue (`@TB-NNN`) và ID kịch bản (`@S01`...), đường lỗi và biên (quyền, trùng, validation, đồng thời, hết hạn, idempotency). Mỗi kịch bản truy được về một FR/BR/NFR. **Hành vi spec không nói → không tự viết kịch bản đoán**; ghi vào Câu hỏi mở (xem dưới).
+2. **Viết `.feature`** tại `document/spec/features/<service>/<ten>.feature` theo `test-review.md` mục 1–2: viết toàn bộ bằng tiếng Anh (feature, step, test, comment; ASCII), khai báo, ngôn ngữ nghiệp vụ, một `When`, tag issue (`@TB-NNN`) và ID kịch bản (`@S01`...), đường lỗi và biên (quyền, trùng, validation, đồng thời, hết hạn, idempotency). Mỗi kịch bản truy được về một FR/BR/NFR. **Hành vi spec không nói → không tự viết kịch bản đoán**; ghi vào Câu hỏi mở (xem dưới).
 3. **Viết step definition và test thực thi** theo plan (từng bước một chu kỳ), đặt đúng project/thư mục theo cấu trúc service; tên test `Method_Condition_ExpectedResult`; không phụ thuộc thứ tự/thời gian thực; clock/ID giả khi cần; integration dùng DB thật trong container (không mock DB).
 4. **Khung tối thiểu để biên dịch**: interface/stub rỗng để test chạy được. Không logic.
 5. **Chạy test** → phải **đỏ đúng lý do** (assertion fail vì chưa có hành vi / `NotImplemented`), **không** đỏ vì lỗi biên dịch, thiếu cấu hình, thiếu dữ liệu, môi trường. Điều tra và sửa nguyên nhân đỏ sai.

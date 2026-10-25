@@ -50,6 +50,22 @@ public sealed class ProblemFactoryTests
     }
 
     [Fact]
+    [Trait("Scenario", "S04")]
+    public void Create_ContextHasCorrelationId_UsesItAndKeepsTraceId()
+    {
+        using var source = new ActivitySource("Teamboard.Shared.Http.Tests");
+        using var listener = ListenToAll();
+        using var activity = source.StartActivity("request")!;
+        var context = new DefaultHttpContext();
+        context.Items[CorrelationHeaders.ItemKey] = "client-id-1";
+
+        var problem = ProblemFactory.Create(RouteNotFound, context);
+
+        Assert.Equal("client-id-1", problem.Extensions["correlationId"]);
+        Assert.Equal(activity.Id, problem.Extensions["traceId"]);
+    }
+
+    [Fact]
     public void Create_DetailOverride_UsesProvidedDetail()
     {
         var problem = ProblemFactory.Create(RouteNotFound, new DefaultHttpContext(), "Custom detail.");

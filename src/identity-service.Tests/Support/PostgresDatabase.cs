@@ -3,12 +3,12 @@ using Testcontainers.PostgreSql;
 
 namespace IdentityService.Tests.Support;
 
-/// <summary>PostgreSQL thật trong container cho test tích hợp (không mock DB; Testcontainers đã duyệt ở Confirm log #2 của plan TB-021).</summary>
+/// <summary>Real PostgreSQL in a container for integration tests (no DB mock; Testcontainers approved in Confirm log #2 of plan TB-021).</summary>
 internal sealed class PostgresDatabase : IAsyncDisposable
 {
     public const string Password = "test-only-pw-9f3a";
 
-    // Ghim theo config/tool-versions.yaml (người dùng chọn 2026-10-25); compose dùng cùng tag ở B4.
+    // Pinned per config/tool-versions.yaml (chosen by the user 2026-10-25); compose uses the same tag in B4.
     private const string Image = "postgres:17-alpine";
 
     private readonly PostgreSqlContainer _container;

@@ -26,8 +26,8 @@ Không viết production code cho hành vi chưa có kịch bản/test đỏ. S�
 ## 1. Cấu trúc và vị trí `.feature`
 
 - Vị trí: `document/spec/features/<service-hoac-feature>/<ten>.feature` (kebab-case), cùng thư mục với spec; runner trỏ tới đây (chọn runner: `config/tool-versions.yaml`, hiện TODO). Kịch bản cho luồng người dùng thấy trên UI Angular chạy bằng runner web (`bdd_runner_web`, đề xuất Playwright; `frontend-testing.md`).
-- Một file = một khả năng nghiệp vụ (capability). `Feature:` có mô tả "Là… Tôi muốn… Để…" ngắn.
-- Từ khoá Gherkin tiếng Anh (`Given/When/Then/And/But`, `Scenario`, `Scenario Outline`), nội dung tiếng Việt, thuật ngữ/ID/enum giữ nguyên theo contract.
+- Một file = một khả năng nghiệp vụ (capability). `Feature:` có mô tả "As a… I want… So that…" ngắn.
+- **Toàn bộ test BDD viết bằng tiếng Anh**: `.feature` (từ khoá và nội dung), step definition, test xUnit, tên test và comment trong code test. Không dùng ký tự ngoài ASCII (tránh lỗi unicode khi sinh code Reqnroll); dữ liệu test cố ý ngoài ASCII viết bằng escape `\uXXXX` trong code. Thuật ngữ/ID/enum giữ nguyên theo contract.
 - **Tag**: issue key (`@TB-001`), ID kịch bản duy nhất trong file (`@S01`, `@S02`), service (`@board-service`), loại (`@smoke`, `@wip`). Kịch bản có tag `@wip` **không** được có trong nhánh chờ merge.
 - Mỗi kịch bản truy ngược được tới một dòng của spec hoặc tiêu chí hoàn thành trong issue.
 

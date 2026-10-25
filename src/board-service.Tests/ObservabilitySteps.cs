@@ -13,14 +13,14 @@ public sealed class ObservabilitySteps
 
     private readonly DockerCli _docker = new();
 
-    [Given("compose chính và compose observability đang chạy với tên dự án riêng")]
+    [Given("the main compose and observability compose are running under a dedicated project name")]
     public void GivenComposeRunning()
     {
         var result = _docker.ComposeUp([MainCompose, ObservabilityCompose], "board-service", "jaeger");
-        Assert.True(result.ExitCode == 0, $"docker compose up lỗi: {result.Error}");
+        Assert.True(result.ExitCode == 0, $"docker compose up failed: {result.Error}");
     }
 
-    [When("tôi gọi {string} tới cổng host 6060")]
+    [When("I call {string} on host port 6060")]
     public async Task WhenCallHost(string request)
     {
         var path = request.Split(' ', 2)[1];
@@ -28,23 +28,23 @@ public sealed class ObservabilitySteps
         Assert.Equal(200, status);
     }
 
-    [Then("Jaeger có trace của service {string} trong thời gian chờ")]
+    [Then("Jaeger has a trace for service {string} within the wait time")]
     public async Task ThenJaegerHasTrace(string service)
     {
-        // Jaeger 2.x chỉ còn API v3 (/api/traces của v1 trả 404) và bắt buộc khoảng thời gian tìm kiếm.
+        // Jaeger 2.x only has the v3 API (v1 /api/traces returns 404) and requires a search time range.
         var from = DateTime.UtcNow.AddMinutes(-15).ToString("yyyy-MM-ddTHH:mm:ssZ");
         var to = DateTime.UtcNow.AddMinutes(5).ToString("yyyy-MM-ddTHH:mm:ssZ");
         var url = $"http://127.0.0.1:16686/api/v3/traces?query.service_name={service}"
             + $"&query.start_time_min={from}&query.start_time_max={to}&query.num_traces=1";
         var body = await HttpWait.GetBodyUntilAsync(url, json => HasTrace(json, service), TimeSpan.FromSeconds(90));
-        Assert.True(body is not null, $"Jaeger không có trace của {service}.");
+        Assert.True(body is not null, $"Jaeger has no trace for {service}.");
     }
 
-    [Then("Jaeger và cổng OTLP chỉ bind 127.0.0.1")]
+    [Then("Jaeger and the OTLP port bind only to 127.0.0.1")]
     public void ThenBoundToLoopback()
     {
         var result = _docker.Compose(TimeSpan.FromMinutes(1), "config", "--format", "json");
-        Assert.True(result.ExitCode == 0, $"docker compose config lỗi: {result.Error}");
+        Assert.True(result.ExitCode == 0, $"docker compose config failed: {result.Error}");
 
         using var document = JsonDocument.Parse(result.Output);
         var ports = document.RootElement.GetProperty("services").GetProperty("jaeger").GetProperty("ports").EnumerateArray().ToList();
@@ -57,7 +57,7 @@ public sealed class ObservabilitySteps
 
     private static bool HasTrace(string json, string service)
     {
-        // Jaeger v3 trả JSON OTLP: result.resourceSpans[].resource.attributes có service.name.
+        // Jaeger v3 returns OTLP JSON: result.resourceSpans[].resource.attributes has service.name.
         using var document = JsonDocument.Parse(json);
         if (!document.RootElement.TryGetProperty("result", out var result)
             || !result.TryGetProperty("resourceSpans", out var resourceSpans))

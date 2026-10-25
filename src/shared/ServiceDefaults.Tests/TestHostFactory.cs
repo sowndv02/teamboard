@@ -11,7 +11,7 @@ using OpenTelemetry.Trace;
 
 namespace Teamboard.Shared.ServiceDefaults.Tests;
 
-/// <summary>Host in-process dùng ServiceDefaults, thu span/log vào bộ nhớ để test kiểm chứng.</summary>
+/// <summary>In-process host using ServiceDefaults; collects spans, logs and metrics in memory for assertions.</summary>
 internal sealed class TestHostFactory : IAsyncDisposable
 {
     public List<Activity> Spans { get; } = [];
@@ -41,7 +41,7 @@ internal sealed class TestHostFactory : IAsyncDisposable
 
         factory.App = builder.Build();
         factory.App.MapDefaultEndpoints();
-        // Endpoint chỉ có trong test để gửi body; không phải hành vi của ServiceDefaults.
+        // Test-only endpoint for sending a body; not ServiceDefaults behavior.
         factory.App.MapPost("/echo", async (HttpContext context) =>
         {
             await context.Request.Body.CopyToAsync(Stream.Null);

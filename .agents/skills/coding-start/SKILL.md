@@ -72,6 +72,7 @@ Trước khi code, tra `document/lessons/README.md` theo tag của vùng đang l
 - [ ] Gate đầy đủ xanh (hoặc nêu rõ phần không chạy được và vì sao)
 - [ ] Bảng kịch bản ↔ test không còn gap; không `@wip`/skip
 - [ ] Issue: TDD log (đỏ/xanh), Workflow `coding-start: done, xanh N/N`
+- [ ] Tính năng lớn: hàng lát trong `<feature>-slices.md` là `in-progress` (đổi khi bắt đầu coding)
 - [ ] Không có thay đổi ngoài phạm vi; diff sạch (không secret/file sinh ra)
 - Báo `workflow` mở `coding-review`.
 

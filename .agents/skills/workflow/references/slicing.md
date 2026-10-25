@@ -40,6 +40,8 @@ updated: YYYY-MM-DD
 
 Trạng thái lát: `todo` → `planning` → `in-progress` → `review` → `done` (theo issue). Bảng là **điểm resume**: lát đầu tiên chưa `done` là lát hiện tại.
 
+**Đồng bộ bắt buộc:** cột Trạng thái của hàng lát đổi **cùng commit** với trạng thái issue của lát đó: `plan-init` xong → `planning`; `coding-start` bắt đầu → `in-progress`; `create-pr` mở PR → `review`; PR merge → `done` (kèm ước lượng thực tế). Cập nhật `updated:` của bảng; đặt `status: done` khi mọi lát `done`.
+
 ## 3. Quy trình
 
 1. Đọc spec + design `confirmed`; liệt kê FR/BR/NFR và quyết định design; xác định "xương sống".

@@ -10,7 +10,7 @@ public sealed class RepositoryHygieneSteps
 {
     private readonly List<string> _violations = [];
 
-    [When("tôi đọc khai báo gói của các dự án .NET")]
+    [When("I read the package declarations of the .NET projects")]
     public void WhenReadPackages()
     {
         var src = Path.Combine(RepoRoot.Find(), "src");
@@ -28,7 +28,7 @@ public sealed class RepositoryHygieneSteps
         }
     }
 
-    [When("tôi đọc các tệp compose của repo")]
+    [When("I read the compose files of the repo")]
     public void WhenReadCompose()
     {
         var src = Path.Combine(RepoRoot.Find(), "src");
@@ -44,11 +44,11 @@ public sealed class RepositoryHygieneSteps
         }
     }
 
-    [Then("mọi gói có phiên bản chính xác, không dùng dải hay dấu sao")]
-    public void ThenPinned() => Assert.True(_violations.Count == 0, "Gói chưa pin: " + string.Join("; ", _violations));
+    [Then("every package has an exact version, with no ranges or wildcards")]
+    public void ThenPinned() => Assert.True(_violations.Count == 0, "Unpinned packages: " + string.Join("; ", _violations));
 
-    [Then("mọi giá trị mật khẩu, khoá hay token chỉ tham chiếu biến môi trường")]
-    public void ThenNoSecrets() => Assert.True(_violations.Count == 0, "Có bí mật viết cứng tại: " + string.Join(", ", _violations));
+    [Then("every password, key or token value only references an environment variable")]
+    public void ThenNoSecrets() => Assert.True(_violations.Count == 0, "Hard-coded secret at: " + string.Join(", ", _violations));
 
     private static bool IsBuildOutput(string path) =>
         path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")

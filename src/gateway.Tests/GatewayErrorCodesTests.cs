@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Gateway.Tests;
 
-/// <summary>Test chính sách cho bảng mã lỗi riêng của gateway (`backend-engineering.md` mục 1).</summary>
+/// <summary>Policy test for the gateway's own error code table (`backend-engineering.md` section 1).</summary>
 public sealed partial class GatewayErrorCodesTests
 {
     [Fact]

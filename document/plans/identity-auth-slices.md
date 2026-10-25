@@ -14,7 +14,7 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 
 | # | GĐ | Lát (hành vi giao được) | FR/NFR | Phụ thuộc | Ước lượng | Issue | Trạng thái |
 |---|---|---|---|---|---|---|---|
-| 1a | I1 | Khung identity-service chạy được: health live/ready (ready kiểm DB), OTel, PostgreSQL + EF Core, migration nền, Dockerfile và compose | NFR-001, NFR-003, NFR-009 (một phần NFR-004: `traceparent`) | TB-001 (ServiceDefaults, xong), `shared/Http` (xong) | 2–3 ngày | TB-021 | in-progress |
+| 1a | I1 | Khung identity-service chạy được: health live/ready (ready kiểm DB), OTel, PostgreSQL + EF Core, migration nền, Dockerfile và compose | NFR-001, NFR-003, NFR-009 (một phần NFR-004: `traceparent`) | TB-001 (ServiceDefaults, xong), `shared/Http` (xong) | 2–3 ngày | TB-021 | review |
 | 1b | I1 | Đăng ký bằng email/mật khẩu băm PBKDF2, benchmark số vòng và vCPU | FR-001, FR-004, BR-001, BR-002, NFR-002, NFR-007 (metric băm) | 1a | 2–3 ngày | – | todo |
 | 2 | I1 | Đăng nhập, lỗi chung không lộ email | FR-002, BR-003 | 1b | 2–3 ngày | – | todo |
 | 3 | I1 | Khoá tạm theo (email, IP) và giới hạn tốc độ (cờ `RateLimiter`, Q-G = A) | FR-003, NFR-008 | 2 | 2–3 ngày | – | todo |

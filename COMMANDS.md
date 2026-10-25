@@ -23,7 +23,7 @@ Quy tắc đầy đủ: `.agents/rules/code-change-gate.md`. Chạy gate của t
 ```bash
 # .NET
 dotnet build src/teamboard.slnx -warnaserror
-dotnet test src/teamboard.slnx --filter "Category!=docker"   # nhanh; thêm test Docker bằng `--filter "Category=docker"` (cần Docker Desktop, cổng 6060, 6061 và 8080 trống; test identity dùng Testcontainers nên cũng cần Docker)
+dotnet test src/teamboard.slnx --filter "Category!=docker"   # nhanh; thêm test Docker bằng `--filter "Category=docker"` (cần Docker Desktop, cổng 6060, 6061 và 8080 trống; test identity dùng Testcontainers nên cũng cần Docker; nhóm docker của các assembly dùng chung cổng host nên chạy MỖI LẦN MỘT assembly, ví dụ `dotnet test src/gateway.Tests --filter "Category=docker"`, không chạy song song cả solution)
 dotnet format src/teamboard.slnx --verify-no-changes
 
 # Angular (src/web), 🚧 chưa scaffold; dùng `npm ci` (không `npm install`) trong gate

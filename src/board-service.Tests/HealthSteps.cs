@@ -12,21 +12,21 @@ public sealed class HealthSteps : IDisposable
     private HttpClient? _client;
     private HttpResponseMessage? _response;
 
-    [Given("board-service đã khởi động")]
+    [Given("board-service is running")]
     public void GivenStarted()
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
     }
 
-    [When("tôi gọi {string}")]
+    [When("I call {string}")]
     public async Task WhenCall(string request)
     {
         var parts = request.Split(' ', 2);
         _response = await _client!.SendAsync(new HttpRequestMessage(new HttpMethod(parts[0]), parts[1]));
     }
 
-    [Then("mã trạng thái là {int}")]
+    [Then("the status code is {int}")]
     public void ThenStatus(int status) => Assert.Equal((HttpStatusCode)status, _response!.StatusCode);
 
     public void Dispose()

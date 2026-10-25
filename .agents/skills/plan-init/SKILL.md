@@ -52,6 +52,7 @@ Rule liên quan: `task-workflow.md`, `testing.md`, `test-review.md`, `architectu
 - [ ] Mỗi bước có kịch bản/test, kiểm chứng, file dự kiến
 - [ ] Câu hỏi mở và giả định được liệt kê, không tự chốt
 - [ ] Issue có bảng Workflow cập nhật
+- [ ] Tính năng lớn: hàng lát trong `<feature>-slices.md` đổi `planning` (cùng commit với trạng thái issue)
 
 ## Ghi trạng thái workflow
 

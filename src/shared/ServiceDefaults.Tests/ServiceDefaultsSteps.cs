@@ -19,54 +19,54 @@ public sealed class ServiceDefaultsSteps : IAsyncDisposable
     private HealthReport? _report;
     private readonly List<HttpResponseMessage> _responses = [];
 
-    private TestHostFactory Host => _host ?? throw new InvalidOperationException("Chưa dựng host.");
+    private TestHostFactory Host => _host ?? throw new InvalidOperationException("Host has not been built.");
 
-    [Given("một host dùng AddServiceDefaults chưa khởi động")]
+    [Given("a host using AddServiceDefaults that has not started")]
     public void GivenHostNotStarted() => _host = TestHostFactory.Build("service-defaults-tests");
 
-    [Given("một host tối thiểu gọi AddServiceDefaults và MapDefaultEndpoints đã khởi động")]
+    [Given("a minimal host calling AddServiceDefaults and MapDefaultEndpoints that has started")]
     public async Task GivenMinimalHostStarted()
     {
         _host = TestHostFactory.Build("service-defaults-tests");
         await _host.StartAsync();
     }
 
-    [Given("một host dùng AddServiceDefaults với tên service {string} đã khởi động")]
+    [Given("a host using AddServiceDefaults with service name {string} that has started")]
     public async Task GivenHostWithServiceNameStarted(string serviceName)
     {
         _host = TestHostFactory.Build(serviceName);
         await _host.StartAsync();
     }
 
-    [Given("biến môi trường endpoint OTLP không được đặt")]
+    [Given("the OTLP endpoint environment variable is not set")]
     public void GivenOtlpEndpointUnset() => Environment.SetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT", null);
 
-    [When("tôi chạy các health check có tag {string}")]
+    [When("I run the health checks tagged {string}")]
     public async Task WhenRunHealthChecks(string tag)
     {
         var service = Host.App.Services.GetRequiredService<HealthCheckService>();
         _report = await service.CheckHealthAsync(registration => registration.Tags.Contains(tag));
     }
 
-    [When("tôi gọi {string}")]
+    [When("I call {string}")]
     public async Task WhenCall(string request) => _responses.Add(await Send(request));
 
-    [When("tôi gọi cả {string} và {string}")]
+    [When("I call both {string} and {string}")]
     public async Task WhenCallBoth(string first, string second)
     {
         _responses.Add(await Send(first));
         _responses.Add(await Send(second));
     }
 
-    [Given("một host dùng AddServiceDefaults với tên service {string} và endpoint OTLP không có dịch vụ lắng nghe đã khởi động")]
+    [Given("a host using AddServiceDefaults with service name {string} and an OTLP endpoint with no listener that has started")]
     public async Task GivenHostWithUnreachableOtlpStarted(string serviceName)
     {
-        // Cổng 1 không có dịch vụ nào lắng nghe: exporter không kết nối được nhưng service phải vẫn chạy.
+        // Nothing listens on port 1: the exporter cannot connect, but the service must keep running.
         _host = TestHostFactory.Build(serviceName, "http://127.0.0.1:1");
         await _host.StartAsync();
     }
 
-    [When("tôi gửi một yêu cầu ghi dữ liệu với header Authorization {string}, cookie {string}, query {string} và body {string}")]
+    [When("I send a write request with Authorization header {string}, cookie {string}, query {string} and body {string}")]
     public async Task WhenPostWithSecrets(string authorization, string cookie, string query, string body)
     {
         using var message = new HttpRequestMessage(HttpMethod.Post, $"/echo?{query}")
@@ -78,28 +78,28 @@ public sealed class ServiceDefaultsSteps : IAsyncDisposable
         _responses.Add(await Host.Client.SendAsync(message));
     }
 
-    [Then("kết quả là Unhealthy")]
+    [Then("the result is Unhealthy")]
     public void ThenUnhealthy()
     {
         Assert.NotNull(_report);
         Assert.Equal(HealthStatus.Unhealthy, _report!.Status);
     }
 
-    [Then("cả hai phản hồi có mã {int}")]
+    [Then("both responses have status {int}")]
     public void ThenBothStatus(int status)
     {
         Assert.Equal(2, _responses.Count);
         Assert.All(_responses, response => Assert.Equal((HttpStatusCode)status, response.StatusCode));
     }
 
-    [Then("mã trạng thái là {int}")]
+    [Then("the status code is {int}")]
     public void ThenStatus(int status)
     {
         var response = Assert.Single(_responses);
         Assert.Equal((HttpStatusCode)status, response.StatusCode);
     }
 
-    [Then("có một span của request với service.name {string}")]
+    [Then("there is a request span with service.name {string}")]
     public void ThenSpanHasServiceName(string serviceName)
     {
         var tracerProvider = Host.App.Services.GetRequiredService<TracerProvider>();
@@ -110,28 +110,28 @@ public sealed class ServiceDefaultsSteps : IAsyncDisposable
         Assert.Contains(attributes, attribute => attribute.Key == "service.name" && (string?)attribute.Value == serviceName);
     }
 
-    [Then("telemetry đã ghi nhận ít nhất một span")]
+    [Then("telemetry has recorded at least one span")]
     public void ThenSpanRecorded()
     {
         Host.App.Services.GetRequiredService<TracerProvider>().ForceFlush();
         Assert.NotEmpty(Host.Spans);
     }
 
-    [Then("telemetry đã ghi nhận ít nhất một metric")]
+    [Then("telemetry has recorded at least one metric")]
     public void ThenMetricRecorded()
     {
         Host.App.Services.GetRequiredService<MeterProvider>().ForceFlush();
         Assert.NotEmpty(Host.Metrics);
     }
 
-    [Then("telemetry đã ghi nhận ít nhất một bản ghi log")]
+    [Then("telemetry has recorded at least one log record")]
     public void ThenLogRecorded()
     {
         Host.App.Services.GetRequiredService<LoggerProvider>().ForceFlush();
         Assert.NotEmpty(Host.Logs);
     }
 
-    [Then("không span hay bản ghi log nào chứa {string}")]
+    [Then("no span or log record contains {string}")]
     public void ThenNoTelemetryContains(string secret)
     {
         Host.App.Services.GetRequiredService<TracerProvider>().ForceFlush();

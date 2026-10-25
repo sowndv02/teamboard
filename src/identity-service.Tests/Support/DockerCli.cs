@@ -3,7 +3,7 @@ using Xunit;
 
 namespace IdentityService.Tests.Support;
 
-/// <summary>Gọi `docker compose` qua Process cho test nhóm @docker (bản sao từ gateway.Tests, ghi nợ tách project dùng chung; xem plan TB-010).</summary>
+/// <summary>Calls `docker compose` via Process for @docker tests (copied from gateway.Tests; extracting a shared project is tracked debt, see plan TB-010).</summary>
 internal sealed class DockerCli
 {
     public const string ProjectName = "tb021-tests";
@@ -13,32 +13,32 @@ internal sealed class DockerCli
     private string[] _composeFiles = [];
     private string? _envFile;
 
-    /// <summary>Bỏ qua scenario (không phải đỏ) khi máy không có Docker daemon.</summary>
+    /// <summary>Skips the scenario (not red) when the machine has no Docker daemon.</summary>
     public static void RequireDocker()
     {
         var result = Run(RepoRoot.Find(), TimeSpan.FromSeconds(30), "info", "--format", "{{.ServerVersion}}");
         if (result.ExitCode != 0)
         {
-            throw new SkipException("Docker daemon không khả dụng; bỏ qua test nhóm docker.");
+            throw new SkipException("Docker daemon is not available; skipping docker tests.");
         }
     }
 
     public void UseFiles(params string[] composeFiles) => _composeFiles = composeFiles;
 
-    /// <summary>Compose chính đòi biến mật khẩu DB bắt buộc; test dùng file mẫu (giá trị mẫu, không phải mật khẩu thật).</summary>
+    /// <summary>The main compose file requires DB password variables; tests use the example file (sample values, not real passwords).</summary>
     public void UseEnvFile(string envFile) => _envFile = envFile;
 
     public CommandResult ComposeBuild(params string[] services) =>
         Compose(TimeSpan.FromMinutes(10), ["build", .. services]);
 
-    /// <summary>Chạy chỉ các service được chỉ định (không `--build`: image đã build ở bước riêng để đo thời gian khởi động).</summary>
+    /// <summary>Runs only the given services (no `--build`: the image is built in a separate step to measure startup time).</summary>
     public CommandResult ComposeUp(params string[] services)
     {
         _composeStarted = true;
         return Compose(TimeSpan.FromMinutes(5), ["up", "-d", .. services]);
     }
 
-    /// <summary>Chạy lệnh trong container của một service đang chạy (không cấp TTY).</summary>
+    /// <summary>Runs a command in the container of a running service (no TTY).</summary>
     public CommandResult ComposeExec(string service, params string[] command) =>
         Compose(TimeSpan.FromSeconds(30), ["exec", "-T", service, .. command]);
 
@@ -61,7 +61,7 @@ internal sealed class DockerCli
         return Run(_repoRoot, timeout, arguments.ToArray());
     }
 
-    /// <summary>Dọn container và volume của dự án compose riêng của test (-v an toàn vì tên dự án không dùng chung); volume DB còn sót làm lệch mật khẩu và dữ liệu ở lần chạy sau.</summary>
+    /// <summary>Cleans up containers and volumes of the test's own compose project (-v is safe since the project name is not shared); a leftover DB volume skews the password and data on the next run.</summary>
     public void ComposeDown()
     {
         if (_composeStarted)
@@ -92,7 +92,7 @@ internal sealed class DockerCli
             if (!process.WaitForExit(timeout))
             {
                 process.Kill(entireProcessTree: true);
-                return new CommandResult(-1, string.Empty, $"Quá thời gian chờ {timeout}.");
+                return new CommandResult(-1, string.Empty, $"Timed out after {timeout}.");
             }
 
             return new CommandResult(process.ExitCode, output.Result, error.Result);

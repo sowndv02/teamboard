@@ -1,23 +1,23 @@
 @TB-001 @board-service
-Feature: Tên service board-service nhất quán
-  Là lập trình viên
-  Tôi muốn service có một tên duy nhất ở mọi nơi
-  Để các issue sau (gateway, task) tham chiếu đúng tên
+Feature: Consistent board-service name
+  As a developer
+  I want the service to have a single name everywhere
+  So that later issues (gateway, task) reference the right name
 
   @S01 @FR-001
-  Scenario: Tên assembly và namespace gốc của service là board-service
-    When tôi kiểm tra assembly của service
-    Then tên assembly là "board-service"
-    And namespace gốc của dự án service là "BoardService"
+  Scenario: The service assembly name and root namespace are board-service
+    When I inspect the service assembly
+    Then the assembly name is "board-service"
+    And the root namespace of the service project is "BoardService"
 
   @S02 @FR-001
-  Scenario: Không tệp hiện hành nào còn tên cũ của service
-    When tôi quét mã nguồn, cấu hình và tài liệu hiện hành
-    Then không tệp nào chứa tên cũ của service
+  Scenario: No current file still contains the old service name
+    When I scan the current source code, configuration and documentation
+    Then no file contains the old service name
 
   @S03 @FR-001 @docker
-  Scenario: Compose chạy service board-service ở cổng host 6060
-    Given Docker khả dụng
-    When tôi chạy compose chính với tên dự án riêng
-    Then danh sách service đang chạy gồm "board-service"
-    And cổng host 6060 phản hồi một mã HTTP
+  Scenario: Compose runs the board-service service on host port 6060
+    Given Docker is available
+    When I run the main compose under a dedicated project name
+    Then the list of running services includes "board-service"
+    And host port 6060 responds with an HTTP status code
