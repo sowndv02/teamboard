@@ -45,7 +45,7 @@ internal sealed class UpstreamStub : IAsyncDisposable
 
     public const string UpstreamTraceId = "upstream-trace-id";
 
-    public static async Task<UpstreamStub> StartAsync(string? problemPath = null, string? problemCode = null)
+    public static async Task<UpstreamStub> StartAsync(string? problemPath = null, string? problemCode = null, UpstreamBehavior behavior = UpstreamBehavior.Normal)
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");
@@ -61,6 +61,26 @@ internal sealed class UpstreamStub : IAsyncDisposable
             if (stub.ResponseCorrelationId is not null)
             {
                 context.Response.Headers["X-Correlation-Id"] = stub.ResponseCorrelationId;
+            }
+
+            switch (behavior)
+            {
+                case UpstreamBehavior.CloseBeforeHeaders:
+                    // Reset the connection before any response bytes: the gateway sees a transport error, not a response.
+                    context.Abort();
+                    return;
+                case UpstreamBehavior.HangBeforeHeaders:
+                    await WaitUntilClientGoesAway(context);
+                    return;
+                case UpstreamBehavior.HeadersThenClose:
+                    await SendHeadersAndPartialBody(context);
+                    // Returning with fewer bytes than Content-Length makes Kestrel flush what was written, then drop the connection;
+                    // unlike Abort() this keeps the byte order, so the headers always reach the gateway first.
+                    return;
+                case UpstreamBehavior.HeadersThenHang:
+                    await SendHeadersAndPartialBody(context);
+                    await WaitUntilClientGoesAway(context);
+                    return;
             }
 
             if (problemPath is not null && context.Request.Path == problemPath)
@@ -86,6 +106,28 @@ internal sealed class UpstreamStub : IAsyncDisposable
         return stub;
     }
 
+    // The gateway drops its connection when it gives up (timeout), which cancels RequestAborted and frees this request.
+    private static async Task WaitUntilClientGoesAway(HttpContext context)
+    {
+        try
+        {
+            await Task.Delay(Timeout.InfiniteTimeSpan, context.RequestAborted);
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected: the client (gateway) went away.
+        }
+    }
+
+    private static async Task SendHeadersAndPartialBody(HttpContext context)
+    {
+        context.Response.Headers[MarkerHeader] = "1";
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentLength = 1024;
+        await context.Response.WriteAsync("partial");
+        await context.Response.Body.FlushAsync();
+    }
+
     public Task StopAsync() => _app.StopAsync();
 
     public async ValueTask DisposeAsync()
@@ -93,4 +135,14 @@ internal sealed class UpstreamStub : IAsyncDisposable
         await _app.StopAsync();
         await _app.DisposeAsync();
     }
+}
+
+/// <summary>How the fake upstream misbehaves (failure injection for the downstream-error scenarios).</summary>
+internal enum UpstreamBehavior
+{
+    Normal,
+    CloseBeforeHeaders,
+    HangBeforeHeaders,
+    HeadersThenClose,
+    HeadersThenHang,
 }

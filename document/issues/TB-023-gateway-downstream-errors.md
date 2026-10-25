@@ -52,7 +52,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-023-gateway-downstream-errors.md` (draft), 4 bước B1-B4, 10 kịch bản @S01-@S10, 4 câu hỏi mở P-01..P-04, 5 giả định cần spike ở test-init |
 | plan-review | PASS | 1 | 2026-10-25 | plan `approved`; 7 quyết định (vị trí `UseRequestTimeouts`, metric không mang `correlationId`, timeout kết nối 504, lỗi lạ 502, client huỷ, giữ cỡ lát, khoảng `Retry-After`), 11 FIX; review độc lập kèm spike YARP |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-10-25 | 34 test đỏ đúng lý do ở hành vi (host 12 dòng + bộ phân loại + khoảng Retry-After), 52 xanh (hồi quy và dữ liệu); @S10 Docker chưa chạy được vì Docker Desktop tắt; ổn định qua 3 lần chạy |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -76,6 +76,20 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 (503, GET/HEAD/POST) | `downstream-errors.feature` @S01 (Outline 3 dòng) | Đỏ: mong 503, nhận 502 (YARP trả 502 mặc định khi cổng đóng) | – |
+| @S02 (cluster không có đích) | `downstream-errors.feature` @S02 | Đỏ: 503 của YARP không có thân `problem+json` (content-type và code sai) | – |
+| @S03 (502 đóng trước header) | `downstream-errors.feature` @S03 | Đỏ: thân không phải `problem+json` (status 502 mặc định đã đúng, thân rỗng) | – |
+| @S04 (504 vượt route Timeout) | `downstream-errors.feature` @S04 | Đỏ: route `Timeout` mà thiếu `UseRequestTimeouts` làm request 500 (đúng như spike) | – |
+| @S05 (504 vượt ActivityTimeout) | `downstream-errors.feature` @S05 | Đỏ: cùng lý do 500 (cấu hình `Timeout` của route có mặt, middleware chưa có) | – |
+| @S06 (header rồi đóng) | `downstream-errors.feature` @S06 | Đỏ ở metric: `gateway_upstream_aborted` là 0, mong 1 (client bị ngắt đã xanh sẵn vì YARP tự ngắt; log Warning chưa kiểm tới vì dừng ở bước metric) | – |
+| @S07 (header rồi treo, 2 dòng) | `downstream-errors.feature` @S07 Outline | Đỏ: 500 do route `Timeout` thiếu middleware nên client không bị ngắt (cùng lý do S04) | – |
+| @S08 (timeout mặc định 30 giây) | `downstream-errors.feature` @S08 | Đỏ: `appsettings.json` chưa có `Timeout` và `ActivityTimeout` | – |
+| @S09 (health khi upstream chết) | `downstream-errors.feature` @S09 Outline | Xanh sẵn: hành vi đúng từ lát 1; giữ làm test hồi quy | Xanh sẵn |
+| @S10 (`@docker`, compose, cổng đóng) | `downstream-errors.feature` @S10 | Chưa chạy được: Docker Desktop đang tắt (test bỏ qua, không phải đỏ) | – |
+| @S11 (Retry-After từ cấu hình) | `downstream-errors.feature` @S11 | Đỏ: mong 503 kèm `Retry-After` 7, nhận 502 | – |
+| Bộ phân loại lỗi | `UpstreamErrorClassifierTests` (19 ca) | Đỏ: khung trả `None` (assertion, chưa có ánh xạ); ca `None` xanh sẵn | – |
+| Khoảng `Retry-After` | `UpstreamOptionsTests` (4 ca sai, 3 ca đúng) | 4 ca sai đỏ: chưa kiểm tra giá trị khi khởi động; 3 ca đúng xanh sẵn | – |
+| Mã lỗi gateway | `GatewayErrorCodesTests` (có sẵn, nay phủ 4 mã) | Xanh sẵn: dữ liệu hợp đồng (ba mã mới) đi cùng khung biên dịch | Xanh sẵn |
 
 ## Test review rounds
 

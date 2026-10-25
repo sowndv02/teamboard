@@ -57,7 +57,7 @@ Sau header, YARP tự ngắt kết nối với client; client thấy lỗi đọ
 | FR-006 không lộ host nội bộ hay stack trace; 5xx mang `X-Correlation-Id` | D4, mục 8, 11 | B1, B2 | @S01–@S05 (bước chung) | Mọi phản hồi lỗi: không chứa địa chỉ upstream, tên service, tên exception; allowlist thuộc tính; header `X-Correlation-Id` bằng `correlationId` của body (HEAD: chỉ header) |
 | FR-006 header đã gửi rồi mới ngắt/treo → ngắt kết nối + log + metric | D4, mục 9 | B3 | @S06, @S07 | Host test (Outline S07: treo vượt `Timeout` của route / vượt `ActivityTimeout`): client lỗi đọc thân; `MeterListener` thấy `gateway_upstream_aborted`; log Warning có `correlationId` |
 | NFR-003 timeout cấu hình được, không hardcode | D4 | B2, B4 | @S04, @S05, @S08 | Test dùng giá trị ghi đè ngắn qua cấu hình; test đọc `appsettings.json` thật: 30 giây |
-| `Retry-After` cấu hình được, có khoảng hợp lệ | D4, `api-endpoints.md` §6 | B1 | @S01, @S08 | Ghi đè 7 giây → header `7`; giá trị 0 hoặc 3601 làm khởi động thất bại (unit `UpstreamOptions`) |
+| `Retry-After` cấu hình được, có khoảng hợp lệ | D4, `api-endpoints.md` §6 | B1 | @S01, @S11 | Ghi đè 7 giây → header `7`; giá trị 0 hoặc 3601 làm khởi động thất bại (unit `UpstreamOptions`) |
 | Gateway sống khi upstream chết (spec FR-002) | spec | B4 | @S09 | `/health/live` và `/health/ready` 200 khi upstream đã dừng |
 | FR-006 không kết nối được trong môi trường thật | D4 | B4 | @S10 | `@docker`: gateway chạy riêng, `GET /api/v1/boards` → 503 `UPSTREAM_UNAVAILABLE` |
 | Thứ tự middleware khoá bằng test (slice mục đầu, design 6.4) | 6.4 (cập nhật) | B2 | @S04 (kèm) | Test khẳng định 504 mang `X-Correlation-Id` (Correlation ngoài) và route `Timeout` có hiệu lực (RequestTimeouts đứng trước YARP) |
@@ -70,9 +70,10 @@ Kịch bản (ID duy nhất trong file `.feature`; viết ở test-init):
 - @S05 Upstream im lặng vượt `ActivityTimeout` của cluster (ngắn hơn `Timeout`): `504` `UPSTREAM_TIMEOUT`.
 - @S06 Upstream trả header rồi đóng kết nối giữa chừng: client bị ngắt, metric `gateway_upstream_aborted` tăng 1, có log Warning mang `correlationId`.
 - @S07 (Outline) Upstream trả header rồi treo vượt `Timeout` của route / vượt `ActivityTimeout`: client bị ngắt, metric tăng.
-- @S08 Cấu hình: timeout mặc định trong `appsettings.json` là 30 giây (route và cluster); `Retry-After` đọc từ cấu hình.
+- @S08 Cấu hình: timeout mặc định trong `appsettings.json` là 30 giây (route và cluster).
 - @S09 `/health/live` và `/health/ready` trả 200 khi upstream đã dừng.
 - @S10 (`@docker`) Gateway chạy riêng trong compose, `GET /api/v1/boards` trả `503` `UPSTREAM_UNAVAILABLE`.
+- @S11 `Retry-After` đọc từ cấu hình (ghi đè 7 giây → header `7`); tách khỏi @S08 ở test-init để ID kịch bản duy nhất và mỗi kịch bản một hành vi.
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 
@@ -210,3 +211,4 @@ Giả định đã kiểm bằng spike hộp đen của reviewer (YARP 2.3.0, .N
 |---|---|---|
 | 2026-10-25 | Tạo bản nháp | plan-init cho TB-023 (lát 3 của gateway) |
 | 2026-10-25 | plan-review vòng 1: ghi 7 quyết định, sửa 11 FIX, sửa spec FR-006 và design D4, 6.4, 9; plan `approved` | plan-review TB-023 |
+| 2026-10-25 | test-init: tách @S11 (Retry-After từ cấu hình) khỏi @S08; không đổi hành vi | test-init TB-023 |
