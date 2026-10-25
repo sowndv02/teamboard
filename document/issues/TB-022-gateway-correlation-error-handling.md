@@ -53,7 +53,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-022-gateway-correlation-error-handling.md` (draft), 3 bước B1–B3, 1 câu hỏi mở P-01 |
 | plan-review | PASS | 2 | 2026-10-25 | plan `approved`; 4 quyết định (nhiều giá trị id, spike ép lỗi, không log khi thay id, cổng Docker), 12 FIX; review độc lập (sub-agent) |
 | test-init | done | – | 2026-10-25 | 18 test thư viện + 16 test host gateway + @S06 Docker đỏ đúng lý do; spike A-03 đạt (thay `IHttpForwarder`); trace-by-id Jaeger kiểm tay: `GET /api/v3/traces/{traceId}` |
-| test-review | pending | | | |
+| test-review | PASS | 2 | 2026-10-25 | 14 FIX vòng 1 + 4 quyết định (traceparent thiếu/sai, giữ bảng id, không test log gateway); test tiếng Anh ASCII theo quy tắc mới; review độc lập (sub-agent); 33 + 26 test đỏ ở hành vi, @S06 đỏ đúng lý do |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -93,6 +93,29 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-10-25 | e148e83 | Cần sửa feature | 14 FIX (3 P1, 5 P2, 6 P3) và 3 CONFIRM: traceparent-edge, pyramid-grammar-duplication, gateway-log-scope-untested (đã chốt, Confirm log #5-8); review độc lập (sub-agent) |
+| 2 | 2026-10-25 | working tree sau vòng 1 (gồm 41e358a) | PASS | 0; còn 1 P3 diễn đạt (`http-code-in-feature`) đã sửa ngay (@S12 không còn mã HTTP); reviewer độc lập xác nhận 14 FIX đóng |
+
+### Fix log test-review
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | pipeline-order-mismatch | FIX | `Http.Tests/TestHostBuilder.cs` | Host thử đặt ExceptionHandler ngoài Correlation, ngược design 6.4 | `UseCorrelation` rồi `UseTeamboardExceptionHandler` | Bản tham chiếu 40/40 xanh |
+| 1 | activity-assert-race-vacuous | FIX | `CorrelationMiddlewareTests`, `TestHostBuilder` | Đọc Activity đã dừng, listener toàn cục, test âm thiếu đối chứng dương | Đọc tag `Activity.Current` trong endpoint (`SeenTag`), thêm đối chứng dương | Test chạy, đỏ do thiếu tag |
+| 1 | duplicate-scenario-ids | FIX | `correlation.feature`, plan | @S02 và @S04 trùng ID trong file | Tách @S08, @S09; thêm @S10 (method), @S11, @S12 (traceparent) | Plan mục 2, bảng TDD log |
+| 1 | red-by-stub-exception | FIX | `src/shared/Http/*Extensions.cs` | Stub ném `NotImplementedException` nên đỏ ở harness | Stub chuyển tiếp, không hành vi | 33 test đỏ ở hành vi |
+| 1 | two-whens-tracing | FIX | `tracing.feature` | Hai `When` trong @S06 | Dựng compose chuyển sang `Given` | Một `When` |
+| 1 | id-grammar-boundary-gap | FIX | feature và unit | Thiếu ký tự sát biên `[ \ ] ^ ` / : @ { ~` | Thêm vào Examples và `InlineData` (17 và 15 ca) | Bản tham chiếu bắt được bug `$` với `\n` |
+| 1 | 500-body-contract-gap | FIX | `ExceptionHandlerTests` | Thiếu type, title, detail, traceId, ca không gửi id | Mở rộng hợp đồng đầy đủ, thêm ca không gửi id | 5 test handler |
+| 1 | weak-leak-assertion | FIX | `ExceptionHandlerTests`, steps | `DoesNotContain(" at ")` yếu | Allowlist tên thuộc tính cộng các chuỗi cấm | Bản tham chiếu xanh |
+| 1 | guid-check-weak | FIX | unit và steps | `Guid.TryParse` nhận mọi dạng | `TryParseExact "D"` | Build, test |
+| 1 | method-status-coverage | FIX | `correlation.feature` | Chỉ GET | @S10 HEAD, POST, DELETE | Chạy đỏ đúng lý do |
+| 1 | scenario-test-traceability | FIX | `Http.Tests` | Test không mang ID kịch bản | `[Trait("Scenario", ...)]` | Mã nguồn |
+| 1 | gherkin-encoding-style | FIX | feature và steps | DSL trong Examples không giải thích, step trùng | Chú thích ký hiệu, gộp step, bỏ `Replace` thừa | Build, test |
+| 1 | docker-project-name-reuse | FIX | `DockerCli`, `TracingSteps` | @S06 dùng chung project với TB-010 | `DockerCli(projectName)`, `tb022-tests` | @S06 chạy lại, đỏ đúng lý do |
+| 1 | traceparent-edge | CONFIRM #5, #6 | `correlation.feature` | traceparent thiếu hoặc sai | Thêm @S11, @S12 (bỏ qua, trace mới, vẫn chuyển tiếp) | Hai test xanh sẵn |
+| 2 | http-code-in-feature | FIX | `correlation.feature` @S12 | Mã HTTP trong kịch bản nghiệp vụ | Thay bằng "upstream nhận đúng method và đường dẫn" (request vẫn được chuyển tiếp) | Test @S12 xanh |
+| 2 | rules-english-ascii | Quy tắc mới (người dùng) | feature, steps, test | Test tiếng Việt và ký tự Unicode trực tiếp | Dịch sang tiếng Anh ASCII, chữ số Arabic-Indic bằng `١٢٣` | Commit 41e358a, build `-warnaserror` |
 
 ## Review rounds
 

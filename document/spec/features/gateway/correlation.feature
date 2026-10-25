@@ -77,7 +77,7 @@ Feature: Gateway keeps the correlation id and propagates the trace
   @S12 @FR-003
   Scenario: A malformed traceparent is ignored and the gateway starts a new trace
     When I send "GET" to "/api/v1/boards" with traceparent "00-not-valid-01"
-    Then the status code is 200
+    Then the fake upstream receives exactly method "GET" and path "/api/v1/boards"
     And the fake upstream receives a valid traceparent different from the value the client sent
 
   @S04 @FR-001
