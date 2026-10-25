@@ -36,6 +36,7 @@ Plan chi tiết: `document/plans/TB-024-gateway-rate-limit.md`.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-10-25: plan-review chốt 6 điểm; spike cho thấy `Retry-After` phải lấy từ cửa sổ, YARP mặc định đã Set `X-Forwarded-For/Proto`, `KnownNetworks` obsolete.
 - 2026-10-25: bắt đầu lát 4; nhánh tạo từ `main` sau PR 16; đồng bộ lát 3 (TB-023) sang `done` cùng lúc (LL-006).
 
 ## Workflow
@@ -45,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-10-25 | `document/plans/TB-024-gateway-rate-limit.md` (draft), 4 bước B1-B4, 11 kịch bản @S01-@S11, 5 câu hỏi mở P-01..P-05, 6 giả định cần spike ở test-init |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-10-25 | plan `approved`; 6 quyết định (cờ `ForwardedHeaders`, thứ tự Routing, giữ cỡ lát, `X-Forwarded-Host`, IP null, 6 đoạn), 8 FIX theo kết quả spike (KnownIPNetworks, Retry-After từ cửa sổ, YARP mặc định Set XFF, kịch bản cấu hình thật...); review độc lập kèm spike |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -56,6 +57,12 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-024:forwarded-flags | Cờ `ForwardedHeaders` được xử lý | `XForwardedFor` và `XForwardedProto` | 1 | 2026-10-25 |
+| 2 | plan-review:TB-024:routing-order | `UseRouting` ngầm chạy trước `ForwardedHeaders` | Gọi tường minh `UseForwardedHeaders()` rồi `UseRouting()`, giữ design 6.4 | 1 | 2026-10-25 |
+| 3 | plan-review:TB-024:slice-size | Giữ hay chia lát | Giữ một lát, gộp kịch bản | 1 | 2026-10-25 |
+| 4 | plan-review:TB-024:forwarded-host | `X-Forwarded-Host` bằng `Host` client gửi | Chấp nhận, ghi giới hạn đã biết | 1 | 2026-10-25 |
+| 5 | plan-review:TB-024:null-remote | `RemoteIpAddress` null | Bộ đếm chung `unknown` | 1 | 2026-10-25 |
+| 6 | plan-review:TB-024:segments-default | Số đoạn của cửa sổ trượt | 6 đoạn (10 giây) | 1 | 2026-10-25 |
 
 ## Kịch bản và TDD log
 
