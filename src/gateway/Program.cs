@@ -11,7 +11,11 @@ builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSecti
 var app = builder.Build();
 
 // Thứ tự middleware đích (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, CORS, RateLimiter, BodyLimit, YARP.
-// Lát này mới có routing, health và fallback; các middleware còn lại thêm ở các lát sau.
+// Lát này có Correlation, ExceptionHandler, routing, health và fallback; các middleware còn lại thêm ở các lát sau.
+// UseRouting do minimal hosting tự thêm ở đầu pipeline nên không gọi tường minh.
+app.UseCorrelation();
+app.UseTeamboardExceptionHandler();
+
 app.MapDefaultEndpoints();
 app.MapReverseProxy();
 
