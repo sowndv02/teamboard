@@ -55,6 +55,7 @@ Lệnh: `dotnet test src/identity-service.Tests --no-build` (bản đầu 7 test
 | @S07 cờ tự áp tắt thì service vẫn sống và không áp migration (`database.feature`) | `Không tự áp migration khi cờ tự áp tắt` | Bản đầu xanh ngay (không từng đỏ); sau `test-review` (Confirm log 10) thêm kiểm `/health/live` 200 nên đỏ: mong 200, nhận 404 | Xanh (coding-start) |
 | @S08 telemetry mang `service.name` đúng (`health.feature`) | `Telemetry của identity-service mang đúng tên service` | Đỏ: "identity-service chưa đăng ký OpenTelemetry" (thêm ở `test-review`) | Xanh (coding-start) |
 | @S09 user DB của identity không có quyền quản trị (`compose.feature`) | `Người dùng cơ sở dữ liệu của identity không có quyền quản trị` | Đỏ: `no such service: identity-service` (thêm ở `test-review`) | Xanh (coding-start) |
+| @S10 role khác không kết nối được vào database identity (`compose.feature`) | `Người dùng cơ sở dữ liệu khác không kết nối được vào database của identity` | Đỏ: "Role khác vẫn kết nối được vào database identity" (thêm ở `coding-review`, Confirm log 12) | Xanh (sau `REVOKE CONNECT`) |
 
 Gate nhanh `Category!=docker`: 2 test (@S01, @S06) đỏ; 5 test còn lại thuộc nhóm `docker` (Testcontainers cần Docker daemon). `dotnet build src/teamboard.slnx -warnaserror` xanh; `dotnet format --verify-no-changes` không báo lỗi.
 
@@ -147,6 +148,53 @@ Lệnh và kết quả (2026-10-25, Docker 29.5.3):
 - Migration nền sinh bằng `dotnet-ef 10.0.13` cài vào thư mục tạm (không cài toàn cục, không thêm vào repo).
 - `Microsoft.EntityFrameworkCore.Design` giữ `PrivateAssets=all`, giống `board-service`.
 
+## Review rounds (coding-review)
+
+Base: `main` (`e79560d`); branch `feature/TB-021-identity-service-skeleton`; review tự thân của agent (không dùng phiên độc lập), đọc `code-review.md` và `backend-engineering.md`, `dotnet.md`, `docker.md`.
+
+| Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
+|---|---|---|---|---|
+| 1 | 2026-10-25 | `83089c9` | Sẵn sàng sau khi sửa (4 finding, 1 cần người dùng chốt) | `identity-service:compose-overlays:env-examples-missing-vars` (P2), `identity-service:postgres-init:public-connect-open` (P2), `identity-service:PersistenceExtensions:migrate-no-cancellation` (P3), `identity-service:env-example:password-special-chars` (P3) |
+| 2 | 2026-10-25 | `9edbaa7`, `3efde2e` (delta) | Sẵn sàng merge | Không |
+
+**Confirm log (coding-review):** #12 `identity-service:postgres-init:public-connect-open`: người dùng chọn "Thêm REVOKE và test ngay" (2026-10-25).
+
+**Fix log:**
+
+| Fingerprint | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|
+| `identity-service:compose-overlays:env-examples-missing-vars` | `src/.env.develop.example`, `src/.env.stg.example`, `config/environments.yaml` | Biến mật khẩu bắt buộc của compose chính làm `docker compose -f main -f develop|stg` lỗi vì hai file mẫu không có biến | Thêm `POSTGRES_PASSWORD`, `IDENTITY_DB_PASSWORD` vào cả hai file mẫu; ghi `src/.env` vào `environments.yaml` | `9edbaa7`; `docker compose ... -f develop|stg --env-file <giá trị tạm> config -q` ok |
+| `identity-service:PersistenceExtensions:migrate-no-cancellation` | `Persistence/PersistenceExtensions.cs` | `MigrateAsync()` không nhận token, trái `dotnet.md` | Truyền `app.Lifetime.ApplicationStopping` | `9edbaa7`; build `-warnaserror`, test xanh |
+| `identity-service:env-example:password-special-chars` | `src/.env.example` | Mật khẩu ghép nguyên văn vào chuỗi kết nối, ký tự `;`, nháy, `$` làm hỏng hoặc chèn tham số | Thêm cảnh báo vào file mẫu | `9edbaa7` |
+| `identity-service:postgres-init:public-connect-open` | `src/postgres/init/01-identity.sh` | Database `identity` mở CONNECT cho mọi role cùng instance, trái D0.2 khi task-service thêm user | `REVOKE CONNECT ON DATABASE identity FROM PUBLIC`; thêm @S10 (đỏ trước, xanh sau) | `3efde2e`; test `Người dùng cơ sở dữ liệu khác không kết nối được...` |
+
+**Tiêu chí issue (F6):** cả 6 tiêu chí đã có evidence ở "Coding log" và "Kịch bản và TDD log" (health, migration, compose ≤ 30 giây, lỗi 500, gate, `config`/`PROJECT.md`/compose khớp, không secret).
+
+**Risk Audit:**
+
+| Probe | Áp dụng? | Kết quả |
+|---|---|---|
+| F1 transaction và lỗi | Có (migration) | Migration lỗi làm host dừng ngay (fail fast, có log), không nuốt lỗi; Npgsql giữ khoá migration khi nhiều instance |
+| F2 validation | Có (cấu hình) | Thiếu chuỗi kết nối thì dừng khi khởi động, thông báo không chứa giá trị |
+| F3 độ sâu test | Có | Kiểm trạng thái thật (bảng lịch sử migration, role trong `pg_roles`, kết nối bị từ chối); ready kiểm DB dừng thật |
+| F4 idempotency | Có (migration) | Áp hai lần chỉ một bản ghi nền (@S04) |
+| F5 đối chiếu chéo | Có | Tên `identity`, `IdentityDb`, cổng 6061, biến mật khẩu khớp giữa code, compose, test, `config`; sửa env mẫu (finding 1) |
+| F6 tiêu chí issue | Có | Xem trên |
+| F7 persistence | Có | Migration nền rỗng, an toàn; không có trường server-managed |
+| F8 bảo mật | Có | Không secret trong repo, `.dockerignore` chặn `**/.env`, user DB không quản trị, CONNECT thu hồi, lỗi không lộ nội bộ; xem Giới hạn đã biết |
+
+**Blast Radius:** B1: compose chính dùng chung (biến bắt buộc ảnh hưởng mọi lệnh compose; đã sửa test gateway/board, env mẫu develop/stg, `COMMANDS.md`); B2: không có API hay event, chỉ thêm health; B3: không có tác động chéo; B4: API/contract không đổi, database mới `identity` ở `postgres` dùng chung, các service khác không bị ảnh hưởng (chạy lại docker test gateway 1/1, board 2/2).
+
+**Best Practices:** BP1 đạt (không hardcode cấu hình trong code, `shared/` không có logic nghiệp vụ, không tham chiếu service khác); BP2 đạt sau sửa token huỷ; BP3 đạt; BP4 không áp dụng (tải rất nhỏ); BP5 đạt; BP6 đạt (exception handler của ASP.NET ghi log lỗi kèm stack ở server, không vào response).
+
+**Giới hạn đã biết:**
+- Exception handler nằm trong `Program.cs`, chưa ở `src/shared` (chờ gateway lát 2 đưa middleware dùng chung); `correlationId` hiện bằng `traceId` (Confirm log 5 của plan).
+- Migration tự áp ở compose: `Database__MigrateOnStartup` bật; chưa có bước migration riêng cho môi trường thật (lát hạ tầng sau).
+- `gitleaks` chưa cài nên chưa chạy; quét secret thô sạch.
+- Chưa có test cho hành vi "cờ migration bật mà DB không kết nối được lúc khởi động" (hiện dừng host); spec chưa quy định.
+- `identity-service` publish ra cổng host 6061 trên mọi interface như `board-service` (6060) và `gateway`; chỉ để debug local.
+- Review do chính agent đã viết code thực hiện, không phải phiên độc lập; PR vẫn cần người duyệt.
+
 ## Workflow
 
 Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đạt.
@@ -158,3 +206,4 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-10-25 | Đỏ: 6/7 test (bản đầu), xanh 1; xem "Kịch bản và TDD log" |
 | test-review | done | 1 | 2026-10-25 | PASS (Sẵn sàng code); 9 test đỏ đúng lý do; xem "Test review rounds" |
 | coding-start | done | – | 2026-10-25 | Xanh 9/9; gate đầy đủ xanh (trừ gitleaks chưa cài); xem "Coding log" |
+| coding-review | done | 2 | 2026-10-25 | PASS (Sẵn sàng merge); 4 finding đã sửa, 1 CONFIRM đã chốt; xem "Review rounds (coding-review)" |

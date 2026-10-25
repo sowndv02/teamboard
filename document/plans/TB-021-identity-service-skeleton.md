@@ -34,7 +34,7 @@ Lát 1a trong [`identity-auth-slices.md`](identity-auth-slices.md) (`approved`, 
 | NFR-004 `traceparent` (một phần; `X-Correlation-Id` để sau, Confirm log #5) | mục 9 | B1 | – | Kiểm `ServiceDefaults` đã gắn trace; không thêm test riêng |
 | NFR-009 khôi phục DB dev bằng migration | 10 | B3 | @S04, @S07 | Áp migration lên DB trống, kiểm bảng lịch sử migration |
 | Compose chạy identity-service + DB (tiêu chí issue) | 10, D0.2 | B4 | @S05 | Test nhóm `docker` gọi `docker compose` qua Process |
-| Database + user riêng (D0.2) | D0.2 | B3, B4 | @S05, @S09 | Script khởi tạo tạo database và user `identity` riêng; kết nối bằng user đó (ready) và user không có quyền quản trị |
+| Database + user riêng (D0.2) | D0.2 | B3, B4 | @S05, @S09, @S10 | Script khởi tạo tạo database và user `identity` riêng; kết nối bằng user đó (ready), user không có quyền quản trị, role khác không kết nối được |
 | Gate xanh (tiêu chí issue) | – | B1–B4 | – | `dotnet build -warnaserror`, `dotnet test`, `dotnet format --verify-no-changes`, `docker compose config -q` |
 
 Kịch bản (ID duy nhất, tag `@TB-021 @identity-service`):
@@ -46,6 +46,7 @@ Kịch bản (ID duy nhất, tag `@TB-021 @identity-service`):
 - @S07 Khi cờ tự áp migration tắt thì service vẫn khởi động (`/health/live` 200) và không tạo lịch sử migration (từ B3: "có test cờ tắt thì không áp"; `test-init` thêm ID, `test-review` thêm kiểm live để test từng đỏ, Confirm log #10 của issue).
 - @S08 Telemetry của service mang `service.name` = `identity-service` (NFR-001; thêm ở `test-review`, Confirm log #9 của issue).
 - @S09 (`@docker`) Người dùng DB của identity không là superuser, không có quyền tạo role hay database (D0.2; thêm ở `test-review`, Confirm log #11 của issue).
+- @S10 (`@docker`) Một role khác dùng chung instance không kết nối được vào database `identity` (D0.2; thêm ở `coding-review`, Confirm log #12 của issue).
 - @S06 Lỗi chưa xử lý trả `500 problem+json` có `code` `INTERNAL_ERROR`, `traceId`; body không có stack trace, tên máy, đường dẫn nội bộ.
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
