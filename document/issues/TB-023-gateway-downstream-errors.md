@@ -89,7 +89,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S06 (header rồi đóng) | `downstream-errors.feature` @S06 | Đỏ ở log Warning của gateway (client bị ngắt đã xanh sẵn vì YARP tự ngắt; cảnh báo của chính YARP không được tính) | Xanh 2026-10-25 (B1-B3) |
 | @S07 (header rồi treo, 2 dòng) | `downstream-errors.feature` @S07 Outline | Đỏ: 500 do route `Timeout` thiếu middleware nên client không bị ngắt | Xanh 2026-10-25 (B1-B3) |
 | @S09 (health khi upstream chết) | `downstream-errors.feature` @S09 Outline | Xanh sẵn: hành vi đúng từ lát 1; giữ làm test hồi quy | Xanh sẵn |
-| @S10 (`@docker`, compose, cổng đóng) | `downstream-errors.feature` @S10 | Chưa chạy được: Docker Desktop đang tắt (test bỏ qua, không phải đỏ) | Xanh 2026-10-25 (B1-B3) |
+| @S10 (`@docker`, compose, cổng đóng) | `downstream-errors.feature` @S10 | Đỏ trên mã trước B1 (worktree riêng ở a607d6a, Docker bật): mong 503, nhận 502 | Xanh 2026-10-25 (B1) |
 | @S11 (Retry-After từ cấu hình) | `downstream-errors.feature` @S11 | Đỏ: mong 503 kèm `Retry-After` 7, nhận 502 | Xanh 2026-10-25 (B1-B3) |
 | @S12 (không lộ thông tin nhạy cảm vào log) | `downstream-errors.feature` @S12 | Đỏ: mong 503, nhận 502 (chưa tới bước kiểm log) | Xanh 2026-10-25 (B1-B3) |
 | Timeout mặc định 30 giây (@S08 cũ) | `ConfigurationTests` (2 test) | Đỏ: `appsettings.json` chưa có `Timeout` và `ActivityTimeout` | Xanh 2026-10-25 (B1-B3) |
