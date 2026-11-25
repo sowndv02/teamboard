@@ -22,13 +22,18 @@ Issue khung cấp key khi duyệt bảng lát: lát 6 của `document/plans/api-
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Preflight `OPTIONS` từ origin trong allowlist trả header CORS, không chuyển xuống service, không bị rate limit (FR-005, spec 8.2; kịch bản @S01, @S04)
+- [ ] Origin ngoài allowlist không nhận header CORS (FR-005; @S02)
+- [ ] Header cho phép và lộ ra đúng design 6.3; `429` vẫn mang header CORS (@S03, @S05)
+- [ ] Không credentials, không `*`; origin lấy từ `Cors:AllowedOrigins` (@S06, @S07)
+- [ ] Gate xanh theo plan mục 6
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-026-gateway-cors.md`](../plans/TB-026-gateway-cors.md) (draft, 3 bước B1–B3, 7 kịch bản @S01–@S07, 3 câu hỏi mở P-01..P-03 chờ plan-review).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-25: plan-init. Nhánh `feature/TB-026-gateway-cors` tạo từ `origin/main` (TB-025 đã merge, PR 19). Người dùng chốt: lát 1 (TB-010) coi là `done`; khoá cấu hình `Cors:AllowedOrigins`.
 
 ## Workflow
 
@@ -36,9 +41,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
-| plan-review | pending | | | |
-| test-init | pending | – | | |
+| plan-init | done | – | 2026-11-25 | `document/plans/TB-026-gateway-cors.md` (draft), 3 bước B1–B3, 3 câu hỏi mở P-01..P-03 |
+| plan-review | PASS | 2 | 2026-11-25 | Vòng 1: 4 CONFIRM, 3 FIX đã sửa; vòng 2 (delta): 4 CONFIRM đã chốt, PASS. Plan `approved` |
+| test-init | done | – | 2026-11-25 | Đỏ 11/213 đúng lý do (xem "Kịch bản và TDD log"); xanh sẵn 2 khoá hợp đồng (S02, S06) |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -55,6 +60,22 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 Preflight từ origin trong allowlist: 204, header CORS, không tới upstream | `cors.feature` "A preflight from an allowed origin..." | Đỏ: `status code is 204`, nhận 404 (OPTIONS rơi vào fallback, đúng A-01) | – |
+| @S02 Origin ngoài allowlist không có Allow-Origin (preflight và simple) | `cors.feature` Outline "An origin outside the allowlist..." (2 ví dụ) | Xanh sẵn (khoá hợp đồng, không có CORS nên không có header) | – |
+| @S03 Simple request: Allow-Origin, expose headers, Vary | `cors.feature` "A simple request from an allowed origin..." | Đỏ: không có `Access-Control-Allow-Origin` | – |
+| @S04 Preflight không bị rate limit | `cors.feature` "A preflight is not counted against the rate limit" | Đỏ: `status code is 204` không khớp (cùng nguyên nhân với S01; mã thực tế chưa in ra, cần kiểm ở coding-start) | – |
+| @S05 429 mang header CORS | `cors.feature` "A 429 answered to an allowed origin..." | Đỏ: không có `Access-Control-Allow-Origin` trên 429 | – |
+| @S06 Không credentials, không `*` | `cors.feature` "The gateway never allows credentials or every origin" | Xanh sẵn (khoá hợp đồng; không có CORS nên không có header) | – |
+| @S07 Origin lấy từ cấu hình (Outline 2 ví dụ) | `cors.feature` Outline "The allowed origins come from configuration" | Đỏ (allowed): không có Allow-Origin; blocked xanh sẵn | – |
+| P-01 Vary, P-02 allowlist rỗng, mục 3 B1 | `CorsOptionsTests` `Validate_NotAnAbsoluteOrigin_Fails` (5 ví dụ: `*`, path, query, không phải URL, rỗng) | Đỏ 5/5: stub `CorsOptionsValidator` luôn Success | – |
+| P-02 allowlist rỗng hợp lệ | `CorsOptionsTests.Validate_EmptyList_Succeeds` | Xanh sẵn (hồi quy: stub đúng với ca này) | – |
+| Mặc định `http://localhost:4200` trong `appsettings.json` | `ConfigurationTests.ShippedCors_AllowsOnlyTheLocalAngularDevOrigin` | Đỏ: "appsettings.json has no Cors section." | – |
+
+Lệnh đã chạy: `dotnet test src/gateway.Tests/gateway.Tests.csproj --filter "Category!=docker"`: **Failed 11, Passed 202, Total 213**. 11 đỏ = 1 (S01) + 1 (S03) + 1 (S04) + 1 (S05) + 1 (S07 allowed) + 5 (CorsOptions) + 1 (ConfigurationTests). Build `-warnaserror` xanh; `dotnet format --verify-no-changes` không báo lỗi.
+
+Ghi chú: S02, S06 và `Validate_EmptyList_Succeeds` xanh trước khi có code CORS. Đây là khoá hợp đồng/hồi quy (không có header CORS khi chưa có CORS), không phải đỏ→xanh. Đánh dấu cho test-review quyết định có chấp nhận.
+
+Khung production tối thiểu (stub, không logic): `src/gateway/CorsOptions.cs` (`AllowedOrigins`), `src/gateway/CorsOptionsValidator.cs` (luôn Success). Chưa đăng ký trong `Program.cs`, chưa thêm `Cors` vào `appsettings.json`.
 
 ## Test review rounds
 

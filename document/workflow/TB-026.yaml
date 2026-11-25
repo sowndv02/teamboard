@@ -1,0 +1,69 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-026
+scope: issue
+title: Gateway lát 6, CORS theo allowlist
+updated: 2026-11-25T00:00:00Z
+updated_by: orchestrator:claude-session
+
+links:
+  issue: document/issues/TB-026-gateway-cors.md
+  spec: document/spec/api-gateway.md
+  design: document/design/api-gateway.md
+  plan: document/plans/TB-026-gateway-cors.md
+  features_dir: document/spec/features/gateway/
+  branch: feature/TB-026-gateway-cors
+  base: origin/main
+  pr: null
+
+current_step: test-review
+next_action: "Mở test-review cho TB-026: đối chiếu cors.feature @S01–@S07 và CorsOptionsTests; quyết định chấp nhận S02/S06 xanh sẵn là khoá hợp đồng"
+blocked_by: null
+
+steps:
+  requirements-discovery: { status: done, evidence: ["document/spec/api-gateway.md"] }
+  spec-review:            { status: done, evidence: ["spec confirmed (TB-007)"] }
+  system-design:          { status: done, evidence: ["document/design/api-gateway.md"] }
+  design-review:          { status: done, evidence: ["design confirmed (TB-007)"] }
+  plan-init:
+    status: done
+    owner: orchestrator:claude-session
+    started: 2026-11-25T00:00:00Z
+    finished: 2026-11-25T00:00:00Z
+    inputs: { spec: "document/spec/api-gateway.md", design: "document/design/api-gateway.md", slices: "document/plans/api-gateway-slices.md" }
+    artifacts: [document/plans/TB-026-gateway-cors.md, document/issues/TB-026-gateway-cors.md, document/plans/api-gateway-slices.md, document/plans/README.md, document/issues/README.md, document/issues/TB-010-gateway-skeleton-routing.md]
+    evidence: ["Confirm log: 3 quyết định (#1 base branch từ origin/main, #2 TB-010 done, #3 Cors:AllowedOrigins)", "plan TB-026 draft: 3 bước, 7 kịch bản, 3 câu hỏi mở P-01..P-03, 3 giả định A-01..A-03", "origin/main 1397f24 chứa TB-025 (PR 19); local main 66673c2 còn cũ"]
+  plan-review:
+    status: done
+    owner: orchestrator:claude-session
+    finished: 2026-11-25T00:00:00Z
+    round: 2
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/plans/TB-026-gateway-cors.md]
+    evidence: ["Confirm log: 7 quyết định (#1–#7), #4–#7 chốt ở vòng 2", "Review rounds: 2 vòng (vòng 2 PASS)", "Fix log: 3 FIX vòng 1 + 4 thay đổi vòng 2", "plan status approved; TB-025 sync (#6) áp dụng trong nhánh"]
+  test-init:
+    status: done
+    owner: orchestrator:claude-session
+    finished: 2026-11-25T00:00:00Z
+    inputs: { plan: "document/plans/TB-026-gateway-cors.md (approved, plan-review vòng 2)" }
+    artifacts: [document/spec/features/gateway/cors.feature, src/gateway.Tests/CorsSteps.cs, src/gateway.Tests/CorsOptionsTests.cs, src/gateway.Tests/ConfigurationTests.cs, src/gateway/CorsOptions.cs, src/gateway/CorsOptionsValidator.cs]
+    evidence: ["dotnet test gateway.Tests (Category!=docker): Failed 11, Passed 202, Total 213", "11 đỏ đúng lý do: S01 status 204, S03/S05/S07 không có Allow-Origin, S04 status, CorsOptions 5 ví dụ không hợp lệ, ConfigurationTests thiếu section Cors", "xanh sẵn (khoá hợp đồng): S02, S06, CorsOptions empty list", "build -warnaserror xanh; dotnet format --verify-no-changes không báo lỗi", "stub không logic: CorsOptions, CorsOptionsValidator (Success)"]
+  test-review:
+    status: pending
+  coding-start:
+    status: pending
+  coding-review:
+    status: pending
+  create-pr:
+    status: pending
+
+confirm_pending: []
+
+subtasks: []
+
+events:
+  - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:claude-session", event: created, detail: "Khởi tạo state cho lát 6 (TB-026) từ bảng lát api-gateway-slices" }
+  - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:claude-session", event: confirm_answered, detail: "Nhánh từ origin/main; TB-010 coi là done; khoá Cors:AllowedOrigins" }
+  - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:claude-session", event: step_done, detail: "plan-init: plan TB-026 draft, chờ plan-review" }
