@@ -29,15 +29,18 @@ public sealed partial class UpstreamErrorMiddleware(RequestDelegate next, ILogge
             case UpstreamFailure.Unavailable:
                 // 503 and 504 are routine while an upstream is down and YARP already logs the exception: only the type is kept here.
                 LogUnavailable(feature.Error, feature.Exception?.GetType().Name);
+                metrics.Http503();
                 await WriteProblemAsync(context, GatewayErrorCodes.UpstreamUnavailable, retryAfter: true);
                 break;
             case UpstreamFailure.Timeout:
                 LogTimeout(feature.Error, feature.Exception?.GetType().Name);
+                metrics.Http504();
                 await WriteProblemAsync(context, GatewayErrorCodes.UpstreamTimeout, retryAfter: false);
                 break;
             case UpstreamFailure.BadGateway:
                 // The exception goes to the log only: it can name internal hosts and ports, which the response must never carry.
                 LogBadGateway(feature.Exception, feature.Error);
+                metrics.Http502();
                 await WriteProblemAsync(context, GatewayErrorCodes.UpstreamBadGateway, retryAfter: false);
                 break;
             case UpstreamFailure.PayloadTooLarge:

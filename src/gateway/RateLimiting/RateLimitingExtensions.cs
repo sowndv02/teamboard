@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
+using Gateway;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Teamboard.Shared.Http;
@@ -23,7 +24,7 @@ public static class RateLimitingExtensions
         return services;
     }
 
-    private sealed class RateLimiterOptionsConfigurer(IOptions<RateLimitOptions> rateLimitOptions) : IConfigureOptions<RateLimiterOptions>
+    private sealed class RateLimiterOptionsConfigurer(IOptions<RateLimitOptions> rateLimitOptions, GatewayMetrics metrics) : IConfigureOptions<RateLimiterOptions>
     {
         public void Configure(RateLimiterOptions options)
         {
@@ -32,6 +33,7 @@ public static class RateLimitingExtensions
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.OnRejected = async (context, cancellationToken) =>
             {
+                metrics.Http429();
                 var windowSeconds = WindowSecondsFor(context.HttpContext, settings);
                 context.HttpContext.Response.Headers.RetryAfter = windowSeconds.ToString(CultureInfo.InvariantCulture);
                 await Results.Problem(ProblemFactory.Create(GatewayErrorCodes.RateLimitExceeded, context.HttpContext))

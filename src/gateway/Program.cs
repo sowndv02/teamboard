@@ -41,12 +41,14 @@ app.UseForwardedHeaders();
 app.UseRouting();
 app.UseCorrelation();
 app.UseGatewayRequestLogging();
+app.UseGatewayRequestMetrics();
 app.UseTeamboardExceptionHandler();
 app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();
 app.UseGatewayCors();
 app.UseRateLimiter();
 app.UseMiddleware<BodyLimitMiddleware>();
+app.UseGatewayProxyTiming();
 
 app.MapDefaultEndpoints();
 app.MapReverseProxy();
