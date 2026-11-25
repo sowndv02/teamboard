@@ -22,15 +22,15 @@ Issue khung cấp key khi duyệt bảng lát: lát 1b của `document/plans/ide
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] `POST` đăng ký (đường dẫn chốt ở plan-review): email/mật khẩu hợp lệ → 201, không trả mật khẩu/hash (FR-001, @S01, @S06)
-- [ ] Email trùng (sau chuẩn hoá) → 409 `problem+json` (BR-003, @S02, @S07)
-- [ ] Mật khẩu &lt;12 hoặc &gt;128 ký tự → 400 (BR-002, @S03, @S08)
-- [ ] Email không hợp lệ → 400 (@S11)
-- [ ] PBKDF2 BCL, salt ngẫu nhiên; hash khác nhau cho cùng mật khẩu (FR-004, NFR-002, @S04)
-- [ ] Không lộ mật khẩu trong log (FR-004, @S05)
-- [ ] Metric `password_hash_duration_seconds` sau băm (NFR-007, @S09)
-- [ ] Hai đăng ký đồng thời cùng email: một 201, một 409 (@S10)
-- [ ] Gate xanh theo plan mục 6; TB-021/lát 1a đồng bộ `done`
+- [x] `POST` đăng ký (đường dẫn chốt ở plan-review): email/mật khẩu hợp lệ → 201, không trả mật khẩu/hash (FR-001, @S01, @S06)
+- [x] Email trùng (sau chuẩn hoá) → 409 `problem+json` (BR-003, @S02, @S07)
+- [x] Mật khẩu &lt;12 hoặc &gt;128 ký tự → 400 (BR-002, @S03, @S08)
+- [x] Email không hợp lệ → 400 (@S11)
+- [x] PBKDF2 BCL, salt ngẫu nhiên; hash khác nhau cho cùng mật khẩu (FR-004, NFR-002, @S04)
+- [x] Không lộ mật khẩu trong log (FR-004, @S05)
+- [x] Metric `password_hash_duration_seconds` sau băm (NFR-007, @S09)
+- [x] Hai đăng ký đồng thời cùng email: một 201, một 409 (@S10)
+- [x] Gate xanh đầy đủ (coding-review); TB-021/lát 1a đồng bộ `done`
 
 ## Kế hoạch
 Plan: [`document/plans/TB-029-identity-register.md`](../plans/TB-029-identity-register.md) (`approved`, B1–B4, @S01–@S11; Confirm #1–#5 đã chốt).
@@ -41,6 +41,9 @@ Plan: [`document/plans/TB-029-identity-register.md`](../plans/TB-029-identity-re
 - 2026-11-25: plan-review PASS vòng 1–2 (Confirm #1–#5).
 - 2026-11-25: test-init — `register.feature`, steps, `PasswordHasherTests`; `dotnet test identity-service.Tests` đỏ 10 TB-029 (chủ yếu 404), hồi quy TB-021 10/10 xanh (lọc `!~Registration`).
 - 2026-11-25: test-review v1 PASS — sửa @S05 (thêm Then 201), seed register assert 201; 10 scenario + 1 unit đỏ đúng lý do.
+- 2026-11-25: coding-start B1–B4 — `users` migration, PBKDF2 600k, register endpoint, metric; 18/18 `identity-service.Tests` xanh (~47s, 600k PBKDF2).
+- 2026-11-25: coding-review v1 PASS — FIX unique-violation chain, `PasswordOptions` validate-on-start; benchmark PBKDF2 **p95 ≈ 0.242 s** (600k, máy dev, 21 mẫu).
+- 2026-11-25: Gate — `dotnet build -warnaserror` ✅ · `identity-service.Tests` 18/18 ✅ · `dotnet format --verify-no-changes` ✅ · `dotnet list package --vulnerable` (identity-service) ✅ · gitleaks 🚧.
 
 ## Workflow
 
@@ -52,9 +55,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-25 | Confirm #1–#5; plan `approved` |
 | test-init | done | – | 2026-11-25 | `register.feature` @S01–@S11; 10 đỏ (404/DB/metric); unit PBKDF2 NIE |
 | test-review | PASS | 1 | 2026-11-25 | FIX @S05 + Given 201; 10/10+1 đỏ đúng lý do |
-| coding-start | pending | – | | |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
+| coding-start | done | – | 2026-11-25 | B1–B4; 18/18 identity-service.Tests (lọc !~Compose) |
+| coding-review | PASS | 1 | 2026-11-25 | working tree (chưa commit feat); 0 CONFIRM mở |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -73,17 +75,17 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 | `register.feature` + `IdentityServiceSteps` | 404 (chưa có route) | |
-| @S02 | same | 409 expected, 404 | |
-| @S03 | same | 400 expected, 404 | |
-| @S04 | same + `GetDistinctPasswordHashesAsync` | 2 hashes / SQL | |
-| @S05 | same + `CapturingLoggerProvider` | 201 expected, 404 | |
-| @S07 | same | 409 expected, 404 | |
-| @S08 | `WhenRegisterLongPassword` | 400 expected, 404 | |
-| @S09 | `MeterListener` | 0 samples metric | |
-| @S10 | concurrent POST | [404,404] | |
-| @S11 | same | 400 expected, 404 | |
-| unit @S04 | `PasswordHasherTests` | `NotImplementedException` | |
+| @S01 | `register.feature` + `IdentityServiceSteps` | | xanh 2026-11-25 |
+| @S02 | same | | xanh |
+| @S03 | same | | xanh |
+| @S04 | same + `GetDistinctPasswordHashesAsync` | | xanh |
+| @S05 | same + `CapturingLoggerProvider` | | xanh |
+| @S07 | same | | xanh |
+| @S08 | `WhenRegisterLongPassword` | | xanh |
+| @S09 | `MeterListener` | | xanh |
+| @S10 | concurrent POST | | xanh |
+| @S11 | same | | xanh |
+| unit @S04 | `PasswordHasherTests` | | xanh |
 
 ## Test review rounds
 
@@ -102,6 +104,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-25 | `2e81aec` + working tree (feat chưa commit) | PASS | 0 |
 
 ## Fix log
 
@@ -109,6 +112,9 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | identity:RegisterEndpoints:unique-email-chain | FIX | `RegisterEndpoints.cs` | `DbUpdateException` bọc `PostgresException` sâu hơn một cấp → race @S10 có thể 500 | Duyệt chuỗi `InnerException` tìm `UniqueViolation` | test @S10 xanh |
+| 1 | identity:IdentitySecurityExtensions:validate-options | FIX | `IdentitySecurityExtensions.cs` | Thiếu `using` + đăng ký `IValidateOptions` | `ValidateOnStart` + `PasswordOptionsValidator` DI | build xanh |
+| 1 | identity:PasswordOptionsValidator:min-length | FIX | `PasswordOptionsValidator.cs` | `MinLength` cho phép &lt; 12, lệch BR-002 nếu cấu hình sai | Sàn validate **12** | build + 18/18 test |
 
 ## Bài học (lessons learned)
 

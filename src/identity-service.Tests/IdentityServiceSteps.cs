@@ -253,11 +253,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.DoesNotContain(ThrowMessage, _body, StringComparison.Ordinal);
     }
 
-    [Then("the database migration history has exactly one baseline record")]
-    public async Task ThenOneBaselineRecord()
+    [Then("the database migration history has exactly {int} migration records")]
+    public async Task ThenMigrationRecordCount(int expected)
     {
         Assert.True(await Database.HasMigrationHistoryAsync(), "The migration history table was not created.");
-        Assert.Equal(1, await Database.CountMigrationRecordsAsync());
+        Assert.Equal(expected, await Database.CountMigrationRecordsAsync());
     }
 
     [Then("the database has no migration history")]
