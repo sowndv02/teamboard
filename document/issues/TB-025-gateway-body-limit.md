@@ -24,14 +24,14 @@ Issue khung cấp key khi duyệt bảng lát: lát 5 của `document/plans/api-
 ## Tiêu chí hoàn thành (kiểm chứng được)
 - [ ] FR-007: `POST` có `Content-Length` đúng 1.048.576 byte được chuyển tiếp nguyên vẹn (@S01)
 - [ ] FR-007: `Content-Length` 1.048.577 byte nhận `413 problem+json` `PAYLOAD_TOO_LARGE`, upstream không nhận gì, có `X-Correlation-Id` (@S02)
-- [ ] FR-007: giới hạn cấu hình được (`Gateway:BodyLimit:MaxBytes`, mặc định 1.048.576), giá trị ngoài khoảng làm khởi động thất bại (@S03)
-- [ ] FR-007: body chunked đúng giới hạn qua, vượt giới hạn bị ngắt luồng và không nhận `500` (@S04, @S05)
+- [ ] FR-007: giới hạn cấu hình được (`Gateway:BodyLimit:MaxBytes`, mặc định 1.048.576), khoảng hợp lệ 1 đến 10.485.760 byte, ngoài khoảng làm khởi động thất bại (@S03)
+- [ ] FR-007: body chunked đúng giới hạn qua, vượt giới hạn nhận `413 problem+json` `PAYLOAD_TOO_LARGE` kèm `X-Correlation-Id`, không `500` (@S04, @S05)
 - [ ] NFR-006: log khi từ chối không chứa nội dung body (@S06)
 - [ ] Thứ tự design 6.4: IP đã hết hạn mức thì `429` đến trước `413` (@S07)
 - [ ] Gate xanh (`code-change-gate.md`); bảng lát và `document/issues/README.md` đồng bộ (LL-006)
 
 ## Kế hoạch
-Plan: [`document/plans/TB-025-gateway-body-limit.md`](../plans/TB-025-gateway-body-limit.md) (`draft`), 3 bước B1-B3, 7 kịch bản @S01-@S07, 4 câu hỏi mở còn lại P-02..P-05 (P-01 đã đóng vì TB-024 merge), 4 giả định cần spike ở test-init.
+Plan: [`document/plans/TB-025-gateway-body-limit.md`](../plans/TB-025-gateway-body-limit.md) (`approved`), 3 bước B1-B3, 7 kịch bản @S01-@S07; không còn câu hỏi mở (P-01..P-05 đã đóng); spike của plan-review đã kiểm giả định Kestrel/YARP, kiểm lại ở test-init.
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
@@ -45,7 +45,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-25 | `document/plans/TB-025-gateway-body-limit.md` (draft, cập nhật sau TB-024), làn vừa, 3 bước, 7 kịch bản, 4 câu hỏi mở |
-| plan-review | pending | | | |
+| plan-review | PASS | 2 | 2026-11-25 | plan `approved`; 4 quyết định (chunked `problem+json`, mọi request, khoảng 1-10 MiB, giữ một lát); 3 FIX theo spike (TestServer không có feature giới hạn, Kestrel trả `413` rỗng, không `500`); làn vừa |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -56,6 +56,10 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-025:chunked-413-shape | Chunked vượt giới hạn: `413 problem+json` hay `413` rỗng | `413 problem+json` | 1 | 2026-11-25 |
+| 2 | plan-review:TB-025:scope-all-requests | `413` áp mọi request hay chỉ route proxy | Mọi request | 1 | 2026-11-25 |
+| 3 | plan-review:TB-025:maxbytes-range | Khoảng hợp lệ của `MaxBytes` | 1 đến 10.485.760 byte | 1 | 2026-11-25 |
+| 4 | plan-review:TB-025:slice-size | Giữ một lát hay chia | Giữ một lát | 1 | 2026-11-25 |
 
 ## Kịch bản và TDD log
 

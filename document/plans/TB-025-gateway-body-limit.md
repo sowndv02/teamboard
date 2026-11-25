@@ -1,7 +1,7 @@
 ---
 title: Gateway lát 5, giới hạn body 1 MiB
 issue: TB-025
-status: draft            # draft | in-review | approved | done
+status: approved         # draft | in-review | approved | done
 owner: sondv
 updated: 2026-11-25
 spec: document/spec/api-gateway.md
@@ -17,17 +17,29 @@ Lát 5 trong [`api-gateway-slices.md`](api-gateway-slices.md) (`approved`), ph�
 
 Đã có (đã đọc code, trên `main` `66673c2`): `src/gateway/Program.cs` (thứ tự hiện tại `UseForwardedHeaders` → `UseRouting` → `UseCorrelation` → `UseTeamboardExceptionHandler` → `UseRequestTimeouts` → `UpstreamErrorMiddleware` → `UseRateLimiter` → `MapDefaultEndpoints` → `MapReverseProxy` → `MapFallback`; chưa có CORS, chưa có `BodyLimit`), `GatewayErrorCodes` (5 mã, thiếu `PAYLOAD_TOO_LARGE`; `All` liệt kê mã), mẫu Options của TB-024 (`RateLimiting/RateLimitOptions.cs` + `RateLimitOptionsValidator.cs`, đăng ký bằng `AddOptions().BindConfiguration().ValidateOnStart()` trong `RateLimitingExtensions`), `UpstreamErrorMiddleware` + `UpstreamErrorClassifier` (lỗi forwarder có hậu tố `*Client` được coi là client huỷ: không ghi response), `src/shared/Http` (`ErrorDefinition`, `ProblemFactory`, handler `500` bắt mọi ngoại lệ), `src/gateway.Tests` (`GatewayContext` dùng `WebApplicationFactory` TestServer với `Settings`, `OuterResponseHeader`, `Logs`; `TestRemoteIpStartupFilter` đặt IP giả bằng header `X-Test-Remote-Ip`; `UpstreamStub` Kestrel thật ghi method, path, header nhưng **chưa đếm byte body**; `CapturingLoggerProvider`). Chưa có code nào về body (`grep 413|BadHttpRequest|MaxRequestBody` trong `src` không có kết quả).
 
-Hành vi đã biết từ tài liệu học (chưa kiểm trên mã repo): `MaxRequestBodySize` của Kestrel/route trả `413` nhưng upstream vẫn thấy yêu cầu (`document/learning/api-gateway/part-5-production-security-ops.md`, Lab 5.2), nên muốn "không gửi xuống upstream" phải tự kiểm `Content-Length` bằng middleware đứng trước YARP (design 6.3).
+Hành vi đã biết từ tài liệu học: `MaxRequestBodySize` của Kestrel/route trả `413` nhưng upstream vẫn thấy yêu cầu (`document/learning/api-gateway/part-5-production-security-ops.md`, Lab 5.2), nên muốn "không gửi xuống upstream" phải tự kiểm `Content-Length` bằng middleware đứng trước YARP (design 6.3).
+
+**Kết quả spike của plan-review vòng 1** (bản sao tạm trong `gateway.Tests`, đã xoá; .NET 10.0.13, Mvc.Testing 10.0.13, giới hạn 1024 byte đặt bằng `IHttpMaxRequestBodySizeFeature` ở đầu pipeline, body 2048 byte; kiểm lại ở test-init):
+
+| Điều đã thử | Kết quả |
+|---|---|
+| TestServer, có `Content-Length` hoặc chunked | Feature `IHttpMaxRequestBodySizeFeature` là `null`: không có giới hạn nào, request `201` và đi hết xuống upstream |
+| Kestrel thật (`UseKestrel(0)` + `StartServer()` trên factory dẫn xuất), có `Content-Length` quá giới hạn | Kestrel trả `413` **rỗng** (không `problem+json`), nhưng upstream **vẫn nhận request** (`Received` = 1) |
+| Kestrel thật, chunked quá giới hạn | Cùng kết quả: `413` rỗng, upstream đã nhận request; YARP ghi cảnh báo `RequestBodyClient` (nguyên nhân `BadHttpRequestException` "Request body too large") |
+| `ExceptionHandler` có đổi lỗi này thành `500` không | **Không**: ngoại lệ do YARP bắt, không tới handler |
+| `UpstreamErrorMiddleware` với `RequestBodyClient` | Phân loại `ClientCancelled`, không ghi gì: phản hồi `413` rỗng đến từ Kestrel/YARP, không có `code` và `correlationId` trong thân |
+| Hai host Kestrel thật chạy song song trong cùng tiến trình | Một host lỗi `AddressInUseException` (cổng 5000); chạy riêng từng host thì xanh |
 
 ## 1. Phạm vi của lát
 
 **Làm:**
 - Mã lỗi `PAYLOAD_TOO_LARGE` (413) trong `GatewayErrorCodes` (hợp đồng công khai, DA-02) và mở rộng `GatewayErrorCodesTests`.
-- Giới hạn cấu hình được `Gateway:BodyLimit:MaxBytes`, mặc định 1.048.576 byte (1 MiB), qua Options có `ValidateOnStart` (`backend-engineering.md` mục 7); ngoài khoảng hợp lệ thì khởi động thất bại.
+- Giới hạn cấu hình được `Gateway:BodyLimit:MaxBytes`, mặc định 1.048.576 byte (1 MiB), qua Options có `ValidateOnStart` (`backend-engineering.md` mục 7); khoảng hợp lệ 1 đến 10.485.760 byte (người dùng chốt, Confirm #3), ngoài khoảng thì khởi động thất bại.
 - Middleware `BodyLimit` đứng ngay trước YARP, **sau** `RateLimiter` (design 6.4; request vượt hạn mức nhận `429` trước khi bị xét kích thước, và request bị `413` vẫn tính vào hạn mức của IP): request có `Content-Length` > giới hạn bị `413 problem+json` ngay, **không** gửi xuống upstream; đúng bằng giới hạn thì chuyển tiếp bình thường.
-- Body chunked (không có `Content-Length`) vượt giới hạn: ngắt luồng và trả lỗi; upstream có thể đã nhận một phần body (đã chấp nhận ở design-review). Giới hạn do middleware đặt cho request (cơ chế cụ thể: giả định A-01).
+- Body chunked (không có `Content-Length`) vượt giới hạn: middleware đặt `IHttpMaxRequestBodySizeFeature.MaxRequestBodySize` cho request (spike: có hiệu lực trên Kestrel thật, đặt được trước khi đọc body); khi vượt, gateway trả **`413 problem+json` `PAYLOAD_TOO_LARGE`** thay cho `413` rỗng của Kestrel (người dùng chốt, Confirm #1): `UpstreamErrorMiddleware`/`UpstreamErrorClassifier` nhận ra `RequestBodyClient` có nguyên nhân `BadHttpRequestException` 413 khi response chưa bắt đầu và ghi `problem+json` (thêm một giá trị phân loại, không còn là `ClientCancelled`). Upstream có thể đã nhận request và một phần body (đã chấp nhận ở design-review, spike xác nhận). Giới hạn chunked chỉ có hiệu lực ở route proxy (nơi body được đọc); route khác (health, fallback) chỉ chịu kiểm `Content-Length`.
+- Phạm vi áp dụng: **mọi request** (kể cả route không tồn tại: `Content-Length` lớn thì `413` thay vì `404`; người dùng chốt, Confirm #2).
 - Phản hồi `413` mang `code`, `traceId`, `correlationId` trong body và `X-Correlation-Id` ở header; không lộ giá trị giới hạn nội bộ ngoài `detail` chuẩn, không lộ host/tên nội bộ; log không ghi body (NFR-006).
-- Việc TB-022/TB-023 để lại: kiểm `ExceptionHandler` có đổi ngoại lệ kèm status riêng của framework (`BadHttpRequestException`, 413) thành `500` không, và xử lý đúng trong luồng chunked.
+- Việc TB-022/TB-023 để lại (đã kiểm bằng spike): `ExceptionHandler` không đổi `BadHttpRequestException` 413 thành `500` vì YARP bắt trước; phần còn lại là bước phân loại ở mục trên.
 - Test: host test in-process (`gateway.Tests`), `.feature` ở `document/spec/features/gateway/body-limit.feature`.
 
 **Không làm (trong lát này):** sửa rate limit và `ForwardedHeaders` (lát 4, TB-024, đã merge; chỉ thêm một test thứ tự), CORS (lát 6), metric riêng cho body bị từ chối và metric độ trễ (lát 7), các `BadHttpRequestException` khác 413 (ví dụ chunk sai định dạng, header quá lớn: ghi nhận là việc ngoài phạm vi, báo lại nếu spike thấy bị `500`), giới hạn riêng theo route (design chỉ có một giới hạn chung), test Docker (không có hành vi phụ thuộc môi trường; cấu hình mặc định kiểm bằng `ConfigurationTests`), smoke với `board-service` thật (lát 8).
@@ -41,7 +53,7 @@ Hành vi đã biết từ tài liệu học (chưa kiểm trên mã repo): `MaxR
 | FR-007 `413` mang `X-Correlation-Id`, không lộ nội bộ | D5, mục 8 | B1 | @S02 (bước chung) | Header bằng `correlationId` của body; body không chứa tên upstream/exception |
 | FR-007 giới hạn cấu hình được (không hardcode) | 6.3 "cấu hình được" | B1, B3 | @S03, `BodyLimitOptionsTests`, `ConfigurationTests` | Ghi đè 1024 byte → 1025 byte bị 413; unit Options (khoảng hợp lệ); đọc `appsettings.json` thật: 1.048.576 |
 | FR-007 chunked đúng giới hạn → chuyển tiếp | 6.3 | B2 | @S04 | Host test (Kestrel thật): chunked tổng 1.048.576 byte → upstream nhận đủ |
-| FR-007 chunked vượt giới hạn → ngắt luồng và trả lỗi | 6.3 | B2 | @S05 | Host test (Kestrel thật): chunked 1.048.577 byte → 413 `PAYLOAD_TOO_LARGE` (nếu header chưa gửi) hoặc kết nối bị ngắt; không `500` |
+| FR-007 chunked vượt giới hạn → ngắt luồng và trả lỗi | 6.3 | B2 | @S05 | Host test (Kestrel thật): chunked 1.048.577 byte → `413 problem+json` `PAYLOAD_TOO_LARGE` có `X-Correlation-Id` bằng `correlationId` trong thân; không `500`; unit classifier: `RequestBodyClient` do `BadHttpRequestException` 413 → giá trị phân loại mới, `RequestBodyClient` khác vẫn `ClientCancelled` |
 | NFR-006 log không chứa body | mục 11 | B1, B2 | @S06 | `CapturingLoggerProvider`: log của 413 không chứa nội dung body và có `correlationId` |
 | Thứ tự middleware (`BodyLimit` ngay trước YARP) khoá phần quan sát được | 6.4 | B1 | @S02 (kèm), @S07 | 413 mang `X-Correlation-Id` (Correlation ngoài); khi IP đã hết hạn mức ghi, request có `Content-Length` lớn nhận `429` chứ không phải `413` (`RateLimiter` trước `BodyLimit`) |
 
@@ -50,14 +62,14 @@ Kịch bản (ID duy nhất trong `body-limit.feature`; viết ở test-init):
 - @S02 `Content-Length` 1.048.577 byte nhận `413` `PAYLOAD_TOO_LARGE`, upstream không nhận gì, có `X-Correlation-Id`.
 - @S03 Giới hạn đọc từ cấu hình (ghi đè 1024 byte): 1024 byte qua, 1025 byte bị `413`.
 - @S04 Body chunked đúng giới hạn được chuyển tiếp.
-- @S05 Body chunked vượt giới hạn bị ngắt luồng, client không nhận `500`.
+- @S05 Body chunked vượt giới hạn: client nhận `413 problem+json` `PAYLOAD_TOO_LARGE` kèm `X-Correlation-Id`, không `500`.
 - @S06 Log của gateway khi từ chối body không chứa nội dung body (NFR-006).
 - @S07 Thứ tự với rate limit: IP đã hết hạn mức ghi, request kế tiếp có `Content-Length` lớn nhận `429`, không phải `413` (dùng `X-Test-Remote-Ip` và ngưỡng nhỏ qua cấu hình; không ghi đè `WindowSeconds` dưới 30 giây).
-- Test xUnit không qua feature: `GatewayErrorCodesTests` (mã `PAYLOAD_TOO_LARGE` + status 413), `BodyLimitOptionsTests` (mặc định, khoảng), `ConfigurationTests` (giá trị trong `appsettings.json`), unit của middleware nếu tách logic quyết định.
+- Test xUnit không qua feature: `GatewayErrorCodesTests` (mã `PAYLOAD_TOO_LARGE` + status 413), `BodyLimitOptionsTests` (mặc định, khoảng 1 đến 10.485.760, ngoài khoảng thì lỗi), `UpstreamErrorClassifierTests` mở rộng (nhánh body quá lớn), `ConfigurationTests` (giá trị trong `appsettings.json`), unit của middleware nếu tách logic quyết định.
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)
 
-Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗi bước một commit nhỏ (dưới khoảng 400 dòng diff). Khung rỗng chỉ để test biên dịch được. **Spike ở test-init** kiểm các giả định mục 7 trên mã repo.
+Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗi bước một commit nhỏ (dưới khoảng 400 dòng diff). Khung rỗng chỉ để test biên dịch được. **Spike ở test-init** kiểm lại bảng spike đầu plan trên mã repo (sai lệch thì dừng và hỏi).
 
 ### B1. Hợp đồng lỗi, giới hạn cấu hình và từ chối theo `Content-Length` (đường chính)
 - **Kịch bản/test sẽ viết (đỏ trước):** `document/spec/features/gateway/body-limit.feature` (@S01, @S02, @S03, @S06 phần log, @S07 thứ tự với rate limit); unit `GatewayErrorCodesTests` (mã mới), `BodyLimitOptionsTests`; `UpstreamStub` đếm số byte body nhận được; `GatewayContext` hỗ trợ gửi body theo số byte với `Content-Length`. Đỏ vì chưa có mã, Options hay middleware (S01 xanh sẵn vì hiện chưa giới hạn: ghi TDD log là hồi quy).
@@ -69,11 +81,11 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗ
 - **Phụ thuộc:** không.
 
 ### B2. Body chunked: ngắt luồng khi vượt giới hạn
-- **Kịch bản/test sẽ viết (đỏ trước):** @S04, @S05 (và @S06 phần chunked); cần host Kestrel thật vì TestServer có thể không áp `MaxRequestBodySize` (giả định A-02, spike); test gửi stream không biết độ dài (chunked) qua cổng thật; khẳng định client không nhận `500`, kết quả là `413` hoặc kết nối bị ngắt. Đỏ vì chunked hiện đi hết xuống upstream.
-- **File/module dự kiến chạm:** `src/gateway/BodyLimitMiddleware.cs` (đặt giới hạn cho request qua `IHttpMaxRequestBodySizeFeature` khi không có `Content-Length`; xử lý `BadHttpRequestException` 413 để không thành `500`); có thể `src/gateway/UpstreamErrorClassifier.cs` (lỗi `RequestBodyClient` do vượt giới hạn không được coi là "client huỷ" mà bỏ qua nếu header chưa gửi); `src/gateway.Tests/GatewayContext.cs` (chế độ host Kestrel thật) và `Support/`.
-- **Hợp đồng thay đổi:** không thêm (cùng `413`); chunked vượt giới hạn có thể thành ngắt kết nối nếu response đã bắt đầu.
+- **Kịch bản/test sẽ viết (đỏ trước):** @S04, @S05 (và @S06 phần chunked); unit classifier cho nhánh body quá lớn; cần host Kestrel thật vì TestServer không có feature giới hạn (spike); test gửi stream không biết độ dài (chunked) qua cổng thật; khẳng định `413 problem+json`, không `500`. Đỏ vì chunked hiện đi hết xuống upstream (TestServer) hoặc nhận `413` rỗng (Kestrel).
+- **File/module dự kiến chạm:** `src/gateway/BodyLimitMiddleware.cs` (đặt `MaxRequestBodySize` cho request khi feature có mặt và chưa chỉ đọc); `src/gateway/UpstreamErrorClassifier.cs` (đã có thật; thêm giá trị phân loại cho `RequestBodyClient` do `BadHttpRequestException` 413 khi response chưa bắt đầu) và `src/gateway/UpstreamErrorMiddleware.cs` (ghi `413 problem+json`, không `Response.Clear()`); `src/gateway.Tests/GatewayContext.cs` (chế độ host Kestrel thật, chạy tuần tự, không song song hai host) và `Support/`.
+- **Hợp đồng thay đổi:** không thêm (cùng `413`); nếu response đã bắt đầu thì không đổi được status (giữ nhánh hiện có).
 - **Migration / cấu hình:** không có.
-- **Tài liệu cần cập nhật:** design 6.3 và spec FR-007 chỉ khi spike cho thấy hành vi chunked khác chữ hiện tại (hỏi người dùng trước, không tự sửa).
+- **Tài liệu cần cập nhật:** design 6.3 và 6.4 (thêm `BodyLimit` vào mô tả chunked: trả `413 problem+json` thay cho "ngắt luồng"; spec FR-007 đã nói "ngắt luồng và trả lỗi" nên không cần đổi); sửa trong cùng commit coding, ghi vào Fix log của review code.
 - **Kiểm chứng:** @S04, @S05 xanh; không có `500` trong log; chạy lặp 10 lần nhóm host test để bắt flaky; test lát 1–3 xanh.
 - **Phụ thuộc:** B1.
 
@@ -92,7 +104,7 @@ Quy ước: test thực thi sinh theo từng bước, đỏ từng bước; mỗ
 |---|---|---|---|
 | Unit | Mã lỗi `PAYLOAD_TOO_LARGE`; `BodyLimitOptions` (mặc định, khoảng); logic quyết định theo `Content-Length` nếu tách | xUnit thuần | Không mock |
 | Integration (host in-process) | 413 theo `Content-Length`, đúng bằng giới hạn, cấu hình ghi đè, header correlation, log không có body (`gateway.Tests`) | `WebApplicationFactory<Program>` (TestServer) + `UpstreamStub` Kestrel cổng ngẫu nhiên đếm byte nhận; ghi đè qua `UseSetting` | Không mock YARP; upstream giả là socket thật |
-| Integration (host Kestrel thật) | Body chunked bằng và vượt giới hạn | Gateway chạy trên Kestrel cổng ngẫu nhiên (nếu TestServer không áp `MaxRequestBodySize`, giả định A-02) | Chỉ cho nhóm chunked, giữ nhỏ |
+| Integration (host Kestrel thật) | Body chunked bằng và vượt giới hạn | Gateway chạy trên Kestrel cổng ngẫu nhiên (`UseKestrel(0)` + `StartServer()`; spike: TestServer không có feature giới hạn) | Chỉ cho nhóm chunked, giữ nhỏ, chạy tuần tự (hai host song song gây `AddressInUse`) |
 
 Không có test Docker (không phụ thuộc môi trường). Công cụ: xUnit + Reqnroll.xUnit theo `config/tool-versions.yaml` (đã dùng ở lát trước). Test BDD viết tiếng Anh, ASCII (`test-review.md` mục 1). Kim tự tháp: nhiều unit/host test nhanh, nhóm Kestrel thật chỉ cho chunked.
 
@@ -101,8 +113,10 @@ Không có test Docker (không phụ thuộc môi trường). Công cụ: xUnit 
 | Rủi ro | Tác động | Giảm thiểu | Rollback |
 |---|---|---|---|
 | R-01 `BodyLimit` đặt sai chỗ so với `RateLimiter` (design yêu cầu `RateLimiter` trước `BodyLimit`) | `413` thoát khỏi hạn mức hoặc hạn mức bị bỏ qua | TB-024 đã merge nên đặt đúng chỗ ngay (một dòng sau `UseRateLimiter`); @S07 khoá thứ tự quan sát được | Revert B1 |
-| R-02 Hành vi Kestrel/YARP với body vượt giới hạn khác giả định (upstream vẫn thấy request; `BadHttpRequestException` bị handler đổi thành `500`; `RequestBodyClient` bị coi là client huỷ nên không có response) | Trả `500` hoặc không có phản hồi | Spike ở test-init; mục B2 xử lý tường minh; thấy lệch design thì dừng và hỏi | Revert B2 |
-| R-03 TestServer không áp `MaxRequestBodySize` nên test chunked xanh giả | Bỏ sót lỗi thật | Dùng host Kestrel thật cho @S04, @S05 | Không áp dụng |
+| R-02 Hành vi Kestrel/YARP với body quá lớn khác kết quả spike khi cài (spike: `413` rỗng, upstream đã nhận request, `RequestBodyClient` bị coi là client huỷ) | `413` rỗng hoặc `500` thay cho problem+json | Spike lặp lại ở test-init; B2 phân loại tường minh; lệch thì dừng và hỏi | Revert B2 |
+| R-03 TestServer không có feature giới hạn nên test chunked xanh giả | Bỏ sót lỗi thật | Dùng host Kestrel thật cho @S04, @S05 (đã xác nhận bằng spike) | Không áp dụng |
+| R-06 Hai host Kestrel thật song song gây `AddressInUse` (spike) | Test đỏ ngẫu nhiên | Một host mỗi lần, đặt nhóm chunked cùng collection tuần tự, chạy lặp 10 lần | Sửa test |
+| R-07 Mỗi request chunked quá lớn làm YARP ghi một cảnh báo `RequestBodyClient` kèm ngoại lệ | Log ồn khi bị spam | Rate limit đứng trước; chấp nhận ở lát này, lát 7 xem lại log | Không áp dụng |
 | R-04 Client ghi body lớn trong khi gateway đã trả 413 và đóng kết nối nên client thấy lỗi ghi thay vì 413 | Test flaky | Test dùng `Content-Length` giả lớn với body nhỏ nơi kiểm header, và body thật 1 MiB+1 chỉ ở bước kiểm byte; chờ có điều kiện | Sửa test |
 | R-05 Giá trị `MaxBytes` ngoài khoảng (0, âm, rất lớn) | Gateway vô tác dụng hoặc chặn mọi thứ | `ValidateOnStart` với khoảng hợp lệ; unit test | Revert B1 |
 
@@ -118,30 +132,45 @@ Bài học đã tra (`document/lessons/README.md`, tag `api`, `security`, `obser
 
 ## 7. Câu hỏi mở và giả định
 
-Giả định (chưa xác minh trên mã repo, kiểm ở test-init):
-- A-01 Cơ chế ngắt chunked là `IHttpMaxRequestBodySizeFeature.MaxRequestBodySize` do middleware đặt cho từng request; thay thế nếu không đủ là bọc `Request.Body` bằng stream đếm byte.
-- A-02 `TestServer` không áp `MaxRequestBodySize`, nên chunked cần host Kestrel thật.
-- A-03 `ExceptionHandler` (handler `500` của gateway) bắt `BadHttpRequestException` 413 và trả `500` nếu không xử lý riêng (suy luận từ TB-022).
-- A-04 Lỗi forwarder khi body bị ngắt có hậu tố `*Client` nên `UpstreamErrorClassifier` hiện coi là client huỷ và không ghi response.
+Giả định A-01..A-04 của bản nháp đã được spike của plan-review kiểm (bảng đầu plan): A-01 đúng (feature có hiệu lực trên Kestrel thật); A-02 đúng (TestServer không có feature); A-03 **sai** (không có `500`, ngoại lệ do YARP bắt); A-04 đúng một phần (bị coi là client huỷ, nhưng phản hồi `413` rỗng vẫn tới client; cần phân loại mới). Chưa kiểm: body chunked qua route không proxy (không đọc body nên không bị giới hạn chunked, chỉ kiểm `Content-Length`; ghi ở mục 1), `Expect: 100-continue`, hành vi khi client ngắt giữa chừng.
 
-| # | Điều chưa rõ | Ảnh hưởng tới | Người trả lời | Ghi chú (không tự điền) |
+| # | Điều chưa rõ | Ảnh hưởng tới | Người trả lời | Ghi chú |
 |---|---|---|---|---|
 | P-01 | Thứ tự làm/merge với lát 4 | R-01, B1 | – | answered bởi thực tế: TB-024 đã merge (PR 18, `main` `66673c2`); lát 5 đặt `BodyLimit` sau `RateLimiter` theo design 6.4, thêm @S07 |
-| P-02 | Chunked vượt giới hạn khi header chưa gửi: trả `413 problem+json` (khuyến nghị: nhất quán với `Content-Length`, client biết lý do) hay chỉ ngắt kết nối (đúng chữ "ngắt luồng" của design, đơn giản hơn)? Spec FR-007: "ngắt luồng và trả lỗi". Nếu chưa chốt: plan viết theo khuyến nghị (413 khi còn kịp, ngắt khi header đã gửi), test @S05 chấp nhận cả hai. | B2, @S05 | sondv | open |
-| P-03 | `413` áp cho mọi request kể cả route không tồn tại (`/foo` kèm `Content-Length` lớn thì 413 thay vì 404) hay chỉ route proxy? Khuyến nghị áp cho mọi request (đơn giản, đúng "chặn request khổng lồ sớm", middleware đứng trước endpoint). Nếu chưa chốt: áp cho mọi request. | B1 | sondv | open |
-| P-04 | Khoảng hợp lệ của `MaxBytes` (đề xuất 1 đến 10 MiB) và có thêm giới hạn riêng cho health không (khuyến nghị không). Nếu chưa chốt: dùng 1 đến 10.485.760. | B1 | sondv | open |
-| P-05 | Cỡ lát: 7 kịch bản, 3 bước, ~1 ngày: giữ nguyên (khuyến nghị) hay chia. | cả plan | sondv | open |
+| P-02 | Chunked vượt giới hạn: `413 problem+json` hay `413` rỗng của Kestrel | B2, @S05 | sondv | answered: `413 problem+json` (Confirm #1, 2026-11-25) |
+| P-03 | `413` áp cho mọi request hay chỉ route proxy | B1 | sondv | answered: mọi request (Confirm #2, 2026-11-25) |
+| P-04 | Khoảng hợp lệ của `MaxBytes` | B1 | sondv | answered: 1 đến 10.485.760 byte, mặc định 1.048.576, không giới hạn riêng cho health (Confirm #3, 2026-11-25) |
+| P-05 | Cỡ lát (7 kịch bản, 3 bước, ~1 ngày) | cả plan | sondv | answered: giữ một lát (Confirm #4, 2026-11-25) |
 
 ## Confirm log
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-025:chunked-413-shape | Body chunked vượt giới hạn: `413 problem+json` hay `413` rỗng của Kestrel | `413 problem+json` (thêm nhánh phân loại ở `UpstreamErrorClassifier`) | 1 | 2026-11-25 |
+| 2 | plan-review:TB-025:scope-all-requests | `413` áp cho mọi request hay chỉ route proxy | Mọi request | 1 | 2026-11-25 |
+| 3 | plan-review:TB-025:maxbytes-range | Khoảng hợp lệ của `MaxBytes` | 1 đến 10.485.760 byte | 1 | 2026-11-25 |
+| 4 | plan-review:TB-025:slice-size | Giữ một lát hay chia | Giữ một lát | 1 | 2026-11-25 |
 
 ## Review rounds
 | Vòng | Ngày | Phạm vi | CONFIRM mở | FIX mở | Verdict |
 |---|---|---|---|---|---|
+| 1 | 2026-11-25 | Làn vừa: A, B, D, E, F; kèm spike thực nghiệm trên mã repo | 4 → đã chốt | 3 → đã sửa | NEEDS_CONFIRM → PASS sau khi chốt và sửa |
+| 2 | 2026-11-25 | Delta: kiểm nhất quán giữa mục 1, truy vết, B2, rủi ro, câu hỏi mở, issue | 0 | 0 | PASS |
+
+### Fix log vòng 1
+
+| Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa thế nào |
+|---|---|---|---|---|
+| spike-assumptions-stale | FIX | mục 7, đầu plan, R-02, R-03 | A-03 sai và A-04 thiếu: spike cho thấy `413` rỗng của Kestrel tới client, không có `500` | Thêm bảng spike đầu plan; viết lại giả định và rủi ro theo kết quả; thêm R-06, R-07 |
+| chunked-only-on-proxy-route | FIX | mục 1 | Giới hạn chunked chỉ hiệu lực ở route đọc body (proxy); phạm vi "mọi request" gây hiểu nhầm | Ghi rõ: route khác chỉ chịu kiểm `Content-Length` |
+| b2-classifier-missing | FIX + CONFIRM #1 | B2, truy vết @S05, danh sách test | B2 chưa nêu rõ file thật phải đổi (`UpstreamErrorClassifier`, `UpstreamErrorMiddleware`) và test classifier | Cập nhật B2, @S05, thêm `UpstreamErrorClassifierTests` mở rộng, design 6.3/6.4 cần cập nhật khi coding |
+| decisions-applied | CONFIRM #1-#4 | mục 1, 4, 7, B2 | Áp dụng quyết định người dùng | `problem+json` cho chunked; mọi request; khoảng 1 đến 10 MiB; giữ một lát; test Kestrel chạy tuần tự |
+
+## Dây chuyền đã kiểm ở vòng 2
+Đổi `problem+json` kéo theo: unit classifier (đã thêm), design 6.3/6.4 (ghi ở B2), issue TB-025 (đồng bộ tiêu chí @S05 và số câu hỏi mở), bảng lát (giữ `planning` đến coding-start), `PROJECT.md` không đổi.
 
 ## Lịch sử thay đổi
 | Ngày | Thay đổi | Lý do |
 |---|---|---|
 | 2026-10-25 | Tạo bản nháp | plan-init lát 5 |
+| 2026-11-25 | plan-review vòng 1-2: spike (TestServer không có feature, Kestrel trả `413` rỗng, upstream đã nhận request, không `500`); 4 quyết định (Confirm #1-#4); sửa 3 FIX; plan `approved` | plan-review TB-025 |
 | 2026-11-25 | Cập nhật tại chỗ sau khi TB-024 merge: nhánh fast-forward lên `main` `66673c2`, cập nhật mục "Đã có", thứ tự `BodyLimit` sau `RateLimiter`, thêm @S07, đóng P-01, cập nhật rủi ro R-01 và bài học | plan-init chạy lại, bản nháp cũ lệch `main` |
