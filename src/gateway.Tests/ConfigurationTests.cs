@@ -40,7 +40,7 @@ public sealed class ConfigurationTests
 
         Assert.True(file.RootElement.TryGetProperty("Cors", out var cors), "appsettings.json has no Cors section.");
         Assert.True(cors.TryGetProperty("AllowedOrigins", out var origins), "Cors has no AllowedOrigins.");
-        var shipped = origins.EnumerateArray().Select(origin => origin.GetString()).ToArray();
+        var shipped = origins.EnumerateArray().Select(origin => origin.GetString() ?? string.Empty).ToArray();
         Assert.Equal(["http://localhost:4200"], shipped);
     }
 

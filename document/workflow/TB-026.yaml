@@ -16,8 +16,8 @@ links:
   base: origin/main
   pr: null
 
-current_step: coding-start
-next_action: "Mở coding-start cho TB-026: viết B1 (CorsOptions, validator, UseCors trước RateLimiter, appsettings Cors), chạy @S01 để xác nhận A-01 (204 cho preflight)"
+current_step: create-pr
+next_action: "Mở create-pr cho TB-026 (skill create-pr): xác nhận với người dùng trước khi push và gh pr create"
 blocked_by: null
 
 steps:
@@ -61,9 +61,21 @@ steps:
     artifacts: [document/spec/features/gateway/cors.feature, src/gateway.Tests/CorsSteps.cs, src/gateway.Tests/CorsOptionsTests.cs]
     evidence: ["Confirm log: guard tests S02, S06, CorsOptions empty-list giữ làm khóa hợp đồng (người dùng chốt)", "FIX: format Examples S07; plan P-01 chỉ áp cho S01, S03", "Chạy lại: Failed 11, Passed 202 (đỏ đúng lý do)", "ASCII check các file mới xanh"]
   coding-start:
-    status: pending
+    status: done
+    owner: orchestrator:claude-session
+    finished: 2026-11-25T00:00:00Z
+    artifacts: [src/gateway/CorsExtensions.cs, src/gateway/CorsOptions.cs, src/gateway/CorsOptionsValidator.cs, src/gateway/Program.cs, src/gateway/appsettings.json, src/gateway.Tests/ConfigurationTests.cs]
+    evidence: ["gateway.Tests (Category!=docker): Passed 213/213", "dotnet build src/teamboard.slnx -warnaserror: 0 warning, 0 error", "dotnet format --verify-no-changes không lỗi", "vulnerable: không có gói lỗi cho gateway", "gitleaks chưa cài (ghi rõ)", "Vary: Origin thêm qua UseGatewayCors (ASP.NET không tự thêm); A-01 xác nhận"]
   coding-review:
-    status: pending
+    status: done
+    owner: orchestrator:cursor-session
+    started: 2026-11-25T00:00:00Z
+    finished: 2026-11-25T00:00:00Z
+    round: 2
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence: ["Delta cb40107..610e75c: CORS implementation + LL-006 docs", "Gate: gateway.Tests 215/215 (Category!=docker)", "Fingerprint workflow:TB-026:uncommitted-production đóng tại 610e75c"]
   create-pr:
     status: pending
 

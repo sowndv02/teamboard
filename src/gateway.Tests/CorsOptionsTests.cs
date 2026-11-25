@@ -28,6 +28,8 @@ public sealed class CorsOptionsTests
     [InlineData("http://localhost:4200/app")]
     [InlineData("http://localhost:4200?x=1")]
     [InlineData("localhost:4200")]
+    [InlineData("http://localhost:4200/")]
+    [InlineData("ftp://localhost:4200")]
     [InlineData("")]
     public void Validate_NotAnAbsoluteOrigin_Fails(string origin)
     {
