@@ -1,7 +1,7 @@
 ---
 key: TB-025
 title: Gateway lát 5, giới hạn body 1 MiB
-status: review
+status: done
 phase: 1
 branch: feature/TB-025-gateway-body-limit
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)

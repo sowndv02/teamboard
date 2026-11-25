@@ -26,6 +26,7 @@ builder.Services
 
 builder.Services.AddSingleton<IConfigureOptions<ForwardedHeadersOptions>, ForwardedHeadersSetup>();
 builder.Services.AddGatewayRateLimiting();
+builder.Services.AddGatewayCors();
 
 // Needed for the route-level Timeout in the YARP configuration: without this middleware a route with Timeout fails with 500.
 builder.Services.AddRequestTimeouts();
@@ -42,6 +43,7 @@ app.UseCorrelation();
 app.UseTeamboardExceptionHandler();
 app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();
+app.UseGatewayCors();
 app.UseRateLimiter();
 app.UseMiddleware<BodyLimitMiddleware>();
 

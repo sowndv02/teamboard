@@ -1,7 +1,7 @@
 ---
 key: TB-010
 title: Gateway lát 1, khung YARP, route boards, health và 404 problem+json
-status: review
+status: done
 phase: 1
 branch: feature/TB-010-gateway-skeleton-routing
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)

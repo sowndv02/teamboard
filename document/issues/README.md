@@ -22,7 +22,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-007](TB-007-api-gateway.md) | API gateway (YARP) mỏng: spec, design và bảng lát (issue tài liệu; code theo từng lát TB-010..) | 0 | review |
 | [TB-008](TB-008-review-fix-report.md) | Báo cáo mọi FIX agent đã sửa sau mỗi vòng review (không sửa im lặng) | 0 | review |
 | [TB-009](TB-009-commit-per-step.md) | Commit file của từng bước workflow ngay khi bước đạt | 0 | review |
-| [TB-010](TB-010-gateway-skeleton-routing.md) | Gateway lát 1, khung YARP, route boards, health và 404 problem+json | 1 | review |
+| [TB-010](TB-010-gateway-skeleton-routing.md) | Gateway lát 1, khung YARP, route boards, health và 404 problem+json | 1 | done |
 | [TB-011](TB-011-learning-hub.md) | Skill learning-hub gom kiến thức theo chủ đề vào document/learning | 0 | review |
 | [TB-012](TB-012-learning-hub-realworld.md) | learning-hub bắt buộc real-world có nguồn và phân tầng khái niệm/công cụ | 0 | done |
 | [TB-013](TB-013-learning-roadmap-docker.md) | Lộ trình học hai chiều (Part × L1–L8) cho learning-hub, mẫu trên Docker | 0 | review |
@@ -37,8 +37,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-022](TB-022-gateway-correlation-error-handling.md) | Gateway lát 2, correlation, trace nối xuyên service và 500 problem+json | 1 | done |
 | [TB-023](TB-023-gateway-downstream-errors.md) | Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng) | 1 | done |
 | [TB-024](TB-024-gateway-rate-limit.md) | Gateway lát 4, rate limit theo IP và 429 problem+json | 1 | done |
-| [TB-025](TB-025-gateway-body-limit.md) | Gateway lát 5, giới hạn body 1 MiB | 1 | review |
-| [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | todo |
+| [TB-025](TB-025-gateway-body-limit.md) | Gateway lát 5, giới hạn body 1 MiB | 1 | done |
+| [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | review |
 | [TB-027](TB-027-gateway-observability-ops.md) | Gateway lát 7, quan sát và vận hành | 1 | todo |
 | [TB-028](TB-028-gateway-smoke-board-service.md) | Gateway lát 8, smoke với board-service thật (hoãn) | 1 | todo |
 | [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | todo |
