@@ -69,7 +69,7 @@ Test không qua feature: `CorsOptionsTests` (validation cấu hình), `Configura
 Quy ước: test viết theo từng bước, đỏ trước khi code; mỗi bước một commit nhỏ (dưới khoảng 400 dòng diff). Khung rỗng chỉ để test biên dịch.
 
 ### B1. Preflight và header CORS theo allowlist (đường chính)
-- **Kịch bản/test sẽ viết (đỏ trước):** `document/spec/features/gateway/cors.feature` (@S01, @S02, @S03, @S07); @S01–@S03 khẳng định `Vary` chứa `Origin` (P-01 đã chốt: có); `CorsSteps.cs` (gửi `OPTIONS` và `GET` với `Origin`, đọc header); `CorsOptionsTests` (validation: `*`, path, chuỗi không phải URL, phần tử rỗng; danh sách rỗng hợp lệ, P-02 đã chốt); `UpstreamStub.Received` để khẳng định preflight không tới upstream. Đỏ vì chưa có CORS (@S01 đỏ vì `OPTIONS` hiện rơi vào fallback `404`).
+- **Kịch bản/test sẽ viết (đỏ trước):** `document/spec/features/gateway/cors.feature` (@S01, @S02, @S03, @S07); @S01 và @S03 khẳng định `Vary` chứa `Origin` (P-01 đã chốt: có; @S02 không có Allow-Origin nên không áp dụng); `CorsSteps.cs` (gửi `OPTIONS` và `GET` với `Origin`, đọc header); `CorsOptionsTests` (validation: `*`, path, chuỗi không phải URL, phần tử rỗng; danh sách rỗng hợp lệ, P-02 đã chốt); `UpstreamStub.Received` để khẳng định preflight không tới upstream. Đỏ vì chưa có CORS (@S01 đỏ vì `OPTIONS` hiện rơi vào fallback `404`).
 - **File/module dự kiến chạm:** mới `src/gateway/CorsOptions.cs` (`SectionName = "Cors"`, `string[] AllowedOrigins`, mặc định rỗng trong class, giá trị thật trong `appsettings.json`); mới `src/gateway/CorsOptionsValidator.cs` (`IValidateOptions<CorsOptions>`, theo mẫu `RateLimitOptionsValidator`, đăng ký cùng chỗ với `AddOptions().BindConfiguration().ValidateOnStart()` như `RateLimitingExtensions`); mới `src/gateway/CorsExtensions.cs` (`AddGatewayCors`: `AddCors` với một default policy đọc allowlist, methods, headers, expose, `SetPreflightMaxAge(600)`, không `AllowCredentials`); `src/gateway/Program.cs` (đăng ký `AddGatewayCors()`; `app.UseCors()` đặt **sau** `UpstreamErrorMiddleware` và **trước** `UseRateLimiter()`; cập nhật comment thứ tự design 6.4); `src/gateway/appsettings.json` (`Cors:AllowedOrigins: ["http://localhost:4200"]`); `src/gateway.Tests/` (`cors.feature`, `CorsSteps.cs`, `CorsOptionsTests.cs`).
 - **Hợp đồng thay đổi (API):** thêm hành vi `OPTIONS` có `Origin` từ origin trong allowlist: `204` với header CORS (trước đây `404`). Không mã lỗi mới. Thay đổi cộng thêm, không breaking (design 10: thêm là cộng thêm).
 - **Migration / cấu hình / biến môi trường:** khoá `Cors:AllowedOrigins` (mảng) trong `appsettings.json`; ghi đè bằng `Cors__AllowedOrigins__0` khi triển khai (không đổi compose ở lát này).
@@ -139,7 +139,7 @@ Giả định (cần kiểm ở test-init, sai thì dừng và hỏi):
 
 | # | Điều chưa rõ | Ảnh hưởng tới | Người trả lời | Ghi chú (không tự điền) |
 |---|---|---|---|---|
-| P-01 | Có khẳng định `Vary: Origin` không? | B1, @S01–@S03 | sondv | **Đã chốt (CONFIRM #1): có.** |
+| P-01 | Có khẳng định `Vary: Origin` không? | B1, @S01, @S03 | sondv | **Đã chốt (CONFIRM #1): có.** |
 | P-02 | `Cors:AllowedOrigins` rỗng (`[]`) là hợp lệ hay lỗi khởi động? | B1, `CorsOptionsTests` | sondv | **Đã chốt (CONFIRM #2): hợp lệ** (CORS tắt); phần tử sai (`*`, path, không phải URL) vẫn lỗi khi khởi động. |
 | P-03 | TB-025 còn `review` trong bảng lát và `document/issues/README.md` dù PR 19 đã merge | Đồng bộ LL-006, B3 | sondv | **Đã chốt (CONFIRM #3): đồng bộ TB-025 sang `done` ngay trong nhánh này** (ngoại lệ có chủ ý của người dùng với `docs-update-specs.md`; ghi trong B3). |
 

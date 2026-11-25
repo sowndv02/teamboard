@@ -16,8 +16,8 @@ links:
   base: origin/main
   pr: null
 
-current_step: test-review
-next_action: "Mở test-review cho TB-026: đối chiếu cors.feature @S01–@S07 và CorsOptionsTests; quyết định chấp nhận S02/S06 xanh sẵn là khoá hợp đồng"
+current_step: coding-start
+next_action: "Mở coding-start cho TB-026: viết B1 (CorsOptions, validator, UseCors trước RateLimiter, appsettings Cors), chạy @S01 để xác nhận A-01 (204 cho preflight)"
 blocked_by: null
 
 steps:
@@ -51,7 +51,15 @@ steps:
     artifacts: [document/spec/features/gateway/cors.feature, src/gateway.Tests/CorsSteps.cs, src/gateway.Tests/CorsOptionsTests.cs, src/gateway.Tests/ConfigurationTests.cs, src/gateway/CorsOptions.cs, src/gateway/CorsOptionsValidator.cs]
     evidence: ["dotnet test gateway.Tests (Category!=docker): Failed 11, Passed 202, Total 213", "11 đỏ đúng lý do: S01 status 204, S03/S05/S07 không có Allow-Origin, S04 status, CorsOptions 5 ví dụ không hợp lệ, ConfigurationTests thiếu section Cors", "xanh sẵn (khoá hợp đồng): S02, S06, CorsOptions empty list", "build -warnaserror xanh; dotnet format --verify-no-changes không báo lỗi", "stub không logic: CorsOptions, CorsOptionsValidator (Success)"]
   test-review:
-    status: pending
+    status: done
+    owner: orchestrator:claude-session
+    finished: 2026-11-25T00:00:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    artifacts: [document/spec/features/gateway/cors.feature, src/gateway.Tests/CorsSteps.cs, src/gateway.Tests/CorsOptionsTests.cs]
+    evidence: ["Confirm log: guard tests S02, S06, CorsOptions empty-list giữ làm khóa hợp đồng (người dùng chốt)", "FIX: format Examples S07; plan P-01 chỉ áp cho S01, S03", "Chạy lại: Failed 11, Passed 202 (đỏ đúng lý do)", "ASCII check các file mới xanh"]
   coding-start:
     status: pending
   coding-review:

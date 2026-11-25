@@ -44,7 +44,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-25 | `document/plans/TB-026-gateway-cors.md` (draft), 3 bước B1–B3, 3 câu hỏi mở P-01..P-03 |
 | plan-review | PASS | 2 | 2026-11-25 | Vòng 1: 4 CONFIRM, 3 FIX đã sửa; vòng 2 (delta): 4 CONFIRM đã chốt, PASS. Plan `approved` |
 | test-init | done | – | 2026-11-25 | Đỏ 11/213 đúng lý do (xem "Kịch bản và TDD log"); xanh sẵn 2 khoá hợp đồng (S02, S06) |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-25 | 11 đỏ đúng lý do; S02, S06, CorsOptions empty-list xanh sẵn là khóa hợp đồng (người dùng chốt) |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -81,6 +81,7 @@ Khung production tối thiểu (stub, không logic): `src/gateway/CorsOptions.cs
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-25 | working tree sau test-init (chưa commit) | PASS | 0 (1 FIX đã sửa: format Examples S07; 1 FIX plan: Vary chỉ S01, S03; 1 CONFIRM guard đã chốt) |
 
 ## Review rounds
 
