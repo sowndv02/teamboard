@@ -1,13 +1,13 @@
 ---
 key: TB-026
 title: Gateway lát 6, CORS theo allowlist
-status: review
+status: done
 phase: 1
 branch: feature/TB-026-gateway-cors
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-25     # ngày done/dropped
 ---
 
 # TB-026 — Gateway lát 6, CORS theo allowlist
@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-026-gateway-cors.md`](../plans/TB-026-gateway-cors.md)
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-25: plan-init. Nhánh `feature/TB-026-gateway-cors` tạo từ `origin/main` (TB-025 đã merge, PR 19). Người dùng chốt: lát 1 (TB-010) coi là `done`; khoá cấu hình `Cors:AllowedOrigins`.
 - 2026-11-25: mở PR https://github.com/sowndv02/teamboard/pull/20 (nhánh `feature/TB-026-gateway-cors` vào `main`); trạng thái review.
+- 2026-11-25: PR #20 merged; issue và lát 6 chuyển `done` (đồng bộ khi bắt đầu TB-027).
 
 ## Workflow
 

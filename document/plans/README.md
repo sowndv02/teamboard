@@ -20,3 +20,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-024-gateway-rate-limit](TB-024-gateway-rate-limit.md) | TB-024 (lát 4 gateway) | approved |
 | [TB-025-gateway-body-limit](TB-025-gateway-body-limit.md) | TB-025 (lát 5 gateway) | approved |
 | [TB-026-gateway-cors](TB-026-gateway-cors.md) | TB-026 (lát 6 gateway) | approved |
+| [TB-027-gateway-observability-ops](TB-027-gateway-observability-ops.md) | TB-027 (lát 7 gateway) | approved |
