@@ -1,0 +1,86 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-027
+scope: issue
+title: Gateway lát 7, quan sát và vận hành
+updated: 2026-11-25T12:00:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-027-gateway-observability-ops.md
+  spec: document/spec/api-gateway.md
+  design: document/design/api-gateway.md
+  plan: document/plans/TB-027-gateway-observability-ops.md
+  features_dir: document/spec/features/gateway/
+  branch: feature/TB-027-gateway-observability-ops
+  base: origin/main
+  pr: https://github.com/sowndv02/teamboard/pull/21
+
+current_step: create-pr
+next_action: "create-pr sau khi người dùng xác nhận push/PR"
+
+steps:
+  requirements-discovery: { status: done, evidence: ["document/spec/api-gateway.md"] }
+  spec-review:            { status: done, evidence: ["spec confirmed (TB-007)"] }
+  system-design:          { status: done, evidence: ["document/design/api-gateway.md"] }
+  design-review:          { status: done, evidence: ["design confirmed (TB-007)"] }
+  plan-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-25T00:00:00Z
+    artifacts: [document/plans/TB-027-gateway-observability-ops.md, document/issues/TB-027-gateway-observability-ops.md, document/plans/api-gateway-slices.md, document/plans/README.md, document/issues/README.md, document/issues/TB-026-gateway-cors.md]
+    evidence: ["Plan draft 4 bước B1–B4, 7 kịch bản @S01–@S07, 4 câu hỏi mở P-01..P-04", "Branch từ origin/main c0caa06; LL-006 TB-026 done"]
+  plan-review:
+    status: done
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    finished: 2026-11-25T00:00:00Z
+    evidence: ["CONFIRM #1 Activity overhead", "#2 four counters", "#3 docker logs", "#4 runbook+PROJECT"]
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-25T00:00:00Z
+    artifacts:
+      - document/spec/features/gateway/observability.feature
+      - src/gateway.Tests/ObservabilitySteps.cs
+      - src/gateway.Tests/GatewayContext.cs
+    evidence: ["dotnet test gateway.Tests Category!=docker: 8 fail (TB-027), 215 pass"]
+  test-review:
+    status: done
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    finished: 2026-11-25T12:00:00Z
+    evidence:
+      - "8 observability scenarios red for right reason; 215 regression pass"
+      - "FIX S01 access log fields; FIX shutdown config source"
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-25T15:00:00Z
+    evidence:
+      - "B1–B4: @S01–@S07 xanh"
+      - "dotnet test gateway.Tests Category!=docker: 223/223"
+      - "document/runbooks/gateway-operations.md + PROJECT.md link"
+  coding-review:
+    status: done
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    finished: 2026-11-25T16:00:00Z
+    evidence: ["merge-base c0caa06..a79396f", "gateway.Tests 223/223 Category!=docker", "build -warnaserror 0"]
+  create-pr:
+    status: done
+    finished: 2026-11-25T15:55:00Z
+    evidence: ["https://github.com/sowndv02/teamboard/pull/21"]
+
+confirm_pending: []
+
+subtasks: []
+
+events:
+  - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:cursor-session", event: created, detail: "Khởi tạo state lát 7 sau merge PR #20" }
+  - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init: plan TB-027 draft" }
+  - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: observability.feature @S01–@S07 đỏ" }
+  - { at: 2026-11-25T12:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS; next coding-start B1" }

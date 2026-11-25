@@ -48,7 +48,7 @@ Ghi vào "Câu hỏi mở" của plan (hoặc `.feature` bằng tag `@wip` kèm 
 ## Không làm
 - Không viết code production có logic; không sửa spec/plan để cho test dễ viết.
 - Không skip/ignore/xoá test để "đỏ rồi xanh".
-- Không commit/push khi chưa được phép (xem `git-workflow.md`); khi được phép, commit theo `git-commit.md` loại `test`.
+- Không commit/push khi chưa được phép (xem `git-workflow.md`); khi được phép, commit theo `git-commit.md` loại `test` (không `Co-Authored-By`; `commit.coAuthorTrailer: false`).
 
 ## Hoàn thành khi
 - [ ] Mọi kịch bản của plan có `.feature` + test thực thi, tag đúng, bảng truy vết đủ

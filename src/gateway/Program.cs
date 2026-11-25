@@ -7,6 +7,7 @@ using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureHostOptions(options => options.ShutdownTimeout = TimeSpan.FromSeconds(30));
 builder.AddServiceDefaults("gateway");
 
 // Routes and upstream addresses live in the "ReverseProxy" configuration (NFR-004), not hardcoded.
@@ -40,12 +41,15 @@ var app = builder.Build();
 app.UseForwardedHeaders();
 app.UseRouting();
 app.UseCorrelation();
+app.UseGatewayRequestLogging();
+app.UseGatewayRequestMetrics();
 app.UseTeamboardExceptionHandler();
 app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();
 app.UseGatewayCors();
 app.UseRateLimiter();
 app.UseMiddleware<BodyLimitMiddleware>();
+app.UseGatewayProxyTiming();
 
 app.MapDefaultEndpoints();
 app.MapReverseProxy();

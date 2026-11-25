@@ -24,6 +24,9 @@ public sealed class GatewayContext : IAsyncDisposable
     private HttpClient? _client;
     private MeterListener? _meterListener;
     private long _abortedCount;
+    private readonly Dictionary<string, long> _counterTotals = new(StringComparer.Ordinal);
+    private long _requestDurationSamples;
+    private long _overheadDurationSamples;
 
     internal UpstreamStub? UpstreamOrNull { get; set; }
 
@@ -56,6 +59,16 @@ public sealed class GatewayContext : IAsyncDisposable
 
     /// <summary>Sum of the measurements of the gateway_upstream_aborted counter seen since the gateway started.</summary>
     public long AbortedCount => Interlocked.Read(ref _abortedCount);
+
+    /// <summary>Sum of measurements for a named counter instrument on the gateway meter.</summary>
+    public long CounterTotal(string instrumentName) =>
+        _counterTotals.TryGetValue(instrumentName, out var total) ? total : 0;
+
+    /// <summary>Number of histogram samples recorded for gateway_request_duration_seconds.</summary>
+    public long RequestDurationSamples => Interlocked.Read(ref _requestDurationSamples);
+
+    /// <summary>Number of histogram samples recorded for gateway_overhead_duration_seconds.</summary>
+    public long OverheadDurationSamples => Interlocked.Read(ref _overheadDurationSamples);
 
     /// <summary>When true the gateway listens on a real Kestrel socket: TestServer has no request body size feature (plan TB-025 spike).</summary>
     internal bool UseRealKestrel { get; set; }
@@ -166,19 +179,57 @@ public sealed class GatewayContext : IAsyncDisposable
     private void StartMeterListener()
     {
         // Listens by instrument name only, so the test does not depend on the meter name or on the counter's numeric type.
+        _counterTotals.Clear();
+        Interlocked.Exchange(ref _requestDurationSamples, 0);
+        Interlocked.Exchange(ref _overheadDurationSamples, 0);
         _meterListener = new MeterListener
         {
             InstrumentPublished = (instrument, listener) =>
             {
-                if (instrument.Name == AbortedInstrumentName)
+                if (IsObservedInstrument(instrument.Name))
                 {
                     listener.EnableMeasurementEvents(instrument);
                 }
             },
         };
-        _meterListener.SetMeasurementEventCallback<long>((_, measurement, _, _) => Interlocked.Add(ref _abortedCount, measurement));
-        _meterListener.SetMeasurementEventCallback<int>((_, measurement, _, _) => Interlocked.Add(ref _abortedCount, measurement));
+        _meterListener.SetMeasurementEventCallback<long>((instrument, measurement, _, _) => RecordMeasurement(instrument, measurement));
+        _meterListener.SetMeasurementEventCallback<int>((instrument, measurement, _, _) => RecordMeasurement(instrument, measurement));
+        _meterListener.SetMeasurementEventCallback<double>((instrument, measurement, _, _) => RecordHistogramSample(instrument.Name, measurement));
         _meterListener.Start();
+    }
+
+    private static bool IsObservedInstrument(string name) => name switch
+    {
+        AbortedInstrumentName => true,
+        "gateway_http_429" or "gateway_http_502" or "gateway_http_503" or "gateway_http_504" => true,
+        "gateway_request_duration_seconds" or "gateway_overhead_duration_seconds" => true,
+        _ => false,
+    };
+
+    private void RecordMeasurement(Instrument instrument, long measurement)
+    {
+        if (instrument.Name == AbortedInstrumentName)
+        {
+            Interlocked.Add(ref _abortedCount, measurement);
+            return;
+        }
+
+        lock (_counterTotals)
+        {
+            _counterTotals[instrument.Name] = _counterTotals.GetValueOrDefault(instrument.Name) + measurement;
+        }
+    }
+
+    private void RecordHistogramSample(string instrumentName, double _)
+    {
+        if (instrumentName == "gateway_request_duration_seconds")
+        {
+            Interlocked.Increment(ref _requestDurationSamples);
+        }
+        else if (instrumentName == "gateway_overhead_duration_seconds")
+        {
+            Interlocked.Increment(ref _overheadDurationSamples);
+        }
     }
 
     private sealed class ThrowingForwarder : IHttpForwarder

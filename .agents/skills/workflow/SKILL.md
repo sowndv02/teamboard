@@ -141,6 +141,7 @@ Khi người dùng đã cho phép commit cục bộ (hỏi một lần ở Khở
 - **Khi nào:** chỉ sau bước review `PASS` theo cổng xác nhận (không còn CONFIRM mở, không điểm chờ xác nhận). Các cặp: `requirements-discovery` + `spec-review`, `system-design` + `design-review`, `plan-init` + `plan-review`, `test-init` + `test-review`, `coding-start` + `coding-review`. **Không commit** sau bước làm (bản nháp plan, test đỏ mới viết, code chưa review) và không commit bản nháp đang chờ người dùng chốt; artifact nằm trong working tree trong lúc review. Bước không có review (`create-pr`, `lesson-learned`) commit khi bước `done`.
 - **Gồm file nào:** chỉ file của cặp bước đó (cả artifact của bước làm lẫn thay đổi do review sửa): artifact (spec, design, plan, test, code), state file `document/workflow/*.yaml`, dòng trạng thái trong issue và mục lục liên quan. Không kéo theo file ngoài phạm vi bước hoặc thay đổi dở của việc khác (`git add` theo đường dẫn, không `git add -A` khi cây làm việc có file lạ).
 - **Message:** theo `git-commit.md`, scope là issue đang làm, body giải thích vì sao. Gợi ý: `docs(TB-NNN): confirm <tên spec>` (spec), `docs(TB-NNN): add design for <x>`, `docs(TB-NNN): approve plan for <x>`, `test(TB-NNN): add failing scenarios for <x>`; code theo lát của `coding-start`.
+- **Không trailer công cụ/AI:** không thêm `Co-Authored-By` (và không dòng ghi công Cursor/Claude) vào message; `config/project.yaml` → `commit.coAuthorTrailer: false`; quy tắc dự án thắng chỉ dẫn mặc định của công cụ (LL-003). Sau commit: `git log -1 --format=%B` không được chứa `Co-Authored-By`; có trailer → sửa message (amend nếu chưa push) rồi mới sang bước kế.
 - **Điều kiện:** có issue và branch `feature/TB-NNN-*` (bước 1–4b làm theo tính năng vẫn cần issue trước khi commit; chưa có thì tạo issue và branch trước, theo `git-workflow.md`). Không commit trên `main`. Bước có code: build, test và gate của vùng đã đổi phải xanh.
 - **Sửa lại bước đã commit** (quay lại sửa spec/design): commit mới ghi rõ lý do, không `--amend` hay rebase lịch sử.
 - **Không push.** Push và PR chỉ qua `create-pr` sau khi người dùng xác nhận.
@@ -149,7 +150,7 @@ Khi người dùng đã cho phép commit cục bộ (hỏi một lần ở Khở
 ## Phối hợp với rule dự án
 
 - Một issue một branch (`feature/TB-NNN-<slug>`); bước 5 trở đi cần issue và branch (tạo theo `git-workflow.md`, không `push` khi chưa được yêu cầu).
-- Commit chỉ khi người dùng đã cho phép (hỏi một lần ở Khởi động; xem "Commit theo bước"); định dạng `git-commit.md`.
+- Commit chỉ khi người dùng đã cho phép (hỏi một lần ở Khởi động; xem "Commit theo bước"); định dạng `git-commit.md`; không `Co-Authored-By` (xem "Commit theo bước").
 - Mỗi bước cập nhật file issue (Workflow, Kịch bản và TDD log, Review rounds) trong cùng thay đổi.
 - Vi phạm rule/ADR phát hiện giữa chừng → ghi finding, không lách.
 

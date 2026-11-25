@@ -35,6 +35,10 @@ Không "đơn giản hoá" một service về CRUD layered: kiến trúc khác n
 
 Xem `COMMANDS.md`: các lệnh cần chạy đầu phiên, kiểm tra trước khi báo xong, chạy local, infra, và danh sách lệnh không được tự chạy.
 
+## Runbook gateway
+
+Vận hành và cảnh báo bảo mật (không expose internet trước JWT): [`document/runbooks/gateway-operations.md`](document/runbooks/gateway-operations.md).
+
 ## Workflow (issue, branch, commit, PR)
 
 Cấu hình trong `config/project.yaml`. Tóm tắt:
