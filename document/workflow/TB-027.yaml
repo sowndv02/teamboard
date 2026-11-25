@@ -3,7 +3,7 @@
 id: TB-027
 scope: issue
 title: Gateway lát 7, quan sát và vận hành
-updated: 2026-11-25T12:00:00Z
+updated: 2026-11-25T15:55:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: origin/main
   pr: https://github.com/sowndv02/teamboard/pull/21
 
-current_step: create-pr
-next_action: "create-pr sau khi người dùng xác nhận push/PR"
+current_step: done
+next_action: null
 
 steps:
   requirements-discovery: { status: done, evidence: ["document/spec/api-gateway.md"] }
@@ -84,3 +84,5 @@ events:
   - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init: plan TB-027 draft" }
   - { at: 2026-11-25T00:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: observability.feature @S01–@S07 đỏ" }
   - { at: 2026-11-25T12:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS; next coding-start B1" }
+  - { at: 2026-11-25T15:51:34Z, actor: user, event: merged, detail: "PR #21 merge commit 8988fce on main" }
+  - { at: 2026-11-25T15:55:00Z, actor: orchestrator:cursor-session, event: closed, detail: "issue và lát 7 done; lessons_recorded: none" }
