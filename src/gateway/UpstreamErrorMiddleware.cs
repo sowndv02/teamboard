@@ -40,6 +40,11 @@ public sealed partial class UpstreamErrorMiddleware(RequestDelegate next, ILogge
                 LogBadGateway(feature.Exception, feature.Error);
                 await WriteProblemAsync(context, GatewayErrorCodes.UpstreamBadGateway, retryAfter: false);
                 break;
+            case UpstreamFailure.PayloadTooLarge:
+                // The body is the client's, so the log keeps only the forwarder error: no exception text, no body content (NFR-006).
+                LogPayloadTooLarge(feature.Error);
+                await WriteProblemAsync(context, GatewayErrorCodes.PayloadTooLarge, retryAfter: false);
+                break;
             case UpstreamFailure.AbortedAfterHeaders:
                 // Too late to change the status: YARP already cut the connection, so record it for the log and the counter.
                 LogAborted(feature.Exception, feature.Error);
@@ -75,6 +80,9 @@ public sealed partial class UpstreamErrorMiddleware(RequestDelegate next, ILogge
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Upstream failed after the response started ({ForwarderError}); the connection was cut.")]
     private partial void LogAborted(Exception? exception, ForwarderError forwarderError);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Request body over the limit, answered 413 ({ForwarderError}).")]
+    private partial void LogPayloadTooLarge(ForwarderError forwarderError);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "The client cancelled the request ({ForwarderError}).")]
     private partial void LogClientCancelled(ForwarderError forwarderError);

@@ -18,3 +18,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-022-gateway-correlation-error-handling](TB-022-gateway-correlation-error-handling.md) | TB-022 (lát 2 gateway) | approved |
 | [TB-023-gateway-downstream-errors](TB-023-gateway-downstream-errors.md) | TB-023 (lát 3 gateway) | approved |
 | [TB-024-gateway-rate-limit](TB-024-gateway-rate-limit.md) | TB-024 (lát 4 gateway) | approved |
+| [TB-025-gateway-body-limit](TB-025-gateway-body-limit.md) | TB-025 (lát 5 gateway) | approved |

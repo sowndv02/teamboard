@@ -57,6 +57,9 @@ public sealed class GatewayContext : IAsyncDisposable
     /// <summary>Sum of the measurements of the gateway_upstream_aborted counter seen since the gateway started.</summary>
     public long AbortedCount => Interlocked.Read(ref _abortedCount);
 
+    /// <summary>When true the gateway listens on a real Kestrel socket: TestServer has no request body size feature (plan TB-025 spike).</summary>
+    internal bool UseRealKestrel { get; set; }
+
     internal void StartGateway(bool forceUnhandledError = false)
     {
         StartMeterListener();
@@ -112,6 +115,12 @@ public sealed class GatewayContext : IAsyncDisposable
                 }
             });
         });
+        if (UseRealKestrel)
+        {
+            _factory.UseKestrel(0);
+            _factory.StartServer();
+        }
+
         _client = _factory.CreateClient();
         // A safety net far above every timeout used in the tests, so a missing gateway timeout fails instead of hanging.
         _client.Timeout = TimeSpan.FromSeconds(20);

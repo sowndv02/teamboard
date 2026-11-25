@@ -50,6 +50,16 @@ public sealed partial class GatewayErrorCodesTests
     }
 
     [Fact]
+    public void All_ContainsPayloadTooLarge_As413WithoutInternals()
+    {
+        var error = Assert.Single(GatewayErrorCodes.All, e => e.Code == "PAYLOAD_TOO_LARGE");
+
+        Assert.Equal(413, error.Status);
+        Assert.DoesNotMatch(@"\d", error.Message);
+        Assert.DoesNotContain("board-service", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void All_Codes_AreUniqueAndHaveMessages()
     {
         Assert.NotEmpty(GatewayErrorCodes.All);

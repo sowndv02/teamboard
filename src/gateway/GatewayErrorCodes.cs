@@ -15,5 +15,7 @@ public static class GatewayErrorCodes
 
     public static readonly ErrorDefinition RateLimitExceeded = new("RATE_LIMIT_EXCEEDED", 429, "Too many requests.");
 
-    public static IReadOnlyList<ErrorDefinition> All { get; } = [RouteNotFound, UpstreamUnavailable, UpstreamBadGateway, UpstreamTimeout, RateLimitExceeded];
+    public static readonly ErrorDefinition PayloadTooLarge = new("PAYLOAD_TOO_LARGE", 413, "The request body is too large.");
+
+    public static IReadOnlyList<ErrorDefinition> All { get; } = [RouteNotFound, UpstreamUnavailable, UpstreamBadGateway, UpstreamTimeout, RateLimitExceeded, PayloadTooLarge];
 }
