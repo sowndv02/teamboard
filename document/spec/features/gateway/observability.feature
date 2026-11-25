@@ -10,6 +10,8 @@ Feature: Gateway observability and operations
     And the gateway is configured to point at the fake upstream
     When client "203.0.113.10" sends "GET" to "/api/v1/boards" with X-Correlation-Id "obs-s01-correlation"
     Then the gateway wrote an access log entry with correlationId "obs-s01-correlation" and client IP "203.0.113.10"
+    And that access log entry includes method "GET" and status 200
+    And that access log entry includes a non-empty trace id
 
   @S02 @NFR-006
   Scenario: Access logs never contain Authorization values or request bodies
@@ -51,7 +53,7 @@ Feature: Gateway observability and operations
     When I inspect the shipped gateway compose settings
     Then the gateway service uses the json-file log driver with size limits
 
-  @S06
+  @S06 @NFR-006
   Scenario: Graceful shutdown timeouts match operations design
     When I inspect the shipped gateway host and compose settings
     Then the gateway host shutdown timeout is at least 30 seconds

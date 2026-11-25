@@ -39,19 +39,38 @@ public sealed class ObservabilitySteps(GatewayContext context)
         });
     }
 
+    private CapturingLoggerProvider.LogEntry? _lastAccessLog;
+
     [Then(@"the gateway wrote an access log entry with correlationId ""(.*)"" and client IP ""(.*)""")]
     public void ThenAccessLogWithCorrelationAndIp(string correlationId, string clientIp)
     {
-        var entry = FindAccessLog(correlationId, clientIp);
-        Assert.NotNull(entry);
+        _lastAccessLog = FindAccessLog(correlationId, clientIp);
+        Assert.NotNull(_lastAccessLog);
+    }
+
+    [Then(@"that access log entry includes method ""(.*)"" and status {int}")]
+    public void ThenAccessLogMethodAndStatus(string method, int status)
+    {
+        var entry = _lastAccessLog ?? throw new InvalidOperationException("No access log entry from the previous step.");
+        var text = $"{entry.Message} {entry.Scopes}";
+        Assert.Contains($"method={method}", text, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains($"status={status}", text, StringComparison.Ordinal);
+    }
+
+    [Then("that access log entry includes a non-empty trace id")]
+    public void ThenAccessLogTraceId()
+    {
+        var entry = _lastAccessLog ?? throw new InvalidOperationException("No access log entry from the previous step.");
+        var text = $"{entry.Message} {entry.Scopes}";
+        Assert.Matches("traceId=[^|,}\\s]+", text);
     }
 
     [Then(@"the gateway wrote an access log entry with correlationId from the response and client IP ""(.*)""")]
     public void ThenAccessLogWithResponseCorrelationAndIp(string clientIp)
     {
         var correlationId = AssertResponseCorrelationId();
-        var entry = FindAccessLog(correlationId, clientIp);
-        Assert.NotNull(entry);
+        _lastAccessLog = FindAccessLog(correlationId, clientIp);
+        Assert.NotNull(_lastAccessLog);
     }
 
     [Then(@"no gateway log entry contains ""(.*)"", ""(.*)"" or the request body")]
@@ -109,11 +128,34 @@ public sealed class ObservabilitySteps(GatewayContext context)
     [Then("the gateway host shutdown timeout is at least {int} seconds")]
     public void ThenHostShutdownTimeout(int minimumSeconds)
     {
-        var source = _programSource ?? File.ReadAllText(Path.Combine(RepoRoot.Find(), "src", "gateway", "Program.cs"));
-        var match = Regex.Match(source, @"ShutdownTimeout\s*=\s*TimeSpan\.FromSeconds\((\d+)\)");
-        Assert.True(match.Success, "Program.cs does not set HostOptions.ShutdownTimeout.");
-        var seconds = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+        var seconds = TryReadShutdownTimeoutSeconds();
+        Assert.True(seconds is not null, "Neither Program.cs nor appsettings.json sets Host shutdown timeout.");
         Assert.True(seconds >= minimumSeconds, $"ShutdownTimeout is {seconds}s, expected >= {minimumSeconds}s.");
+    }
+
+    private int? TryReadShutdownTimeoutSeconds()
+    {
+        var programPath = Path.Combine(RepoRoot.Find(), "src", "gateway", "Program.cs");
+        var source = _programSource ?? File.ReadAllText(programPath);
+        var codeMatch = Regex.Match(source, @"ShutdownTimeout\s*=\s*TimeSpan\.FromSeconds\((\d+)\)");
+        if (codeMatch.Success)
+        {
+            return int.Parse(codeMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+        }
+
+        var settingsPath = Path.Combine(RepoRoot.Find(), "src", "gateway", "appsettings.json");
+        using var document = JsonDocument.Parse(File.ReadAllText(settingsPath));
+        if (document.RootElement.TryGetProperty("Host", out var host)
+            && host.TryGetProperty("ShutdownTimeout", out var timeoutToken))
+        {
+            var raw = timeoutToken.GetString();
+            if (TimeSpan.TryParse(raw, CultureInfo.InvariantCulture, out var timeout))
+            {
+                return (int)timeout.TotalSeconds;
+            }
+        }
+
+        return null;
     }
 
     [Then("the gateway compose service allows {int} seconds to stop")]
