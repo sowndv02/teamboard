@@ -1,7 +1,7 @@
 ---
 key: TB-026
 title: Gateway lát 6, CORS theo allowlist
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-026-gateway-cors
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -34,6 +34,7 @@ Plan: [`document/plans/TB-026-gateway-cors.md`](../plans/TB-026-gateway-cors.md)
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-25: plan-init. Nhánh `feature/TB-026-gateway-cors` tạo từ `origin/main` (TB-025 đã merge, PR 19). Người dùng chốt: lát 1 (TB-010) coi là `done`; khoá cấu hình `Cors:AllowedOrigins`.
+- 2026-11-25: mở PR https://github.com/sowndv02/teamboard/pull/20 (nhánh `feature/TB-026-gateway-cors` vào `main`); trạng thái review.
 
 ## Workflow
 
@@ -47,7 +48,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-25 | 11 đỏ đúng lý do; S02, S06, CorsOptions empty-list xanh sẵn là khóa hợp đồng (người dùng chốt) |
 | coding-start | done | – | 2026-11-25 | Xanh 213/213 (gateway.Tests, không docker); build -warnaserror và format xanh; xem "Kịch bản và TDD log" |
 | coding-review | PASS | 2 | 2026-11-25 | Vòng 2 delta `1e5c607`: 0 fingerprint mở; gate 215/215 |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-25 | https://github.com/sowndv02/teamboard/pull/20 |
 
 ## Confirm log
 

@@ -14,10 +14,10 @@ links:
   features_dir: document/spec/features/gateway/
   branch: feature/TB-026-gateway-cors
   base: origin/main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/20
 
 current_step: create-pr
-next_action: "Mở create-pr cho TB-026 (skill create-pr): xác nhận với người dùng trước khi push và gh pr create"
+next_action: "Chờ review người và CI xanh; merge do người dùng; sau merge đồng bộ lát 6 và issue sang done"
 blocked_by: null
 
 steps:
@@ -77,7 +77,9 @@ steps:
     open_fix: 0
     evidence: ["Delta cb40107..1e5c607: CORS implementation + LL-006 docs", "Gate: gateway.Tests 215/215 (Category!=docker)", "Fingerprint workflow:TB-026:uncommitted-production đóng tại 1e5c607"]
   create-pr:
-    status: pending
+    status: done
+    finished: 2026-11-25T00:00:00Z
+    evidence: ["https://github.com/sowndv02/teamboard/pull/20", "push feature/TB-026-gateway-cors", "gate 215/215 truoc PR"]
 
 confirm_pending: []
 
