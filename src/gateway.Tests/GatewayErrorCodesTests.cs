@@ -41,6 +41,15 @@ public sealed partial class GatewayErrorCodesTests
     }
 
     [Fact]
+    public void All_ContainsRateLimitExceeded_As429WithoutInternals()
+    {
+        var error = Assert.Single(GatewayErrorCodes.All, e => e.Code == "RATE_LIMIT_EXCEEDED");
+
+        Assert.Equal(429, error.Status);
+        Assert.DoesNotMatch(@"\d+\.\d+\.\d+\.\d+", error.Message);
+    }
+
+    [Fact]
     public void All_Codes_AreUniqueAndHaveMessages()
     {
         Assert.NotEmpty(GatewayErrorCodes.All);

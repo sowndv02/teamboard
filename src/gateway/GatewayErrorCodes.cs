@@ -13,5 +13,7 @@ public static class GatewayErrorCodes
 
     public static readonly ErrorDefinition UpstreamTimeout = new("UPSTREAM_TIMEOUT", 504, "The upstream service did not respond in time.");
 
-    public static IReadOnlyList<ErrorDefinition> All { get; } = [RouteNotFound, UpstreamUnavailable, UpstreamBadGateway, UpstreamTimeout];
+    public static readonly ErrorDefinition RateLimitExceeded = new("RATE_LIMIT_EXCEEDED", 429, "Too many requests.");
+
+    public static IReadOnlyList<ErrorDefinition> All { get; } = [RouteNotFound, UpstreamUnavailable, UpstreamBadGateway, UpstreamTimeout, RateLimitExceeded];
 }

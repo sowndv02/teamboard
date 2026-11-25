@@ -74,6 +74,8 @@ public sealed class GatewayContext : IAsyncDisposable
             }
 
             builder.ConfigureLogging(logging => logging.AddProvider(Logs));
+            // Tests choose the client address per request with the X-Test-Remote-Ip header; TestServer has no real socket address.
+            builder.ConfigureTestServices(services => services.AddSingleton<IStartupFilter, TestRemoteIpStartupFilter>());
             if (OuterResponseHeader is { } outer)
             {
                 builder.ConfigureTestServices(services => services.AddSingleton<IStartupFilter>(new OuterHeaderStartupFilter(outer.Name, outer.Value)));

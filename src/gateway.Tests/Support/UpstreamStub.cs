@@ -40,6 +40,9 @@ internal sealed class UpstreamStub : IAsyncDisposable
     /// <summary>X-Correlation-Id and traceparent headers each request received (empty string if absent; multiple values joined by commas).</summary>
     public ConcurrentQueue<(string CorrelationId, string TraceParent)> ReceivedHeaders { get; } = new();
 
+    /// <summary>X-Forwarded-For and X-Forwarded-Proto each request received (empty string if absent).</summary>
+    public ConcurrentQueue<(string For, string Proto)> ReceivedForwarded { get; } = new();
+
     /// <summary>If set, the upstream returns this X-Correlation-Id (checks the gateway does not leave two values in the response).</summary>
     public string? ResponseCorrelationId { get; set; }
 
@@ -58,6 +61,9 @@ internal sealed class UpstreamStub : IAsyncDisposable
             stub.ReceivedHeaders.Enqueue((
                 context.Request.Headers["X-Correlation-Id"].ToString(),
                 context.Request.Headers["traceparent"].ToString()));
+            stub.ReceivedForwarded.Enqueue((
+                context.Request.Headers["X-Forwarded-For"].ToString(),
+                context.Request.Headers["X-Forwarded-Proto"].ToString()));
             if (stub.ResponseCorrelationId is not null)
             {
                 context.Response.Headers["X-Correlation-Id"] = stub.ResponseCorrelationId;
