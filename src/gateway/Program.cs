@@ -1,4 +1,7 @@
 using Gateway;
+using Gateway.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
@@ -15,6 +18,9 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+builder.Services.AddSingleton<IConfigureOptions<ForwardedHeadersOptions>, ForwardedHeadersSetup>();
+builder.Services.AddGatewayRateLimiting();
+
 // Needed for the route-level Timeout in the YARP configuration: without this middleware a route with Timeout fails with 500.
 builder.Services.AddRequestTimeouts();
 
@@ -24,12 +30,13 @@ builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(Gate
 var app = builder.Build();
 
 // Target middleware order (design 6.4): ForwardedHeaders, Routing, Correlation, ExceptionHandler, RequestTimeouts, UpstreamError, CORS, RateLimiter, BodyLimit, YARP.
-// This slice has Correlation, ExceptionHandler, routing, health and fallback; the remaining middleware are added in later slices.
-// UseRouting is added at the start of the pipeline by minimal hosting, so it is not called explicitly.
+app.UseForwardedHeaders();
+app.UseRouting();
 app.UseCorrelation();
 app.UseTeamboardExceptionHandler();
 app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();
+app.UseRateLimiter();
 
 app.MapDefaultEndpoints();
 app.MapReverseProxy();
