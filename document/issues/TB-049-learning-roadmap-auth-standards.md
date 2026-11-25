@@ -1,7 +1,7 @@
 ---
 key: TB-049
 title: Lộ trình học Authentication Standards (khái niệm) theo Part 0–7 × L1–L8
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-049-learning-roadmap-auth-standards
 estimate: L
@@ -42,3 +42,4 @@ Nhánh cắt từ `origin/main` trong worktree `H:\learning\board-tb-049`; nhán
 - 2026-11-25: tạo issue theo kế hoạch người dùng duyệt (plan mode).
 - 2026-11-25: viết `document/learning/auth-standards/` Part 0–7 từ `auth_std_roadmap-main`; xoá `identity/auth-methods-map.md`; cập nhật mục lục learning + identity README; lab/quiz hoãn.
 - 2026-11-25: ghi chiến lược lab dual provider (`identity-auth-lab.md`, `auth-development.example.yaml`, issue TB-050); settings `Auth:Provider` Identity|Keycloak.
+- 2026-11-25: mở PR https://github.com/sowndv02/teamboard/pull/23 (nhánh `feature/TB-049-learning-roadmap-auth-standards` → `main`); trạng thái `review`.
