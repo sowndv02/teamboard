@@ -241,7 +241,7 @@ Gateway: nhận request công khai, áp biên bảo vệ (rate limit, CORS, gi�
 | Lỗi chưa lường của gateway | 500 | `INTERNAL_ERROR` |
 
   Đây là mã mới do gateway định nghĩa, là một phần hợp đồng công khai; người dùng đã xác nhận (DA-02). Lỗi sau khi đã gửi header: ngắt kết nối, không có status mới (D4).
-- **Giới hạn body (FR-007):** 1 MiB = 1.048.576 byte. Request có `Content-Length` lớn hơn giới hạn bị từ chối `413` ngay, **không** gửi xuống upstream. Body chunked (không có `Content-Length`): ngắt luồng khi vượt giới hạn; upstream **có thể đã nhận một phần** body (người dùng chấp nhận; spec FR-007 được sửa câu chữ cho khớp).
+- **Giới hạn body (FR-007):** 1 MiB = 1.048.576 byte. Request có `Content-Length` lớn hơn giới hạn bị từ chối `413` ngay, **không** gửi xuống upstream. Body chunked (không có `Content-Length`): `BodyLimit` đếm byte thân khi đọc và ngắt luồng khi vượt giới hạn, client nhận `413 problem+json` `PAYLOAD_TOO_LARGE` (không phải `413` rỗng của Kestrel); upstream **có thể đã nhận request và một phần** body (người dùng chấp nhận; spec FR-007 được sửa câu chữ cho khớp). Giới hạn chunked chỉ có hiệu lực ở route proxy, nơi body được đọc; route khác chỉ chịu kiểm `Content-Length`. Giới hạn áp cho mọi request, `MaxBytes` hợp lệ từ 1 đến 10.485.760 byte.
 - **Sự kiện:** không có (spec mục 11).
 
 ### 6.4 Luồng chính
@@ -436,6 +436,7 @@ Ghi chú đã chốt: **Q-D1** chọn A, làm TB-001 trước rồi mới tới 
 | 2026-10-25 | Thêm `UpstreamError` vào thứ tự middleware 6.4 (sau `RequestTimeouts`, không xoá header của middleware phía trong) | coding-review TB-023 (người dùng chốt) |
 | 2026-10-25 | Làm rõ phạm vi "khoá bằng test" của thứ tự middleware 6.4: chỉ phần quan sát được | test-review TB-024 (người dùng chốt) |
 | 2026-10-25 | D1: `Retry-After` của `429` bằng độ dài cửa sổ của policy, không lấy từ metadata lease (khớp kết quả spike ở plan-review) | coding-review TB-024 (người dùng chốt) |
+| 2026-11-25 | 6.3: body chunked vượt giới hạn trả `413 problem+json` (đếm byte thân khi đọc), giới hạn áp mọi request, `MaxBytes` 1 đến 10 MiB | plan-review TB-025 (người dùng chốt) |
 
 ## 18. Confirm log
 

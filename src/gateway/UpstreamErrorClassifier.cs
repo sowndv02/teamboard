@@ -49,6 +49,12 @@ public static class UpstreamErrorClassifier
             return UpstreamFailure.AbortedAfterHeaders;
         }
 
+        // Kestrel or the body limit cut a request body that is too large: the client gets a 413, it did not leave.
+        if (error == ForwarderError.RequestBodyClient && IsBodyTooLarge(exception))
+        {
+            return UpstreamFailure.PayloadTooLarge;
+        }
+
         if (isClientSide)
         {
             return UpstreamFailure.ClientCancelled;
@@ -66,6 +72,15 @@ public static class UpstreamErrorClassifier
             _ => UpstreamFailure.BadGateway,
         };
     }
+
+    // YARP wraps the failure (AggregateException around the BadHttpRequestException, spike TB-025), so the whole tree is searched.
+    private static bool IsBodyTooLarge(Exception? exception) => exception switch
+    {
+        null => false,
+        BadHttpRequestException { StatusCode: StatusCodes.Status413PayloadTooLarge } => true,
+        AggregateException aggregate => aggregate.InnerExceptions.Any(IsBodyTooLarge),
+        _ => IsBodyTooLarge(exception.InnerException),
+    };
 
     // A refused connection or an unresolvable name means nothing is listening: 503. A reset in the middle of an exchange is a bad gateway.
     private static bool IsConnectionRefusedOrUnresolvable(Exception? exception)

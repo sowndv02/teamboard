@@ -18,6 +18,12 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+builder.Services
+    .AddOptions<BodyLimitOptions>()
+    .BindConfiguration(BodyLimitOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 builder.Services.AddSingleton<IConfigureOptions<ForwardedHeadersOptions>, ForwardedHeadersSetup>();
 builder.Services.AddGatewayRateLimiting();
 
@@ -37,6 +43,7 @@ app.UseTeamboardExceptionHandler();
 app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();
 app.UseRateLimiter();
+app.UseMiddleware<BodyLimitMiddleware>();
 
 app.MapDefaultEndpoints();
 app.MapReverseProxy();
