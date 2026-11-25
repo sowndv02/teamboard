@@ -50,7 +50,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 2 | 2026-11-25 | plan `approved`; 4 quyết định (chunked `problem+json`, mọi request, khoảng 1-10 MiB, giữ một lát); 3 FIX theo spike (TestServer không có feature giới hạn, Kestrel trả `413` rỗng, không `500`); làn vừa |
 | test-init | done | – | 2026-11-25 | 7 kịch bản (`body-limit.feature`) + 3 nhóm xUnit; đỏ 12 test đúng lý do (413 mong đợi nhưng nhận 201, thiếu mã `PAYLOAD_TOO_LARGE`, thiếu cấu hình và validation `MaxBytes`, classifier chưa có nhánh body quá lớn); 4 kịch bản xanh sẵn (hồi quy); gateway 188 test: 176 xanh, 12 đỏ |
 | test-review | PASS | 1 | 2026-11-25 | 2 FIX đã sửa (thiếu kịch bản cho Confirm #2 và phần chunked của NFR-006: thêm @S08, @S09), 1 P3 người dùng bỏ qua; 9 kịch bản, gateway 191 test: 15 đỏ đúng lý do (413 mong đợi, nhận 201/200/404, thiếu mã, cấu hình, nhánh classifier), 176 xanh gồm 166 test cũ; review do agent đã viết test thực hiện |
-| coding-start | done | – | 2026-11-25 | xanh 191/191 gateway (3 lần liên tiếp; nhóm TB-025 10/10) và toàn solution không docker (266/266: 40 + 11 + 3 + 21 + 191); build `-warnaserror` 0/0, format, vulnerable, compose config sạch; gitleaks chưa cài, quét secret thô sạch; nhóm docker không chạy (không đổi compose/Dockerfile); chưa commit |
+| coding-start | done | – | 2026-11-25 | xanh 191/191 gateway (3 lần liên tiếp; nhóm TB-025 10/10) và toàn solution không docker (266/266: 40 + 11 + 3 + 21 + 191); build `-warnaserror` 0/0, format, vulnerable, compose config sạch; gitleaks chưa cài lúc đó (đã quét ở coding-review), quét secret thô sạch; nhóm docker không chạy (không đổi compose/Dockerfile); chưa commit |
 | coding-review | PASS | 1 | 2026-11-25 | 0 P0-P2, 1 P3 test coverage (đã sửa: thêm `LimitedReadStreamTests`); probe F1-F8, B1-B4, BP1-BP6 đã kiểm; gate xanh: build `-warnaserror` 0/0, format, vulnerable, compose config, test không docker 271/271 (gateway 196); gitleaks chưa cài; review do agent đã viết code thực hiện, chưa có reviewer độc lập |
 | create-pr | pending | – | | |
 
@@ -106,7 +106,7 @@ Giới hạn đã biết: (1) @S05 và @S09 gửi body chunked qua socket thật
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
-| 1 | 2026-11-25 | `e76a299` (base `main` `66673c2`) | Sẵn sàng merge sau khi sửa P3 (đã sửa trong working tree, chưa commit) | không |
+| 1 | 2026-11-25 | `314ee2b` (base `main` `66673c2`) | Sẵn sàng merge (S1-S15 đã kiểm; `gitleaks` sạch) | không |
 
 **Báo cáo vòng 1 (tóm tắt):**
 
@@ -137,8 +137,13 @@ Giới hạn đã biết: (1) @S05 và @S09 gửi body chunked qua socket thật
 | S8 Giới hạn, DoS | Có | Đây chính là biện pháp giới hạn body; rate limit đứng trước (@S07). Tồn đọng đã ghi: giới hạn chunked chỉ ở route proxy, log cảnh báo YARP mỗi request chunked quá lớn (R-07) |
 | S9 Phụ thuộc | Có | Không đổi file `.csproj`; `dotnet list package --vulnerable --include-transitive` không có gói lỗ hổng |
 | S10 Race, trạng thái | Không áp dụng | Không ghi trạng thái; bộ đếm `_total` thuộc từng request |
+| S11 Client-side | Không áp dụng | Diff không chạm `src/web` |
+| S12 Mass assignment, quyền theo logic | Không áp dụng | Không có DTO hay entity; không có quyền theo trạng thái |
+| S13 IaC, container, CI/CD | Không áp dụng | Diff không chạm `infra/`, Dockerfile, compose hay CI (chỉ `src/gateway`, `src/gateway.Tests`, tài liệu, `.agents/` do commit `58897e3`) |
+| S14 Audit log | Không áp dụng | Không có hành động nhạy cảm mới; log "413" mang `correlationId` qua scope; rate limit đã có từ lát 4 |
+| S15 Công cụ quét | Có | `dotnet list package --vulnerable` sạch; `gitleaks` 8.30.1 (người dùng cài 2026-11-25): `gitleaks git --log-opts="main..HEAD"` quét 8 commit, không có rò rỉ; `gitleaks dir` trên file issue chưa commit, không có rò rỉ. SAST (Semgrep/CodeQL) chưa có trong dự án: không bắt buộc cho đổi nhỏ theo rule |
 
-Không có finding bảo mật mới; verdict vòng 1 giữ nguyên.
+Không có finding bảo mật. S15 đã đóng. `gitleaks` mới chạy ở lần này nên `COMMANDS.md` vẫn ghi "🚧 chưa cài" (ngoài phạm vi issue, báo lại).
 
 Lăng kính: Chất lượng đạt (lỗi qua registry, không nuốt lỗi); Bảo mật đạt (không secret, phụ thuộc không lỗ hổng); Chi phí đạt (bọc stream rẻ, không log thêm ngoại lệ).
 
