@@ -3,8 +3,8 @@
 id: feature-identity-auth
 scope: feature
 title: Xác thực và ủy quyền (identity-service)
-updated: 2026-10-25T03:00:00Z
-updated_by: orchestrator:claude-session
+updated: 2026-11-25T16:30:00Z
+updated_by: orchestrator:cursor-session
 
 links:
   issue: TB-004
@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: plan-review
-next_action: "Theo dõi từng lát qua state của issue (lát 1a: TB-021, plan-review). Lát 19 (I9) cần spec/design gateway và board bổ sung trước khi plan; ADR tạo ngay trước lát cần"
+next_action: "Lát hiện tại: TB-029 (1b register) — plan-review chốt P-01..P-04. Lát 1a TB-021 done. Lát 19 (I9) cần spec/design gateway và board bổ sung trước khi plan; ADR tạo ngay trước lát cần"
 blocked_by: null
 
 steps:

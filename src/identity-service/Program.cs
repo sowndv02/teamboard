@@ -1,10 +1,13 @@
+using IdentityService.Features.Register;
 using IdentityService.Persistence;
+using IdentityService.Security;
 using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults("identity-service");
 builder.AddIdentityPersistence();
+builder.AddIdentitySecurity();
 
 var app = builder.Build();
 
@@ -17,6 +20,7 @@ app.UseExceptionHandler(errorApp => errorApp.Run(context =>
     Results.Problem(ProblemFactory.Create(SharedErrors.InternalError, context)).ExecuteAsync(context)));
 
 app.MapDefaultEndpoints();
+app.MapRegisterEndpoints();
 
 app.Run();
 

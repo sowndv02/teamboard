@@ -1,13 +1,13 @@
 ---
 key: TB-021
 title: Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền
-status: review
+status: done
 phase: 1
 branch: feature/TB-021-identity-service-skeleton
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-10-25          # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2025-10-25     # ngày done/dropped
 ---
 
 # TB-021 — Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền
@@ -40,6 +40,7 @@ Plan chi tiết: `document/plans/TB-021-identity-service-skeleton.md` (`approved
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue từ hàng 1a của bảng lát; nhánh từ `main` `e79560d`.
 - 2026-10-25: mở PR [sowndv02/teamboard#14](https://github.com/sowndv02/teamboard/pull/14); issue chuyển `review`.
+- 2026-11-25: PR #14 đã merge; lát 1a `done`; tiếp TB-029 plan-init.
 
 ## Kịch bản và TDD log
 

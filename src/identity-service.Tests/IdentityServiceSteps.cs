@@ -1,9 +1,12 @@
+using System.Diagnostics.Metrics;
+using System.Net.Http.Json;
 using System.Text.Json;
 using IdentityService.Tests.Support;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry;
 using OpenTelemetry.Trace;
 using Reqnroll;
@@ -18,6 +21,8 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string MigrateKey = "Database:MigrateOnStartup";
     private const string ThrowPath = "/__test/throw";
     private const string ThrowMessage = "boom: internal detail must not leak";
+    private const string RegisterPath = "/api/v1/auth/register";
+    private const string HashDurationInstrument = "password_hash_duration_seconds";
 
     // Nothing listens on port 1: simulates a stopped DB without needing a container.
     private const string UnreachableConnection =
@@ -29,6 +34,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private HttpResponseMessage? _response;
     private Exception? _thrown;
     private string _body = string.Empty;
+    private CapturingLoggerProvider? _logs;
+    private MeterListener? _meterListener;
+    private long _hashDurationSamples;
+    private (int First, int Second)? _concurrentStatuses;
 
     private PostgresDatabase Database => _database ?? throw new InvalidOperationException("No database yet.");
 
@@ -47,6 +56,106 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [Given("identity-service has an operation that causes an unexpected error")]
     public void GivenServiceWithFailingOperation() =>
         _client = StartService(UnreachableConnection, migrate: false, services => services.AddSingleton<IStartupFilter, ThrowingEndpointFilter>());
+
+    [Given("identity-service log capture is enabled")]
+    public void GivenLogCapture() => _logs = new CapturingLoggerProvider();
+
+    [Given("identity-service metrics are being observed")]
+    public void GivenMetrics() => StartMeterListener();
+
+    [Given("a user is registered with email {string} and password {string}")]
+    public async Task GivenRegisteredUser(string email, string password) => await SendRegisterAsync(email, password, expectedStatus: 201);
+
+    [When("I send a registration request with email {string} and password {string}")]
+    public Task WhenRegister(string email, string password) => SendRegisterAsync(email, password);
+
+    [When("I send a registration request with email {string} and a password longer than {int} characters")]
+    public Task WhenRegisterLongPassword(string email, int minAllowed) =>
+        SendRegisterAsync(email, new string('a', minAllowed + 1));
+
+    [When("I register users {string} and {string} with the same password {string}")]
+    public async Task WhenRegisterTwoUsers(string emailA, string emailB, string password)
+    {
+        await SendRegisterAsync(emailA, password, expectedStatus: 201);
+        await SendRegisterAsync(emailB, password, expectedStatus: 201);
+    }
+
+    [When("two registration requests run concurrently for email {string} and password {string}")]
+    public async Task WhenConcurrentRegister(string email, string password)
+    {
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        var taskA = client.PostAsJsonAsync(RegisterPath, new { email, password });
+        var taskB = client.PostAsJsonAsync(RegisterPath, new { email, password });
+        await Task.WhenAll(taskA, taskB);
+        using var responseA = await taskA;
+        using var responseB = await taskB;
+        _concurrentStatuses = ((int)responseA.StatusCode, (int)responseB.StatusCode);
+    }
+
+    [Then("the registration response body does not contain {string}, {string}, or {string}")]
+    public void ThenBodyExcludesSecrets(string a, string b, string c)
+    {
+        Assert.DoesNotContain(a, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(b, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(c, _body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Then("the registration response has a non-empty id")]
+    public void ThenResponseHasId()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var id = document.RootElement.GetProperty("id").GetString();
+        Assert.False(string.IsNullOrWhiteSpace(id));
+        Assert.True(Guid.TryParse(id, out _), "id should be a GUID string.");
+    }
+
+    [Then("the registration response has a Location header for the created user")]
+    public void ThenResponseHasLocation()
+    {
+        Assert.NotNull(_response);
+        Assert.True(_response.Headers.TryGetValues("Location", out var values), "Location header is missing.");
+        var location = values.Single();
+        Assert.Matches("/api/v1/users/[0-9a-fA-F-]{36}", location);
+    }
+
+    [Then("the database stores two different password hashes for those users")]
+    public async Task ThenDifferentHashes()
+    {
+        var hashes = await Database.GetDistinctPasswordHashesAsync();
+        Assert.Equal(2, hashes.Count);
+        Assert.NotEqual(hashes[0], hashes[1]);
+    }
+
+    [Then("no captured log entry contains {string}")]
+    public void ThenLogsExclude(string secret)
+    {
+        Assert.NotNull(_logs);
+        foreach (var entry in _logs.Entries)
+        {
+            Assert.DoesNotContain(secret, entry.Message, StringComparison.Ordinal);
+            if (entry.Exception is not null)
+            {
+                Assert.DoesNotContain(secret, entry.Exception.ToString()!, StringComparison.Ordinal);
+            }
+        }
+    }
+
+    [Then("the identity histogram {string} recorded at least one sample")]
+    public void ThenHistogram(string instrumentName)
+    {
+        Assert.Equal(HashDurationInstrument, instrumentName);
+        Assert.True(_hashDurationSamples > 0, $"Expected at least one sample for {instrumentName}.");
+    }
+
+    [Then("one registration result has status {int} and the other has status {int}")]
+    public void ThenConcurrentStatuses(int first, int second)
+    {
+        Assert.NotNull(_concurrentStatuses);
+        var statuses = new[] { _concurrentStatuses.Value.First, _concurrentStatuses.Value.Second };
+        Assert.Contains(first, statuses);
+        Assert.Contains(second, statuses);
+        Assert.NotEqual(statuses[0], statuses[1]);
+    }
 
     [When("I send {string} to {string}")]
     public async Task WhenSend(string method, string path)
@@ -144,11 +253,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.DoesNotContain(ThrowMessage, _body, StringComparison.Ordinal);
     }
 
-    [Then("the database migration history has exactly one baseline record")]
-    public async Task ThenOneBaselineRecord()
+    [Then("the database migration history has exactly {int} migration records")]
+    public async Task ThenMigrationRecordCount(int expected)
     {
         Assert.True(await Database.HasMigrationHistoryAsync(), "The migration history table was not created.");
-        Assert.Equal(1, await Database.CountMigrationRecordsAsync());
+        Assert.Equal(expected, await Database.CountMigrationRecordsAsync());
     }
 
     [Then("the database has no migration history")]
@@ -158,11 +267,47 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     {
         _response?.Dispose();
         _client?.Dispose();
+        _meterListener?.Dispose();
         await DisposeFactoriesAsync();
         if (_database is not null)
         {
             await _database.DisposeAsync();
         }
+    }
+
+    private async Task SendRegisterAsync(string email, string password, int? expectedStatus = null)
+    {
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        _response?.Dispose();
+        _response = await client.PostAsJsonAsync(RegisterPath, new { email, password });
+        _body = await _response.Content.ReadAsStringAsync();
+        if (expectedStatus is not null)
+        {
+            Assert.Equal(expectedStatus, (int)_response.StatusCode);
+        }
+    }
+
+    private void StartMeterListener()
+    {
+        _meterListener = new MeterListener
+        {
+            InstrumentPublished = (instrument, listener) =>
+            {
+                if (instrument.Meter.Name.Contains("identity", StringComparison.OrdinalIgnoreCase)
+                    && instrument.Name == HashDurationInstrument)
+                {
+                    listener.EnableMeasurementEvents(instrument);
+                }
+            }
+        };
+        _meterListener.SetMeasurementEventCallback<double>((instrument, _, _, _) =>
+        {
+            if (instrument.Name == HashDurationInstrument)
+            {
+                Interlocked.Increment(ref _hashDurationSamples);
+            }
+        });
+        _meterListener.Start();
     }
 
     private HttpClient StartService(string connectionString, bool migrate, Action<IServiceCollection>? configureServices = null)
@@ -174,6 +319,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             builder.UseEnvironment("Production");
             builder.UseSetting(ConnectionKey, connectionString);
             builder.UseSetting(MigrateKey, migrate ? "true" : "false");
+            if (_logs is not null)
+            {
+                builder.ConfigureLogging(logging => logging.AddProvider(_logs));
+            }
+
             if (configureServices is not null)
             {
                 builder.ConfigureServices(configureServices);
