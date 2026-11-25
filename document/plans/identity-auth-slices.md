@@ -15,8 +15,8 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | # | GĐ | Lát (hành vi giao được) | FR/NFR | Phụ thuộc | Ước lượng | Issue | Trạng thái |
 |---|---|---|---|---|---|---|---|
 | 1a | I1 | Khung identity-service chạy được: health live/ready (ready kiểm DB), OTel, PostgreSQL + EF Core, migration nền, Dockerfile và compose | NFR-001, NFR-003, NFR-009 (một phần NFR-004: `traceparent`) | TB-001 (ServiceDefaults, xong), `shared/Http` (xong) | 2–3 ngày | TB-021 | done |
-| 1b | I1 | Đăng ký bằng email/mật khẩu băm PBKDF2, benchmark số vòng và vCPU | FR-001, FR-004, BR-001, BR-002, NFR-002, NFR-007 (metric băm) | 1a | 2–3 ngày | [TB-029](../issues/TB-029-identity-register.md) | review |
-| 2 | I1 | Đăng nhập, lỗi chung không lộ email | FR-002, BR-003 | 1b | 2–3 ngày | [TB-030](../issues/TB-030-identity-login.md) | todo |
+| 1b | I1 | Đăng ký bằng email/mật khẩu băm PBKDF2, benchmark số vòng và vCPU | FR-001, FR-004, BR-001, BR-002, NFR-002, NFR-007 (metric băm) | 1a | 2–3 ngày | [TB-029](../issues/TB-029-identity-register.md) | done |
+| 2 | I1 | Đăng nhập, lỗi chung không lộ email | FR-002, BR-003 | 1b | 2–3 ngày | [TB-030](../issues/TB-030-identity-login.md) | in-progress |
 | 3 | I1 | Khoá tạm theo (email, IP) và giới hạn tốc độ (cờ `RateLimiter`, Q-G = A) | FR-003, NFR-008 | 2 | 2–3 ngày | [TB-031](../issues/TB-031-identity-lockout-rate-limit.md) | todo |
 | 4 | I2 | Phát access token JWT khi đăng nhập (ADR RS256 + Secrets Manager tạo trước lát này) | FR-005, BR-004 | 2, ADR thuật toán ký | 2–3 ngày | [TB-032](../issues/TB-032-identity-access-token.md) | todo |
 | 5 | I2 | Bộ kiểm tra token dùng chung `Teamboard.Auth` (JWKS, cache) và test tấn công (ADR thư viện token) | FR-006, NFR-006 | 4, JWKS (6) | 3–4 ngày | [TB-033](../issues/TB-033-auth-token-validation-library.md) | todo |

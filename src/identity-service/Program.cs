@@ -1,3 +1,4 @@
+using IdentityService.Features.Login;
 using IdentityService.Features.Register;
 using IdentityService.Persistence;
 using IdentityService.Security;
@@ -21,6 +22,7 @@ app.UseExceptionHandler(errorApp => errorApp.Run(context =>
 
 app.MapDefaultEndpoints();
 app.MapRegisterEndpoints();
+app.MapLoginEndpoints();
 
 app.Run();
 

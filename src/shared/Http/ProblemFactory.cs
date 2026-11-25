@@ -18,7 +18,7 @@ public static class ProblemFactory
         var problem = new ProblemDetails
         {
             Type = TypePrefix + error.Code.ToLowerInvariant().Replace('_', '-'),
-            Title = ReasonPhrases.GetReasonPhrase(error.Status),
+            Title = error.Title ?? ReasonPhrases.GetReasonPhrase(error.Status),
             Status = error.Status,
             Detail = detail ?? error.Message,
         };

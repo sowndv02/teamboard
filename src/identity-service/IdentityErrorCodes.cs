@@ -9,4 +9,10 @@ public static class IdentityErrorCodes
         "EMAIL_ALREADY_EXISTS",
         409,
         "An account with this email already exists.");
+
+    public static readonly ErrorDefinition InvalidCredentials = new(
+        "INVALID_CREDENTIALS",
+        401,
+        "Invalid email or password.",
+        "Invalid email or password.");
 }
