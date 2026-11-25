@@ -16,8 +16,8 @@ links:
   base: origin/main
   pr: null
 
-current_step: coding-review
-next_action: "coding-review TB-027 full branch diff; gate 223/223 gateway.Tests"
+current_step: create-pr
+next_action: "create-pr sau khi người dùng xác nhận push/PR"
 
 steps:
   requirements-discovery: { status: done, evidence: ["document/spec/api-gateway.md"] }
@@ -64,7 +64,12 @@ steps:
       - "dotnet test gateway.Tests Category!=docker: 223/223"
       - "document/runbooks/gateway-operations.md + PROJECT.md link"
   coding-review:
-    status: in_progress
+    status: done
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    finished: 2026-11-25T16:00:00Z
+    evidence: ["merge-base c0caa06..a79396f", "gateway.Tests 223/223 Category!=docker", "build -warnaserror 0"]
   create-pr:
     status: pending
 

@@ -48,7 +48,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-25 | observability.feature @S01–@S07; ObservabilitySteps; 8 đỏ / 215 hồi quy xanh |
 | test-review | PASS | 1 | 2026-11-25 | S01 bổ sung method/status/traceId; shutdown đọc appsettings |
 | coding-start | done | – | 2026-11-25 | B1–B4 xong; 223/223 gateway.Tests (Category!=docker) |
-| coding-review | pending | | | |
+| coding-review | PASS | 1 | 2026-11-25 | `a79396f`..HEAD; 223/223; 0 CONFIRM |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -90,6 +90,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-25 | `a79396f` (toàn nhánh `c0caa06..HEAD`) | PASS | 0 |
 
 ## Fix log
 
