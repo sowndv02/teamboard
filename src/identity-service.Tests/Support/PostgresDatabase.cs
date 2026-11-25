@@ -43,5 +43,28 @@ internal sealed class PostgresDatabase : IAsyncDisposable
         return (long)(await command.ExecuteScalarAsync())!;
     }
 
+    /// <summary>Distinct stored password hashes (TB-029 @S04); fails until the users table exists.</summary>
+    public async Task<IReadOnlyList<string>> GetDistinctPasswordHashesAsync()
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        // Table/column names must match the AddUsers migration in coding-start (plan B1).
+        const string sql =
+            """
+            SELECT DISTINCT password_hash::text AS hash
+            FROM users
+            WHERE password_hash IS NOT NULL
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        var results = new List<string>();
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            results.Add(reader.GetString(0));
+        }
+
+        return results;
+    }
+
     public ValueTask DisposeAsync() => _container.DisposeAsync();
 }
