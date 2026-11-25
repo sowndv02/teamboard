@@ -33,7 +33,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-018](TB-018-learning-roadmap-container.md) | Lộ trình học Container (khái niệm gốc) theo Part 0–7 × L1–L8 | 0 | review |
 | [TB-019](TB-019-learning-roadmap-redis.md) | Lộ trình học Redis (phần riêng) và ghi chú so sánh Redis với Valkey | 0 | review |
 | [TB-020](TB-020-learning-roadmap-identity.md) | Lộ trình học Identity (xác thực và ủy quyền) theo Part 0–7 × L1–L8 | 0 | review |
-| [TB-021](TB-021-identity-service-skeleton.md) | Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền | 1 | review |
+| [TB-021](TB-021-identity-service-skeleton.md) | Identity lát 1a, khung identity-service, health, PostgreSQL và migration nền | 1 | done |
 | [TB-022](TB-022-gateway-correlation-error-handling.md) | Gateway lát 2, correlation, trace nối xuyên service và 500 problem+json | 1 | done |
 | [TB-023](TB-023-gateway-downstream-errors.md) | Gateway lát 3, lỗi phía sau (timeout, 503/502/504, ngắt giữa chừng) | 1 | done |
 | [TB-024](TB-024-gateway-rate-limit.md) | Gateway lát 4, rate limit theo IP và 429 problem+json | 1 | done |
@@ -41,7 +41,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | done |
 | [TB-027](TB-027-gateway-observability-ops.md) | Gateway lát 7, quan sát và vận hành | 1 | done |
 | [TB-028](TB-028-gateway-smoke-board-service.md) | Gateway lát 8, smoke với board-service thật (hoãn) | 1 | todo |
-| [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | todo |
+| [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | in-progress |
 | [TB-030](TB-030-identity-login.md) | Identity lát 2, đăng nhập với lỗi chung không lộ email | 1 | todo |
 | [TB-031](TB-031-identity-lockout-rate-limit.md) | Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập | 1 | todo |
 | [TB-032](TB-032-identity-access-token.md) | Identity lát 4, phát access token JWT khi đăng nhập | 1 | todo |
