@@ -43,6 +43,9 @@ internal sealed class UpstreamStub : IAsyncDisposable
     /// <summary>X-Forwarded-For and X-Forwarded-Proto each request received (empty string if absent).</summary>
     public ConcurrentQueue<(string For, string Proto)> ReceivedForwarded { get; } = new();
 
+    /// <summary>Number of request body bytes each request delivered before the stub answered (0 when there was no body).</summary>
+    public ConcurrentQueue<long> ReceivedBodyBytes { get; } = new();
+
     /// <summary>If set, the upstream returns this X-Correlation-Id (checks the gateway does not leave two values in the response).</summary>
     public string? ResponseCorrelationId { get; set; }
 
@@ -58,6 +61,7 @@ internal sealed class UpstreamStub : IAsyncDisposable
         app.Run(async context =>
         {
             stub!.Received.Enqueue((context.Request.Method, context.Request.Path + context.Request.QueryString));
+            stub.ReceivedBodyBytes.Enqueue(await CountBodyBytesAsync(context));
             stub.ReceivedHeaders.Enqueue((
                 context.Request.Headers["X-Correlation-Id"].ToString(),
                 context.Request.Headers["traceparent"].ToString()));
@@ -110,6 +114,27 @@ internal sealed class UpstreamStub : IAsyncDisposable
         var address = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.First();
         stub = new UpstreamStub(app, address);
         return stub;
+    }
+
+    // Reads the whole request body; a body the gateway cuts short ends the count at what arrived instead of failing the stub.
+    private static async Task<long> CountBodyBytesAsync(HttpContext context)
+    {
+        long total = 0;
+        var buffer = new byte[81920];
+        try
+        {
+            int read;
+            while ((read = await context.Request.Body.ReadAsync(buffer, context.RequestAborted)) > 0)
+            {
+                total += read;
+            }
+        }
+        catch (Exception exception) when (exception is IOException or OperationCanceledException or BadHttpRequestException)
+        {
+            // The gateway closed the request body early: report the bytes that did arrive.
+        }
+
+        return total;
     }
 
     // The gateway drops its connection when it gives up (timeout), which cancels RequestAborted and frees this request.

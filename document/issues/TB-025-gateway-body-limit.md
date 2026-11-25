@@ -46,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-25 | `document/plans/TB-025-gateway-body-limit.md` (draft, cập nhật sau TB-024), làn vừa, 3 bước, 7 kịch bản, 4 câu hỏi mở |
 | plan-review | PASS | 2 | 2026-11-25 | plan `approved`; 4 quyết định (chunked `problem+json`, mọi request, khoảng 1-10 MiB, giữ một lát); 3 FIX theo spike (TestServer không có feature giới hạn, Kestrel trả `413` rỗng, không `500`); làn vừa |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-25 | 7 kịch bản (`body-limit.feature`) + 3 nhóm xUnit; đỏ 12 test đúng lý do (413 mong đợi nhưng nhận 201, thiếu mã `PAYLOAD_TOO_LARGE`, thiếu cấu hình và validation `MaxBytes`, classifier chưa có nhánh body quá lớn); 4 kịch bản xanh sẵn (hồi quy); gateway 188 test: 176 xanh, 12 đỏ |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -67,6 +67,25 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 body đúng 1.048.576 byte được chuyển tiếp | `body-limit.feature` @S01 (`BodyLimitSteps`) | không: xanh sẵn (chưa có giới hạn nào), test hồi quy | chờ coding |
+| @S02 vượt 1 byte: `413 problem+json`, upstream không nhận | @S02 | có: mong đợi 413, nhận 201 | chờ coding |
+| @S03 giới hạn từ cấu hình (1024 qua, 1025 chặn) | @S03 (Outline, 2 dòng) | dòng 1025: mong đợi 413, nhận 201; dòng 1024 xanh sẵn (hồi quy) | chờ coding |
+| @S04 chunked đúng giới hạn qua | @S04 (Kestrel thật) | không: xanh sẵn (Kestrel mặc định 30 MB), test hồi quy | chờ coding |
+| @S05 chunked vượt giới hạn: `413 problem+json` | @S05 (Kestrel thật) | có: mong đợi 413, nhận 201 | chờ coding |
+| @S06 nội dung body bị từ chối không vào log | @S06 | có: mong đợi 413, nhận 201 (phần log xanh sẵn, chỉ có nghĩa khi 413 đã có) | chờ coding |
+| @S07 hết hạn mức thì `429` trước `413` | @S07 | không: xanh sẵn vì chưa có `BodyLimit`; khoá thứ tự, sẽ đỏ nếu `BodyLimit` đặt trước `RateLimiter` | chờ coding |
+| Mã `PAYLOAD_TOO_LARGE` 413 | `GatewayErrorCodesTests.All_ContainsPayloadTooLarge_As413WithoutInternals` | có: thiếu mã | chờ coding |
+| `MaxBytes` mặc định 1 MiB | `BodyLimitConfigurationTests.ShippedLimit_IsOneMebibyte` | có: thiếu mục `Gateway:BodyLimit` | chờ coding |
+| `MaxBytes` ngoài khoảng 1 đến 10.485.760 làm khởi động thất bại | `BodyLimitConfigurationTests.Start_WithInvalidLimit_FailsAndNamesTheSetting` (4 giá trị) | có: khởi động vẫn thành công | chờ coding |
+| `MaxBytes` hợp lệ khởi động được | `BodyLimitConfigurationTests.Start_WithValidLimit_Succeeds` (3 giá trị) | không: xanh sẵn (hồi quy, để validation không chặn nhầm) | chờ coding |
+| `RequestBodyClient` do body quá lớn → `PayloadTooLarge` (trực tiếp, bọc `AggregateException`) | `BodyLimitClassifierTests` (2 test) | có: nhận `ClientCancelled` | chờ coding |
+| `RequestBodyClient` khác, không ngoại lệ, response đã bắt đầu → vẫn `ClientCancelled` | `BodyLimitClassifierTests` (3 test) | không: xanh sẵn (hồi quy, giữ hành vi cũ) | chờ coding |
+
+Lệnh đã chạy: `dotnet build src/gateway.Tests -warnaserror` (0 cảnh báo, 0 lỗi); `dotnet test src/gateway.Tests --no-build --filter "Category!=docker"` → 188 test, 176 xanh, 12 đỏ (đúng 12 test đỏ ở bảng trên; 166 test cũ đều xanh); `dotnet test ... --filter "Category=TB-025"` chạy 3 lần: 4 đỏ, 4 xanh mỗi lần (không flaky); `dotnet format src/teamboard.slnx --verify-no-changes` sạch.
+
+Khung tối thiểu cho biên dịch: một giá trị enum rỗng `UpstreamFailure.PayloadTooLarge` ở `src/gateway/UpstreamErrorClassifier.cs` (chưa có logic). Hỗ trợ test: `UpstreamStub` đếm byte body (`ReceivedBodyBytes`), `GatewayContext.UseRealKestrel` (host Kestrel thật cho chunked).
+
+Ghi nhận cho test-review: (1) quyết định Confirm #2 "`413` áp cho mọi request" (kể cả route không tồn tại) chưa có kịch bản riêng vì plan chỉ liệt kê @S01-@S07; (2) rủi ro R-06 của plan (hai host Kestrel song song gây `AddressInUse`) không tái hiện được ở test-init: @S04 và @S05 chạy tuần tự (assembly đã tắt chạy song song) xanh 3 lần liên tiếp.
 
 ## Test review rounds
 

@@ -14,6 +14,7 @@ public enum UpstreamFailure
     Timeout,
     ClientCancelled,
     AbortedAfterHeaders,
+    PayloadTooLarge,
 }
 
 /// <summary>
