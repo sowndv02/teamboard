@@ -102,13 +102,18 @@ Trụ cột này **luôn chạy**, kể cả khi diff "chỉ là CRUD" hay "ch�
 | S8 | SSRF, upload & giới hạn | Request ra ngoài với URL do người dùng cung cấp có allowlist? Upload có giới hạn kích thước, kiểm loại file? Có giới hạn tốc độ/kích thước body cho endpoint công khai? Vòng lặp/truy vấn không giới hạn (DoS)? |
 | S9 | Phụ thuộc & chuỗi cung ứng | Gói mới có lỗ hổng đã biết (`dotnet list package --vulnerable`, `npm audit`)? Gói lạ/typo-squatting, script cài đặt tự chạy? Image/base image có tag cố định? |
 | S10 | Bảo mật dữ liệu & ghi trạng thái | Race condition/TOCTOU trên thao tác tiền, quyền, tồn kho? Xóa mềm/xóa cứng đúng quyền? Event/message có kiểm tra nguồn gửi? |
+| S11 | Client-side (Angular/FE) | XSS: `innerHTML`, `bypassSecurityTrust*`, `[innerHtml]`, render dữ liệu chưa escape? Token hoặc PII trong URL, query string, log, `localStorage`? CSRF: mutation dùng cookie có anti-forgery token/`SameSite` không? Open redirect: `returnUrl`/redirect đích có allowlist? Prototype pollution khi merge object từ input? |
+| S12 | Mass assignment & quyền theo logic | DTO nhận field nhạy cảm từ client (`Role`, `OwnerId`, `TenantId`, `IsAdmin`, `Status`) rồi map thẳng vào entity? Quyền có phụ thuộc trạng thái nghiệp vụ (chỉ sửa khi còn mở, chỉ chủ sở hữu)? Kiểm quyền trước hay sau khi đã thao tác? Dữ liệu có rò rỉ giữa tenant/board khi query list? |
+| S13 | IaC, container & CI/CD | Terraform: bucket public, IAM `*`/`Action: *`, security group `0.0.0.0/0` tới cổng nhạy cảm, mã hóa at-rest/in-transit tắt, log bật? Docker: chạy root, base image không pin version/digest, copy secret vào image? CI: secret in log, `pull_request_target` với code từ fork, quyền token workflow quá rộng, action không pin SHA? |
+| S14 | Audit log & giám sát bảo mật | Hành động nhạy cảm (đăng nhập thất bại, đổi quyền, xóa, đổi mật khẩu/token) có được ghi lại với `correlationId` và actor không? Log có đủ để điều tra mà không chứa secret/PII? Có giới hạn lần thử (lockout/rate limit) cho đăng nhập? |
+| S15 | Công cụ và quét tự động | Gate có chạy `gitleaks` (diff và lịch sử), `dotnet list package --vulnerable`, `npm audit` không? Có SAST (Semgrep/CodeQL) cho đổi lớn? Nếu công cụ chưa cài (`COMMANDS.md` 🚧) → ghi "Giới hạn đã biết" và không verdict merge khi đổi auth/secret/input. Nếu lịch sử git có secret đã biết (`PROJECT.md`) → xác nhận đã xoay khóa. |
 
 Phân loại:
-- Lỗi bảo mật rõ ràng (S1–S3 vi phạm, secret thật, bypass auth, injection) = **P0** nếu khai thác được ngay, **P1** nếu cần điều kiện thêm.
-- Thiếu hardening có tác động thật (S4–S10) = **P2**; chỉ là khuyến nghị tổng quát không có tác động trong phạm vi = **P3**.
+- Lỗi bảo mật rõ ràng (S1–S3, S11 XSS/CSRF, S12 mass assignment cho field quyền, secret thật, bypass auth, injection, bucket public/IAM `*` mở ra internet) = **P0** nếu khai thác được ngay, **P1** nếu cần điều kiện thêm.
+- Thiếu hardening có tác động thật (S4–S10, S13–S15 còn lại) = **P2**; chỉ là khuyến nghị tổng quát không có tác động trong phạm vi = **P3**.
 - Đánh đổi bảo mật/hiệu năng không có đáp án duy nhất = CONFIRM (người dùng quyết).
 
-Báo cáo bắt buộc có bảng `Probe S1–S10 | Áp dụng? | Kết quả | Finding` trong mục Risk Audit. Probe áp dụng mà chưa kiểm chứng (chưa đọc đường đi của input hoặc chưa kiểm quyền) → **không** được verdict "Sẵn sàng merge".
+Báo cáo bắt buộc có bảng `Probe S1–S15 | Áp dụng? | Kết quả | Finding` trong mục Risk Audit. Probe áp dụng mà chưa kiểm chứng (chưa đọc đường đi của input, chưa kiểm quyền, chưa đọc file IaC/CI đã đổi) → **không** được verdict "Sẵn sàng merge". S13 chỉ áp dụng khi diff chạm `infra/`, Docker, hoặc CI, nhưng phải ghi rõ "Không áp dụng" với lý do.
 
 ## Pragmatic guardrails (lọc mọi finding)
 
@@ -152,7 +157,7 @@ Vòng 1 đầy đủ; vòng 2+ thêm mục 3 và rút gọn probe không đổi.
 5. **Testing gaps**: hành vi chưa có evidence (trong phạm vi delta ở vòng 2+).
 6. **Tiêu chí issue (F6)**: bảng `Tiêu chí | Trạng thái | Evidence`.
 7. **Risk Audit**: bảng `Probe F1–F8 | Áp dụng? | Kết quả | Finding`; probe áp dụng mà chưa kiểm chứng thì không được verdict merge.
-   **Security** (trụ cột 4): bảng `Probe S1–S10 | Áp dụng? | Kết quả | Finding`, luôn đủ 10 dòng.
+   **Security** (trụ cột 4): bảng `Probe S1–S15 | Áp dụng? | Kết quả | Finding`, luôn đủ 15 dòng.
 8. **Blast Radius & tác động**: bảng B1–B4 và tóm tắt tác động API/Contract, Database, tính năng liên quan.
 9. **Best Practices**: bảng BP1–BP6 `Lens | Áp dụng? | Đạt/Không | Finding`.
 10. **Verdict**, một trong:

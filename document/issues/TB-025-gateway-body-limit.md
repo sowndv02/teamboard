@@ -123,6 +123,23 @@ Giới hạn đã biết: (1) @S05 và @S09 gửi body chunked qua socket thật
 | B3, B4 | B4 có | Không DB, không event; tác động: contract công khai gateway thêm một mã lỗi, health và route khác không đổi |
 | BP1-BP6 | Có | Options theo mẫu dự án; async có `CancellationToken`; log không có nội dung body; một chỗ xử lý "body quá lớn" (classifier); không hardcode (cấu hình `appsettings.json`) |
 
+**Bổ sung vòng 1 theo trụ cột Security mới của `code-review.md` (commit `58897e3`, đến sau khi vòng 1 chạy; đã chạy lại phần bảo mật trên cùng diff):**
+
+| Probe | Áp dụng? | Kết quả |
+|---|---|---|
+| S1 AuthN/AuthZ | Không áp dụng | Không endpoint mới; gateway chưa kiểm JWT theo spec mục 10 (cảnh báo "không ra internet trước JWT" ở lát 7) |
+| S2 Input, kích thước | Có | Đã đọc đường đi: `Content-Length` > giới hạn bị chặn trước khi chuyển tiếp; chunked bị đếm khi đọc (`LimitedReadStream`); `MaxBytes` kiểm khoảng lúc khởi động; không parse thân, không injection |
+| S3 Secret, PII | Có | Không secret trong diff; log không chứa nội dung body (@S06, @S09); chuỗi `secret-board-title-` chỉ là dấu hiệu trong test, không phải secret |
+| S4 Lộ thông tin | Có | `413` từ registry `problem+json`, không lộ giá trị giới hạn, host hay ngoại lệ (test @S02, `GatewayErrorCodesTests`) |
+| S5 Token, cookie | Không áp dụng | Không có token hay cookie trong diff |
+| S6 Mật mã | Không áp dụng | Không dùng mật mã |
+| S7 Cấu hình, header | Có | Không đổi CORS, header, cổng hay bind; chỉ thêm khoá `Gateway:BodyLimit:MaxBytes` |
+| S8 Giới hạn, DoS | Có | Đây chính là biện pháp giới hạn body; rate limit đứng trước (@S07). Tồn đọng đã ghi: giới hạn chunked chỉ ở route proxy, log cảnh báo YARP mỗi request chunked quá lớn (R-07) |
+| S9 Phụ thuộc | Có | Không đổi file `.csproj`; `dotnet list package --vulnerable --include-transitive` không có gói lỗ hổng |
+| S10 Race, trạng thái | Không áp dụng | Không ghi trạng thái; bộ đếm `_total` thuộc từng request |
+
+Không có finding bảo mật mới; verdict vòng 1 giữ nguyên.
+
 Lăng kính: Chất lượng đạt (lỗi qua registry, không nuốt lỗi); Bảo mật đạt (không secret, phụ thuộc không lỗ hổng); Chi phí đạt (bọc stream rẻ, không log thêm ngoại lệ).
 
 Giới hạn đã biết: giới hạn chunked chỉ hiệu lực ở route proxy; YARP vẫn ghi cảnh báo `RequestBodyClient` kèm ngoại lệ cho mỗi request chunked quá lớn (R-07); gitleaks chưa cài; review do agent đã viết code thực hiện.

@@ -28,7 +28,7 @@ description: Review code của một issue sau khi mọi test đã pass - tìm l
 ## Lăng kính Chất lượng / Bảo mật / Chi phí (`../workflow/references/review-philosophy.md` mục 4)
 Ngoài probe của `code-review.md`, báo cáo phải có bảng "Lăng kính":
 - **Chất lượng:** đúng, xử lý lỗi, không nuốt lỗi, không N+1, phân trang/giới hạn, log/trace, dễ đọc, theo kiến trúc service.
-- **Bảo mật (bắt buộc, kiểm đủ S1–S10 của `code-review.md` trụ cột 4 cho MỌI diff):** không được bỏ qua vì "diff không chạm bảo mật". Kiểm chứng bằng cách đọc đường đi của input và quyền truy cập, không chỉ quét từ khóa; chạy `dotnet list package --vulnerable` (và `npm audit` khi có FE) nếu diff đổi phụ thuộc. Phụ thuộc có lỗ hổng: `quality-gate.md`.
+- **Bảo mật (bắt buộc, kiểm đủ S1–S15 của `code-review.md` trụ cột 4 cho MỌI diff):** không được bỏ qua vì "diff không chạm bảo mật". Kiểm chứng bằng cách đọc đường đi của input và quyền truy cập, không chỉ quét từ khóa; chạy `dotnet list package --vulnerable` (và `npm audit` khi có FE) nếu diff đổi phụ thuộc. Phụ thuộc có lỗ hổng: `quality-gate.md`.
 - **Chi phí:** truy vấn/gọi ngoài thừa, vòng lặp tốn kém, log/dữ liệu lưu quá mức, polling không cần, tài nguyên không giải phóng, kích thước bundle.
 - **Chi phí:** truy vấn/gọi ngoài thừa, vòng lặp tốn kém, log/dữ liệu lưu quá mức, polling không cần, tài nguyên không giải phóng, kích thước bundle.
 - Lỗi bảo mật rõ ràng = FIX `blocker`; đánh đổi bảo mật/chi phí/hiệu năng không có đáp án duy nhất = CONFIRM.
