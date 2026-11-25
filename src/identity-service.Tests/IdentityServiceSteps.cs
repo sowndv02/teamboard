@@ -22,7 +22,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string ThrowPath = "/__test/throw";
     private const string ThrowMessage = "boom: internal detail must not leak";
     private const string RegisterPath = "/api/v1/auth/register";
+    private const string LoginPath = "/api/v1/auth/login";
     private const string HashDurationInstrument = "password_hash_duration_seconds";
+    private const string LoginFailuresInstrument = "login_failures_total";
 
     // Nothing listens on port 1: simulates a stopped DB without needing a container.
     private const string UnreachableConnection =
@@ -37,6 +39,8 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private CapturingLoggerProvider? _logs;
     private MeterListener? _meterListener;
     private long _hashDurationSamples;
+    private long _loginFailureMeasurements;
+    private bool _observeLoginFailuresOnly;
     private (int First, int Second)? _concurrentStatuses;
 
     private PostgresDatabase Database => _database ?? throw new InvalidOperationException("No database yet.");
@@ -61,13 +65,28 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     public void GivenLogCapture() => _logs = new CapturingLoggerProvider();
 
     [Given("identity-service metrics are being observed")]
-    public void GivenMetrics() => StartMeterListener();
+    public void GivenMetrics()
+    {
+        _observeLoginFailuresOnly = false;
+        StartMeterListener();
+    }
+
+    [Given("identity-service metrics are being observed for login failures")]
+    public void GivenLoginFailureMetrics()
+    {
+        _observeLoginFailuresOnly = true;
+        _loginFailureMeasurements = 0;
+        StartMeterListener();
+    }
 
     [Given("a user is registered with email {string} and password {string}")]
     public async Task GivenRegisteredUser(string email, string password) => await SendRegisterAsync(email, password, expectedStatus: 201);
 
     [When("I send a registration request with email {string} and password {string}")]
     public Task WhenRegister(string email, string password) => SendRegisterAsync(email, password);
+
+    [When("I send a login request with email {string} and password {string}")]
+    public Task WhenLogin(string email, string password) => SendLoginAsync(email, password);
 
     [When("I send a registration request with email {string} and a password longer than {int} characters")]
     public Task WhenRegisterLongPassword(string email, int minAllowed) =>
@@ -116,6 +135,41 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.True(_response.Headers.TryGetValues("Location", out var values), "Location header is missing.");
         var location = values.Single();
         Assert.Matches("/api/v1/users/[0-9a-fA-F-]{36}", location);
+    }
+
+    [Then("the login response body does not contain {string}, {string}, {string}, {string}, or {string}")]
+    public void ThenLoginBodyExcludesSecrets(string a, string b, string c, string d, string e)
+    {
+        Assert.DoesNotContain(a, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(b, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(c, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(d, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(e, _body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Then("the login response has a non-empty id")]
+    public void ThenLoginResponseHasId()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var id = document.RootElement.GetProperty("id").GetString();
+        Assert.False(string.IsNullOrWhiteSpace(id));
+        Assert.True(Guid.TryParse(id, out _), "id should be a GUID string.");
+    }
+
+    [Then("the error title is {string}")]
+    public void ThenErrorTitle(string expectedTitle)
+    {
+        using var document = JsonDocument.Parse(_body);
+        Assert.Equal(expectedTitle, document.RootElement.GetProperty("title").GetString());
+    }
+
+    [Then("the identity counter {string} increased by at least {int}")]
+    public void ThenLoginFailureCounter(string instrumentName, int minimumIncrease)
+    {
+        Assert.Equal(LoginFailuresInstrument, instrumentName);
+        Assert.True(
+            _loginFailureMeasurements >= minimumIncrease,
+            $"Expected at least {minimumIncrease} measurement(s) for {instrumentName}, got {_loginFailureMeasurements}.");
     }
 
     [Then("the database stores two different password hashes for those users")]
@@ -287,14 +341,36 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         }
     }
 
+    private async Task SendLoginAsync(string email, string password)
+    {
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        _response?.Dispose();
+        _response = await client.PostAsJsonAsync(LoginPath, new { email, password });
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
     private void StartMeterListener()
     {
         _meterListener = new MeterListener
         {
             InstrumentPublished = (instrument, listener) =>
             {
-                if (instrument.Meter.Name.Contains("identity", StringComparison.OrdinalIgnoreCase)
-                    && instrument.Name == HashDurationInstrument)
+                if (!instrument.Meter.Name.Contains("identity", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                if (_observeLoginFailuresOnly)
+                {
+                    if (instrument.Name == LoginFailuresInstrument)
+                    {
+                        listener.EnableMeasurementEvents(instrument);
+                    }
+
+                    return;
+                }
+
+                if (instrument.Name == HashDurationInstrument)
                 {
                     listener.EnableMeasurementEvents(instrument);
                 }
@@ -305,6 +381,13 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             if (instrument.Name == HashDurationInstrument)
             {
                 Interlocked.Increment(ref _hashDurationSamples);
+            }
+        });
+        _meterListener.SetMeasurementEventCallback<long>((instrument, measurement, _, _) =>
+        {
+            if (instrument.Name == LoginFailuresInstrument)
+            {
+                Interlocked.Add(ref _loginFailureMeasurements, measurement);
             }
         });
         _meterListener.Start();

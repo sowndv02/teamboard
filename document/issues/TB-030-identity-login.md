@@ -37,6 +37,8 @@ Plan: [`document/plans/TB-030-identity-login.md`](../plans/TB-030-identity-login
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-25: TB-029 merged PR #24; `plan-init` trên nhánh `feature/TB-030-identity-login` từ `main` `068212c`.
 - 2026-11-25: plan-review PASS vòng 1–2 (Confirm #1–#4).
+- 2026-11-25: test-init — `login.feature` @S01–@S09, steps; `dotnet test` 9 login đỏ (404/metric), 18 hồi quy xanh.
+- 2026-11-25: test-review v1 PASS — 9 đỏ đúng lý do (404); tag @S06/@S09; B3 timing không BDD.
 
 ## Workflow
 
@@ -46,8 +48,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-25 | `document/plans/TB-030-identity-login.md` draft B1–B3, P-01..P-04 |
 | plan-review | PASS | 2 | 2026-11-25 | Confirm #1–#4; plan `approved` |
-| test-init | pending | – | | |
-| test-review | pending | | | |
+| test-init | done | – | 2026-11-25 | `login.feature` @S01–@S09; 9 đỏ 404; TB-029/021 18 xanh |
+| test-review | PASS | 1 | 2026-11-25 | Sẵn sàng code; @S08 hai When (accepted) |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -67,11 +69,21 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | `login.feature` + `IdentityServiceSteps` | 404 | |
+| @S02 | same | 404 | |
+| @S03 | same | 404 | |
+| @S04 | same | 404 | |
+| @S05 | same | 404 | |
+| @S06 | same | 404 | |
+| @S07 | same + `CapturingLoggerProvider` | 404 (assert 401) | |
+| @S08 | same (2 When login) | 404 | |
+| @S09 | `MeterListener` login_failures_total | 0 counter | |
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-25 | working tree | Sẵn sàng code | – |
 
 ## Review rounds
 
@@ -84,6 +96,10 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | test:identity-service:s06-tag | FIX | login.feature @S06 | Tag @FR-002 sai (validation) | Bỏ @FR-002 | feature |
+| 1 | test:identity-service:s09-tag | FIX | login.feature @S09 | Metric nên @NFR-007 | Đổi tag | register @S09 pattern |
+| 1 | test:identity-service:s08-double-when | P3 | login.feature @S08 | Hai `When` trong một scenario | `skipped`: so sánh BR-003 trong một flow (plan @S08) | plan mục 2 |
+| 1 | plan-review:TB-030:b3-timing | P3 | plan B3 | Bảng truy vết @S07 timing vs feature log | `skipped`: B3 không BDD timing; kiểm coding-review | plan mục 5 rủi ro |
 
 ## Bài học (lessons learned)
 

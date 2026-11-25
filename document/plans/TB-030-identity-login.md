@@ -66,8 +66,8 @@ Kịch bản (tag `@TB-030 @identity-service @docker`):
 - **Hợp đồng:** Confirm #1–#3; đường dẫn tạm theo design 6.3 và `.agents/rules/api-endpoints.md` (ADR exception giống register).
 - **Kiểm chứng:** login scenarios đỏ→xanh; `register.feature` hồi quy xanh.
 
-### B3. Băm giả và độ trễ (@S07)
-- **Kịch bản:** @S07 — thời gian @S02 và @S03 cùng bậc (ví dụ mỗi bên ≥ 50ms, không so sánh chênh lệch ms).
+### B3. Băm giả và độ trễ (coding, không BDD riêng)
+- **Kịch bản:** không thêm @S10 timing (flaky CI; xem rủi ro mục 5) — `login.feature` @S07 là log BR-007; độ trễ đồng đều kiểm qua dummy `VerifyPassword` trong coding-review.
 - **File:** `LoginEndpoints` nhánh user không tồn tại gọi `VerifyPassword` với dummy `HashedPassword` cố định.
 - **Kiểm chứng:** toàn bộ TB-030 xanh; gate đầy đủ.
 
