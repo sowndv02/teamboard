@@ -22,12 +22,12 @@ Issue khung cấp key khi duyệt bảng lát: lát 7 của `document/plans/api-
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Access log: IP + `correlationId`, không `Authorization`/body (NFR-006, @S01–@S02)
-- [ ] Metric: histogram thời gian request và độ trễ thêm vào đo được (NFR-001, @S03); counter lỗi `429`/`5xx` (@S04)
-- [ ] Graceful shutdown: `ShutdownTimeout` ≥ 30s, compose `stop_grace_period` 35s (@S06)
-- [ ] Retention log local ~7 ngày trên docker gateway (@S05); Jaeger theo quyết định P-03
-- [ ] Cảnh báo không expose internet trước JWT (@S07)
-- [ ] Gate xanh theo plan mục 6; TB-026/lát 6 đồng bộ `done` (LL-006)
+- [x] Access log: IP + `correlationId`, không `Authorization`/body (NFR-006, @S01–@S02)
+- [x] Metric: histogram thời gian request và độ trễ thêm vào đo được (NFR-001, @S03); counter lỗi `429`/`5xx` (@S04)
+- [x] Graceful shutdown: `ShutdownTimeout` ≥ 30s, compose `stop_grace_period` 35s (@S06)
+- [x] Retention log local ~7 ngày trên docker gateway (@S05); Jaeger theo quyết định P-03
+- [x] Cảnh báo không expose internet trước JWT (@S07)
+- [x] Gate xanh theo plan mục 6; TB-026/lát 6 đồng bộ `done` (LL-006)
 
 ## Kế hoạch
 Plan: [`document/plans/TB-027-gateway-observability-ops.md`](../plans/TB-027-gateway-observability-ops.md) (`approved`, B1–B4, @S01–@S07; P-01..P-04 đã chốt vòng plan-review 1).
@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-027-gateway-observability-ops.md`](../plans/TB-027-gat
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-25: plan-init. Nhánh `feature/TB-027-gateway-observability-ops` từ `origin/main` (sau PR #20). Đồng bộ TB-026 merge → `done`.
+- 2026-11-25: coding-start B4 xong — runbook JWT + link PROJECT; 223/223 test; chuyển `coding-review`.
 
 ## Workflow
 
@@ -46,7 +47,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-25 | 4 CONFIRM chốt (Activity overhead, counter tách, docker logs, runbook JWT) |
 | test-init | done | – | 2026-11-25 | observability.feature @S01–@S07; ObservabilitySteps; 8 đỏ / 215 hồi quy xanh |
 | test-review | PASS | 1 | 2026-11-25 | S01 bổ sung method/status/traceId; shutdown đọc appsettings |
-| coding-start | in-progress | – | 2026-11-25 | B1–B3 xong; @S07 đỏ (B4) |
+| coding-start | done | – | 2026-11-25 | B1–B4 xong; 223/223 gateway.Tests (Category!=docker) |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -67,7 +68,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S04 | observability.feature (2 scenario) + ObservabilitySteps | | xanh (B2) |
 | @S05 | observability.feature + ObservabilitySteps | | xanh (B3) |
 | @S06 | observability.feature + ObservabilitySteps | | xanh (B3) |
-| @S07 | observability.feature + ObservabilitySteps | đỏ (thiếu runbook) | |
+| @S07 | observability.feature + ObservabilitySteps | | xanh (B4) |
 
 ## Test review rounds
 

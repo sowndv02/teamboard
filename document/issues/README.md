@@ -39,7 +39,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-024](TB-024-gateway-rate-limit.md) | Gateway lát 4, rate limit theo IP và 429 problem+json | 1 | done |
 | [TB-025](TB-025-gateway-body-limit.md) | Gateway lát 5, giới hạn body 1 MiB | 1 | done |
 | [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | done |
-| [TB-027](TB-027-gateway-observability-ops.md) | Gateway lát 7, quan sát và vận hành | 1 | in-progress |
+| [TB-027](TB-027-gateway-observability-ops.md) | Gateway lát 7, quan sát và vận hành | 1 | review |
 | [TB-028](TB-028-gateway-smoke-board-service.md) | Gateway lát 8, smoke với board-service thật (hoãn) | 1 | todo |
 | [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | todo |
 | [TB-030](TB-030-identity-login.md) | Identity lát 2, đăng nhập với lỗi chung không lộ email | 1 | todo |
