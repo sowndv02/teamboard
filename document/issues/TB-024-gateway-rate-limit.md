@@ -1,13 +1,13 @@
 ---
 key: TB-024
 title: Gateway lát 4, rate limit theo IP và 429 problem+json
-status: review
+status: done
 phase: 1
 branch: feature/TB-024-gateway-rate-limit
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-10-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-25      # ngày done/dropped
 ---
 
 # TB-024 — Gateway lát 4, rate limit theo IP và 429 problem+json
