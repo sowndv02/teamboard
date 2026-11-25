@@ -60,3 +60,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-045](TB-045-identity-scope-authorization.md) | Identity lát 17, ủy quyền theo scope | 1 | todo |
 | [TB-046](TB-046-identity-revocation-introspection.md) | Identity lát 18, thu hồi token và introspection tối thiểu | 1 | todo |
 | [TB-047](TB-047-identity-auth-methods-map.md) | Bản đồ phương thức xác thực (bổ sung phần còn thiếu cho lộ trình identity) | 0 | review |
+| [TB-049](TB-049-learning-roadmap-auth-standards.md) | Lộ trình học Authentication Standards (khái niệm) theo Part 0–7 × L1–L8 | 0 | in-progress |
