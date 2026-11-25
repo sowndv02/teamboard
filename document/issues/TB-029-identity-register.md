@@ -1,7 +1,7 @@
 ---
 key: TB-029
 title: Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-029-identity-register
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -44,6 +44,7 @@ Plan: [`document/plans/TB-029-identity-register.md`](../plans/TB-029-identity-re
 - 2026-11-25: coding-start B1–B4 — `users` migration, PBKDF2 600k, register endpoint, metric; 18/18 `identity-service.Tests` xanh (~47s, 600k PBKDF2).
 - 2026-11-25: coding-review v1 PASS — FIX unique-violation chain, `PasswordOptions` validate-on-start; benchmark PBKDF2 **p95 ≈ 0.242 s** (600k, máy dev, 21 mẫu).
 - 2026-11-25: Gate — `dotnet build -warnaserror` ✅ · `identity-service.Tests` 18/18 ✅ · `dotnet format --verify-no-changes` ✅ · `dotnet list package --vulnerable` (identity-service) ✅ · gitleaks 🚧.
+- 2026-11-25: mở PR [sowndv02/teamboard#24](https://github.com/sowndv02/teamboard/pull/24); commit `a51dd21`; issue chuyển `review`.
 
 ## Workflow
 
@@ -57,7 +58,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-25 | FIX @S05 + Given 201; 10/10+1 đỏ đúng lý do |
 | coding-start | done | – | 2026-11-25 | B1–B4; 18/18 identity-service.Tests (lọc !~Compose) |
 | coding-review | PASS | 1 | 2026-11-25 | working tree (chưa commit feat); 0 CONFIRM mở |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-25 | PR #24 |
 
 ## Confirm log
 
