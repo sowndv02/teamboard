@@ -41,6 +41,7 @@ Plan: [`document/plans/TB-030-identity-login.md`](../plans/TB-030-identity-login
 - 2026-11-25: test-review v1 PASS — 9 đỏ đúng lý do (404); tag @S06/@S09; B3 timing không BDD.
 - 2026-11-25: coding-start — `POST /api/v1/auth/login`, `INVALID_CREDENTIALS` title, metric, dummy verify; `dotnet test` 27/27.
 - 2026-11-25: coding-review v1 PASS — gate targeted; dummy iterations align PasswordOptions default.
+- 2026-11-26: commit `09f755a`, PR #25 opened.
 
 ## Workflow
 
@@ -54,7 +55,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-25 | Sẵn sàng code; @S08 hai When (accepted) |
 | coding-start | done | – | 2026-11-25 | 27/27 xanh; login endpoint B1–B3 |
 | coding-review | PASS | 1 | 2026-11-25 | 27/27; shared Http 40/40 |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | PR #25 |
 
 ## Confirm log
 

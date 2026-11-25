@@ -14,10 +14,10 @@ links:
   features_dir: document/spec/features/identity-service/
   branch: feature/TB-030-identity-login
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/25
 
 current_step: create-pr
-next_action: "create-pr TB-030 sau khi user commit feat"
+next_action: "Chờ review/merge PR #25"
 blocked_by: null
 
 steps:
@@ -66,7 +66,11 @@ steps:
     open_confirm: 0
     open_fix: 0
     evidence: ["27/27 identity; 40/40 Http; build -warnaserror; no vuln pkgs"]
-  create-pr:            { status: pending }
+  create-pr:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T00:15:00Z
+    evidence: ["PR #25 https://github.com/sowndv02/teamboard/pull/25"]
 
 confirm_pending: []
 
