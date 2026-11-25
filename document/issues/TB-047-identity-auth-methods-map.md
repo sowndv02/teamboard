@@ -1,7 +1,7 @@
 ---
 key: TB-047
 title: Bản đồ phương thức xác thực (bổ sung phần còn thiếu cho lộ trình identity)
-status: in-progress
+status: review
 phase: 0
 branch: feature/TB-047-identity-auth-methods-map
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -38,6 +38,7 @@ closed: null            # ngày done/dropped
 - 2026-11-25: đã viết `document/learning/identity/auth-methods-map.md` (10 mục, 6 nhóm A–F, Bản đồ giải pháp, 3 case real-world), cập nhật `document/learning/README.md` và `document/learning/identity/README.md`.
 - Điểm phát hiện để người dùng quyết (không tự sửa): spec `identity-auth` BR-002 yêu cầu mật khẩu tối thiểu 12 ký tự, NIST SP 800-63B-4 ghi 15 ký tự cho mật khẩu một yếu tố.
 - Chưa làm (ngoài phạm vi): `.agents/skills/learning-hub/references/topic-map.md` chưa có dòng cho bản đồ này (thuộc `.agents/**`, chờ người dùng quyết); chưa chạy lab nào (mọi mục chưa chạy gắn ⚠ hoặc `Chưa kiểm`).
+- 2026-11-25: mở PR [sowndv02/teamboard#17](https://github.com/sowndv02/teamboard/pull/17); issue chuyển `review`.
 
 ## Giới hạn đã biết
 - Mức xác minh là **Vừa** cho mọi nguồn web (agent mở, tôi chưa tự mở lại); case real-world vì vậy chỉ **Đạt một phần**.
