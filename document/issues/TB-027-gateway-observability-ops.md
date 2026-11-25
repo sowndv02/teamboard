@@ -1,7 +1,7 @@
 ---
 key: TB-027
 title: Gateway lát 7, quan sát và vận hành
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-027-gateway-observability-ops
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-027-gateway-observability-ops.md`](../plans/TB-027-gat
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-25: plan-init. Nhánh `feature/TB-027-gateway-observability-ops` từ `origin/main` (sau PR #20). Đồng bộ TB-026 merge → `done`.
 - 2026-11-25: coding-start B4 xong — runbook JWT + link PROJECT; 223/223 test; chuyển `coding-review`.
+- 2026-11-25: PR https://github.com/sowndv02/teamboard/pull/21 (nhánh vào `main`).
 
 ## Workflow
 
@@ -49,7 +50,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-25 | S01 bổ sung method/status/traceId; shutdown đọc appsettings |
 | coding-start | done | – | 2026-11-25 | B1–B4 xong; 223/223 gateway.Tests (Category!=docker) |
 | coding-review | PASS | 1 | 2026-11-25 | `a79396f`..HEAD; 223/223; 0 CONFIRM |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-25 | https://github.com/sowndv02/teamboard/pull/21 |
 
 ## Confirm log
 

@@ -14,7 +14,7 @@ links:
   features_dir: document/spec/features/gateway/
   branch: feature/TB-027-gateway-observability-ops
   base: origin/main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/21
 
 current_step: create-pr
 next_action: "create-pr sau khi người dùng xác nhận push/PR"
@@ -71,7 +71,9 @@ steps:
     finished: 2026-11-25T16:00:00Z
     evidence: ["merge-base c0caa06..a79396f", "gateway.Tests 223/223 Category!=docker", "build -warnaserror 0"]
   create-pr:
-    status: pending
+    status: done
+    finished: 2026-11-25T15:55:00Z
+    evidence: ["https://github.com/sowndv02/teamboard/pull/21"]
 
 confirm_pending: []
 
