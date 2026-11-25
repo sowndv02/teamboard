@@ -1,13 +1,13 @@
 ---
 key: TB-029
 title: Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2
-status: review
+status: done
 phase: 1
 branch: feature/TB-029-identity-register
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-25     # ngày done/dropped
 ---
 
 # TB-029 — Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2
@@ -45,6 +45,7 @@ Plan: [`document/plans/TB-029-identity-register.md`](../plans/TB-029-identity-re
 - 2026-11-25: coding-review v1 PASS — FIX unique-violation chain, `PasswordOptions` validate-on-start; benchmark PBKDF2 **p95 ≈ 0.242 s** (600k, máy dev, 21 mẫu).
 - 2026-11-25: Gate — `dotnet build -warnaserror` ✅ · `identity-service.Tests` 18/18 ✅ · `dotnet format --verify-no-changes` ✅ · `dotnet list package --vulnerable` (identity-service) ✅ · gitleaks 🚧.
 - 2026-11-25: mở PR [sowndv02/teamboard#24](https://github.com/sowndv02/teamboard/pull/24); commit `a51dd21`; issue chuyển `review`.
+- 2026-11-25: PR #24 merged (`068212c`); lát 1b `done`.
 
 ## Workflow
 

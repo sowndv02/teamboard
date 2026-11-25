@@ -41,8 +41,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-026](TB-026-gateway-cors.md) | Gateway lát 6, CORS theo allowlist | 1 | done |
 | [TB-027](TB-027-gateway-observability-ops.md) | Gateway lát 7, quan sát và vận hành | 1 | done |
 | [TB-028](TB-028-gateway-smoke-board-service.md) | Gateway lát 8, smoke với board-service thật (hoãn) | 1 | todo |
-| [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | review |
-| [TB-030](TB-030-identity-login.md) | Identity lát 2, đăng nhập với lỗi chung không lộ email | 1 | todo |
+| [TB-029](TB-029-identity-register.md) | Identity lát 1b, đăng ký bằng email và mật khẩu băm PBKDF2 | 1 | done |
+| [TB-030](TB-030-identity-login.md) | Identity lát 2, đăng nhập với lỗi chung không lộ email | 1 | in-progress |
 | [TB-031](TB-031-identity-lockout-rate-limit.md) | Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập | 1 | todo |
 | [TB-032](TB-032-identity-access-token.md) | Identity lát 4, phát access token JWT khi đăng nhập | 1 | todo |
 | [TB-033](TB-033-auth-token-validation-library.md) | Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth | 1 | todo |

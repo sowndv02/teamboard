@@ -1,12 +1,12 @@
 ---
 key: TB-030
 title: Identity lát 2, đăng nhập với lỗi chung không lộ email
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-030-identity-login
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-25     # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
@@ -22,13 +22,20 @@ Issue khung cấp key khi duyệt bảng lát: lát 2 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] `POST` đăng nhập (đường dẫn chốt ở plan-review): credential đúng → thành công theo P-02, không trả mật khẩu/hash/token JWT (FR-002)
+- [ ] Email không tồn tại và mật khẩu sai → cùng `401 problem+json`, cùng `code` (BR-003, FR-002)
+- [ ] Email không hợp lệ / mật khẩu không đạt BR-002 → 400 `VALIDATION_FAILED`
+- [ ] Email chuẩn hoá khớp user đã đăng ký (BR-001)
+- [ ] Không lộ mật khẩu trong log (BR-007, FR-004)
+- [ ] Metric `login_failures_total` khi 401 credential (design mục 9)
+- [ ] Gate xanh đầy đủ; TB-029/lát 1b đồng bộ `done`
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-030-identity-login.md`](../plans/TB-030-identity-login.md) (`draft`, B1–B3, @S01–@S08; P-01..P-04 mở).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-25: TB-029 merged PR #24; `plan-init` trên nhánh `feature/TB-030-identity-login` từ `main` `068212c`.
 
 ## Workflow
 
@@ -36,7 +43,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-11-25 | `document/plans/TB-030-identity-login.md` draft B1–B3, P-01..P-04 |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |

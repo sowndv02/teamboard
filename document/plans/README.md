@@ -22,3 +22,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-026-gateway-cors](TB-026-gateway-cors.md) | TB-026 (lát 6 gateway) | approved |
 | [TB-027-gateway-observability-ops](TB-027-gateway-observability-ops.md) | TB-027 (lát 7 gateway) | approved |
 | [TB-029-identity-register](TB-029-identity-register.md) | TB-029 (lát 1b identity) | approved |
+| [TB-030-identity-login](TB-030-identity-login.md) | TB-030 (lát 2 identity) | draft |
