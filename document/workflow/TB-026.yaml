@@ -75,7 +75,7 @@ steps:
     verdict: PASS
     open_confirm: 0
     open_fix: 0
-    evidence: ["Delta cb40107..610e75c: CORS implementation + LL-006 docs", "Gate: gateway.Tests 215/215 (Category!=docker)", "Fingerprint workflow:TB-026:uncommitted-production đóng tại 610e75c"]
+    evidence: ["Delta cb40107..1e5c607: CORS implementation + LL-006 docs", "Gate: gateway.Tests 215/215 (Category!=docker)", "Fingerprint workflow:TB-026:uncommitted-production đóng tại 1e5c607"]
   create-pr:
     status: pending
 

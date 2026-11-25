@@ -46,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-25 | Đỏ 11/213 đúng lý do (xem "Kịch bản và TDD log"); xanh sẵn 2 khoá hợp đồng (S02, S06) |
 | test-review | PASS | 1 | 2026-11-25 | 11 đỏ đúng lý do; S02, S06, CorsOptions empty-list xanh sẵn là khóa hợp đồng (người dùng chốt) |
 | coding-start | done | – | 2026-11-25 | Xanh 213/213 (gateway.Tests, không docker); build -warnaserror và format xanh; xem "Kịch bản và TDD log" |
-| coding-review | PASS | 2 | 2026-11-25 | Vòng 2 delta `610e75c`: 0 fingerprint mở; gate 215/215 |
+| coding-review | PASS | 2 | 2026-11-25 | Vòng 2 delta `1e5c607`: 0 fingerprint mở; gate 215/215 |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -95,7 +95,7 @@ Khung production tối thiểu (stub, không logic): `src/gateway/CorsOptions.cs
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
 | 1 | 2026-11-25 | `cb40107` + working tree (CORS chưa commit) | NEEDS_FIX | `workflow:TB-026:uncommitted-production` |
-| 2 | 2026-11-25 | `610e75c` | PASS | 0 |
+| 2 | 2026-11-25 | `1e5c607` | PASS | 0 |
 
 ## Fix log
 
@@ -103,7 +103,7 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
-| 1 | workflow:TB-026:uncommitted-production | coding-review vòng 1 FIX | git, `src/gateway` | Implementation CORS chỉ ở working tree | Commit `610e75c` feat | Vòng 2 PASS; gate 215/215 |
+| 1 | workflow:TB-026:uncommitted-production | coding-review vòng 1 FIX | git, `src/gateway` | Implementation CORS chỉ ở working tree | Commit `1e5c607` feat | Vòng 2 PASS; gate 215/215 |
 
 ## Bài học (lessons learned)
 
