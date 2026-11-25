@@ -9,6 +9,7 @@ Nơi agent (và người) tra cứu **cấu hình không bí mật** của dự 
 | `environments.yaml` | Môi trường local/dev/stg: region, tên resource, cách deploy | Làm infra, CI/CD, đổi cấu hình theo môi trường |
 | `dependencies.yaml` | Danh bạ phụ thuộc bên thứ ba đã xét: hạng T0–T3, giấy phép, nguồn kiểm, lối thoát | Thêm/đổi/nâng cấp phụ thuộc; chọn thư viện; review |
 | `tool-versions.yaml` | Phiên bản công cụ yêu cầu (.NET, Terraform, Docker...) | Setup máy, viết CI, kiểm tra phiên bản |
+| `auth-development.example.yaml` | Contract `Auth:Provider` (Identity / Keycloak), Authority, Audience (lab local) | TB-050; xem `document/architecture/identity-auth-lab.md` |
 
 ## Quy tắc
 

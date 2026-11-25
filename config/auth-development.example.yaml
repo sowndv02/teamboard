@@ -1,0 +1,22 @@
+# Contract cấu hình auth local (không secret). Copy ý tưởng sang appsettings.Development.json
+# hoặc biến môi trường khi TB-050 implement. Không commit secret.
+#
+# Cổng: identity 6061, gateway 8080 (config/services.yaml) — Keycloak lab dùng 8090.
+
+Auth:
+  Provider: Identity   # Identity | Keycloak
+  Identity:
+    Authority: http://localhost:6061
+    Audience: boards-api
+    # Khi có OIDC discovery: MetadataAddress thường là {Authority}/.well-known/openid-configuration
+  Keycloak:
+    Authority: http://localhost:8090/realms/demo
+    Audience: demo-api
+  Clients:
+    # Chỉ dùng khi Provider khớp; client_id phải đăng ký ở IdP đang chọn
+    public_pkce:
+      ClientId: demo-client
+      RedirectUri: http://127.0.0.1:7890/
+    confidential_worker:
+      ClientId: worker
+      # client_secret: dùng user-secrets hoặc env — không ghi giá trị ở đây

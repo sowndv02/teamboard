@@ -47,7 +47,7 @@ Mô hình đầy đủ: [lesson-model.md](../../../.agents/skills/learning-hub/r
 | [5 Production](part-5-production-security-ops.md) | các tấn công và biện pháp, quản lý khoá, brute force, quan sát, chi phí | mọi giai đoạn | Biết tấn công thế nào và chặn ra sao |
 | [6 Projects](part-6-projects.md) | độ phủ I1 đến I9 và 12 điểm bảo mật, các điểm cần chốt | I1 đến I9 | Có bằng chứng cho từng điểm bảo mật |
 | [7 Mastery](part-7-troubleshooting-mastery.md) | sự cố thực tế, phỏng vấn, bài mở | – | Tự đánh giá mức thành thạo |
-| [Bản đồ phương thức](auth-methods-map.md) | các phương thức ngoài phạm vi code: HTTP auth, API key, MFA, passkey, SAML, social login, LDAP/AD/Kerberos, OAuth nâng cao, mô hình phân quyền | – (ngoài phạm vi `identity-service`) | Nhận ra và chọn đúng phương thức theo ngữ cảnh |
+| [Authentication Standards (khái niệm)](../auth-standards/README.md) | chuẩn và phương thức ngoài phạm vi code: SAML, LDAP/Kerberos, passkey, kiến trúc SPA/BFF; **Bản đồ giải pháp** ở [Part 7](../auth-standards/part-7-troubleshooting-mastery.md#bản-đồ-giải-pháp) | – (đọc song song; lab 1–4 code → [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md), [identity-auth-lab.md](../../architecture/identity-auth-lab.md)) | Chọn phương thức theo ngữ cảnh; thực hành OAuth/JWT ở Part 1–4 lộ trình này + TB-050 |
 
 ## Ma trận phủ
 
