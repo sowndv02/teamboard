@@ -46,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-25 | 4 CONFIRM chốt (Activity overhead, counter tách, docker logs, runbook JWT) |
 | test-init | done | – | 2026-11-25 | observability.feature @S01–@S07; ObservabilitySteps; 8 đỏ / 215 hồi quy xanh |
 | test-review | PASS | 1 | 2026-11-25 | S01 bổ sung method/status/traceId; shutdown đọc appsettings |
-| coding-start | in-progress | – | 2026-11-25 | B1–B2 xong; @S05–@S07 đỏ (B3–B4) |
+| coding-start | in-progress | – | 2026-11-25 | B1–B3 xong; @S07 đỏ (B4) |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -65,8 +65,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S02 | observability.feature + ObservabilitySteps | | xanh (B1) |
 | @S03 | observability.feature + ObservabilitySteps | | xanh (B2) |
 | @S04 | observability.feature (2 scenario) + ObservabilitySteps | | xanh (B2) |
-| @S05 | observability.feature + ObservabilitySteps | đỏ (compose thiếu logging) | |
-| @S06 | observability.feature + ObservabilitySteps | đỏ (ShutdownTimeout / stop_grace_period) | |
+| @S05 | observability.feature + ObservabilitySteps | | xanh (B3) |
+| @S06 | observability.feature + ObservabilitySteps | | xanh (B3) |
 | @S07 | observability.feature + ObservabilitySteps | đỏ (thiếu runbook) | |
 
 ## Test review rounds

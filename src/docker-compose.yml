@@ -21,6 +21,13 @@ services:
       ReverseProxy__Clusters__board-service__Destinations__d1__Address: http://board-service:7070
     ports:
       - "8080:7070"
+    stop_grace_period: 35s
+    # json-file rotation for local retention (~7 days at modest dev traffic); not a substitute for cloud log policy.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "100"
     restart: unless-stopped
 
   # No gateway route yet (slice 19 of identity-auth); call it directly on port 6061 for debugging.
