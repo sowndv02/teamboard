@@ -7,6 +7,7 @@ public sealed class IdentityMetrics
     public const string MeterName = "Teamboard.Identity";
 
     private readonly Histogram<double> _passwordHashDurationSeconds;
+    private readonly Counter<long> _loginFailuresTotal;
 
     public IdentityMetrics(IMeterFactory meterFactory)
     {
@@ -15,7 +16,12 @@ public sealed class IdentityMetrics
             "password_hash_duration_seconds",
             unit: "s",
             description: "Time spent hashing a password with PBKDF2.");
+        _loginFailuresTotal = meter.CreateCounter<long>(
+            "login_failures_total",
+            description: "Login attempts that failed credential validation.");
     }
 
     public void RecordPasswordHashDuration(double seconds) => _passwordHashDurationSeconds.Record(seconds);
+
+    public void RecordLoginFailure() => _loginFailuresTotal.Add(1);
 }
