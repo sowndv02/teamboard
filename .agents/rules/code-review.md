@@ -86,6 +86,30 @@ Probe áp dụng mà chưa grep/trace consumer → **không** được verdict "
 | BP5 | Dễ đọc | Tên nói rõ ý định, nesting nông, không đòi refactor chỉ vì style. |
 | BP6 | Observability | Log có ngữ cảnh (`correlationId`), đúng mức, không `Console.WriteLine`/`console.log`; lỗi giữ stack. |
 
+### 4. Security — BẮT BUỘC cho mọi diff
+
+Trụ cột này **luôn chạy**, kể cả khi diff "chỉ là CRUD" hay "chỉ sửa UI". Lý do: code sinh nhanh (vibe coding) thường lọt lỗi bảo mật ở chính những chỗ được coi là "không liên quan". Không có quyền bỏ qua probe nào bằng lý do "diff không chạm bảo mật"; probe không áp dụng phải ghi "Không áp dụng" kèm lý do cụ thể (ví dụ "không có input từ ngoài").
+
+| # | Probe | Câu hỏi bắt buộc |
+|---|---|---|
+| S1 | AuthN & AuthZ | Mọi endpoint/handler mới hoặc sửa đều có xác thực? Mutation và truy cập tài nguyên kiểm tra quyền sở hữu/tenant (chống IDOR/BOLA)? Quyền kiểm ở server, không chỉ ở UI/gateway? |
+| S2 | Input & injection | Input từ ngoài (body, query, header, path, file, message, event) được validate và giới hạn kích thước? Có SQL/NoSQL/command/LDAP injection, path traversal, deserialization không an toàn? EF Core dùng tham số hóa, không nối chuỗi SQL? |
+| S3 | Secret & PII | Có secret, connection string, token, khóa thật trong diff, fixture, log, config mẫu, hay lịch sử commit mới? Log/trace/exception có PII, token, password? |
+| S4 | Lộ thông tin & lỗi | Response lỗi có stack trace, tên bảng, thông tin nội bộ không? Có tuân thủ registry mã lỗi `problem+json` và không lộ chi tiết? |
+| S5 | Session, token & cookie | Token/JWT: kiểm chữ ký, `iss`/`aud`/`exp`, thuật toán cố định (không chấp nhận `none`)? Lưu token ở đâu (không localStorage cho token nhạy cảm)? Cookie có `HttpOnly`/`Secure`/`SameSite`? |
+| S6 | Mật mã | Dùng thuật toán cũ/yếu (MD5, SHA1 cho mật khẩu, DES, `Random` cho token)? Mật khẩu băm bằng thuật toán có work factor (bcrypt/Argon2/PBKDF2)? So sánh secret dùng constant-time? |
+| S7 | Cấu hình & header | CORS có `*` kèm credentials? Thiếu header bảo mật (CSP, HSTS, X-Content-Type-Options)? Debug/Swagger bật ở production? Cổng/bind mở rộng ngoài ý muốn? |
+| S8 | SSRF, upload & giới hạn | Request ra ngoài với URL do người dùng cung cấp có allowlist? Upload có giới hạn kích thước, kiểm loại file? Có giới hạn tốc độ/kích thước body cho endpoint công khai? Vòng lặp/truy vấn không giới hạn (DoS)? |
+| S9 | Phụ thuộc & chuỗi cung ứng | Gói mới có lỗ hổng đã biết (`dotnet list package --vulnerable`, `npm audit`)? Gói lạ/typo-squatting, script cài đặt tự chạy? Image/base image có tag cố định? |
+| S10 | Bảo mật dữ liệu & ghi trạng thái | Race condition/TOCTOU trên thao tác tiền, quyền, tồn kho? Xóa mềm/xóa cứng đúng quyền? Event/message có kiểm tra nguồn gửi? |
+
+Phân loại:
+- Lỗi bảo mật rõ ràng (S1–S3 vi phạm, secret thật, bypass auth, injection) = **P0** nếu khai thác được ngay, **P1** nếu cần điều kiện thêm.
+- Thiếu hardening có tác động thật (S4–S10) = **P2**; chỉ là khuyến nghị tổng quát không có tác động trong phạm vi = **P3**.
+- Đánh đổi bảo mật/hiệu năng không có đáp án duy nhất = CONFIRM (người dùng quyết).
+
+Báo cáo bắt buộc có bảng `Probe S1–S10 | Áp dụng? | Kết quả | Finding` trong mục Risk Audit. Probe áp dụng mà chưa kiểm chứng (chưa đọc đường đi của input hoặc chưa kiểm quyền) → **không** được verdict "Sẵn sàng merge".
+
 ## Pragmatic guardrails (lọc mọi finding)
 
 - **PG1 Issue/Spec/ADR là ranh giới**: đánh giá theo quyết định đã chọn, không đòi giải pháp khác (ví dụ không đòi Redis khi ADR chọn in-memory).
@@ -128,6 +152,7 @@ Vòng 1 đầy đủ; vòng 2+ thêm mục 3 và rút gọn probe không đổi.
 5. **Testing gaps**: hành vi chưa có evidence (trong phạm vi delta ở vòng 2+).
 6. **Tiêu chí issue (F6)**: bảng `Tiêu chí | Trạng thái | Evidence`.
 7. **Risk Audit**: bảng `Probe F1–F8 | Áp dụng? | Kết quả | Finding`; probe áp dụng mà chưa kiểm chứng thì không được verdict merge.
+   **Security** (trụ cột 4): bảng `Probe S1–S10 | Áp dụng? | Kết quả | Finding`, luôn đủ 10 dòng.
 8. **Blast Radius & tác động**: bảng B1–B4 và tóm tắt tác động API/Contract, Database, tính năng liên quan.
 9. **Best Practices**: bảng BP1–BP6 `Lens | Áp dụng? | Đạt/Không | Finding`.
 10. **Verdict**, một trong:
