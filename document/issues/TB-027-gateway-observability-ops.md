@@ -73,7 +73,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
-| 1 | 2026-11-25 | `07c6fe6` (+ delta chưa commit) | Sẵn sàng code | 0 |
+| 1 | 2026-11-25 | `e8047c9`..`013fa44` (rewrite bỏ Co-Authored-By) | Sẵn sàng code | 0 |
 
 ### Test review vòng 1 (tóm tắt)
 

@@ -56,6 +56,7 @@ Trước khi code, tra `document/lessons/README.md` theo tag của vùng đang l
 
 ## Commit
 - Chỉ commit khi người dùng cho phép. Quyền thường đã được hỏi một lần ở đầu workflow (skill `workflow`, mục "Commit theo bước"); nếu chạy riêng skill này và chưa được hỏi trong phiên thì **hỏi một lần** ("cho phép tôi commit cục bộ trên branch này sau khi coding-review PASS?"). Được phép → **không commit trong lúc code**; sau `coding-review` PASS commit theo `git-commit.md` (tiếng Anh, `type(TB-NNN): summary` + body), mỗi commit build được và test xanh (đổi sau review thì sửa trong working tree rồi review lại, chưa commit). **Không push.**
+- **Không** thêm `Co-Authored-By` hay dòng ghi công công cụ/AI (`commit.coAuthorTrailer: false`); kiểm `git log -1 --format=%B` sau commit — có trailer thì sửa message trước khi báo xong.
 - Không commit file sinh ra, secret, `local/`.
 
 ## Ngoài đời thực
