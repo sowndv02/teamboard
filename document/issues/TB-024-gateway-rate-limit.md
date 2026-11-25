@@ -1,7 +1,7 @@
 ---
 key: TB-024
 title: Gateway lát 4, rate limit theo IP và 429 problem+json
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-024-gateway-rate-limit
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -39,6 +39,7 @@ Plan chi tiết: `document/plans/TB-024-gateway-rate-limit.md`.
 - 2026-10-25: coding-start: code production viết bởi Cursor Agent (`agent -p --force --trust`, brief `local/cursor-tb024-brief.md`), Claude kiểm lại diff và test. Quyết định ngoài brief của Cursor: `RateLimitOptionsValidator` (kiểm Read/Write lồng nhau), `Retry-After` theo policy của endpoint, `ForwardedHeadersSetup` đăng ký bằng `IConfigureOptions`.
 - 2026-10-25: plan-review chốt 6 điểm; spike cho thấy `Retry-After` phải lấy từ cửa sổ, YARP mặc định đã Set `X-Forwarded-For/Proto`, `KnownNetworks` obsolete.
 - 2026-10-25: bắt đầu lát 4; nhánh tạo từ `main` sau PR 16; đồng bộ lát 3 (TB-023) sang `done` cùng lúc (LL-006).
+- 2026-10-25: mở PR https://github.com/sowndv02/teamboard/pull/18 (nhánh `feature/TB-024-gateway-rate-limit` vào `main`); trạng thái review.
 
 ## Workflow
 
@@ -52,7 +53,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 2 | 2026-10-25 | 1 P1 (proxy tin cậy) và 5 P2 vòng 1 đã sửa bằng @S11-@S14 và mở rộng @S02, @S03; 3 quyết định (khoá thứ tự quan sát được, bỏ cột Host, hoãn ForwardLimit); review độc lập kèm bản tham chiếu 166/166 xanh và đột biến bị bắt |
 | coding-start | done | – | 2026-10-25 | xanh 166/166 gateway (3 lần liên tiếp) và toàn solution không docker (241/241); code production do Cursor Agent viết theo brief `local/cursor-tb024-brief.md` rồi được kiểm lại (diff chỉ trong `src/gateway`, build, test, format, vulnerable sạch); chưa commit; nhóm docker không có test mới, chưa chạy lại; gitleaks chưa cài |
 | coding-review | PASS | 2 | 2026-10-25 | vòng 1: 0 P0-P2, 2 P3 (cả hai CONFIRM đã chốt, đã sửa); vòng 2 delta xanh: build `-warnaserror` 0/0, gateway 166/166, docker 3/3, format sạch; review của Claude (đã kiểm diff ở coding-start), code do Cursor Agent viết; gitleaks chưa cài |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-10-25 | PR https://github.com/sowndv02/teamboard/pull/18 |
 
 ## Confirm log
 
