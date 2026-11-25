@@ -25,11 +25,11 @@ public sealed class BodyLimitSteps(GatewayContext context)
 
     [When("I send {string} to {string} with a chunked body of {int} bytes")]
     public async Task WhenSendChunkedBody(string method, string path, int size) =>
-        await context.SendAsync(method, path, request =>
-        {
-            request.Content = new ChunkedContent(Filler(size, "a"));
-            request.Headers.TransferEncodingChunked = true;
-        });
+        await SendChunkedAsync(method, path, size, "a");
+
+    [When("I send {string} to {string} with a chunked body of {int} bytes made of {string}")]
+    public async Task WhenSendChunkedBodyMadeOf(string method, string path, int size, string phrase) =>
+        await SendChunkedAsync(method, path, size, phrase);
 
     [When("client {string} sends {string} to {string} with a body of {int} bytes")]
     public async Task WhenClientSendsBody(string client, string method, string path, int size) =>
@@ -53,6 +53,13 @@ public sealed class BodyLimitSteps(GatewayContext context)
         Assert.All(context.Logs.Entries, entry =>
             Assert.DoesNotContain(text, $"{entry.Message} {entry.Scopes} {entry.Exception}", StringComparison.Ordinal));
     }
+
+    private async Task SendChunkedAsync(string method, string path, int size, string phrase) =>
+        await context.SendAsync(method, path, request =>
+        {
+            request.Content = new ChunkedContent(Filler(size, phrase));
+            request.Headers.TransferEncodingChunked = true;
+        });
 
     private static byte[] Filler(int size, string phrase)
     {

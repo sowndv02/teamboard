@@ -65,6 +65,29 @@ Feature: Gateway rejects request bodies over the size limit
     Then the gateway answers with status 413 and problem+json code "PAYLOAD_TOO_LARGE" for "POST"
     And no log line contains "secret-board-title-"
 
+  @S08 @FR-007
+  Scenario Outline: The limit applies to every request, not only to the proxied routes
+    Given a fake upstream is running
+    And the gateway is configured to point at the fake upstream
+    When I send "<method>" to "<path>" with a body of 1048577 bytes
+    Then the gateway answers with status 413 and problem+json code "PAYLOAD_TOO_LARGE" for "<method>"
+    And the fake upstream receives no request
+
+    Examples:
+      | method | path           |
+      | POST   | /no-such-route |
+      | GET    | /health/live   |
+
+  @S09 @FR-007 @NFR-006
+  Scenario: The content of a rejected chunked body is never logged
+    Given a fake upstream is running
+    And the body limit is 1024 bytes
+    And the gateway runs on a real server socket
+    And the gateway is configured to point at the fake upstream
+    When I send "POST" to "/api/v1/boards" with a chunked body of 2048 bytes made of "secret-board-title-"
+    Then the gateway answers with status 413 and problem+json code "PAYLOAD_TOO_LARGE" for "POST"
+    And no log line contains "secret-board-title-"
+
   @S07 @FR-004 @FR-007
   Scenario: A client over its request allowance gets 429 before the size check
     Given a fake upstream is running

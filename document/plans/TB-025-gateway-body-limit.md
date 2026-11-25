@@ -55,6 +55,8 @@ Hành vi đã biết từ tài liệu học: `MaxRequestBodySize` của Kestrel/
 | FR-007 chunked đúng giới hạn → chuyển tiếp | 6.3 | B2 | @S04 | Host test (Kestrel thật): chunked tổng 1.048.576 byte → upstream nhận đủ |
 | FR-007 chunked vượt giới hạn → ngắt luồng và trả lỗi | 6.3 | B2 | @S05 | Host test (Kestrel thật): chunked 1.048.577 byte → `413 problem+json` `PAYLOAD_TOO_LARGE` có `X-Correlation-Id` bằng `correlationId` trong thân; không `500`; unit classifier: `RequestBodyClient` do `BadHttpRequestException` 413 → giá trị phân loại mới, `RequestBodyClient` khác vẫn `ClientCancelled` |
 | NFR-006 log không chứa body | mục 11 | B1, B2 | @S06 | `CapturingLoggerProvider`: log của 413 không chứa nội dung body và có `correlationId` |
+| FR-007 áp cho mọi request (Confirm #2) | 6.3, 6.4 | B1 | @S08 | Host test: `POST /no-such-route` và `GET /health/live` kèm body 1.048.577 byte → `413 problem+json`, upstream không nhận |
+| NFR-006 log không chứa body chunked bị từ chối | mục 11 | B2 | @S09 | Host Kestrel thật, giới hạn 1024: log (mọi category) không chứa nội dung body |
 | Thứ tự middleware (`BodyLimit` ngay trước YARP) khoá phần quan sát được | 6.4 | B1 | @S02 (kèm), @S07 | 413 mang `X-Correlation-Id` (Correlation ngoài); khi IP đã hết hạn mức ghi, request có `Content-Length` lớn nhận `429` chứ không phải `413` (`RateLimiter` trước `BodyLimit`) |
 
 Kịch bản (ID duy nhất trong `body-limit.feature`; viết ở test-init):
@@ -65,6 +67,7 @@ Kịch bản (ID duy nhất trong `body-limit.feature`; viết ở test-init):
 - @S05 Body chunked vượt giới hạn: client nhận `413 problem+json` `PAYLOAD_TOO_LARGE` kèm `X-Correlation-Id`, không `500`.
 - @S06 Log của gateway khi từ chối body không chứa nội dung body (NFR-006).
 - @S07 Thứ tự với rate limit: IP đã hết hạn mức ghi, request kế tiếp có `Content-Length` lớn nhận `429`, không phải `413` (dùng `X-Test-Remote-Ip` và ngưỡng nhỏ qua cấu hình; không ghi đè `WindowSeconds` dưới 30 giây).
+- Thêm ở test-review vòng 1: @S08 (Outline) `413` áp cho mọi request, kể cả route không tồn tại và health (Confirm #2); @S09 nội dung body chunked bị từ chối không vào log (NFR-006, phần chunked của @S06 theo B2).
 - Test xUnit không qua feature: `GatewayErrorCodesTests` (mã `PAYLOAD_TOO_LARGE` + status 413), `BodyLimitOptionsTests` (mặc định, khoảng 1 đến 10.485.760, ngoài khoảng thì lỗi), `UpstreamErrorClassifierTests` mở rộng (nhánh body quá lớn), `ConfigurationTests` (giá trị trong `appsettings.json`), unit của middleware nếu tách logic quyết định.
 
 ## 3. Các bước (mỗi bước một chu kỳ Đỏ → Xanh → Refactor)

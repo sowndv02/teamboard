@@ -47,7 +47,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-25 | `document/plans/TB-025-gateway-body-limit.md` (draft, cập nhật sau TB-024), làn vừa, 3 bước, 7 kịch bản, 4 câu hỏi mở |
 | plan-review | PASS | 2 | 2026-11-25 | plan `approved`; 4 quyết định (chunked `problem+json`, mọi request, khoảng 1-10 MiB, giữ một lát); 3 FIX theo spike (TestServer không có feature giới hạn, Kestrel trả `413` rỗng, không `500`); làn vừa |
 | test-init | done | – | 2026-11-25 | 7 kịch bản (`body-limit.feature`) + 3 nhóm xUnit; đỏ 12 test đúng lý do (413 mong đợi nhưng nhận 201, thiếu mã `PAYLOAD_TOO_LARGE`, thiếu cấu hình và validation `MaxBytes`, classifier chưa có nhánh body quá lớn); 4 kịch bản xanh sẵn (hồi quy); gateway 188 test: 176 xanh, 12 đỏ |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-25 | 2 FIX đã sửa (thiếu kịch bản cho Confirm #2 và phần chunked của NFR-006: thêm @S08, @S09), 1 P3 người dùng bỏ qua; 9 kịch bản, gateway 191 test: 15 đỏ đúng lý do (413 mong đợi, nhận 201/200/404, thiếu mã, cấu hình, nhánh classifier), 176 xanh gồm 166 test cũ; review do agent đã viết test thực hiện |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -60,6 +60,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | 2 | plan-review:TB-025:scope-all-requests | `413` áp mọi request hay chỉ route proxy | Mọi request | 1 | 2026-11-25 |
 | 3 | plan-review:TB-025:maxbytes-range | Khoảng hợp lệ của `MaxBytes` | 1 đến 10.485.760 byte | 1 | 2026-11-25 |
 | 4 | plan-review:TB-025:slice-size | Giữ một lát hay chia | Giữ một lát | 1 | 2026-11-25 |
+| 5 | test:gateway:real-socket-given-leak | Step Given "the gateway runs on a real server socket" lộ chi tiết kỹ thuật (P3) | Bỏ qua (`skipped`): step hạ tầng bắt buộc vì TestServer không có giới hạn body; feature khác có step tương tự | 1 | 2026-11-25 |
 
 ## Kịch bản và TDD log
 
@@ -74,6 +75,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S05 chunked vượt giới hạn: `413 problem+json` | @S05 (Kestrel thật) | có: mong đợi 413, nhận 201 | chờ coding |
 | @S06 nội dung body bị từ chối không vào log | @S06 | có: mong đợi 413, nhận 201 (phần log xanh sẵn, chỉ có nghĩa khi 413 đã có) | chờ coding |
 | @S07 hết hạn mức thì `429` trước `413` | @S07 | không: xanh sẵn vì chưa có `BodyLimit`; khoá thứ tự, sẽ đỏ nếu `BodyLimit` đặt trước `RateLimiter` | chờ coding |
+| @S08 `413` áp mọi request (route lạ, health) | @S08 (Outline: `POST /no-such-route`, `GET /health/live`) | có: mong đợi 413, nhận 404 và 200 | chờ coding |
+| @S09 nội dung body chunked bị từ chối không vào log | @S09 (Kestrel thật, giới hạn 1024) | có: mong đợi 413, nhận 201 | chờ coding |
 | Mã `PAYLOAD_TOO_LARGE` 413 | `GatewayErrorCodesTests.All_ContainsPayloadTooLarge_As413WithoutInternals` | có: thiếu mã | chờ coding |
 | `MaxBytes` mặc định 1 MiB | `BodyLimitConfigurationTests.ShippedLimit_IsOneMebibyte` | có: thiếu mục `Gateway:BodyLimit` | chờ coding |
 | `MaxBytes` ngoài khoảng 1 đến 10.485.760 làm khởi động thất bại | `BodyLimitConfigurationTests.Start_WithInvalidLimit_FailsAndNamesTheSetting` (4 giá trị) | có: khởi động vẫn thành công | chờ coding |
@@ -91,6 +94,11 @@ Ghi nhận cho test-review: (1) quyết định Confirm #2 "`413` áp cho mọi 
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-25 | `9dd37eb` (kèm sửa chưa commit) | Sẵn sàng code: 0 P0-P2 mở, P3 `real-socket-given-leak` đã bỏ qua có lý do (Confirm #5) | không |
+
+Bảng reconcile (kịch bản ↔ test) nằm ở mục "Kịch bản và TDD log" phía trên, đủ 9 kịch bản và 4 nhóm xUnit, không có kịch bản thiếu test. Đã kiểm: A (khai báo, tag `@TB-025` và `@S01`-`@S09`, không `@wip`, ASCII), B (phủ FR-007, NFR-004, NFR-006, đường lỗi và biên 1024/1025, 1.048.576/1.048.577), D (đỏ đúng lý do, `ReceivedBodyBytes` assert byte thật, không `sleep`, không logic production), E (xUnit 2.9.3 + Reqnroll 3.3.4, lệnh ghi ở TDD log). Mutation nghĩ đến: `BodyLimit` đặt trước `RateLimiter` làm @S07 đỏ; bỏ nhánh `Content-Length` làm @S02, @S08 đỏ; bỏ `MaxRequestBodySize` làm @S05, @S09 đỏ.
+
+Giới hạn đã biết: (1) @S05 và @S09 gửi body chunked qua socket thật; khi gateway trả `413` sớm client có thể gặp lỗi ghi thay vì đọc được `413` (R-04 của plan), cần quan sát khi coding, chạy lặp 10 lần; (2) review do agent đã viết test thực hiện, chưa có reviewer độc lập.
 
 ## Review rounds
 
@@ -103,6 +111,8 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 (test-review) | test:gateway:scope-all-requests-no-scenario | FIX (theo Confirm #2) | `body-limit.feature`, plan mục 2 | Quyết định "`413` áp mọi request" chưa có kịch bản | Thêm @S08 (Outline: `POST /no-such-route`, `GET /health/live` với body 1.048.577 byte); cập nhật plan | @S08 đỏ: mong đợi 413, nhận 404 và 200 |
+| 1 (test-review) | test:gateway:chunked-log-no-scenario | FIX (theo plan B2, NFR-006) | `body-limit.feature`, `BodyLimitSteps.cs`, plan mục 2 | Plan nói @S06 phủ cả phần chunked nhưng chưa có test | Thêm @S09 (Kestrel thật, giới hạn 1024, body chunked 2048 byte); thêm step "chunked body ... made of"; cập nhật plan | @S09 đỏ: mong đợi 413, nhận 201 |
 
 ## Bài học (lessons learned)
 
