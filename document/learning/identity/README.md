@@ -47,6 +47,7 @@ Mô hình đầy đủ: [lesson-model.md](../../../.agents/skills/learning-hub/r
 | [5 Production](part-5-production-security-ops.md) | các tấn công và biện pháp, quản lý khoá, brute force, quan sát, chi phí | mọi giai đoạn | Biết tấn công thế nào và chặn ra sao |
 | [6 Projects](part-6-projects.md) | độ phủ I1 đến I9 và 12 điểm bảo mật, các điểm cần chốt | I1 đến I9 | Có bằng chứng cho từng điểm bảo mật |
 | [7 Mastery](part-7-troubleshooting-mastery.md) | sự cố thực tế, phỏng vấn, bài mở | – | Tự đánh giá mức thành thạo |
+| [Bản đồ phương thức](auth-methods-map.md) | các phương thức ngoài phạm vi code: HTTP auth, API key, MFA, passkey, SAML, social login, LDAP/AD/Kerberos, OAuth nâng cao, mô hình phân quyền | – (ngoài phạm vi `identity-service`) | Nhận ra và chọn đúng phương thức theo ngữ cảnh |
 
 ## Ma trận phủ
 
