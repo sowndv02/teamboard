@@ -40,6 +40,7 @@ var app = builder.Build();
 app.UseForwardedHeaders();
 app.UseRouting();
 app.UseCorrelation();
+app.UseGatewayRequestLogging();
 app.UseTeamboardExceptionHandler();
 app.UseRequestTimeouts();
 app.UseMiddleware<UpstreamErrorMiddleware>();

@@ -48,7 +48,7 @@ public sealed class ObservabilitySteps(GatewayContext context)
         Assert.NotNull(_lastAccessLog);
     }
 
-    [Then(@"that access log entry includes method ""(.*)"" and status {int}")]
+    [Then(@"that access log entry includes method ""([^""]+)"" and status (\d+)")]
     public void ThenAccessLogMethodAndStatus(string method, int status)
     {
         var entry = _lastAccessLog ?? throw new InvalidOperationException("No access log entry from the previous step.");
