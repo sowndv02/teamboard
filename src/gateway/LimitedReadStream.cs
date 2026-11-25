@@ -6,7 +6,7 @@ namespace Gateway;
 /// Read-only wrapper that fails once more than <c>maxBytes</c> of body have been read. It counts payload bytes only:
 /// Kestrel's own limit also counts chunk framing, so it would reject a chunked body of exactly the limit (plan TB-025, test S04).
 /// </summary>
-internal sealed class LimitedReadStream(Stream inner, long maxBytes) : Stream
+public sealed class LimitedReadStream(Stream inner, long maxBytes) : Stream
 {
     private long _total;
 

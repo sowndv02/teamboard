@@ -51,7 +51,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-25 | 7 kịch bản (`body-limit.feature`) + 3 nhóm xUnit; đỏ 12 test đúng lý do (413 mong đợi nhưng nhận 201, thiếu mã `PAYLOAD_TOO_LARGE`, thiếu cấu hình và validation `MaxBytes`, classifier chưa có nhánh body quá lớn); 4 kịch bản xanh sẵn (hồi quy); gateway 188 test: 176 xanh, 12 đỏ |
 | test-review | PASS | 1 | 2026-11-25 | 2 FIX đã sửa (thiếu kịch bản cho Confirm #2 và phần chunked của NFR-006: thêm @S08, @S09), 1 P3 người dùng bỏ qua; 9 kịch bản, gateway 191 test: 15 đỏ đúng lý do (413 mong đợi, nhận 201/200/404, thiếu mã, cấu hình, nhánh classifier), 176 xanh gồm 166 test cũ; review do agent đã viết test thực hiện |
 | coding-start | done | – | 2026-11-25 | xanh 191/191 gateway (3 lần liên tiếp; nhóm TB-025 10/10) và toàn solution không docker (266/266: 40 + 11 + 3 + 21 + 191); build `-warnaserror` 0/0, format, vulnerable, compose config sạch; gitleaks chưa cài, quét secret thô sạch; nhóm docker không chạy (không đổi compose/Dockerfile); chưa commit |
-| coding-review | pending | | | |
+| coding-review | PASS | 1 | 2026-11-25 | 0 P0-P2, 1 P3 test coverage (đã sửa: thêm `LimitedReadStreamTests`); probe F1-F8, B1-B4, BP1-BP6 đã kiểm; gate xanh: build `-warnaserror` 0/0, format, vulnerable, compose config, test không docker 271/271 (gateway 196); gitleaks chưa cài; review do agent đã viết code thực hiện, chưa có reviewer độc lập |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -106,6 +106,26 @@ Giới hạn đã biết: (1) @S05 và @S09 gửi body chunked qua socket thật
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-25 | `e76a299` (base `main` `66673c2`) | Sẵn sàng merge sau khi sửa P3 (đã sửa trong working tree, chưa commit) | không |
+
+**Báo cáo vòng 1 (tóm tắt):**
+
+| Probe | Áp dụng? | Kết quả |
+|---|---|---|
+| F1 lỗi | Có | `BadHttpRequestException` được YARP bắt và phân loại, không nuốt lỗi; không `catch` rỗng trong code mới |
+| F2 validation | Có | `MaxBytes` kiểm 1 đến 10.485.760 lúc khởi động (test 4 giá trị sai, 3 đúng) |
+| F3 độ sâu test | Có | Assert byte thật ở upstream (`ReceivedBodyBytes`), upstream không nhận gì khi 413, log không chứa nội dung; P3 thiếu unit test đã sửa |
+| F4 idempotency, F5, F7 | Không áp dụng | Không có consumer, field chung hay persistence |
+| F6 tiêu chí issue | Có | Mọi tiêu chí có test xanh (xem bảng TDD log); tiêu chí đồng bộ bảng lát làm tiếp ở create-pr (lát 5 sang `review`) |
+| F8 bảo mật | Có | 413 không lộ giá trị giới hạn, host hay ngoại lệ; log không chứa body; DoS body lớn bị chặn sớm (Content-Length) hoặc khi đọc (chunked) |
+| B1 code dùng chung | Có | Chỉ đụng `src/gateway`; không đổi `src/shared`; grep `UpstreamFailure` chỉ dùng trong gateway |
+| B2 contract | Có | Thêm `413 PAYLOAD_TOO_LARGE` (cộng thêm, khớp design 6.3); không consumer nào bị phá; không cần ADR |
+| B3, B4 | B4 có | Không DB, không event; tác động: contract công khai gateway thêm một mã lỗi, health và route khác không đổi |
+| BP1-BP6 | Có | Options theo mẫu dự án; async có `CancellationToken`; log không có nội dung body; một chỗ xử lý "body quá lớn" (classifier); không hardcode (cấu hình `appsettings.json`) |
+
+Lăng kính: Chất lượng đạt (lỗi qua registry, không nuốt lỗi); Bảo mật đạt (không secret, phụ thuộc không lỗ hổng); Chi phí đạt (bọc stream rẻ, không log thêm ngoại lệ).
+
+Giới hạn đã biết: giới hạn chunked chỉ hiệu lực ở route proxy; YARP vẫn ghi cảnh báo `RequestBodyClient` kèm ngoại lệ cho mỗi request chunked quá lớn (R-07); gitleaks chưa cài; review do agent đã viết code thực hiện.
 
 ## Fix log
 
@@ -115,6 +135,7 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 |---|---|---|---|---|---|---|
 | 1 (test-review) | test:gateway:scope-all-requests-no-scenario | FIX (theo Confirm #2) | `body-limit.feature`, plan mục 2 | Quyết định "`413` áp mọi request" chưa có kịch bản | Thêm @S08 (Outline: `POST /no-such-route`, `GET /health/live` với body 1.048.577 byte); cập nhật plan | @S08 đỏ: mong đợi 413, nhận 404 và 200 |
 | 1 (test-review) | test:gateway:chunked-log-no-scenario | FIX (theo plan B2, NFR-006) | `body-limit.feature`, `BodyLimitSteps.cs`, plan mục 2 | Plan nói @S06 phủ cả phần chunked nhưng chưa có test | Thêm @S09 (Kestrel thật, giới hạn 1024, body chunked 2048 byte); thêm step "chunked body ... made of"; cập nhật plan | @S09 đỏ: mong đợi 413, nhận 201 |
+| 1 (coding-review) | gateway:LimitedReadStream:no-unit-test | FIX (P3, test coverage) | `src/gateway.Tests/LimitedReadStreamTests.cs`, `src/gateway/LimitedReadStream.cs` | Luật đếm byte chunked (đúng giới hạn qua, quá 1 byte thì 413, một lần đọc vượt giới hạn, thân rỗng, đọc đồng bộ) chỉ được phủ bằng test tích hợp 1 MiB qua socket thật | Thêm 5 unit test với `MemoryStream`; đổi `LimitedReadStream` từ `internal` sang `public` để test truy cập (cùng cách `UpstreamErrorClassifier`) | `LimitedReadStreamTests` 5/5 xanh; gateway 196/196 |
 
 ## Bài học (lessons learned)
 
