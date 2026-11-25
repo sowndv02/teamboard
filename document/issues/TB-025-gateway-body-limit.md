@@ -1,7 +1,7 @@
 ---
 key: TB-025
 title: Gateway lát 5, giới hạn body 1 MiB
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-025-gateway-body-limit
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-025-gateway-body-limit.md`](../plans/TB-025-gateway-bo
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-10-25: plan-init lần đầu ở worktree `board-tb-025` (branch tạo từ `main` feb4278, khi TB-024 chưa merge).
 - 2026-11-25: TB-024 đã merge (PR 18); nhánh fast-forward lên `main` `66673c2`; plan-init cập nhật tại chỗ (`BodyLimit` sau `RateLimiter`, thêm @S07, đóng P-01); đồng bộ lát 4 và TB-024 sang `done` (LL-006).
+- 2026-11-25: mở PR https://github.com/sowndv02/teamboard/pull/19 (nhánh `feature/TB-025-gateway-body-limit` vào `main`); trạng thái review.
 - 2026-11-25: bắt đầu coding (lát 5 `in-progress`). Sai lệch cơ chế so với plan B2: bản đầu dùng `IHttpMaxRequestBodySizeFeature` nhưng Kestrel đếm cả khung chunk nên từ chối body chunked đúng 1.048.576 byte (@S04 đỏ). Chuyển sang phương án thay thế mà plan A-01 đã nêu: `BodyLimitMiddleware` bọc `Request.Body` bằng `LimitedReadStream` đếm byte thân khi không có `Content-Length`, ném `BadHttpRequestException` 413, `UpstreamErrorClassifier` đổi thành `PayloadTooLarge` và `UpstreamErrorMiddleware` ghi `413 problem+json`. Hành vi spec không đổi. Design 6.3 đã cập nhật.
 - Giới hạn đã biết: giới hạn chunked chỉ có hiệu lực ở route proxy (nơi body được đọc); route khác chỉ chịu kiểm `Content-Length`. YARP vẫn ghi cảnh báo `RequestBodyClient` kèm ngoại lệ cho mỗi request chunked quá lớn (R-07, lát 7 xem lại log).
 
@@ -52,7 +53,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-25 | 2 FIX đã sửa (thiếu kịch bản cho Confirm #2 và phần chunked của NFR-006: thêm @S08, @S09), 1 P3 người dùng bỏ qua; 9 kịch bản, gateway 191 test: 15 đỏ đúng lý do (413 mong đợi, nhận 201/200/404, thiếu mã, cấu hình, nhánh classifier), 176 xanh gồm 166 test cũ; review do agent đã viết test thực hiện |
 | coding-start | done | – | 2026-11-25 | xanh 191/191 gateway (3 lần liên tiếp; nhóm TB-025 10/10) và toàn solution không docker (266/266: 40 + 11 + 3 + 21 + 191); build `-warnaserror` 0/0, format, vulnerable, compose config sạch; gitleaks chưa cài lúc đó (đã quét ở coding-review), quét secret thô sạch; nhóm docker không chạy (không đổi compose/Dockerfile); chưa commit |
 | coding-review | PASS | 1 | 2026-11-25 | 0 P0-P2, 1 P3 test coverage (đã sửa: thêm `LimitedReadStreamTests`); probe F1-F8, B1-B4, BP1-BP6 đã kiểm; gate xanh: build `-warnaserror` 0/0, format, vulnerable, compose config, test không docker 271/271 (gateway 196); gitleaks chưa cài; review do agent đã viết code thực hiện, chưa có reviewer độc lập |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-25 | https://github.com/sowndv02/teamboard/pull/19 |
 
 ## Confirm log
 
