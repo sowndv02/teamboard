@@ -154,7 +154,7 @@ Không áp dụng, cùng lý do D0.2. Phương án thay thế nghiêm túc nhấ
 | C. Tự viết thuật toán đếm | Tự cài sliding window/token bucket | Tốt | Vừa | Kém: có thư viện nền tảng | Như A |
 
 - **Vì sao không chọn B:** 50 RPS và một instance không cần đếm chung; B thêm thành phần và chi phí. **B sẽ đúng khi** chạy ≥ 3 instance và cần giới hạn chính xác theo IP, hoặc có route nhạy cảm (login) cần chặn brute force toàn cục. **Vì sao không chọn C:** thư viện nền tảng đã có; C là mức Xa.
-- **Cách cài:** policy có khoá phân vùng (`AddPolicy` với `RateLimitPartition.GetSlidingWindowLimiter(khoá, ...)`) vì bản đăng ký theo tên không phân vùng sẽ thành một bộ đếm chung cho mọi IP. Hai policy `read` và `write` gắn vào hai route YARP bằng `RateLimiterPolicy`. Mã trả về mặc định của rate limiter không phải `429` nên đặt `RejectionStatusCode = 429` và `OnRejected` để ghi `problem+json` (`RATE_LIMIT_EXCEEDED`) kèm `Retry-After` (lấy từ metadata của lease nếu có, nếu không dùng độ dài cửa sổ 60 giây); kiểm bằng test khi cài.
+- **Cách cài:** policy có khoá phân vùng (`AddPolicy` với `RateLimitPartition.GetSlidingWindowLimiter(khoá, ...)`) vì bản đăng ký theo tên không phân vùng sẽ thành một bộ đếm chung cho mọi IP. Hai policy `read` và `write` gắn vào hai route YARP bằng `RateLimiterPolicy`. Mã trả về mặc định của rate limiter không phải `429` nên đặt `RejectionStatusCode = 429` và `OnRejected` để ghi `problem+json` (`RATE_LIMIT_EXCEEDED`) kèm `Retry-After` (bằng độ dài cửa sổ của policy gắn với endpoint, mặc định 60 giây, cấu hình được; không lấy từ metadata của lease vì sliding window không trả `RetryAfter`); kiểm bằng test khi cài.
 - **Đánh đổi chấp nhận / rủi ro:** khi chạy N instance, giới hạn thực lỏng hơn N lần; khởi động lại xoá bộ đếm; IP sau proxy sai nếu cấu hình `ForwardedHeaders` sai (D5).
 - **Khả năng đảo ngược:** dễ; policy nằm trong phần cài đặt, đổi sang kho chung chỉ thay phần đó.
 - **Tín hiệu xem lại:** triển khai > 1 instance (giai đoạn 4) hoặc có route đăng nhập; tỉ lệ `429` bất thường so với số IP.
@@ -435,6 +435,7 @@ Ghi chú đã chốt: **Q-D1** chọn A, làm TB-001 trước rồi mới tới 
 | 2026-10-25 | Thêm `RequestTimeouts` vào thứ tự middleware 6.4; timeout kết nối là `504`; metric `gateway_upstream_aborted` không mang `correlationId` (log mang); lỗi forwarder chưa thuộc bảng là `502` | plan-review TB-023 (người dùng chốt) |
 | 2026-10-25 | Thêm `UpstreamError` vào thứ tự middleware 6.4 (sau `RequestTimeouts`, không xoá header của middleware phía trong) | coding-review TB-023 (người dùng chốt) |
 | 2026-10-25 | Làm rõ phạm vi "khoá bằng test" của thứ tự middleware 6.4: chỉ phần quan sát được | test-review TB-024 (người dùng chốt) |
+| 2026-10-25 | D1: `Retry-After` của `429` bằng độ dài cửa sổ của policy, không lấy từ metadata lease (khớp kết quả spike ở plan-review) | coding-review TB-024 (người dùng chốt) |
 
 ## 18. Confirm log
 
