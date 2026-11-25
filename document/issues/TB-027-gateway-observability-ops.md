@@ -1,13 +1,13 @@
 ---
 key: TB-027
 title: Gateway lát 7, quan sát và vận hành
-status: review
+status: done
 phase: 1
 branch: feature/TB-027-gateway-observability-ops
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-25     # ngày done/dropped
 ---
 
 # TB-027 — Gateway lát 7, quan sát và vận hành
@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-027-gateway-observability-ops.md`](../plans/TB-027-gat
 - 2026-11-25: plan-init. Nhánh `feature/TB-027-gateway-observability-ops` từ `origin/main` (sau PR #20). Đồng bộ TB-026 merge → `done`.
 - 2026-11-25: coding-start B4 xong — runbook JWT + link PROJECT; 223/223 test; chuyển `coding-review`.
 - 2026-11-25: PR https://github.com/sowndv02/teamboard/pull/21 (nhánh vào `main`).
+- 2026-11-25: PR #21 merged (`8988fce`); issue và lát 7 → `done`.
 
 ## Workflow
 
