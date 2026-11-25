@@ -84,7 +84,7 @@ Trước khi chọn OIDC, SAML hay Kerberos, trả lời theo thứ tự (ví d�
 ### Lab hoãn (ô ma trận L4 = –)
 
 > [!NOTE]
-> **Lab hoãn** (TB-049). Thực hành OIDC/BFF/WPF nằm ở bộ lab roadmap và [Identity](../identity/README.md) khi issue lab mở.
+> **L4:** OIDC/BFF/WPF hands-on → [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) + [Identity](../identity/README.md).
 
 ## L5 Troubleshooting — Case và chẩn đoán (bài 7.4)
 

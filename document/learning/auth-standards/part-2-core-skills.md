@@ -444,7 +444,7 @@ sequenceDiagram
 ### Lab hoãn (ô ma trận L4 = –)
 
 > [!NOTE]
-> **Lab Module 02 hoãn** theo [TB-049](../../issues/TB-049-learning-roadmap-auth-standards.md): chưa tích hợp lab gốc (JWT decoder, Base64 Basic, hash demo, Keycloak thực hành). Lab sẽ gom ở issue riêng sau khi Part 0–7 lý thuyết ổn.
+> **Lab Module 02 (L4):** triển khai [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) — JWT decoder/API, thực hành issuer Identity hoặc Keycloak đối chiếu; xem [identity-auth-lab.md](../../architecture/identity-auth-lab.md).
 
 | Bài nguồn | L4 trong Part này |
 |---|---|
@@ -539,7 +539,7 @@ Thực hành JWT/PBKDF2 bằng BCL: [Part 2 Identity](../identity/part-2-core-sk
 
 ## Nguồn và độ tin cậy
 
-**Đã tự mở và đối chiếu:** HTML Module 02 bài 2.1–2.5 trong `auth_std_roadmap-main/site/m02-*.html`; `authentication_standards_15h_roadmap.md` (Module 02); khuôn [part-template.md](../../../.agents/skills/learning-hub/references/part-template.md); [TB-049](../../issues/TB-049-learning-roadmap-auth-standards.md) (hoãn lab L4).
+**Đã tự mở và đối chiếu:** HTML Module 02 bài 2.1–2.5 trong `auth_std_roadmap-main/site/m02-*.html`; `authentication_standards_15h_roadmap.md` (Module 02); khuôn [part-template.md](../../../.agents/skills/learning-hub/references/part-template.md); lab L4 → [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md).
 
 **Đã tham chiếu trong repo:** [Part 1 Identity](../identity/part-1-fundamentals.md), [Part 2 Identity](../identity/part-2-core-skills.md) (JWT/PBKDF2 chi tiết và lab).
 

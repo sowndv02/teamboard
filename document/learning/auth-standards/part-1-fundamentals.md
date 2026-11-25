@@ -184,11 +184,12 @@ So sánh password, OAuth/OIDC, SAML, passkey, Kerberos, API key, mTLS, không x�
 
 ### Lab hoãn (ô ma trận L4 = –)
 
-Theo [TB-049](../../issues/TB-049-learning-roadmap-auth-standards.md), lab Keycloak/ASP.NET từ bộ nguồn chưa tích hợp. Để tự kiểm tra AuthN/AuthZ trên code: [Identity Part 1 Lab 1.1](../identity/part-1-fundamentals.md) (giải mã JWT tay).
+Lab hands-on gom [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) ([identity-auth-lab.md](../../architecture/identity-auth-lab.md)): `Auth:Provider` Identity hoặc Keycloak (profile 8090). Để tự kiểm tra AuthN/AuthZ ngay: [Identity Part 1 Lab 1.1](../identity/part-1-fundamentals.md) (giải mã JWT tay).
 
 | Bài lab nguồn | Trạng thái |
 |---|---|
-| Lab 1–5 (Keycloak, JWT API, PKCE…) | Hoãn issue sau |
+| Lab 1–4 (JWT API, PKCE…) | [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) |
+| Lab 5 (SAML) | Ngoài identity; lý thuyết Part 4 |
 
 ## Tự kiểm tra
 

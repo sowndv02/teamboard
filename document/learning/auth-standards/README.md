@@ -15,11 +15,12 @@
 
 **Không lặp:** JWT cấu trúc, PKCE, lab tấn công, xoay khoá chi tiết → chỉ [trỏ link](../identity/README.md). OAuth/OIDC/SAML ở đây giải thích **chuẩn và vai trò**; Identity chứng minh **một triển khai tối thiểu**.
 
-## Lab và quiz (hoãn)
+## Lab và quiz
 
-- **Lab** (Keycloak, demo ASP.NET Core trong bộ nguồn): **chưa tích hợp** — issue riêng sau TB-049; không chạy Keycloak, không lưu secret thật.
 - **Quiz** trong bộ nguồn: **bỏ**; mỗi Part chỉ giữ mục **Tự kiểm tra** ngắn.
-- **L4 (Hands-on)** trên toàn lộ trình: ô ma trận là `–` vì lab hoãn; phần đọc vẫn nêu đầu ra lab mong đợi để biết đọc xong cần làm gì tiếp.
+- **Lab 1–4 (hands-on):** không gắn Keycloak làm IdP chính; chọn issuer bằng settings `Auth:Provider` = **Identity** (mặc định) hoặc **Keycloak** (profile compose, đối chiếu). Chiến lược: [identity-auth-lab.md](../../architecture/identity-auth-lab.md), triển khai [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md). Mẫu config: [auth-development.example.yaml](../../../config/auth-development.example.yaml).
+- **L4** trên ma trận vẫn là `–` đến khi TB-050 xong; khi đó Part 2–3 trỏ lab JWT/PKCE (đọc song song [identity](../identity/README.md)).
+- **Lab 5 (SAML):** ngoài identity-service — chỉ Part 4 lý thuyết.
 
 ## Cảnh báo
 
@@ -35,7 +36,7 @@ Chiều ngang: **Part 1–7** (ánh xạ 7 module nguồn). Chiều sâu: **L1�
 | L1 What | Khái niệm/cơ chế là gì? |
 | L2 Why | Vì sao cần, giải quyết vấn đề gì? |
 | L3 How | Hoạt động từng bước, sơ đồ, dễ nhầm? |
-| L4 Hands-on | Lab (hoãn toàn lộ trình — xem trên) |
+| L4 Hands-on | Lab (code TB-050 — xem trên) |
 | L5 Troubleshooting | Triệu chứng → nguyên nhân |
 | L6 Production | Chính sách, NIST, storage, vận hành |
 | L7 Architecture | So sánh, chọn giải pháp, Bản đồ giải pháp (Part 7) |
@@ -55,7 +56,7 @@ Chiều ngang: **Part 1–7** (ánh xạ 7 module nguồn). Chiều sâu: **L1�
 
 ## Ma trận phủ
 
-`✓` = một mục `## Lx` trong file Part; `–` = không áp dụng hoặc lab hoãn.
+`✓` = một mục `## Lx` trong file Part; `–` = không áp dụng hoặc L4 chờ TB-050 (trừ SAML/WebAuthn lab riêng).
 
 | Part | L1 | L2 | L3 | L4 | L5 | L6 | L7 | L8 |
 |---|---|---|---|---|---|---|---|---|
@@ -68,7 +69,7 @@ Chiều ngang: **Part 1–7** (ánh xạ 7 module nguồn). Chiều sâu: **L1�
 | 7 | ✓ | ✓ | – | – | ✓ | ✓ | ✓ | ✓ |
 
 **Lý do ô `–`:**
-- **L4 mọi Part:** lab ASP.NET/Keycloak hoãn (TB-049); thực hành JWT/PKCE → [Identity](../identity/README.md).
+- **L4 mọi Part:** lab hands-on qua [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) + [identity-auth-lab.md](../../architecture/identity-auth-lab.md); đọc chuẩn ở đây, chạy JWT/PKCE → [Identity](../identity/README.md).
 - **Part 1, L5–L6:** sự cố và production gom ở Part 2–7.
 - **Part 4–5, L5:** troubleshooting SAML/enterprise ngắn; sự cố API/web sâu hơn ở Part 6–7.
 - **Part 6, L7–L8:** chọn giải pháp toàn cục ở Part 7.
@@ -118,14 +119,14 @@ Bộ nguồn: `H:\learning\auth_std_roadmap-main\auth_std_roadmap-main` (32 bài
 - Trả lời được phần lớn **Tự kiểm tra** ở Part 1–7.
 - Vẽ được một luồng **Code+PKCE** và một luồng **SAML SP-initiated** (không cần lab).
 - Chọn được 1 dòng trong **Bản đồ giải pháp** cho 3 tình huống (web SPA, API partner, nhân viên AD).
-- (Tuỳ chọn) Làm lab Identity Part 2–4 để củng cố OAuth/JWT trên code.
+- Lab thực tế: [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) (dual provider) + lộ trình [Identity](../identity/README.md).
 
 ## Tự kiểm tra nhanh (Part 0)
 
 1. Khác nhau giữa identifier và credential? Cho ví dụ API chỉ đọc email header.
 2. SSO và federation khác nhau thế nào?
 3. Vì sao lộ trình này không thay Identity?
-4. Lab L4 ở ma trận toàn `–` — làm thực hành ở đâu?
+4. Lab L4 ở ma trận toàn `–` — làm thực hành ở đâu sau TB-050?
 
 <details>
 <summary>Đáp án ngắn</summary>
@@ -133,7 +134,7 @@ Bộ nguồn: `H:\learning\auth_std_roadmap-main\auth_std_roadmap-main` (32 bài
 1. Identifier để tra cứu, không chứng minh; credential để chứng minh. API tin email header = nhầm identifier với credential.
 2. SSO là trải nghiệm đăng nhập một lần; federation là quan hệ tin giữa miền danh tính.
 3. Identity = tự dựng và tấn công có kiểm soát trên dự án; auth-standards = chuẩn và bối cảnh doanh nghiệp, không sửa `src/`.
-4. [Identity](../identity/README.md) Part 2–5; lab Keycloak hoãn issue sau TB-049.
+4. [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) và [identity-auth-lab.md](../../architecture/identity-auth-lab.md).
 
 </details>
 

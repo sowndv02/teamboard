@@ -334,7 +334,7 @@ flowchart TD
 
 ### Lab hoãn (ô ma trận L4 = –)
 
-**Hoãn (TB-049):** lab OAuth/OIDC với Keycloak (Lab 1–3 bộ gốc) tích hợp ở issue sau; Part này chỉ lý thuyết.
+**L4 (code):** [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) — lab OAuth/OIDC 1–3; Keycloak chỉ khi `Auth:Provider=Keycloak`. Lý thuyết vẫn ở Part này.
 
 Thực hành liên quan đã có trên lộ trình **Identity** (môi trường `127.0.0.1`, không lặp ở đây):
 
@@ -426,7 +426,7 @@ Thực hành liên quan đã có trên lộ trình **Identity** (môi trường 
 
 **Nguồn chính (đọc khi soạn Part này):** Module 03 trong `authentication_standards_15h_roadmap.md`; site `m03-1-oauth-basics.html` … `m03-7-user-identity.html` (bộ `auth_std_roadmap-main`).
 
-**Đã tự chạy:** không — L4 hoãn; không chạy Keycloak theo phạm vi TB-049.
+**Đã tự chạy:** không — L4 chờ TB-050; Keycloak không bật mặc định (profile `keycloak-lab`).
 
 **Chỉ qua tài liệu / agent (⚠):** RFC 6749, 6750, 7636 (PKCE), 8628 (Device), 7009 (revoke), 9207 (`iss` trong response), 9700 (OAuth security BCP), OIDC Core 1.0, Discovery, RP-Initiated Logout; OAuth 2.1 vẫn Internet-Draft (11/2026).
 

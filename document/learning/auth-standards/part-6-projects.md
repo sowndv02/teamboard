@@ -119,7 +119,7 @@
 ### Lab hoãn (ô ma trận L4 = –)
 
 > [!NOTE]
-> **Lab hoãn** (TB-049): không tích hợp lab Keycloak/ASP.NET từ bộ `auth_std_roadmap` trong Part này. Thực hành phân quyền và cookie nằm ở [Identity Part 2–5](../identity/README.md) và issue lab riêng sau.
+> **L4:** lab Keycloak/JWT từ bộ gốc → [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md). Phân quyền/cookie thực hành: [Identity Part 2–5](../identity/README.md).
 
 **Đầu ra khi lab có:** chạy pipeline 401/403; tái hiện BOLA bằng đổi ID trên URL; cấu hình antiforgery cho BFF.
 
@@ -226,4 +226,4 @@ Kiến trúc SPA nhạy cảm: ưu tiên **server-side web** hoặc **SPA + BFF*
 
 **Đã tự mở và đối chiếu (khi biên soạn):** [NIST SP 800-63B-4](https://pages.nist.gov/800-63-4/sp800-63b.html); [RFC 6750](https://www.rfc-editor.org/rfc/rfc6750) (401/403 Bearer); [OWASP API Security API1:2023 BOLA](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/).
 **Chỉ qua nguồn roadmap HTML (⚠):** nội dung chi tiết bài 6.1–6.5 từ `auth_std_roadmap-main` (m06-*.html); số liệu Microsoft Authenticator number matching (2023) chưa tự đối chiếu bài gốc.
-**Chưa kiểm:** lab Part 6 (hoãn); ví dụ Kaopiz HR trong nguồn là minh họa, không phải hệ thống thật của repo.
+**Chưa kiểm:** lab Part 6 (TB-050 chưa xong); ví dụ Kaopiz HR trong nguồn là minh họa, không phải hệ thống thật của repo.

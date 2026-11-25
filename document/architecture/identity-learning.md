@@ -10,7 +10,7 @@ Mục tiêu học: tự xây các chức năng xác thực/ủy quyền thay vì
 2. **Tự xây để học ≠ tự xây để chạy sản phẩm.** Mật mã và giao thức xác thực rất dễ sai lỗi tinh vi. Quy tắc cho bài học:
    - **Được tự viết:** logic phát/kiểm tra token, các luồng OAuth/OIDC, quản lý người dùng/phiên, ủy quyền theo claim/policy.
    - **Không tự viết thuật toán mật mã.** Dùng nguyên thuỷ của .NET BCL (`System.Security.Cryptography`: RSA/ECDSA, HMAC, `Rfc2898DeriveBytes.Pbkdf2`, `RandomNumberGenerator`, `CryptographicOperations.FixedTimeEquals`), **không** tự cài RSA/SHA/AES.
-   - **Không dùng** framework identity trọn gói (IdentityServer, OpenIddict, Keycloak...) cho phần cần học. Có thể dùng chúng **làm chuẩn đối chiếu** (so hành vi) hoặc để học cách một sản phẩm thật làm.
+   - **Không dùng** framework identity trọn gói (IdentityServer, OpenIddict, Keycloak...) cho phần cần học. Có thể dùng chúng **làm chuẩn đối chiếu** (so hành vi) hoặc để học cách một sản phẩm thật làm — cụ thể lab auth-standards 1–4 với Keycloak optional: [identity-auth-lab.md](identity-auth-lab.md) (`Auth:Provider`, [TB-050](../issues/TB-050-identity-auth-lab-dual-provider.md)).
    - Ghi rõ trong ADR: nếu thành sản phẩm thật thì thay bằng giải pháp đã kiểm chứng (hoặc Cognito: `aws-service-selection`).
 
 ## 1. Khái niệm cần nắm (theo thứ tự học)

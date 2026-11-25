@@ -19,8 +19,8 @@ Nhánh cắt từ `origin/main` trong worktree `H:\learning\board-tb-049`; nhán
 
 ## Phạm vi
 - Làm: lộ trình khái niệm `document/learning/auth-standards/` (Part 0–7), **ưu tiên lý thuyết**, phủ 7 module của bộ bài (identity và nền tảng, session và token, OAuth/OIDC, SAML, doanh nghiệp và passwordless, phân quyền và bảo mật, kiến trúc); "Bản đồ giải pháp" thay cho `auth-methods-map.md` (xoá file này); cập nhật `document/learning/README.md` và `document/learning/identity/README.md`.
-- Hoãn (người dùng quyết 2026-11-25): **lab** (đọc và tích hợp sau, issue riêng) và **quiz** (bỏ; mỗi Part chỉ giữ "Tự kiểm tra" ngắn theo khuôn). Vì vậy tầng L4 ở các Part ghi `–` kèm lý do "lab tích hợp sau" thay vì quy tắc tối thiểu của `lesson-model.md`; ghi rõ ở Part 0.
-- Không làm: sửa `src/`, `config/`, spec, design, ADR; chép nguyên văn bộ bài; sửa `.agents/**` (kể cả `references/topic-map.md`); chạy Keycloak hay lab nào; thử trên hệ thống thật; lưu khoá, mật khẩu hay token thật; lặp phần đã có ở lộ trình identity (JWT, PKCE, tấn công tự dựng: chỉ trỏ link); commit/push khi chưa được yêu cầu.
+- Hoãn **code lab** sang [TB-050](TB-050-identity-auth-lab-dual-provider.md); tài liệu chiến lược dual provider: [identity-auth-lab.md](../architecture/identity-auth-lab.md). **Quiz** bỏ; L4 ma trận `–` đến khi TB-050 xong.
+- Không làm: sửa `src/`, spec, design, ADR; chép nguyên văn bộ bài; sửa `.agents/**` (kể cả `references/topic-map.md`); **wire lab** (TB-050); chạy Keycloak trong CI mặc định; thử trên hệ thống thật; lưu khoá, mật khẩu hay token thật; lặp phần đã có ở lộ trình identity (JWT, PKCE, tấn công tự dựng: chỉ trỏ link); commit/push khi chưa được yêu cầu. Cho phép: tài liệu lab + `config/auth-development.example.yaml` (mẫu, không secret).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
 - [ ] Part 0 có ma trận phủ khớp nội dung, mục phạm vi, quan hệ với lộ trình identity và cảnh báo an toàn lab
@@ -34,10 +34,11 @@ Nhánh cắt từ `origin/main` trong worktree `H:\learning\board-tb-049`; nhán
 ## Kế hoạch
 1. Issue và nhánh (file này).
 2. Đọc nguồn chiều sâu bằng 4 agent chỉ đọc theo nhóm module.
-3. (Hoãn) Lab: đọc và tích hợp ở issue sau.
+3. Lab: chiến lược TB-050 + `identity-auth-lab.md` (code chưa làm trong TB-049).
 4. Viết Part 0–7 (lý thuyết).
 5. Mục lục, liên kết, xoá bản đồ cũ, kiểm chứng.
 
 ## Ghi chú / Nhật ký
 - 2026-11-25: tạo issue theo kế hoạch người dùng duyệt (plan mode).
 - 2026-11-25: viết `document/learning/auth-standards/` Part 0–7 từ `auth_std_roadmap-main`; xoá `identity/auth-methods-map.md`; cập nhật mục lục learning + identity README; lab/quiz hoãn.
+- 2026-11-25: ghi chiến lược lab dual provider (`identity-auth-lab.md`, `auth-development.example.yaml`, issue TB-050); settings `Auth:Provider` Identity|Keycloak.

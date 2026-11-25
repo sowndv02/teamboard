@@ -101,6 +101,7 @@ document/
 
 - [patterns-catalog.md](patterns-catalog.md): danh mục kiến trúc/pattern hay dùng trong dự án thực tế, đối chiếu với TeamBoard
 - [identity-learning.md](identity-learning.md): lộ trình tự xây `identity-service` (JWT, OAuth 2.0, OIDC)
+- [identity-auth-lab.md](identity-auth-lab.md): lab auth-standards 1–4, dual provider (`Auth:Provider` Identity / Keycloak); triển khai [TB-050](../issues/TB-050-identity-auth-lab-dual-provider.md)
 - [observability.md](observability.md): log, metric, trace, health; stack local và AWS (CloudWatch, ADOT/X-Ray)
 - [resilience.md](resilience.md): retry, circuit breaker, bulkhead, timeout, chịu lỗi trên AWS
 - [references.md](references.md): nguồn tham khảo (slide, chuẩn, sách) và cách dùng

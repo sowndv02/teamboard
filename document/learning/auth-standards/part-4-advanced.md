@@ -148,7 +148,7 @@ sequenceDiagram
 
 ### Lab hoãn (ô ma trận L4 = –)
 
-> **Hoãn** (TB-049): Lab SAML trong bộ `auth_std_roadmap` (Lab 5) tích hợp ở issue riêng. Phần này không ghi đầu ra lab giả định.
+> **Lab 5 (SAML):** ngoài [TB-050](../../issues/TB-050-identity-auth-lab-dual-provider.md) (chỉ lab 1–4). Chỉ lý thuyết trong Part này; issue SAML riêng nếu cần sau.
 
 ## L5 Troubleshooting — Triệu chứng thường gặp
 
