@@ -1,0 +1,18 @@
+{
+  "Identity": {
+    "Clients": {
+      "Enabled": true,
+      "SecretHash": {
+        "Iterations": 600000
+      },
+      "Seed": [
+        {
+          "ClientId": "teamboard",
+          "ClientType": "Public",
+          "RedirectUris": ["https://localhost/callback"],
+          "AllowedScopes": ["openid"]
+        }
+      ]
+    }
+  }
+}

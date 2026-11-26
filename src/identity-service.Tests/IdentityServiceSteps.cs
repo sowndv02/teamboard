@@ -107,6 +107,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     {
         _settings.Clear();
         _settings[RateLimitEnabledKey] = "false";
+        _settings[ClientRegistryEnabledKey] = "false";
         _burstStatusCodes.Clear();
         _observeLoginFailuresOnly = false;
         _observeLockoutsOnly = false;

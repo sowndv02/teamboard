@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start B1–B6; 8 đỏ → xanh"
+current_step: coding-review
+next_action: "coding-review TB-040"
 blocked_by: null
 
 steps:
@@ -45,7 +45,10 @@ steps:
     round: 1
     finished: 2026-11-26T18:55:00Z
     evidence: ["76 pass 8 fail !~Compose", "Sẵn sàng code"]
-  coding-start:         { status: pending }
+  coding-start:
+    status: done
+    finished: 2026-11-26T19:30:00Z
+    evidence: ["83/83 !~Compose", "dotnet build warnaserror"]
   coding-review:        { status: pending }
   create-pr:            { status: pending }
 

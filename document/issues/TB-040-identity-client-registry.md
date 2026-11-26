@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 12 của `document/plans/ide
 - Không làm: client_credentials (TB-041), authorize/PKCE (TB-042), CRUD admin, đổi contract login JSON.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Bảng `client` + migration; client mặc định tồn tại sau startup (@S01).
-- [ ] Secret confidential chỉ băm trong DB; verify đúng/sai (@S02); không log secret (@S05).
-- [ ] `ValidateRedirectUri` khớp chính xác BR-005 (@S03).
-- [ ] Hồi quy refresh/login `!~Compose` xanh.
-- [ ] `config/clients.example.json` (hoặc tương đương) không chứa secret thật.
+- [x] Bảng `client` + migration; client mặc định tồn tại sau startup (@S01).
+- [x] Secret confidential chỉ băm trong DB; verify đúng/sai (@S02); không log secret (@S05).
+- [x] `ValidateRedirectUri` khớp chính xác BR-005 (@S03, @S03b).
+- [x] Hồi quy `!~Compose` xanh (83/83).
+- [x] `config/clients.example.json` không chứa secret thật.
 
 ## Kế hoạch
 Plan: [`document/plans/TB-040-identity-client-registry.md`](../plans/TB-040-identity-client-registry.md) (`approved`, B1–B6; plan-review PASS v1).
@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-040-identity-client-registry.md`](../plans/TB-040-iden
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#6 (PBKDF2 secret, jsonb, exact redirect, env secret, teamboard public, ready clients).
 - 2026-11-26: test-init — `client-registry.feature` @S01–@S05; stub `Security/Clients/*`; **7 failed, 75 passed** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX secret_hash only, tách @S03b, `ClientRegistryTests`; **8 failed, 76 passed** `!~Compose`.
+- 2026-11-26: coding-start — migration `client`, seed, health ready, PBKDF2 secret; **83/83** `!~Compose`.
 
 ## Workflow
 
@@ -48,7 +49,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#6 |
 | test-init | done | – | 2026-11-26 | 7 đỏ @S01–@S04 + unit; @S05 xanh |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 8 đỏ đúng lý do |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-11-26 | **83/83** `!~Compose` |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -63,14 +64,14 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 | `client-registry.feature` | bảng `client` / seed | |
-| @S02 | `client-registry.feature` | bảng `client` / hash | |
-| @S03, @S03b | `client-registry.feature` + `RedirectUriMatcherTests` | `NotImplementedException` | |
-| @S04 | `client-registry.feature` + `ClientRegistryTests` | bảng `client` / stub | |
+| @S01 | `client-registry.feature` | | **xanh** |
+| @S02 | `client-registry.feature` | | **xanh** |
+| @S03, @S03b | `client-registry.feature` + `RedirectUriMatcherTests` | | **xanh** |
+| @S04 | `client-registry.feature` | | **xanh** |
 | @S05 | `client-registry.feature` | | **xanh** |
-| unit hash | `ClientSecretHasherTests` (×2) | `NotImplementedException` | |
+| unit hash | `ClientSecretHasherTests` (×2) | | **xanh** |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **76 passed, 8 failed** (sau test-review v1).
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **83/83** (coding-start).
 
 ## Test review rounds
 
