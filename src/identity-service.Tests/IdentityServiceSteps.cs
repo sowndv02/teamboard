@@ -186,15 +186,30 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     }
 
     [When("I request a client credentials token for client {string} with secret {string} and scope {string}")]
-    public async Task WhenRequestClientCredentialsToken(string clientId, string clientSecret, string scope)
+    public async Task WhenRequestClientCredentialsToken(string clientId, string clientSecret, string scope) =>
+        await SendClientCredentialsTokenAsync(clientId, clientSecret, includeScope: true, scope);
+
+    [When("I request a client credentials token for client {string} with secret {string} without a scope")]
+    public async Task WhenRequestClientCredentialsTokenWithoutScope(string clientId, string clientSecret) =>
+        await SendClientCredentialsTokenAsync(clientId, clientSecret, includeScope: false, scope: string.Empty);
+
+    private async Task SendClientCredentialsTokenAsync(
+        string clientId,
+        string clientSecret,
+        bool includeScope,
+        string scope)
     {
         var fields = new Dictionary<string, string>
         {
             ["grant_type"] = "client_credentials",
             ["client_id"] = clientId,
             ["client_secret"] = clientSecret,
-            ["scope"] = scope,
         };
+        if (includeScope)
+        {
+            fields["scope"] = scope;
+        }
+
         using var request = new HttpRequestMessage(HttpMethod.Post, ConnectTokenPath)
         {
             Content = new FormUrlEncodedContent(fields),
@@ -202,6 +217,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _response = await _client!.SendAsync(request);
         _body = await _response.Content.ReadAsStringAsync();
     }
+
+    [Then("the status code is not {int}")]
+    public void ThenStatusCodeIsNot(int forbidden) => Assert.NotEqual(forbidden, (int)_response!.StatusCode);
 
     [Then("the token response includes a Bearer access token with expires_in")]
     public void ThenTokenResponseIncludesBearerAccessToken() => JwtBddAssertions.AssertBearerAccessTokenShape(_body);

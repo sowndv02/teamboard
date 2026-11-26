@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using IdentityService.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -32,5 +33,7 @@ internal static class TokenEndpoints
             statusCode: StatusCodes.Status501NotImplemented);
     }
 
-    private sealed record OAuthTokenErrorResponse(string Error, string ErrorDescription);
+    private sealed record OAuthTokenErrorResponse(
+        [property: JsonPropertyName("error")] string Error,
+        [property: JsonPropertyName("error_description")] string ErrorDescription);
 }

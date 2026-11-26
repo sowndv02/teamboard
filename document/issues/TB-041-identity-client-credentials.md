@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-i
 - 2026-11-26: TB-040 merged PR #36 → `main` `93cdd46`; `plan-init` nhánh `feature/TB-041-identity-client-credentials`.
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#7 (`/connect/token`, form body, scope bắt buộc, feature flag, defer Teamboard.Auth, OAuth errors, AuthPublic rate limit).
 - 2026-11-26: test-init — `client-credentials.feature` @S01–@S06; stub `/connect/token` 501; **5 failed, 87 passed** `!~Compose`.
+- 2026-11-26: test-review v1 **PASS** — FIX missing-scope @S03b, unit asserts behavior; **10 failed, 84 passed** `!~Compose`.
 
 ## Workflow
 
@@ -47,7 +48,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-26 | Draft B1–B5; O-1..O-7 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#7 |
 | test-init | done | – | 2026-11-26 | 5 đỏ @S01–S04,@S06; @S05 xanh; +2 unit |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | FIX @S03b + unit đỏ behavior; 10 fail |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -66,18 +67,22 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | @S01 | `client-credentials.feature` | **đỏ** (501 ≠ 200) | |
 | @S02 | `client-credentials.feature` | **đỏ** (501 ≠ 200) | |
 | @S03 | `client-credentials.feature` | **đỏ** (501 ≠ invalid_scope) | |
+| @S03b | `client-credentials.feature` | **đỏ** (501 ≠ invalid_scope) | |
 | @S04 | `client-credentials.feature` | **đỏ** (501 ≠ invalid_client) | |
-| @S05 | `client-credentials.feature` | | **xanh** |
+| @S05 | `client-credentials.feature` | | **xanh** (log + not 404) |
 | @S06 | `client-credentials.feature` | **đỏ** (501 ≠ unauthorized_client) | |
 | unit issuer | `AccessTokenIssuerMachineTests` | **đỏ** (NIE) | |
-| unit scope | `ScopeValidatorTests` | **đỏ** (NIE) | |
+| unit scope | `ScopeValidatorTests` ×3 | **đỏ** (NIE) | |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **87 pass, 5 fail** (test-init).
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **84 pass, 10 fail** (test-review).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | test-init + FIX | Sẵn sàng code | – |
+
+**Giới hạn đã biết:** Chưa BDD metric `machine_access_tokens_issued_total` (plan B4 — kiểm unit/metric khi coding); feature flag disabled (404) chưa có kịch bản riêng.
 
 ## Review rounds
 
@@ -90,6 +95,10 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | test:identity:missing-scope | FIX P1 | `client-credentials.feature` | Confirm #3 scope bắt buộc thiếu kịch bản | @S03b + step without scope | 10 fail |
+| 1 | test:identity:unit-red-reason | FIX P1 | `ScopeValidatorTests`, `AccessTokenIssuerMachineTests` | Unit xanh vì assert NIE | Assert hành vi thật | NIE fail |
+| 1 | test:identity:cc-log-hit-endpoint | FIX P2 | @S05 | @S05 xanh yếu | `status not 404` | @S05 xanh |
+| 1 | test:identity:oauth-error-json | FIX P2 | `TokenEndpoints` | OAuth error shape | `error` / `error_description` | coding |
 
 ## Bài học (lessons learned)
 

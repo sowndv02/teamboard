@@ -33,6 +33,18 @@ Feature: identity-service OAuth client credentials grant
     Then the status code is 200
     And the access token is not a user access token
 
+  @S03b @FR-015 @docker
+  Scenario: Missing scope is rejected
+    Given an empty PostgreSQL database is running
+    And identity-service has confidential oauth client "bdd-noscope" with secret "NoScopeSecret-Test-12" allows scopes:
+      | scope    |
+      | api.read |
+    And identity-service is configured to use that database and applies migrations on startup
+    When I request a client credentials token for client "bdd-noscope" with secret "NoScopeSecret-Test-12" without a scope
+    Then the status code is 400
+    And the oauth token response error is "invalid_scope"
+    And the token response has no access_token
+
   @S03 @FR-015 @docker
   Scenario: Requested scope outside allowed scopes is rejected
     Given an empty PostgreSQL database is running
@@ -67,7 +79,8 @@ Feature: identity-service OAuth client credentials grant
     And identity-service log capture is enabled
     And identity-service is configured to use that database and applies migrations on startup
     When I request a client credentials token for client "cc-log" with secret "DoNotLogCcSecret-Value-99" and scope "api.read"
-    Then captured logs contain no oauth client secret
+    Then the status code is not 404
+    And captured logs contain no oauth client secret
 
   @S06 @FR-015 @docker
   Scenario: Public client cannot use the client credentials grant

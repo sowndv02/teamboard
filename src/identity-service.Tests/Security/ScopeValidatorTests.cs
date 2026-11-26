@@ -6,16 +6,20 @@ namespace IdentityService.Tests.Security;
 public sealed class ScopeValidatorTests
 {
     [Fact]
-    public void IsRequestedScopeAllowed_WhenSingleScopeIsAllowed_ReturnsTrue()
+    public void IsRequestedScopeAllowed_WhenSubsetOfAllowed_ReturnsTrue()
     {
-        Assert.Throws<NotImplementedException>(() =>
-            ScopeValidator.IsRequestedScopeAllowed(["api.read"], ["api.read", "board.write"]));
+        Assert.True(ScopeValidator.IsRequestedScopeAllowed(["api.read"], ["api.read", "board.write"]));
     }
 
     [Fact]
-    public void IsRequestedScopeAllowed_WhenScopeNotAllowed_ThrowsUntilImplemented()
+    public void IsRequestedScopeAllowed_WhenNotListed_ReturnsFalse()
     {
-        Assert.Throws<NotImplementedException>(() =>
-            ScopeValidator.IsRequestedScopeAllowed(["admin"], ["api.read"]));
+        Assert.False(ScopeValidator.IsRequestedScopeAllowed(["admin"], ["api.read"]));
+    }
+
+    [Fact]
+    public void IsRequestedScopeAllowed_WhenEmpty_ReturnsFalse()
+    {
+        Assert.False(ScopeValidator.IsRequestedScopeAllowed([], ["api.read"]));
     }
 }
