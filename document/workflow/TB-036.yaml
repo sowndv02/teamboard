@@ -3,7 +3,7 @@
 id: TB-036
 scope: issue
 title: Identity lát 8, refresh token xoay vòng
-updated: 2026-11-26T20:00:00Z
+updated: 2026-11-26T20:30:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: plan-review
-next_action: "plan-review TB-036 (O-1..O-5)"
+current_step: test-init
+next_action: "test-init TB-036 (refresh-token.feature @S01-S05, red)"
 
 steps:
   plan-init:
@@ -27,7 +27,17 @@ steps:
     evidence:
       - "Plan draft B0-B6; base main 94dd3a2 after PR #30"
       - "Open questions O-1..O-5"
-  plan-review:          { status: pending }
+  plan-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T20:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "Confirm #1-5 user form"
+      - "FR-010 deferred TB-037; OAuth refresh contract"
   test-init:            { status: pending }
   test-review:          { status: pending }
   coding-start:         { status: pending }
@@ -38,3 +48,4 @@ confirm_pending: []
 
 events:
   - { at: 2026-11-26T20:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-035 merged; plan-init TB-036" }
+  - { at: 2026-11-26T20:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
