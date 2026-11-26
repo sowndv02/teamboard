@@ -214,10 +214,17 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _rotationTime = new FakeRotationTimeProvider(DateTimeOffset.Parse(utcTimestamp, CultureInfo.InvariantCulture));
 
     [When("I advance rotation fake time by {int} minutes")]
-    public void WhenAdvanceRotationFakeTime(int minutes)
+    public void WhenAdvanceRotationFakeTimeMinutes(int minutes)
     {
         var time = _rotationTime ?? throw new InvalidOperationException("Rotation fake time was not set.");
         time.Advance(TimeSpan.FromMinutes(minutes));
+    }
+
+    [When("I advance rotation fake time by {int} hours")]
+    public void WhenAdvanceRotationFakeTimeHours(int hours)
+    {
+        var time = _rotationTime ?? throw new InvalidOperationException("Rotation fake time was not set.");
+        time.Advance(TimeSpan.FromHours(hours));
     }
 
     [When("I run signing key rotate start")]

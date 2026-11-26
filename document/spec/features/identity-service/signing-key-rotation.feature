@@ -31,9 +31,10 @@ Feature: identity-service signing key rotation
     And identity-service signing keys file points to the rotation test file
     And identity-service is configured to use that database and applies migrations on startup
     And a user is registered with email "rotate-s02@example.com" and password "ValidPass123456"
-    And I send a login request with email "rotate-s02@example.com" and password "ValidPass123456"
-    And the status code is 200
-    And I store the current login access token for rotation checks
+    When I send a login request with email "rotate-s02@example.com" and password "ValidPass123456"
+    Then the status code is 200
+    When I store the current login access token for rotation checks
+    Given rotation fake UTC time is "2026-01-01T00:00:00Z"
     When I run signing key rotate start
     And I advance rotation fake time by 11 minutes
     And I run signing key rotate activate
@@ -81,8 +82,8 @@ Feature: identity-service signing key rotation
     And identity-service is configured to use that database and applies migrations on startup
     When I send GET to "/.well-known/jwks.json"
     Then the status code is 200
-    And the JWKS document includes exactly 1 public key
-    When a user is registered with email "rotate-s05@example.com" and password "ValidPass123456"
-    And I send a login request with email "rotate-s05@example.com" and password "ValidPass123456"
+    And the JWKS document includes exactly 1 public keys
+    Given a user is registered with email "rotate-s05@example.com" and password "ValidPass123456"
+    When I send a login request with email "rotate-s05@example.com" and password "ValidPass123456"
     Then the status code is 200
     And the access token header kid is "test-active-1"

@@ -22,4 +22,21 @@ public sealed class SigningKeyRotationCliTests
                 && string.Equals(entry.GetProperty("status").GetString(), "pending", StringComparison.OrdinalIgnoreCase)),
             "Expected pending rotation key in signing keys file.");
     }
+
+    [Fact]
+    public void RotateStart_ReturnsNonZeroWhenSigningKeysFileIsInvalidJson()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"signing-keys-invalid-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, "{ not json");
+        try
+        {
+            var exitCode = SigningKeyRotationCommands.Start(path, TimeProvider.System);
+
+            Assert.NotEqual(0, exitCode);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

@@ -3,7 +3,7 @@
 id: TB-035
 scope: issue
 title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
-updated: 2026-11-26T23:15:00Z
+updated: 2026-11-26T19:00:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-035 (B0 ADR 0013, multi-key JWKS, CLI)"
+current_step: create-pr
+next_action: "create-pr TB-035 (user confirms commit/push)"
 
 steps:
   plan-init:
@@ -57,11 +57,30 @@ steps:
     evidence:
       - "@S06 retire JWKS; S01 dual kid; JwtRetiringKid probe"
       - "identity 48/55 pass; Auth 8/10 pass (2 red)"
-  coding-start:           { status: pending }
-  coding-review:          { status: pending }
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T18:30:00Z
+    evidence:
+      - "identity 55/55 !~Compose; Auth 10/10; board 25/25 Category!=docker"
+      - "dotnet build src/teamboard.slnx -warnaserror; format verify"
+      - "ADR 0013; ADR 0012 multi-key JWKS"
+  coding-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T19:00:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "Review v1; fix identity:SigningKeyRotationCommands:json-parse"
+      - "identity 55/55 + Auth 10/10 gate re-run"
   create-pr:              { status: pending }
 
 confirm_pending: []
 
 events:
   - { at: 2026-11-26T23:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-034 merged PR #29; plan-init TB-035" }
+  - { at: 2026-11-26T18:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start done; all tests green" }
+  - { at: 2026-11-26T19:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }

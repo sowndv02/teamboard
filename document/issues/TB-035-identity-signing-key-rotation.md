@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 7 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Ba lệnh CLI D7: `keys rotate start` / `activate` / `retire` trên file khoá dev với guard thời gian.
-- [ ] JWKS công bố `pending`, `active`, `retiring`; login chỉ ký bằng `active`.
-- [ ] Sau activate: token mới dùng `kid` mới; token phát trước đó còn hạn vẫn verify qua JWKS.
-- [ ] Sau retire hợp lệ: khoá cũ không còn trong JWKS (theo FR-008).
-- [ ] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
+- [x] Ba lệnh CLI D7: `keys rotate start` / `activate` / `retire` trên file khoá dev với guard thời gian.
+- [x] JWKS công bố `pending`, `active`, `retiring`; login chỉ ký bằng `active`.
+- [x] Sau activate: token mới dùng `kid` mới; token phát trước đó còn hạn vẫn verify qua JWKS.
+- [x] Sau retire hợp lệ: khoá cũ không còn trong JWKS (theo FR-008).
+- [x] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
 
 ## Kế hoạch
 Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035-identity-signing-key-rotation.md) (`approved`, B0–B6; plan-review PASS v1).
@@ -37,6 +37,8 @@ Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035
 - 2026-11-26: plan-review v1 PASS — log audit; reload file mỗi sign/JWKS; fake time CLI; file-only keys.
 - 2026-11-26: test-init — `signing-key-rotation.feature` @S01–@S05; `SigningKeyRotationCliTests`; `JwtMultiKidJwksIntegrationTests`; stub CLI; **6 đỏ** (4×rotation BDD + 1×CLI + 1×Auth), @S05 xanh; hồi quy identity 43 + jwks xanh.
 - 2026-11-26: test-review v1 PASS — @S06 retire JWKS; @S01 dual kid; `JwtRetiringKidTokenValidationIntegrationTests` (probe JWKS trước validate); **7+2 đỏ**.
+- 2026-11-26: **coding-start done, xanh 55/55** identity (`!~Compose`), **10/10** Auth, **25/25** board (`Category!=docker`); ADR 0013 + cập nhật 0012; BDD fix S02 fake time + S05 step wording.
+- 2026-11-26: **coding-review v1 PASS** — 1 FIX (CLI `JsonException`); giới hạn kid cố định / không file-lock ghi trong ADR 0013 phạm vi lab.
 
 ## Workflow
 
@@ -48,8 +50,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 6 đỏ; @S05 regression xanh |
 | test-review | PASS | 1 | 2026-11-26 | @S06 + consumer probe; guard @S03/@S04 hoãn tới CLI start |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
+| coding-start | done, xanh 55/55 | – | 2026-11-26 | ADR 0013; gate slnx build+format |
+| coding-review | PASS | 1 | 2026-11-26 | fix CLI JsonException; 0 CONFIRM mở |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -67,11 +69,10 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| rotation @S01–@S04, @S06 | `signing-key-rotation.feature` | **đỏ** (CLI/JWKS chưa đủ kid) | |
-| rotation @S05 | `signing-key-rotation.feature` | | **xanh** |
-| CLI rotate start | `SigningKeyRotationCliTests` | **đỏ** | |
-| FR-006 multi-kid JWKS | `JwtMultiKidJwksIntegrationTests` | **đỏ** | |
-| FR-008 token cũ sau activate | `JwtRetiringKidTokenValidationIntegrationTests` | **đỏ** | |
+| rotation @S01–@S06 | `signing-key-rotation.feature` | | **xanh** |
+| CLI rotate start/activate/retire | `SigningKeyRotationCliTests` | | **xanh** |
+| FR-006 multi-kid JWKS | `JwtMultiKidJwksIntegrationTests` | | **xanh** |
+| FR-008 token cũ sau activate | `JwtRetiringKidTokenValidationIntegrationTests` | | **xanh** |
 | jwks TB-034 @S01–@S04 | `jwks.feature` | | xanh |
 
 ## Test review rounds
@@ -84,6 +85,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `dd71f58` + working tree coding-start | PASS | – |
 
 ## Fix log (test-review)
 
@@ -102,6 +104,7 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | identity:SigningKeyRotationCommands:json-parse | FIX | `SigningKeyRotationCommands.cs:47` | `JsonException` không vào filter → thoát không kiểm soát | Thêm `JsonException`; test invalid JSON | `SigningKeyRotationCliTests.RotateStart_ReturnsNonZeroWhenSigningKeysFileIsInvalidJson` |
 
 ## Bài học (lessons learned)
 

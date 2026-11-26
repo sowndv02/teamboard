@@ -9,12 +9,12 @@ Resource server tải khoá công khai qua HTTP (FR-007, FR-006). ADR 0010/0011 
 
 ## Quyết định
 - Đường dẫn: **`GET /.well-known/jwks.json`** (ngoại lệ `api-endpoints.md` mục 1; chuẩn OIDC/JWK Set).
-- Nội dung: JSON **JWK Set** chỉ khoá **công khai** RS256 đang `active` (lát này một khoá; xoay đa khoá TB-035).
+- Nội dung: JSON **JWK Set** gồm mọi khoá **công khai** RS256 **được công bố** (`pending`, `active`, `retiring` khi đang xoay — ADR 0013); không xoay thì thường chỉ một khoá `active`.
 - Header: **`Cache-Control: public, max-age=600`** (khớp TTL cache consumer, design D2).
 - Không có khoá `active` để xuất bản: **HTTP 503** (plan-review Confirm #1; nhất quán login không phát token).
 - Metric: counter **`jwks_served_total`** mỗi phản hồi JWKS **200** (Confirm #2).
 - Nguồn khoá: cùng file/config `Identity:SigningKeys:JsonFile` như ADR 0010 (dev); không lộ `privateKeyPem` trong response.
-- **Không** trong lát: route gateway, xoay khoá `pending`/`retiring`, discovery OIDC đầy đủ.
+- **Không** trong lát TB-034: route gateway, discovery OIDC đầy đủ. Chu trình xoay và JWKS đa khoá: **ADR 0013** (TB-035).
 
 ## Phương án đã cân nhắc
 

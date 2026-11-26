@@ -99,6 +99,7 @@ document/
 - [0010 Ký access token JWT (RS256) trong identity-service](adr/0010-identity-jwt-signing.md) (chấp nhận, TB-032)
 - [0011 Kiểm access JWT qua Teamboard.Auth](adr/0011-teamboard-auth-jwt-validation.md) (chấp nhận, TB-033)
 - [0012 Endpoint JWKS identity](adr/0012-identity-jwks-endpoint.md) (chấp nhận, TB-034)
+- [0013 Xoay khoá ký JWT identity](adr/0013-identity-signing-key-rotation.md) (chấp nhận, TB-035)
 
 ## Tài liệu kiến trúc chi tiết
 
