@@ -45,6 +45,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 - 2026-11-26: test-init — `authorize-pkce.feature` @S01,@S01b,@S04–@S06,@S08 + `AuthorizationCodeGeneratorTests`; **7 fail, 104 pass** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX @S05 lockout 401; @S06 second When → And; **7 fail, 104 pass** `!~Compose`.
 - 2026-11-26: coding-start **done** — Razor `/login`, cookie `Identity.Idp`, authorize flow, migration #7; **111/111** `!~Compose`.
+- 2026-11-26: coding-review v1 **PASS** — commit `81b8cfa` + FIX `tb.authz.pending` Secure/Path; **111/111** `!~Compose`.
 
 ## Workflow
 
@@ -55,7 +56,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 | test-init | done | – | 2026-11-26 | 7 đỏ 104 pass !~Compose |
 | test-review | PASS | 1 | 2026-11-26 | FIX @S05 @S06 |
 | coding-start | done | – | 2026-11-26 | 111/111 !~Compose |
-| coding-review | pending | | | |
+| coding-review | PASS | 1 | 2026-11-26 | FIX pending cookie Secure |
 | create-pr | pending | | | |
 
 ## Confirm log
@@ -97,11 +98,13 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `81b8cfa` (+ fix) | PASS | – |
 
 ## Fix log
 
 | Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
 |---|---|---|---|---|---|---|
+| 1 | security:tb-052:pending-cookie-secure | FIX P2 | `AuthorizePendingRequestCookie.cs` | `Secure=false` cố định, khác IdP cookie | `Secure = IsHttps`, `Path=/` | 111/111 |
 
 ## Bài học (lessons learned)
 
