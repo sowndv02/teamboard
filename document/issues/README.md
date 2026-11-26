@@ -49,8 +49,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-034](TB-034-identity-jwks.md) | Identity lát 6, công bố JWKS | 1 | done |
 | [TB-035](TB-035-identity-signing-key-rotation.md) | Identity lát 7, xoay khoá ký không hỏng token còn hạn | 1 | done |
 | [TB-036](TB-036-identity-refresh-token.md) | Identity lát 8, refresh token xoay vòng | 1 | done |
-| [TB-037](TB-037-identity-refresh-reuse-detection.md) | Identity lát 9, phát hiện dùng lại refresh token | 1 | review |
-| [TB-038](TB-038-identity-logout.md) | Identity lát 10, đăng xuất thu hồi phiên | 1 | todo |
+| [TB-037](TB-037-identity-refresh-reuse-detection.md) | Identity lát 9, phát hiện dùng lại refresh token | 1 | done |
+| [TB-038](TB-038-identity-logout.md) | Identity lát 10, đăng xuất thu hồi phiên | 1 | in-progress |
 | [TB-039](TB-039-identity-change-password.md) | Identity lát 11, đổi mật khẩu và thu hồi refresh | 1 | todo |
 | [TB-040](TB-040-identity-client-registry.md) | Identity lát 12, quản lý client đăng ký | 1 | todo |
 | [TB-041](TB-041-identity-client-credentials.md) | Identity lát 13, Client Credentials và token máy | 1 | todo |

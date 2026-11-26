@@ -1,13 +1,13 @@
 ---
 key: TB-037
 title: Identity lát 9, phát hiện dùng lại refresh token
-status: review
+status: done
 phase: 1
 branch: feature/TB-037-identity-refresh-reuse-detection
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26
-closed: null            # ngày done/dropped
+closed: 2026-11-26            # ngày done/dropped
 ---
 
 # TB-037 — Identity lát 9, phát hiện dùng lại refresh token
@@ -40,6 +40,7 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 - 2026-11-26: coding-start — reuse detection, family revoke, `refresh_reuse_total`, log; **63/63** identity `!~Compose`; commit `0c5c72e`.
 - 2026-11-26: coding-review v1 **PASS** — commit `0c5c72e`; gate format + 63/63; không CONFIRM mở.
 - 2026-11-26: [PR #33](https://github.com/sowndv02/teamboard/pull/33) (head `01a333b`; đã bỏ `Co-authored-by` trên nhánh).
+- 2026-11-26: merged PR #33 → `main` `895d738`; lát 9 done; mở TB-038.
 
 ## Workflow
 

@@ -14,7 +14,7 @@ links:
   pr: https://github.com/sowndv02/teamboard/pull/33
 
 current_step: done
-next_action: "Chờ review/CI; merge PR #33 (user)"
+next_action: "Merged PR #33 → main 895d738"
 
 steps:
   plan-init:            { status: done }
@@ -50,3 +50,4 @@ events:
   - { at: 2026-11-26T08:20:00Z, actor: "orchestrator:cursor-session", event: commit, detail: "0c5c72e feat(TB-037) reuse detection" }
   - { at: 2026-11-26T08:35:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
   - { at: 2026-11-26T08:50:00Z, actor: "orchestrator:cursor-session", event: pr_opened, detail: "PR #33" }
+  - { at: 2026-11-26T09:00:00Z, actor: "orchestrator:cursor-session", event: merged, detail: "main 895d738" }
