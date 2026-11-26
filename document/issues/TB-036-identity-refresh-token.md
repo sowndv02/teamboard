@@ -38,6 +38,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 - 2026-11-26: test-init — `refresh-token.feature` @S01–@S05; `RefreshTokenHashTests`; stub `/refresh` 501; **6 đỏ**, hồi quy **56/56** (`!~Compose`).
 - 2026-11-26: test-review v1 PASS — FIX Background `And`, assert refresh mới ≠ cũ (@S02); **6 đỏ** đúng lý do (trừ @S03 status tạm thời, xem Giới hạn).
 - 2026-11-26: coding-start — ADR 0014, migration `refresh_token`, login/refresh + CAS; metrics; **62/62** identity `!~Compose`, board `Category!=docker` xanh.
+- 2026-11-26: commit `5a43719` feat refresh; coding-review v1 **PASS** (0 CONFIRM, 0 FIX mở).
 
 ## Workflow
 
@@ -47,10 +48,9 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#5 |
 | test-init | done | – | 2026-11-26 | 6 đỏ (5 BDD + 1 unit); hồi quy 56 xanh |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 6 đỏ |
-| coding-start | done | – | 2026-11-26 | 62/62 `!~Compose`; ADR 0014 |
-| coding-review | pending | – | | next |
-| coding-review | pending | | | |
-| create-pr | pending | – | | |
+| coding-start | done | – | 2026-11-26 | `5a43719`; 62/62 `!~Compose` |
+| coding-review | PASS | 1 | 2026-11-26 | Sẵn sàng merge |
+| create-pr | pending | – | | next |
 
 ## Confirm log
 
@@ -80,16 +80,25 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| refresh @S01–@S05 | `refresh-token.feature` | **đỏ** | |
-| hash SHA-256 | `RefreshTokenHashTests` | **đỏ** | |
+| refresh @S01–@S05 | `refresh-token.feature` | | **xanh** |
+| hash SHA-256 | `RefreshTokenHashTests` | | **xanh** |
 | login/access/jwks hồi quy | TB-030–035 features | | xanh |
-
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → Failed **6**, Passed **56**; `dotnet format src/teamboard.slnx --verify-no-changes` xanh.
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `5a43719` | Sẵn sàng merge | – |
+
+**Lăng kính (v1):** CAS D4 + transaction; 401 chung; hash-only DB; metric; không log refresh; rate limit `auth-public`. **Giới hạn đã biết:** FR-010 family revoke → TB-037; login access+refresh chưa một transaction (fail insert → không 200); chưa BDD expired/revoked seed.
+
+**Gate review:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **62/62**; build `-warnaserror` xanh.
+
+## Fix log (coding-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | – | – | – | Không có FIX mở | – | review `5a43719` |
 
 ## Fix log (test-review)
 

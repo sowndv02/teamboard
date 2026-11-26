@@ -3,7 +3,7 @@
 id: TB-036
 scope: issue
 title: Identity lát 8, refresh token xoay vòng
-updated: 2026-11-26T23:45:00Z
+updated: 2026-11-27T00:15:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,52 +16,43 @@ links:
   base: main
   pr: null
 
-current_step: coding-review
-next_action: "coding-review TB-036"
+current_step: create-pr
+next_action: "create-pr TB-036 (user confirm)"
 
 steps:
   plan-init:
     status: done
     owner: orchestrator:cursor-session
     finished: 2026-11-26T20:00:00Z
-    evidence:
-      - "Plan draft B0-B6; base main 94dd3a2 after PR #30"
   plan-review:
     status: done
-    owner: orchestrator:cursor-session
-    finished: 2026-11-26T20:30:00Z
-    round: 1
     verdict: PASS
-    open_confirm: 0
-    open_fix: 0
-    evidence:
-      - "Confirm #1-5 user form"
+    round: 1
+    finished: 2026-11-26T20:30:00Z
   test-init:
     status: done
-    owner: orchestrator:cursor-session
     finished: 2026-11-26T21:00:00Z
-    evidence:
-      - "refresh-token.feature @S01-S05"
-      - "6 red; 56 pass !~Compose"
   test-review:
     status: done
-    owner: orchestrator:cursor-session
+    verdict: PASS
+    round: 1
     finished: 2026-11-26T22:30:00Z
+  coding-start:
+    status: done
+    finished: 2026-11-26T23:45:00Z
+    evidence:
+      - "5a43719 feat refresh rotation"
+  coding-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-27T00:15:00Z
     round: 1
     verdict: PASS
     open_confirm: 0
     open_fix: 0
     evidence:
-      - "d9a6c7b test-review PASS"
-  coding-start:
-    status: done
-    owner: orchestrator:cursor-session
-    finished: 2026-11-26T23:45:00Z
-    evidence:
-      - "ADR 0014; AddRefreshToken migration"
-      - "RefreshTokenService CAS; login+refresh endpoints"
-      - "62/62 identity !~Compose; format verify"
-  coding-review:        { status: pending }
+      - "5a43719 reviewed"
+      - "62/62 identity !~Compose"
   create-pr:            { status: pending }
 
 confirm_pending: []
@@ -71,4 +62,5 @@ events:
   - { at: 2026-11-26T20:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
   - { at: 2026-11-26T21:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 6 red" }
   - { at: 2026-11-26T22:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
-  - { at: 2026-11-26T23:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 62/62 green" }
+  - { at: 2026-11-26T23:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 62/62" }
+  - { at: 2026-11-27T00:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
