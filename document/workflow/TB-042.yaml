@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-042 (authorize validation BDD)"
+current_step: test-review
+next_action: "test-review TB-042"
 blocked_by: null
 
 steps:
@@ -35,7 +35,10 @@ steps:
     round: 1
     finished: 2026-11-26T13:30:00Z
     evidence: ["Confirm O-1..O-11", "identity-auth-i5 approved"]
-  test-init:              { status: pending }
+  test-init:
+    status: done
+    finished: 2026-11-26T14:00:00Z
+    evidence: ["8 fail 94 pass !~Compose", "authorize-pkce.feature"]
   test-review:            { status: pending }
   coding-start:           { status: pending }
   coding-review:          { status: pending }
@@ -48,3 +51,4 @@ events:
   - { at: 2026-11-26T13:10:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init: draft TB-042-identity-authorize-pkce.md" }
   - { at: 2026-11-26T13:10:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "11 câu hỏi mở O-1..O-11" }
   - { at: 2026-11-26T13:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
+  - { at: 2026-11-26T14:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 8 red → test-review" }

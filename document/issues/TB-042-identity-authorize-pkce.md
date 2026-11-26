@@ -34,6 +34,7 @@ Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-ident
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: `plan-init` từ `main` `138b81a`; chia 14a/14b; `identity-auth-i5.md` approved.
 - 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-11 (design i5, split, Razor 14b, flag, HTML errors, DB context, S256, scope, nonce, redirect BDD).
+- 2026-11-26: test-init — `authorize-pkce.feature` @S02,@S03,@S03b,@S07; stub GET `/connect/authorize` 501; **8 fail, 94 pass** `!~Compose`.
 
 ## Workflow
 
@@ -43,7 +44,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | 14a scope, O-1..O-11 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-26 | 8 fail 94 pass !~Compose |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -60,6 +61,14 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S02 | `authorize-pkce.feature` | **đỏ** | |
+| @S03 | `authorize-pkce.feature` | **đỏ** | |
+| @S03b | `authorize-pkce.feature` | **đỏ** | |
+| @S07 | `authorize-pkce.feature` | **đỏ** | |
+| unit PKCE | `PkceValidatorTests` ×3 | **đỏ** (NIE) | |
+| unit authorize | `AuthorizeRequestValidatorTests` | **đỏ** (NIE) | |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **94 pass, 8 fail** (stub `/connect/authorize` 501; validators NIE).
 
 ## Test review rounds
 
