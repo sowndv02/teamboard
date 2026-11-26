@@ -17,6 +17,7 @@ Ghi chú gom kiến thức theo chủ đề (vấn đề, cách dùng, ưu/như�
 | Kiến trúc microservice (lộ trình Part 0–7) | [microservice/README.md](microservice/README.md) | Có (monolith, modular monolith, microservice, DOMA, serverless, strangler) | 2026-10-23 | Đạt (Segment, Shopify, Uber tự mở; Prime Video chỉ thứ cấp) |
 | Identity: xác thực và ủy quyền (lộ trình Part 0–7, `identity-service` tự xây là ứng dụng) | [identity/README.md](identity/README.md) | Có (tự xây, Cognito, Keycloak, Duende, OpenIddict, session cookie, API key, mTLS, không xác thực) | 2026-10-25 | Chưa đạt (sự cố chỉ qua agent ⚠, chưa mở báo cáo gốc; lab I7, I8, I9 chưa chạy) |
 | Authentication Standards (lộ trình Part 0–7): chuẩn xác thực/ủy quyền theo `auth_std_roadmap-main` (OAuth/OIDC, SAML, enterprise, passkey, phân quyền, kiến trúc); lab 1–4 hands-on → [TB-050](../issues/TB-050-identity-auth-lab-dual-provider.md); đọc song song [Identity](identity/README.md) | [auth-standards/README.md](auth-standards/README.md) | Có (Part 7: mật khẩu+session, OAuth/OIDC, SAML, passkey, Kerberos/LDAP, API key, mTLS, không xác thực) | 2026-11-25 | Chưa đạt (case real-world chưa tự mở; code lab TB-050) |
+| Testing: TDD, BDD và chủ đề liên quan (lộ trình Part 0–7, **khung**, nội dung `TODO`) → [TB-051](../issues/TB-051-learning-roadmap-testing-tdd-bdd.md) | [testing/README.md](testing/README.md) | Chưa viết (dự kiến ở Part 1 mục L7) | 2026-11-26 | Chưa đạt (chưa nghiên cứu nguồn) |
 
 ## Công cụ
 
