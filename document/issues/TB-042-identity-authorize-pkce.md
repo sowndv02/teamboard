@@ -1,16 +1,16 @@
 ---
 key: TB-042
-title: Identity lát 14, Authorization Code + PKCE: authorize và trang đăng nhập
-status: todo
+title: Identity lát 14a, Authorize + PKCE validation (I5 pha 1)
+status: in-progress
 phase: 1
 branch: feature/TB-042-identity-authorize-pkce
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26           # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
-# TB-042 — Identity lát 14, Authorization Code + PKCE: authorize và trang đăng nhập
+# TB-042 — Identity lát 14a, Authorize + PKCE validation
 
 ## Bối cảnh
 Issue khung cấp key khi duyệt bảng lát: lát 14 của `document/plans/identity-auth-slices.md` (spec `document/spec/identity-auth.md`, design `document/design/identity-auth.md`). Chi tiết phạm vi, tiêu chí và plan được lập khi tới lượt lát này (`plan-init`).
@@ -18,17 +18,22 @@ Issue khung cấp key khi duyệt bảng lát: lát 14 của `document/plans/ide
 **Phụ thuộc (theo bảng lát):** 2, 12, ADR trang đăng nhập. Ước lượng của bảng lát: 4–5 ngày.
 
 ## Phạm vi
-- Làm (theo hàng lát, FR/NFR: FR-012, FR-019, BR-005): Authorization Code + PKCE: authorize và trang đăng nhập (chưa có design, chờ spec FE)
-- Không làm: các lát khác của bảng lát.
+- Làm (14a): design phụ lục I5, migration `authorization_code`, PKCE S256, `GET /connect/authorize` + validation, feature flag, BDD lỗi (@S02, @S03).
+- Không làm (14a): Razor login, cookie IdP, redirect `code` → **lát 14b** (issue TBD). Token exchange → TB-043.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Design `identity-auth-i5.md` approved.
+- [ ] `redirect_uri` / params sai → không redirect URI chưa tin cậy (@S02, @S03).
+- [ ] PKCE + registry validation unit/BDD xanh.
+- [ ] Hồi quy `!~Compose` xanh.
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-identity-authorize-pkce.md) (`approved`, 14a B0–B4; plan-review v1 PASS). Design: [`document/design/identity-auth-i5.md`](../design/identity-auth-i5.md).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: `plan-init` từ `main` `138b81a`; chia 14a/14b; `identity-auth-i5.md` approved.
+- 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-11 (design i5, split, Razor 14b, flag, HTML errors, DB context, S256, scope, nonce, redirect BDD).
 
 ## Workflow
 
@@ -36,8 +41,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
-| plan-review | pending | | | |
+| plan-init | done | – | 2026-11-26 | 14a scope, O-1..O-11 |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |

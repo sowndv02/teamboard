@@ -27,8 +27,9 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 9 | 1 ngày | [TB-038](../issues/TB-038-identity-logout.md) | done (PR #34) |
 | 11 | I1 | Đổi mật khẩu (thu hồi refresh) | FR-022 | 3, 8 | 1–2 ngày | [TB-039](../issues/TB-039-identity-change-password.md) | done (PR #35) |
 | 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | [TB-040](../issues/TB-040-identity-client-registry.md) | done (PR #36) |
-| 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | [TB-041](../issues/TB-041-identity-client-credentials.md) | review |
-| 14 | I5 | Authorization Code + PKCE: authorize và trang đăng nhập (chưa có design, chờ spec FE) | FR-012, FR-019, BR-005 | 2, 12, ADR trang đăng nhập | 4–5 ngày | [TB-042](../issues/TB-042-identity-authorize-pkce.md) | todo |
+| 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | [TB-041](../issues/TB-041-identity-client-credentials.md) | done (PR #37) |
+| 14a | I5 | Authorize + PKCE validation (design i5) | FR-012, BR-005 | 2, 12 | 2 ngày | [TB-042](../issues/TB-042-identity-authorize-pkce.md) | planning |
+| 14b | I5 | Login Razor + cookie IdP + phát code (FR-019) | FR-019, NFR-010 | 14a | 2–3 ngày | TBD | todo |
 | 15 | I5 | Endpoint token đổi mã (code_verifier) | FR-013 | 14 | 2–3 ngày | [TB-043](../issues/TB-043-identity-token-endpoint-code-exchange.md) | todo |
 | 16 | I7 | OIDC: id_token, userinfo, discovery | FR-016–018 | 15 | 3–4 ngày | [TB-044](../issues/TB-044-identity-oidc.md) | todo (Could) |
 | 17 | I8 | Ủy quyền theo scope | FR-020 | 5 | 2 ngày | [TB-045](../issues/TB-045-identity-scope-authorization.md) | todo |
@@ -51,7 +52,7 @@ Tổng khoảng 42–58 ngày công (chưa tính lát 19); mỗi lát ≤ ~3 ng�
 Theo mục "Phạm vi" của spec (chưa xác minh email, không role, không API quản trị client).
 
 ## Thứ tự và lý do
-Nền → đăng nhập → bảo vệ chống tấn công → token → hạ tầng khoá → vòng đời refresh → OAuth/OIDC → ủy quyền → tích hợp gateway, bám lộ trình I1–I9 của spec (mục 17). Lát hiện tại: **13** — TB-041 (Client Credentials FR-015).
+Nền → đăng nhập → bảo vệ chống tấn công → token → hạ tầng khoá → vòng đời refresh → OAuth/OIDC → ủy quyền → tích hợp gateway, bám lộ trình I1–I9 của spec (mục 17). Lát hiện tại: **14** — TB-042 (Authorize + PKCE FR-012/FR-019).
 
 ## Confirm log
 
