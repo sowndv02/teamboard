@@ -22,26 +22,26 @@ Issue khung cấp key khi duyệt bảng lát: lát 10 của `document/plans/ide
 - Không làm: huỷ cookie phiên identity (FR-019 → I5), OIDC logout, đổi mật khẩu thu hồi refresh (TB-039), gateway, FE.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Login → logout với refresh hợp lệ → thành công (status theo O-1).
-- [ ] Sau logout, `POST /refresh` với token cùng phiên → **401** chung; **không** tăng `refresh_reuse_total`.
-- [ ] Logout với refresh không tồn tại / hết hạn (hành vi theo O-2).
-- [ ] Structured log/metric theo O-3 (nếu chốt); không log plaintext refresh.
+- [ ] Login → logout với refresh hợp lệ → **204**; sau đó refresh → **401**; không `refresh_reuse_total`.
+- [ ] Logout refresh không hợp lệ / đã revoked → **401** chung; logout lặp @S03 → **401**.
+- [ ] Metric `logout_total` + structured log `event=logout` (không token).
 - [ ] Gate identity `!~Compose` xanh; hồi quy `refresh-token.feature` @S01–@S06.
 
 ## Kế hoạch
-Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logout.md) (`draft`, B0–B5; **plan-review** chốt O-1..O-4).
+Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logout.md) (`approved`, B0–B5; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-037 merged PR #33; `plan-init` trên nhánh `feature/TB-038-identity-logout` từ `main` `895d738`.
+- 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (204; 401; log+metric; @S01–@S03).
 
 ## Workflow
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 mở |
-| plan-review | pending | – | | next |
-| test-init | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
+| test-init | pending | – | | next |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -51,7 +51,10 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
-| | | | | | |
+| 1 | plan-review:TB-038:logout-success-status | O-1 | 204 No Content | 1 | 2026-11-26 |
+| 2 | plan-review:TB-038:logout-invalid-token | O-2 | 401 chung | 1 | 2026-11-26 |
+| 3 | plan-review:TB-038:logout-observability | O-3 | Log + `logout_total` | 1 | 2026-11-26 |
+| 4 | plan-review:TB-038:logout-after-rotate-which-token | O-4 | @S01–@S03 only | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 

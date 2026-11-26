@@ -1,7 +1,7 @@
 ---
 title: Identity lát 10, đăng xuất thu hồi phiên (refresh)
 issue: TB-038
-status: draft
+status: approved
 owner: sondv
 updated: 2026-11-26
 spec: document/spec/identity-auth.md
@@ -18,11 +18,11 @@ Lát 10 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp
 **Làm (FR-011 phần I4 — refresh, design mục scope):**
 - **`POST /api/v1/auth/logout`:** body `{ "refresh_token": "..." }` (cùng kiểu snake_case như refresh); policy `auth-public` + rate limit như login/refresh.
 - **Thu hồi phiên refresh:** với refresh token **hợp lệ** (tồn tại, chưa hết hạn, chưa `revoked_at`) → `UPDATE refresh_token SET revoked_at = now() WHERE family_id = @f AND revoked_at IS NULL` — thu hồi **cả chuỗi** (mọi token mới từ xoay vòng cùng phiên).
-- Sau logout, `POST /refresh` với bất kỳ token nào trong family → **401** chung `InvalidCredentials` (không kích hoạt reuse FR-010 vì không phải replay `used_at`).
+- Sau logout, `POST /refresh` với bất kỳ token nào trong family → **401** chung `InvalidCredentials` (không kích hoạt reuse FR-010 vì không phải replay `used_at`). Logout thành công → **204** không body.
 - **BR-006:** access token đã cấp vẫn có hiệu lực đến `exp`; không endpoint thu hồi access trong lát (ghi trong DoD / BDD note).
-- BDD mới `document/spec/features/identity-service/logout-token.feature` (tags `@TB-038`, `@S01`–`@S03` tối thiểu): login → logout thành công → refresh thất bại; logout token không hợp lệ; logout lần hai / token đã revoke (phụ thuộc O-2).
+- BDD `logout-token.feature` (`@TB-038`, `@S01`–`@S03`): @S01 login → logout **204** → refresh **401**; @S02 token không hợp lệ → logout **401**; @S03 logout lại sau revoke → **401**. Không @S04 rotate (Confirm #4).
 - Cập nhật **ADR 0014** (mục logout / explicit revoke) — delta, không tách ADR mới trừ khi plan-review yêu cầu.
-- Quan sát (tùy O-3): structured log `event=logout` (`user_id`, `family_id`; không token) và/hoặc counter `logout_total`.
+- Structured log `event=logout` (`user_id`, `family_id`; không token); metric `logout_total` (Confirm #3).
 
 **Không làm (trong lát này):**
 - Huỷ **phiên cookie** identity (FR-019) → **I5 / TB-042+**.
@@ -40,7 +40,7 @@ Lát 10 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp
 | NFR-008 rate limit | design 6 | B3 | hồi quy policy | `!~Compose` |
 | Thu hồi family | D4 | B2 | @S01 refresh sau logout | BDD |
 | Từ chối token xấu | spec 8.1 | B1/B2 | @S02 | BDD |
-| Idempotent / đã revoke | – | B1 | @S03 | BDD (nếu O-2 chọn idempotent) |
+| Logout lặp / đã revoke | – | B1 | @S03 | BDD → 401 |
 | Hồi quy refresh/reuse | FR-009/010 | B5 | refresh-token @S01–@S06 | `!~Compose` |
 
 ## 3. Các bước
@@ -50,7 +50,7 @@ Lát 10 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp
 - Kiểm chứng: ADR khớp SQL family revoke.
 
 ### B1. test-init (đỏ)
-- Tạo `logout-token.feature`: @S01 happy path; @S02 token không tồn tại; @S03 gọi logout lại sau khi đã revoke (hành vi theo O-2).
+- `logout-token.feature`: @S01 (204 + refresh 401); @S02 invalid → 401; @S03 second logout → 401.
 - Steps: gửi logout với stored refresh; assert status; reuse refresh step hiện có.
 - Stub endpoint **501** hoặc absent → đỏ đúng lý do.
 
@@ -60,10 +60,10 @@ Lát 10 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp
 
 ### B3. `Features/Logout/LogoutEndpoints.cs`
 - Map `POST /api/v1/auth/logout` trong `Program.cs`.
-- Response theo **O-1**; lỗi theo **O-2**.
+- Thành công **204**; token xấu **401** `InvalidCredentials`; body rỗng/validation như refresh.
 
-### B4. Observability (theo O-3)
-- Log/metric nếu được chốt.
+### B4. Observability
+- `IdentityMetrics.RecordLogout()` → `logout_total`; `LogInformation` hoặc `LogWarning` template cố định `event=logout`.
 
 ### B5. Gate
 - `dotnet build -warnaserror`, format, `identity-service.Tests` `!~Compose`.
@@ -81,7 +81,7 @@ Công cụ: Reqnroll + Testcontainers PostgreSQL (giống TB-036/037).
 
 | Rủi ro | Giảm thiểu | Rollback |
 |---|---|---|
-| Logout token xấu lộ trạng thái | 401 chung hoặc 204 idempotent (O-2) | Revert PR |
+| Logout token xấu lộ trạng thái | 401 chung (Confirm #2) | Revert PR |
 | Nhầm family | Chỉ revoke `family_id` của token match hash | Revert |
 | Access JWT vẫn dùng được | BR-006 đã chốt | không rollback schema |
 
@@ -91,17 +91,28 @@ Công cụ: Reqnroll + Testcontainers PostgreSQL (giống TB-036/037).
 - Gate: `code-change-gate.md`, identity `!~Compose`.
 - Issue: tiêu chí FR-011 (phần refresh) tick + hồi quy refresh.
 
-## 7. Câu hỏi mở (plan-review)
+## 7. Câu hỏi mở
 
-| # | Fingerprint | Câu hỏi | Gợi ý (không chốt) |
-|---|---|---|---|
-| O-1 | plan-review:TB-038:logout-success-status | Thành công: **204 No Content** hay **200** body rỗng? | 204 (REST revoke); login/refresh dùng 200 JSON |
-| O-2 | plan-review:TB-038:logout-invalid-token | Token không tồn tại / hết hạn / đã revoke khi logout → **401** (spec: cần refresh hợp lệ) hay **204 idempotent**? | 401 chung giống refresh |
-| O-3 | plan-review:TB-038:logout-observability | Chỉ structured log, thêm `logout_total`, hay cả hai? | log + `logout_total` (design liệt kê metric bảo mật) |
-| O-4 | plan-review:TB-038:logout-after-rotate-which-token | Client gửi token **mới nhất** sau xoay (refresh cuối) — có bắt buộc trong BDD không? | @S01 dùng token sau login; @S01b tuỳ chọn rotate rồi logout token mới |
+Không còn sau plan-review v1.
+
+## Confirm log
+
+| # | Fingerprint | Câu hỏi | Quyết định | Vòng | Ngày |
+|---|---|---|---|---|---|
+| 1 | plan-review:TB-038:logout-success-status | O-1 | 204 No Content | 1 | 2026-11-26 |
+| 2 | plan-review:TB-038:logout-invalid-token | O-2 | 401 chung | 1 | 2026-11-26 |
+| 3 | plan-review:TB-038:logout-observability | O-3 | Log + `logout_total` | 1 | 2026-11-26 |
+| 4 | plan-review:TB-038:logout-after-rotate-which-token | O-4 | @S01–@S03, login token only | 1 | 2026-11-26 |
+
+## Review rounds
+
+| Vòng | Ngày | Phạm vi | CONFIRM mở | FIX mở | Verdict |
+|---|---|---|---|---|---|
+| 1 | 2026-11-26 | B0–B5, O-1..O-4 | 0 | 0 | PASS |
 
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi | Lý do |
 |---|---|---|
 | 2026-11-26 | Tạo bản nháp | plan-init sau merge TB-037 PR #33 |
+| 2026-11-26 | plan-review v1 PASS | Confirm #1–#4 |
