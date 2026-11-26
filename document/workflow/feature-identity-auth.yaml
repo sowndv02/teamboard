@@ -3,7 +3,7 @@
 id: feature-identity-auth
 scope: feature
 title: Xác thực và ủy quyền (identity-service)
-updated: 2026-11-26T17:35:00Z
+updated: 2026-11-26T15:00:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: plan-review
-next_action: "Lát hiện tại: TB-036 (8 refresh token) — plan-review. Lát 7 TB-035 done (PR #30)."
+next_action: "Lát hiện tại: TB-037 (9 refresh reuse FR-010) — plan-review O-1..O-4. Lát 8 TB-036 done (PR #32)."
 blocked_by: null
 
 steps:

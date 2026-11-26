@@ -1,0 +1,44 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-037
+scope: issue
+title: Identity lát 9, phát hiện dùng lại refresh token
+updated: 2026-11-26T15:00:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-037-identity-refresh-reuse-detection.md
+  spec: document/spec/identity-auth.md
+  design: document/design/identity-auth.md
+  plan: document/plans/TB-037-identity-refresh-reuse-detection.md
+  features_dir: document/spec/features/identity-service/
+  branch: feature/TB-037-identity-refresh-reuse-detection
+  base: main
+  pr: null
+
+current_step: plan-init
+next_action: "plan-review TB-037 (O-1..O-4)"
+
+steps:
+  plan-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T15:00:00Z
+    evidence:
+      - "Plan draft from main 1bfb081 after PR #32"
+      - "O-1..O-4 open"
+  plan-review:          { status: pending }
+  test-init:            { status: pending }
+  test-review:          { status: pending }
+  coding-start:         { status: pending }
+  coding-review:        { status: pending }
+  create-pr:            { status: pending }
+
+confirm_pending:
+  - plan-review:TB-037:security-event-store
+  - plan-review:TB-037:concurrent-loser-reuse
+  - plan-review:TB-037:s06-vs-s02
+  - plan-review:TB-037:revoked-refresh-response
+
+events:
+  - { at: 2026-11-26T15:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init TB-037; TB-036 merged" }

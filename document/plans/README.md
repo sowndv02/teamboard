@@ -29,3 +29,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-034-identity-jwks](TB-034-identity-jwks.md) | TB-034 (lát 6 identity) | approved |
 | [TB-035-identity-signing-key-rotation](TB-035-identity-signing-key-rotation.md) | TB-035 (lát 7 identity) | approved |
 | [TB-036-identity-refresh-token](TB-036-identity-refresh-token.md) | TB-036 (lát 8 identity) | approved |
+| [TB-037-identity-refresh-reuse-detection](TB-037-identity-refresh-reuse-detection.md) | TB-037 (lát 9 identity) | draft |
