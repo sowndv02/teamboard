@@ -54,7 +54,7 @@ steps:
     verdict: PASS
     round: 1
     finished: 2026-11-26T19:45:00Z
-    evidence: ["214005a", "83/83"]
+    evidence: ["b084853", "83/83", "rewrite: no Co-authored-by"]
   create-pr:            { status: pending }
 
 confirm_pending: []
