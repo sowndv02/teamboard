@@ -1,13 +1,13 @@
 ---
 key: TB-035
 title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
-status: review
+status: done
 phase: 1
 branch: feature/TB-035-identity-signing-key-rotation
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26
-closed: null            # ngày done/dropped
+closed: 2026-11-26            # ngày done/dropped
 ---
 
 # TB-035 — Identity lát 7, xoay khoá ký không hỏng token còn hạn
@@ -40,6 +40,7 @@ Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035
 - 2026-11-26: **coding-start done, xanh 55/55** identity (`!~Compose`), **10/10** Auth, **25/25** board (`Category!=docker`); ADR 0013 + cập nhật 0012; BDD fix S02 fake time + S05 step wording.
 - 2026-11-26: **coding-review v1 PASS** — 1 FIX (CLI `JsonException`); giới hạn kid cố định / không file-lock ghi trong ADR 0013 phạm vi lab.
 - 2026-11-26: [PR #30](https://github.com/sowndv02/teamboard/pull/30) (`feat` `965bf04`).
+- 2026-11-26: merged PR #30 vào `main` (`94dd3a2`); lát 7 done; mở TB-036.
 
 ## Workflow
 

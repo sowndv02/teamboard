@@ -47,8 +47,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-032](TB-032-identity-access-token.md) | Identity lát 4, phát access token JWT khi đăng nhập | 1 | done |
 | [TB-033](TB-033-auth-token-validation-library.md) | Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth | 1 | done |
 | [TB-034](TB-034-identity-jwks.md) | Identity lát 6, công bố JWKS | 1 | done |
-| [TB-035](TB-035-identity-signing-key-rotation.md) | Identity lát 7, xoay khoá ký không hỏng token còn hạn | 1 | review |
-| [TB-036](TB-036-identity-refresh-token.md) | Identity lát 8, refresh token xoay vòng | 1 | todo |
+| [TB-035](TB-035-identity-signing-key-rotation.md) | Identity lát 7, xoay khoá ký không hỏng token còn hạn | 1 | done |
+| [TB-036](TB-036-identity-refresh-token.md) | Identity lát 8, refresh token xoay vòng | 1 | in-progress |
 | [TB-037](TB-037-identity-refresh-reuse-detection.md) | Identity lát 9, phát hiện dùng lại refresh token | 1 | todo |
 | [TB-038](TB-038-identity-logout.md) | Identity lát 10, đăng xuất thu hồi phiên | 1 | todo |
 | [TB-039](TB-039-identity-change-password.md) | Identity lát 11, đổi mật khẩu và thu hồi refresh | 1 | todo |

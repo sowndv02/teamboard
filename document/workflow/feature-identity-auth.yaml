@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: plan-review
-next_action: "Lát hiện tại: TB-035 (7 xoay khoá) — coding-start. Lát 6 TB-034 done (PR #29)."
+next_action: "Lát hiện tại: TB-036 (8 refresh token) — plan-review. Lát 7 TB-035 done (PR #30)."
 blocked_by: null
 
 steps:
