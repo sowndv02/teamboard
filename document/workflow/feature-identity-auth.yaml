@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: create-pr
-next_action: "TB-039 coding-review v1 PASS; sẵn sàng PR."
+current_step: done
+next_action: "Lát 11 TB-039 — review PR #35. Chờ merge."
 blocked_by: null
 
 steps:

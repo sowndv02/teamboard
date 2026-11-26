@@ -51,7 +51,7 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-036](TB-036-identity-refresh-token.md) | Identity lát 8, refresh token xoay vòng | 1 | done |
 | [TB-037](TB-037-identity-refresh-reuse-detection.md) | Identity lát 9, phát hiện dùng lại refresh token | 1 | done |
 | [TB-038](TB-038-identity-logout.md) | Identity lát 10, đăng xuất thu hồi phiên | 1 | done |
-| [TB-039](TB-039-identity-change-password.md) | Identity lát 11, đổi mật khẩu và thu hồi refresh | 1 | planning |
+| [TB-039](TB-039-identity-change-password.md) | Identity lát 11, đổi mật khẩu và thu hồi refresh | 1 | review |
 | [TB-040](TB-040-identity-client-registry.md) | Identity lát 12, quản lý client đăng ký | 1 | todo |
 | [TB-041](TB-041-identity-client-credentials.md) | Identity lát 13, Client Credentials và token máy | 1 | todo |
 | [TB-042](TB-042-identity-authorize-pkce.md) | Identity lát 14, Authorization Code + PKCE: authorize và trang đăng nhập | 1 | todo |

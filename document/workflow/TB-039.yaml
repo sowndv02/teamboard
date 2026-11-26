@@ -3,7 +3,7 @@
 id: TB-039
 scope: issue
 title: Identity lát 11, đổi mật khẩu và thu hồi refresh
-updated: 2026-11-26T18:15:00Z
+updated: 2026-11-26T18:45:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -11,40 +11,31 @@ links:
   plan: document/plans/TB-039-identity-change-password.md
   branch: feature/TB-039-identity-change-password
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/35
 
-current_step: create-pr
-next_action: "create-pr TB-039 (user commit/push trước)."
+current_step: done
+next_action: "Chờ review/CI; merge PR #35 (user)"
 
 steps:
   plan-init:            { status: done }
-  plan-review:
-    status: done
-    verdict: PASS
-    round: 1
+  plan-review:          { status: done, verdict: PASS, round: 1 }
   test-init:
     status: done
-    evidence:
-      - "change-password.feature"
-      - "8 failed 66 passed !~Compose"
-  test-review:
-    status: done
-    verdict: PASS
-    round: 1
-    reviewed_commit: working-tree
+    evidence: ["change-password.feature", "8 red then 74 green"]
+  test-review:          { status: done, verdict: PASS, round: 1 }
   coding-start:
     status: done
-    evidence:
-      - "74/74 !~Compose"
-      - "password_change_total + revoke user"
+    evidence: ["74/74 !~Compose"]
   coding-review:
     status: done
     verdict: PASS
     round: 1
-    evidence: ["74/74", "FIX current_password max length"]
-  create-pr:            { status: pending }
+  create-pr:
+    status: done
+    pr: 35
+    url: https://github.com/sowndv02/teamboard/pull/35
 
 confirm_pending: []
 
 events:
-  - { at: 2026-11-26T18:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
+  - { at: 2026-11-26T18:45:00Z, actor: "orchestrator:cursor-session", event: pr_opened, detail: "PR #35" }

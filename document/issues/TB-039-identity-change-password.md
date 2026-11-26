@@ -1,7 +1,7 @@
 ---
 key: TB-039
 title: Identity lát 11, đổi mật khẩu và thu hồi refresh
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-039-identity-change-password
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -41,6 +41,7 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 - 2026-11-26: test-review v1 **PASS** — Sẵn sàng code; FIX tag @S03b + @S04 invalid JWT.
 - 2026-11-26: coding-start — Teamboard.Auth, `/password`, revoke-by-user; **74/74** `!~Compose`; format xanh.
 - 2026-11-26: coding-review v1 **PASS** — giới hạn độ dài `current_password`; 74/74; P3 metric BDD hoãn (TB-038).
+- 2026-11-26: [PR #35](https://github.com/sowndv02/teamboard/pull/35) (head `467e9e0`).
 
 ## Workflow
 
@@ -52,7 +53,7 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code |
 | coding-start | done | – | 2026-11-26 | 74/74 `!~Compose` |
 | coding-review | PASS | 1 | 2026-11-26 | 74/74 sau FIX max length current |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #35](https://github.com/sowndv02/teamboard/pull/35) |
 
 ## Confirm log
 
