@@ -14,7 +14,7 @@ links:
   pr: https://github.com/sowndv02/teamboard/pull/34
 
 current_step: done
-next_action: "Chờ review/CI; merge PR #34 (user)"
+next_action: "Merged PR #34; closed. Lát kế: TB-039."
 
 steps:
   plan-init:            { status: done }
@@ -43,6 +43,7 @@ steps:
     status: done
     pr: 34
     url: https://github.com/sowndv02/teamboard/pull/34
+    merged: main@b90590c
 
 confirm_pending: []
 
