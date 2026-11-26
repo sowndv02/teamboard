@@ -29,11 +29,12 @@ Issue khung cấp key khi duyệt bảng lát: lát 4 của `document/plans/iden
 - [ ] ADR RS256 + loader khoá; gate xanh plan-review
 
 ## Kế hoạch
-Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identity-access-token.md) (`draft`, B0–B4; P-01..P-03; 4 câu hỏi mở).
+Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identity-access-token.md) (`approved`, B0–B4; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-031 merged PR #26 (`cbc8124`); `plan-init` trên nhánh `feature/TB-032-identity-access-token`.
+- 2026-11-26: plan-review v1 PASS (Confirm #1–#4).
 
 ## Workflow
 
@@ -42,7 +43,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B4 |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -53,6 +54,10 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-032:login-response-shape | Login 200 body | id + access_token, token_type, expires_in | 1 | 2026-11-26 |
+| 2 | plan-review:TB-032:issuer-url | iss local | Identity:Jwt:Issuer configurable | 1 | 2026-11-26 |
+| 3 | plan-review:TB-032:secrets-manager-scope | SM trong lát | Dev file only | 1 | 2026-11-26 |
+| 4 | plan-review:TB-032:adr-number | ADR | 0007 JWT signing | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 

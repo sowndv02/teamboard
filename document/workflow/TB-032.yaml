@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: plan-review
-next_action: "plan-review TB-032: chốt P-01..P-04 và Câu hỏi mở"
+current_step: test-init
+next_action: "test-init TB-032: ADR 0007 draft + access-token.feature @S01-S06"
 blocked_by: null
 
 steps:
@@ -26,18 +26,24 @@ steps:
     owner: orchestrator:cursor-session
     finished: 2026-11-26T12:00:00Z
     evidence: ["Plan draft B0–B4; base main cbc8124 after PR #26"]
-  plan-review:          { status: pending }
+  plan-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T12:15:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence: ["Confirm #1–#4"]
+  test-init:            { status: pending }
   test-init:            { status: pending }
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
 
-confirm_pending:
-  - plan-init:TB-032:login-response-shape
-  - plan-init:TB-032:issuer-url
-  - plan-init:TB-032:secrets-manager-scope
-  - plan-init:TB-032:adr-number
+confirm_pending: []
 
 events:
   - { at: 2026-11-26T12:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-031 merged; plan-init TB-032; mở plan-review" }
+  - { at: 2026-11-26T12:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review PASS v1; mở test-init" }

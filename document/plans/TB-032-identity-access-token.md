@@ -1,7 +1,7 @@
 ---
 title: Identity lát 4, phát access token JWT khi đăng nhập
 issue: TB-032
-status: draft
+status: approved
 owner: sondv
 updated: 2026-11-26
 spec: document/spec/identity-auth.md
@@ -91,23 +91,32 @@ Kịch bản dự kiến (`@TB-032 @identity-service @docker`):
 - Gate: `dotnet test identity-service.Tests` (`!~Compose`).
 - Lát 4 `done` khi PR merge.
 
-## 7. Giả định (chờ plan-review CONFIRM nếu cần)
+## 7. Giả định đã chốt (plan-review v1)
 
-- P-01: Response shape **additive** — `{ "id", "access_token", "token_type", "expires_in" }` (snake_case giống OAuth, khớp `api-endpoints` nếu có).
-- P-02: `iss` configurable; local default trỏ URL identity (D0.5 gateway chưa có).
-- P-03: Chỉ **access** token; refresh TB-036.
+- P-01: Response **additive** — `{ "id", "access_token", "token_type": "Bearer", "expires_in" }` (snake_case OAuth).
+- P-02: `Identity:Jwt:Issuer` cấu hình; default URL identity local (gateway sau I9).
+- P-03: Chỉ access token; refresh TB-036.
+- P-04: TB-032 dùng file/env PEM + example; AWS Secrets Manager ngoài lát (infra sau).
+- P-05: ADR **0007** — RS256 + `JsonWebTokenHandler`.
 
-## Câu hỏi mở (plan-review)
+## Confirm log
 
-| # | Fingerprint | Câu hỏi | Ghi chú |
-|---|---|---|---|
-| 1 | plan-init:TB-032:login-response-shape | Trường JSON chính xác và có giữ `id` không? | Đề xuất P-01 |
-| 2 | plan-init:TB-032:issuer-url | `iss` local khi chưa gateway? | Đề xuất P-02 |
-| 3 | plan-init:TB-032:secrets-manager-scope | SM trong lát 4 hay file dev only + SM issue sau? | D3 |
-| 4 | plan-init:TB-032:adr-number | Số ADR 0007 hay khác? | Index ADR |
+| # | Fingerprint | Câu hỏi | Quyết định | Vòng | Ngày |
+|---|---|---|---|---|---|
+| 1 | plan-review:TB-032:login-response-shape | Shape login 200 | Giữ `id` + `access_token`, `token_type`, `expires_in` | 1 | 2026-11-26 |
+| 2 | plan-review:TB-032:issuer-url | `iss` local | `Identity:Jwt:Issuer` configurable | 1 | 2026-11-26 |
+| 3 | plan-review:TB-032:secrets-manager-scope | SM trong lát? | Dev file only; SM sau | 1 | 2026-11-26 |
+| 4 | plan-review:TB-032:adr-number | ADR | 0007 JWT signing | 1 | 2026-11-26 |
+
+## Review rounds
+
+| Vòng | Ngày | CONFIRM | FIX | Verdict |
+|---|---|---|---|---|
+| 1 | 2026-11-26 | 0 mở | 0 mở | PASS |
 
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi | Lý do |
 |---|---|---|
 | 2026-11-26 | Tạo bản nháp | plan-init sau merge TB-031 |
+| 2026-11-26 | plan-review v1 PASS | Confirm #1–#4 |
