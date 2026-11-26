@@ -1,0 +1,44 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-052
+scope: issue
+title: Identity lát 14b, Razor login + cookie IdP + phát code
+updated: 2026-11-26T14:30:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-052-identity-authorize-login.md
+  spec: document/spec/identity-auth.md
+  design: document/design/identity-auth-i5.md
+  plan: document/plans/TB-052-identity-authorize-login.md
+  features_dir: document/spec/features/identity-service/
+  branch: feature/TB-052-identity-authorize-login
+  base: main
+  pr: null
+
+current_step: plan-review
+next_action: "plan-review TB-052 — chốt O-1..O-10"
+blocked_by: null
+
+steps:
+  plan-init:
+    status: done
+    owner: orchestrator:cursor-session
+    started: 2026-11-26T14:00:00Z
+    finished: 2026-11-26T14:30:00Z
+    inputs: { base: "8652c52" }
+    artifacts: [document/plans/TB-052-identity-authorize-login.md]
+    evidence: ["Draft B0-B9", "O-1..O-10"]
+  plan-review:            { status: pending }
+  test-init:              { status: pending }
+  test-review:            { status: pending }
+  coding-start:           { status: pending }
+  coding-review:          { status: pending }
+  create-pr:              { status: pending }
+
+confirm_pending: []
+
+events:
+  - { at: 2026-11-26T14:00:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "plan-init TB-052 từ main 8652c52" }
+  - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init: draft TB-052-identity-authorize-login.md" }
+  - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "10 câu hỏi mở O-1..O-10" }

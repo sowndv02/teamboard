@@ -1,13 +1,13 @@
 ---
 key: TB-042
 title: Identity lát 14a, Authorize + PKCE validation (I5 pha 1)
-status: review
+status: done
 phase: 1
 branch: feature/TB-042-identity-authorize-pkce
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26           # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-26            # ngày done/dropped
 ---
 
 # TB-042 — Identity lát 14a, Authorize + PKCE validation
@@ -39,7 +39,7 @@ Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-ident
 - 2026-11-26: test-review v1 **PASS** — FIX @S03c invalid scope; **9 fail, 94 pass** `!~Compose`.
 - 2026-11-26: coding-start — `GET /connect/authorize` validate PKCE/redirect/scope; **104/104** `!~Compose`.
 - 2026-11-26: coding-review v1 PASS — CONFIRM B1 migration; thêm entity `authorization_code`; **104/104** `!~Compose`.
-- 2026-11-26: [PR #38](https://github.com/sowndv02/teamboard/pull/38) mở — chờ review/CI (head `bcad4f1`; đã bỏ `Co-authored-by` trên nhánh).
+- 2026-11-26: [PR #38](https://github.com/sowndv02/teamboard/pull/38) merged → `main` `8652c52`.
 
 ## Workflow
 

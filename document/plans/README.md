@@ -35,3 +35,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-040-identity-client-registry](TB-040-identity-client-registry.md) | TB-040 (lát 12 identity) | approved |
 | [TB-041-identity-client-credentials](TB-041-identity-client-credentials.md) | TB-041 (lát 13 identity) | approved |
 | [TB-042-identity-authorize-pkce](TB-042-identity-authorize-pkce.md) | TB-042 (lát 14a) | approved |
+| [TB-052-identity-authorize-login](TB-052-identity-authorize-login.md) | TB-052 (lát 14b) | draft |
