@@ -42,6 +42,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 
 - 2026-11-26: `plan-init` từ `main` `8652c52` sau merge TB-042 / PR #38.
 - 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-10.
+- 2026-11-26: test-init — `authorize-pkce.feature` @S01,@S01b,@S04–@S06,@S08 + `AuthorizationCodeGeneratorTests`; **7 fail, 104 pass** `!~Compose`.
 
 ## Workflow
 
@@ -49,7 +50,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B0–B9; O-1..O-10 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
-| test-init | pending | | | |
+| test-init | done | – | 2026-11-26 | 7 đỏ 104 pass !~Compose |
 | test-review | pending | | | |
 | coding-start | pending | | | |
 | coding-review | pending | | | |
@@ -65,6 +66,18 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | `authorize-pkce.feature` | **đỏ** | |
+| @S01b | `authorize-pkce.feature` | **đỏ** | |
+| @S04 | `authorize-pkce.feature` | **đỏ** | |
+| @S05 | `authorize-pkce.feature` | **đỏ** | |
+| @S06 | `authorize-pkce.feature` | **đỏ** | |
+| @S08 | `authorize-pkce.feature` | **đỏ** | |
+| @S02–@S07 | `authorize-pkce.feature` | | **xanh** (TB-042) |
+| unit code | `AuthorizationCodeGeneratorTests` | **đỏ** | |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **7 fail, 104 pass**.
+
+**Lý do đỏ:** chưa Razor `/login`, authorize vẫn 501, stub `AuthorizationCodeGenerator`.
 
 ## Review rounds
 
