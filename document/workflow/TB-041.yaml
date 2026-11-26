@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-041 (client-credentials.feature)"
+current_step: test-review
+next_action: "test-review TB-041"
 blocked_by: null
 
 steps:
@@ -35,7 +35,10 @@ steps:
     round: 1
     finished: 2026-11-26T12:45:00Z
     evidence: ["Confirm #1–#7"]
-  test-init:            { status: pending }
+  test-init:
+    status: done
+    finished: 2026-11-26T13:15:00Z
+    evidence: ["5 fail 87 pass !~Compose", "client-credentials.feature"]
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
@@ -49,3 +52,4 @@ events:
   - { at: 2026-11-26T12:30:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "7 câu hỏi mở O-1..O-7" }
   - { at: 2026-11-26T12:45:00Z, actor: "orchestrator:cursor-session", event: confirm_answered, detail: "Confirm #1–#7" }
   - { at: 2026-11-26T12:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
+  - { at: 2026-11-26T13:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: 5 red BDD + 2 red unit" }

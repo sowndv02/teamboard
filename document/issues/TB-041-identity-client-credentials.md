@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-i
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-040 merged PR #36 → `main` `93cdd46`; `plan-init` nhánh `feature/TB-041-identity-client-credentials`.
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#7 (`/connect/token`, form body, scope bắt buộc, feature flag, defer Teamboard.Auth, OAuth errors, AuthPublic rate limit).
+- 2026-11-26: test-init — `client-credentials.feature` @S01–@S06; stub `/connect/token` 501; **5 failed, 87 passed** `!~Compose`.
 
 ## Workflow
 
@@ -45,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B1–B5; O-1..O-7 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#7 |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-26 | 5 đỏ @S01–S04,@S06; @S05 xanh; +2 unit |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -62,6 +63,16 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | `client-credentials.feature` | **đỏ** (501 ≠ 200) | |
+| @S02 | `client-credentials.feature` | **đỏ** (501 ≠ 200) | |
+| @S03 | `client-credentials.feature` | **đỏ** (501 ≠ invalid_scope) | |
+| @S04 | `client-credentials.feature` | **đỏ** (501 ≠ invalid_client) | |
+| @S05 | `client-credentials.feature` | | **xanh** |
+| @S06 | `client-credentials.feature` | **đỏ** (501 ≠ unauthorized_client) | |
+| unit issuer | `AccessTokenIssuerMachineTests` | **đỏ** (NIE) | |
+| unit scope | `ScopeValidatorTests` | **đỏ** (NIE) | |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **87 pass, 5 fail** (test-init).
 
 ## Test review rounds
 

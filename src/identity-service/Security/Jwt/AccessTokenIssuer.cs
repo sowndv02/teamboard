@@ -52,4 +52,7 @@ public sealed class AccessTokenIssuer : IAccessTokenIssuer
         var token = _tokenHandler.CreateToken(descriptor);
         return new IssuedAccessToken(token, _jwtOptions.AccessTokenLifetimeSeconds);
     }
+
+    public IssuedAccessToken IssueForClient(string clientId, IReadOnlyList<string> scopes) =>
+        throw new NotImplementedException("TB-041: machine access token issuance not implemented.");
 }
