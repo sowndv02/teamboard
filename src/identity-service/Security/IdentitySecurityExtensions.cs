@@ -1,7 +1,11 @@
+using IdentityService.Security.Jwt;
 using IdentityService.Security.Passwords;
+using IdentityService.Security.Signing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
+using Teamboard.Shared.ServiceDefaults;
 
 namespace IdentityService.Security;
 
@@ -22,6 +26,20 @@ public static class IdentitySecurityExtensions
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<IClientIpResolver, ClientIpResolver>();
         builder.Services.AddScoped<LoginLockoutService>();
+
+        builder.Services.AddOptions<SigningKeysOptions>().BindConfiguration(SigningKeysOptions.SectionName).ValidateOnStart();
+        builder.Services.AddOptions<IdentityJwtOptions>()
+            .BindConfiguration(IdentityJwtOptions.SectionName)
+            .ValidateOnStart();
+        builder.Services.AddSingleton<IValidateOptions<IdentityJwtOptions>, IdentityJwtOptionsValidator>();
+
+        builder.Services.AddSingleton<ISigningKeyStore, FileSigningKeyStore>();
+        builder.Services.AddSingleton<IAccessTokenIssuer, AccessTokenIssuer>();
+
+        builder.Services.AddHealthChecks().AddCheck<SigningKeysHealthCheck>(
+            "signing_keys",
+            failureStatus: HealthStatus.Unhealthy,
+            tags: [ServiceDefaultsExtensions.ReadyTag]);
 
         builder.Services.AddSingleton<IdentityMetrics>();
         builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();

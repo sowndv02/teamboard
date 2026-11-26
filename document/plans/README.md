@@ -24,3 +24,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-029-identity-register](TB-029-identity-register.md) | TB-029 (lát 1b identity) | approved |
 | [TB-030-identity-login](TB-030-identity-login.md) | TB-030 (lát 2 identity) | approved |
 | [TB-031-identity-lockout-rate-limit](TB-031-identity-lockout-rate-limit.md) | TB-031 (lát 3 identity) | approved |
+| [TB-032-identity-access-token](TB-032-identity-access-token.md) | TB-032 (lát 4 identity) | approved |

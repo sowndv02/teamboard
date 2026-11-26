@@ -1,0 +1,10 @@
+{
+  "keys": [
+    {
+      "kid": "replace-with-kid",
+      "algorithm": "RS256",
+      "status": "active",
+      "privateKeyPem": "-----BEGIN RSA PRIVATE KEY-----\nREPLACE_WITH_RSA_2048_PRIVATE_KEY_PEM\n-----END RSA PRIVATE KEY-----"
+    }
+  ]
+}

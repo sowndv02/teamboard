@@ -20,4 +20,9 @@ public static class IdentityErrorCodes
         "RATE_LIMIT_EXCEEDED",
         429,
         "Too many requests.");
+
+    public static readonly ErrorDefinition ServiceUnavailable = new(
+        "SERVICE_UNAVAILABLE",
+        503,
+        "The service is not ready to issue tokens.");
 }

@@ -9,6 +9,7 @@ public sealed class IdentityMetrics
     private readonly Histogram<double> _passwordHashDurationSeconds;
     private readonly Counter<long> _loginFailuresTotal;
     private readonly Counter<long> _lockoutTotal;
+    private readonly Counter<long> _accessTokensIssuedTotal;
 
     public IdentityMetrics(IMeterFactory meterFactory)
     {

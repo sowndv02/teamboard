@@ -41,6 +41,10 @@ services:
       ConnectionStrings__IdentityDb: "Host=postgres;Port=5432;Database=identity;Username=identity;Password=${IDENTITY_DB_PASSWORD:?Set IDENTITY_DB_PASSWORD in src/.env (template: src/.env.example)}"
       # Migrations are applied automatically only locally and in compose; the service default is off (backend-engineering.md section 7).
       Database__MigrateOnStartup: "true"
+      Identity__SigningKeys__JsonFile: /app/config/signing-keys.json
+      Identity__Jwt__Issuer: http://localhost:6061
+    volumes:
+      - ../config/signing-keys.dev.json:/app/config/signing-keys.json:ro
     ports:
       - "6061:7070"
     depends_on:
