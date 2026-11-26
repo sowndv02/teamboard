@@ -1,12 +1,12 @@
 ---
 key: TB-034
 title: Identity lát 6, công bố JWKS
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-034-identity-jwks
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26
 closed: null            # ngày done/dropped
 ---
 
@@ -22,13 +22,19 @@ Issue khung cấp key khi duyệt bảng lát: lát 6 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] `GET /.well-known/jwks.json` trả JWK Set chỉ khoá công khai RS256, mỗi khoá có `kid` (FR-007).
+- [ ] `Cache-Control: public, max-age=600` (design D2).
+- [ ] Không có `privateKeyPem` / material riêng trong response.
+- [ ] Consumer: `Teamboard.Auth` ưu tiên `JwksUri` HTTP; board (hoặc Auth integration) xác nhận token qua JWKS identity.
+- [ ] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-034-identity-jwks.md`](../plans/TB-034-identity-jwks.md) (`approved`, B0–B4; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: TB-033 merged PR #28; `plan-init` trên nhánh `feature/TB-034-identity-jwks` từ `main` `e2a046f`.
+- 2026-11-26: plan-review v1 PASS — JWKS no-key **503**; `jwks_served_total`; @S04 board + Auth.Tests.
 
 ## Workflow
 
@@ -36,8 +42,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
-| plan-review | pending | | | |
+| plan-init | done | – | 2026-11-26 | Plan draft B0–B4; O-1..O-3 |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -48,6 +54,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-034:jwks-no-key | JWKS khi không có khoá active | HTTP 503 | 1 | 2026-11-26 |
+| 2 | plan-review:TB-034:jwks-metric | Metric phục vụ JWKS | `jwks_served_total` | 1 | 2026-11-26 |
+| 3 | plan-review:TB-034:jwks-http-consumer | @S04 consumer HTTP JWKS | Board BDD + Auth.Tests | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 

@@ -16,8 +16,8 @@ links:
   base: main
   pr: https://github.com/sowndv02/teamboard/pull/28
 
-current_step: create-pr
-next_action: "Chờ review/CI PR #28; merge do người dùng"
+current_step: done
+next_action: "TB-033 closed; tiếp TB-034"
 blocked_by: null
 
 steps:
@@ -79,6 +79,10 @@ steps:
     evidence:
       - "PR #28 opened; push 3633eec..44c0033"
       - "Gate Auth 7/7, board 25, identity 44, format clean"
+  merged:
+    status: done
+    finished: 2026-11-26T20:30:00Z
+    evidence: ["main e2a046f PR #28"]
 
 confirm_pending: []
 
