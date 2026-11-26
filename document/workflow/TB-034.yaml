@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-034: jwks.feature @S01-S04, đỏ đúng lý do"
+current_step: test-review
+next_action: "test-review TB-034: reconcile @S04 board BDD (Program ambiguity) vs Auth.Tests"
 
 steps:
   plan-init:
@@ -36,7 +36,13 @@ steps:
     open_confirm: 0
     open_fix: 0
     evidence: ["503 no active key; jwks_served_total; @S04 board+Auth.Tests"]
-  test-init:            { status: pending }
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T21:15:00Z
+    evidence:
+      - "jwks.feature @S01-S04; JwtHttpJwksIntegrationTests"
+      - "ADR 0012 proposed; 5 red (404/503); identity regression 44 green"
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }

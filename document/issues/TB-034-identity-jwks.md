@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-034-identity-jwks.md`](../plans/TB-034-identity-jwks.m
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-033 merged PR #28; `plan-init` trên nhánh `feature/TB-034-identity-jwks` từ `main` `e2a046f`.
 - 2026-11-26: plan-review v1 PASS — JWKS no-key **503**; `jwks_served_total`; @S04 board + Auth.Tests.
+- 2026-11-26: test-init — `jwks.feature` @S01–@S04; `JwtHttpJwksIntegrationTests`; ADR 0012 proposed; **5 đỏ** (4×404/503 JWKS, 1×HTTP JWKS); hồi quy identity 44 xanh.
 
 ## Workflow
 
@@ -44,7 +45,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B4; O-1..O-3 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-26 | 4 BDD + 1 Auth đỏ |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -64,6 +65,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| jwks @S01–@S04 | `jwks.feature` | **x** | |
+| FR-006 HTTP JWKS @S04 | `JwtHttpJwksIntegrationTests` | **x** | |
+| auth-me TB-033 @S01–@S04 | `auth-me.feature` | | xanh |
 
 ## Test review rounds
 

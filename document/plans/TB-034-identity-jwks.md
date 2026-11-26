@@ -43,7 +43,7 @@ Kịch bản dự kiến (`document/spec/features/identity-service/jwks.feature`
 - **@S01** Có khoá `active` → `GET /.well-known/jwks.json` **200**; `keys` chứa đúng `kid`; có `kty`,`use`,`n`,`e`; **không** có trường PEM/private.
 - **@S02** Response có `Cache-Control: public, max-age=600`.
 - **@S03** Không có khoá `active` → **503** (Confirm #1, nhất quán login).
-- **@S04** (integration, Confirm #3): **board BDD** auth-me + **Auth.Tests** — login identity → Bearer board `auth/me` với `JwksUri` HTTP → **200** + `sub`.
+- **@S04** (integration, Confirm #3): **Auth.Tests** `JwtHttpJwksIntegrationTests` (HTTP JWKS từ identity test host); board BDD `@S05` thêm ở `coding-start` (tránh xung đột `Program` khi reference chéo).
 
 ## 3. Các bước
 
