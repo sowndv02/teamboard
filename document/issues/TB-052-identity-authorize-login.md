@@ -25,22 +25,30 @@ Lát **14b** trong [`identity-auth-slices.md`](../plans/identity-auth-slices.md)
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
 
-- [ ] Chưa lập chi tiết: bổ sung khi `plan-review` PASS từ bảng truy vết plan.
+- [ ] `authorize_request` migration + TTL 15 phút.
+- [ ] Cookie IdP 30 phút sliding; Data Protection keys directory.
+- [ ] Valid authorize → `/login` → code redirect (@S01, @S01b confidential).
+- [ ] Sai mật khẩu / lockout: không redirect client (@S04, @S05).
+- [ ] Cookie IdP còn hiệu lực → skip form (@S06).
+- [ ] CSP `frame-ancestors 'none'` trên login (@S08).
+- [ ] Migration `scope` trên `authorization_code`; metric `authorization_codes_issued_total`.
+- [ ] Hồi quy `!~Compose` xanh; hồi quy @S02–@S07.
 
 ## Kế hoạch
 
-Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-identity-authorize-login.md) (`draft` — plan-init).
+Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-identity-authorize-login.md) (`approved`, plan-review v1 PASS).
 
 ## Ghi chú / Nhật ký
 
 - 2026-11-26: `plan-init` từ `main` `8652c52` sau merge TB-042 / PR #38.
+- 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-10.
 
 ## Workflow
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B0–B9; O-1..O-10 |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
 | test-init | pending | | | |
 | test-review | pending | | | |
 | coding-start | pending | | | |
@@ -51,6 +59,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1–10 | plan-review:TB-052:O-1..O-10 | Xem plan Confirm log | PASS v1 | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 
