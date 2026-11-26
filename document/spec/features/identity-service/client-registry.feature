@@ -29,17 +29,20 @@ Feature: identity-service OAuth client registry
     And captured logs contain no oauth client secret
 
   @S03 @FR-014 @BR-005
-  Scenario: Redirect URI matching is exact
+  Scenario: Redirect URI matching accepts an exact registered URI
     When oauth redirect URI "https://app.example/callback" is checked against registered URIs:
       | uri |
       | https://app.example/callback |
     Then oauth redirect URI match result is true
+
+  @S03b @FR-014 @BR-005
+  Scenario: Redirect URI matching rejects a non-exact URI
     When oauth redirect URI "https://app.example/callback/" is checked against registered URIs:
       | uri |
       | https://app.example/callback |
     Then oauth redirect URI match result is false
 
-  @S04 @FR-014
+  @S04 @FR-014 @docker
   Scenario: Unknown oauth client is not present in the database
     Given an empty PostgreSQL database is running
     And identity-service oauth client registry is configured for BDD tests

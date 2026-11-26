@@ -192,10 +192,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [Then("the database stores a hash for oauth client {string} and not the plaintext secret {string}")]
     public async Task ThenDatabaseStoresHashNotPlaintext(string clientId, string plaintext)
     {
-        var (hash, echo) = await Database.GetOAuthClientSecretColumnsAsync(clientId);
+        var hash = await Database.GetOAuthClientSecretHashAsync(clientId);
         Assert.False(string.IsNullOrWhiteSpace(hash), "Expected secret_hash to be set for confidential client.");
         Assert.NotEqual(plaintext, hash);
-        Assert.True(string.IsNullOrEmpty(echo), "Plaintext secret must not be stored in the database.");
         Assert.DoesNotContain(plaintext, hash, StringComparison.Ordinal);
     }
 

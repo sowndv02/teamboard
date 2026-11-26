@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-review
-next_action: "test-review: 7 đỏ client-registry; chờ PASS"
+current_step: coding-start
+next_action: "coding-start B1–B6; 8 đỏ → xanh"
 blocked_by: null
 
 steps:
@@ -39,7 +39,12 @@ steps:
     status: done
     finished: 2026-11-26T18:30:00Z
     evidence: ["7 failed, 75 passed !~Compose", "client-registry.feature + unit stubs"]
-  test-review:          { status: pending }
+  test-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-26T18:55:00Z
+    evidence: ["76 pass 8 fail !~Compose", "Sẵn sàng code"]
   coding-start:         { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
@@ -53,3 +58,5 @@ events:
   - { at: 2026-11-26T18:00:00Z, actor: "orchestrator:cursor-session", event: confirm_answered, detail: "Confirm #1–#6" }
   - { at: 2026-11-26T18:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
   - { at: 2026-11-26T18:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: 7 red (missing client table + stubs)" }
+  - { at: 2026-11-26T18:55:00Z, actor: "orchestrator:cursor-session", event: review_round, detail: "test-review v1 PASS; FIX P1/P2" }
+  - { at: 2026-11-26T18:55:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review PASS → coding-start" }

@@ -96,25 +96,20 @@ internal sealed class PostgresDatabase : IAsyncDisposable
         return await command.ExecuteScalarAsync() as string;
     }
 
-    public async Task<(string? Hash, string? PlaintextEcho)> GetOAuthClientSecretColumnsAsync(string clientId)
+    public async Task<string?> GetOAuthClientSecretHashAsync(string clientId)
     {
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
         const string sql = """
-            SELECT secret_hash::text, secret_plaintext_echo::text
+            SELECT secret_hash::text
             FROM client
             WHERE client_id = @client_id
             LIMIT 1
             """;
         await using var command = new NpgsqlCommand(sql, connection);
         command.Parameters.AddWithValue("client_id", clientId);
-        await using var reader = await command.ExecuteReaderAsync();
-        if (!await reader.ReadAsync())
-        {
-            return (null, null);
-        }
-
-        return (reader.IsDBNull(0) ? null : reader.GetString(0), reader.IsDBNull(1) ? null : reader.GetString(1));
+        var value = await command.ExecuteScalarAsync();
+        return value is null or DBNull ? null : (string)value;
     }
 
     public ValueTask DisposeAsync() => _container.DisposeAsync();

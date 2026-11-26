@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-040-identity-client-registry.md`](../plans/TB-040-iden
 - 2026-11-26: TB-039 merged PR #35; `plan-init` trên nhánh `feature/TB-040-identity-client-registry` từ `main` `a923cb2`.
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#6 (PBKDF2 secret, jsonb, exact redirect, env secret, teamboard public, ready clients).
 - 2026-11-26: test-init — `client-registry.feature` @S01–@S05; stub `Security/Clients/*`; **7 failed, 75 passed** `!~Compose`.
+- 2026-11-26: test-review v1 **PASS** — FIX secret_hash only, tách @S03b, `ClientRegistryTests`; **8 failed, 76 passed** `!~Compose`.
 
 ## Workflow
 
@@ -46,7 +47,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-26 | Draft B1–B6; O-1..O-6 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#6 |
 | test-init | done | – | 2026-11-26 | 7 đỏ @S01–@S04 + unit; @S05 xanh |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 8 đỏ đúng lý do |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -62,17 +63,33 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01–@S04 client-registry | `client-registry.feature` | thiếu bảng `client` / stub | |
-| @S05 client-registry | `client-registry.feature` | | **xanh** |
-| @S03 redirect | `client-registry.feature` + `RedirectUriMatcherTests` | `NotImplementedException` | |
-| secret hash | `ClientSecretHasherTests` | `NotImplementedException` | |
+| @S01 | `client-registry.feature` | bảng `client` / seed | |
+| @S02 | `client-registry.feature` | bảng `client` / hash | |
+| @S03, @S03b | `client-registry.feature` + `RedirectUriMatcherTests` | `NotImplementedException` | |
+| @S04 | `client-registry.feature` + `ClientRegistryTests` | bảng `client` / stub | |
+| @S05 | `client-registry.feature` | | **xanh** |
+| unit hash | `ClientSecretHasherTests` (×2) | `NotImplementedException` | |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **75 passed, 7 failed** (hồi quy 74→75 do @S05).
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **76 passed, 8 failed** (sau test-review v1).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `a817a7c` + FIX test-review | Sẵn sàng code | – |
+
+Đối chiếu: 6 scenario Reqnroll + 3 unit class; mọi @S01–@S04/@S03 đỏ vì chưa có migration/impl; @S05 xanh.
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:client-secret-echo-column | FIX P1 | `PostgresDatabase`, step @S02 | Giả định cột `secret_plaintext_echo` không có trong plan | Chỉ assert `secret_hash` ≠ plaintext | diff |
+| 1 | test:identity:redirect-two-when | FIX P2 | `client-registry.feature` | @S03 hai `When` | Tách `@S03b` | diff feature |
+| 1 | test:identity:client-registry-unit | FIX P2 | `ClientRegistryTests` | Thiếu unit @S04 (TryGet) | Assert `NotImplementedException` tạm | diff test |
+| 1 | test:identity:ready-without-client | NOTE P3 | @S01 | Ready 200 có thể xanh trước khi có bảng `client` | coding B4 + Confirm #6 | plan B4 |
+
+**Giới hạn đã biết:** Chưa BDD ready **503** khi thiếu default client (chỉ @S01 200 happy path); verify secret sai/đúng chỉ ở unit, không BDD — đủ cho lát.
 
 ## Review rounds
 

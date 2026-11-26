@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: done
-next_action: "Lát 12 TB-040 — test-review."
+next_action: "Lát 12 TB-040 — coding-start (client registry)."
 blocked_by: null
 
 steps:
