@@ -517,6 +517,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             await SendLoginAsync(email, "WrongPass123456", clientIp);
             _burstStatusCodes.Add((int)_response!.StatusCode);
         }
+
+        // Establish locked state in Given: without lockout this fails here instead of vacuous greens in @S04–@S06.
+        await SendLoginAsync(email, "ValidPass123456", clientIp);
+        Assert.Equal(401, (int)_response!.StatusCode);
+        Assert.True(_response.Headers.Contains("Retry-After"), "Expected Retry-After while asserting the email and IP pair is locked.");
     }
 
     private void StartMeterListener()

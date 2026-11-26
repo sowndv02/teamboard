@@ -23,7 +23,7 @@ Lát 3 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp 
 - Counter `lockout_total` khi 401 do **khoá** (không phải mọi `login_failures_total`).
 - NFR-008 (Q-G = A): cờ `Identity:RateLimiting:Enabled` (mặc định **true** cho chạy trực tiếp) — **một** policy `auth-public`, sliding window **10 req / 60s / IP** áp cho `POST /api/v1/auth/login` và `POST /api/v1/auth/register` (Confirm #2, #4); vượt → **429** `RATE_LIMIT_EXCEEDED` + `Retry-After` (độ dài cửa sổ, pattern TB-024); cờ **false** tắt limiter (chuẩn bị gateway lát 4).
 - BDD `document/spec/features/identity-service/lockout-rate-limit.feature` @S01–@S10; steps Reqnroll; Testcontainers.
-- Test: `LockoutOptions` cho phép override `MaxFailures` / `LockoutMinutes` qua cấu hình test factory (ví dụ 1 phút → tránh flaky 15 phút).
+- Test: `LockoutOptions` cho phép override `MaxFailures` / thời gian khoá qua cấu hình test factory — steps dùng `Identity:Lockout:LockoutDurationSeconds` (vd. 2s @S05) thay vì chờ 15 phút production.
 
 **Không làm (trong lát này):** JWT/`/token` rate limit (TB-032), FR-022, job dọn `login_attempt` 7 ngày (migration comment / issue sau), rate limit gateway (TB-024), route gateway identity (lát 19), `security_event` đầy đủ, khoá tạm trên register (chỉ NFR-008 429).
 

@@ -40,6 +40,9 @@ Feature: identity-service login lockout and auth rate limiting
     When I send 4 login requests with email "lock-s03@example.com" and password "WrongPass123456"
     Then the status code is 401
     And the response has no Retry-After header
+    When I send 5 login requests with email "lock-s03@example.com" and password "WrongPass123456"
+    Then the status code is 401
+    And the response has a Retry-After header greater than 0
 
   @S04 @FR-003
   Scenario: Lockout for one IP does not block the same email from another IP
@@ -48,6 +51,9 @@ Feature: identity-service login lockout and auth rate limiting
     And identity-service is configured to use that database and applies migrations on startup
     And a user is registered with email "lock-s04@example.com" and password "ValidPass123456"
     And client IP "203.0.113.10" has locked the pair for email "lock-s04@example.com"
+    When I send a login request with email "lock-s04@example.com" and password "ValidPass123456" from client IP "203.0.113.10"
+    Then the status code is 401
+    And the response has a Retry-After header greater than 0
     When I send a login request with email "lock-s04@example.com" and password "ValidPass123456" from client IP "203.0.113.11"
     Then the status code is 200
 

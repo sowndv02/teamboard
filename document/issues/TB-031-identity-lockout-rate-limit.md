@@ -38,6 +38,7 @@ Plan: [`document/plans/TB-031-identity-lockout-rate-limit.md`](../plans/TB-031-i
 - 2026-11-26: TB-030 merged PR #25 (`916fcc7`); `plan-init` trên nhánh `feature/TB-031-identity-lockout-rate-limit`.
 - 2026-11-26: plan-review v1 PASS (Confirm #1–#4).
 - 2026-11-26: test-init — `lockout-rate-limit.feature`, steps + `TestClientIpStartupFilter`; build xanh; chạy test đỏ **bị chặn** (Docker Desktop không chạy → 33 scenario @docker skipped).
+- 2026-11-26: test-review v1 PASS — Docker: Failed 9, Passed 28 (hồi quy 27 + @S09); FIX vacuous green @S03–@S05.
 
 ## Workflow
 
@@ -48,7 +49,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-26 | Plan draft B1–B4, P-01..P-04 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 10 kịch bản @S01–@S10; đỏ chờ Docker |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | 9 đỏ đúng lý do; @S09 xanh chủ đích |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -68,23 +69,24 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 | Five consecutive failures lock the email and IP pair even for correct password | Retry-After (chưa lockout) | |
-| @S02 | Locked pair returns the same credential error with Retry-After | Retry-After | |
-| @S03 | Successful login resets the failure counter for the pair | Retry-After sau 4 fail | |
-| @S04 | Lockout for one IP does not block the same email from another IP | 200 từ IP .11 khi .10 khoá | |
-| @S05 | Login succeeds after the lockout duration elapses | 401 khi lock hết hạn | |
-| @S06 | Lockout response does not reveal lock state in the body | Retry-After / body | |
-| @S07 | Enabled rate limiting returns 429 when auth requests exceed the permit limit | 429 RATE_LIMIT_EXCEEDED | |
-| @S08 | Enabled rate limiting applies to registration | 429 register | |
-| @S09 | Disabled rate limiting does not return 429 for bursts | (pass nhầm nếu không có limit) | |
-| @S10 | Lockout records lockout metrics | lockout_total | |
+| @S01 | Five consecutive failures… | ✅ 401/Retry-After (got 200) | |
+| @S02 | Locked pair… Retry-After | ✅ Given lock / Retry-After | |
+| @S03 | Successful login resets… | ✅ 5 fail sau reset → Retry-After | |
+| @S04 | Lockout for one IP… | ✅ Given lock IP .10 / Then .11 | |
+| @S05 | Login succeeds after lockout… | ✅ Given lock / retry 200 | |
+| @S06 | Lockout response does not reveal… | ✅ Given lock | |
+| @S07 | Enabled rate limiting… 429 | ✅ Expected 429, got 401 | |
+| @S08 | Enabled rate limiting… registration | ✅ Expected 429 | |
+| @S09 | Disabled rate limiting… | — | ✅ (burst không 429) |
+| @S10 | Lockout records lockout metrics | ✅ lockout_total = 0 | |
 
-Lệnh: `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"`. Kết quả 2026-11-26: Passed 4, **Skipped 33** (Docker daemon offline); **mở Docker** rồi chạy lại → kỳ vọng **Failed 10** (TB-031), Passed 27 (hồi quy).
+Lệnh: `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"`. Kết quả Docker 2026-11-26: **Failed 9**, **Passed 28** (27 hồi quy + @S09). Lý do đỏ: thiếu lockout / rate limit / metric (không lỗi môi trường).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `63b4627` + test-review delta | PASS | — |
 
 ## Review rounds
 
@@ -97,6 +99,9 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | test:identity-service:vacuous-green-lockout | FIX | @S04 feature | Pass khi chưa khoá IP .11 | Thêm When/Then khoá .10 trước | 9 failed sau sửa |
+| 1 | test:identity-service:vacuous-green-reset | FIX | @S03 feature | Không phát hiện thiếu reset | Thêm 5 fail → Retry-After | S03 failed đúng |
+| 1 | test:identity-service:given-lock-assert | FIX | IdentityServiceSteps | Given lock không kiểm chứng | Probe login 401 + Retry-After | S05–S06 failed trong Given |
 
 ## Bài học (lessons learned)
 
