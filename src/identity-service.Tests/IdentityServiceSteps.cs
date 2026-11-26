@@ -46,6 +46,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const int BddJwtLifetimeSeconds = 120;
     private const string AccessTokensIssuedInstrument = "access_tokens_issued_total";
     private const string JwksServedInstrument = "jwks_served_total";
+    private const string RefreshReuseInstrument = "refresh_reuse_total";
 
     // Nothing listens on port 1: simulates a stopped DB without needing a container.
     private const string UnreachableConnection =
@@ -64,16 +65,20 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private long _lockoutMeasurements;
     private long _accessTokenMeasurements;
     private long _jwksServedMeasurements;
+    private long _refreshReuseMeasurements;
+    private long _refreshReuseBaseline;
     private bool _observeLoginFailuresOnly;
     private bool _observeLockoutsOnly;
     private bool _observeAccessTokensOnly;
     private bool _observeJwksServedOnly;
+    private bool _observeRefreshReuseOnly;
     private bool _omitSigningKeys;
     private string? _rotationKeysPath;
     private FakeRotationTimeProvider? _rotationTime;
     private int? _lastRotationExitCode;
     private string? _storedAccessToken;
     private string? _storedRefreshToken;
+    private string? _latestRotatedRefreshToken;
     private string? _storedLoginAccessToken;
     private int _concurrentRefreshSuccess;
     private int _concurrentRefreshFailure;
@@ -93,13 +98,17 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _observeLockoutsOnly = false;
         _observeAccessTokensOnly = false;
         _observeJwksServedOnly = false;
+        _observeRefreshReuseOnly = false;
         _omitSigningKeys = false;
         _rotationKeysPath = null;
         _rotationTime = null;
         _lastRotationExitCode = null;
         _storedAccessToken = null;
         _storedRefreshToken = null;
+        _latestRotatedRefreshToken = null;
         _storedLoginAccessToken = null;
+        _refreshReuseMeasurements = 0;
+        _refreshReuseBaseline = 0;
         _concurrentRefreshSuccess = 0;
         _concurrentRefreshFailure = 0;
         _loginFailureMeasurements = 0;
@@ -312,6 +321,18 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         StartMeterListener();
     }
 
+    [Given("identity-service metrics are being observed for refresh token reuse")]
+    public void GivenRefreshReuseMetrics()
+    {
+        _observeLoginFailuresOnly = false;
+        _observeLockoutsOnly = false;
+        _observeAccessTokensOnly = false;
+        _observeJwksServedOnly = false;
+        _observeRefreshReuseOnly = true;
+        StartMeterListener();
+        _refreshReuseBaseline = Volatile.Read(ref _refreshReuseMeasurements);
+    }
+
     [Given("the email and IP pair for {string} is locked from failed logins")]
     public async Task GivenPairLocked(string email) =>
         await SendFailedLoginsUntilLockoutAsync(email, clientIp: null, count: null);
@@ -510,6 +531,18 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             ?? throw new InvalidOperationException("access_token is missing from login response.");
     }
 
+    [When("I store the latest refresh token from the last response")]
+    public void WhenStoreLatestRefreshFromLastResponse()
+    {
+        using var document = JsonDocument.Parse(_body);
+        _latestRotatedRefreshToken = document.RootElement.GetProperty("refresh_token").GetString()
+            ?? throw new InvalidOperationException("refresh_token is missing from the last response.");
+    }
+
+    [When("I send a refresh request with the latest rotated refresh token")]
+    public Task WhenRefreshWithLatestRotated() =>
+        SendRefreshAsync(_latestRotatedRefreshToken ?? throw new InvalidOperationException("No latest rotated refresh token."));
+
     [When("I send a refresh request with the stored refresh token")]
     public Task WhenRefreshWithStoredToken() =>
         SendRefreshAsync(_storedRefreshToken ?? throw new InvalidOperationException("No stored refresh token."));
@@ -569,6 +602,13 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     {
         var count = statusCode == 200 ? _concurrentRefreshSuccess : _concurrentRefreshFailure;
         Assert.Equal(1, count);
+    }
+
+    [Then("the refresh token reuse total metric increased by {int}")]
+    public void ThenRefreshReuseMetricIncreasedBy(int delta)
+    {
+        var total = Volatile.Read(ref _refreshReuseMeasurements);
+        Assert.Equal(_refreshReuseBaseline + delta, total);
     }
 
     [Then("no login error field contains a three-part JWT")]
@@ -944,6 +984,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                     return;
                 }
 
+                if (_observeRefreshReuseOnly)
+                {
+                    if (instrument.Name == RefreshReuseInstrument)
+                    {
+                        listener.EnableMeasurementEvents(instrument);
+                    }
+
+                    return;
+                }
+
                 if (instrument.Name == HashDurationInstrument)
                 {
                     listener.EnableMeasurementEvents(instrument);
@@ -977,6 +1027,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             if (instrument.Name == JwksServedInstrument)
             {
                 Interlocked.Add(ref _jwksServedMeasurements, measurement);
+            }
+
+            if (instrument.Name == RefreshReuseInstrument)
+            {
+                Interlocked.Add(ref _refreshReuseMeasurements, measurement);
             }
         });
         _meterListener.Start();

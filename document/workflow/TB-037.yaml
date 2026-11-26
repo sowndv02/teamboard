@@ -1,0 +1,52 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-037
+scope: issue
+title: Identity lát 9, phát hiện dùng lại refresh token
+updated: 2026-11-26T08:50:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-037-identity-refresh-reuse-detection.md
+  plan: document/plans/TB-037-identity-refresh-reuse-detection.md
+  branch: feature/TB-037-identity-refresh-reuse-detection
+  base: main
+  pr: https://github.com/sowndv02/teamboard/pull/33
+
+current_step: done
+next_action: "Chờ review/CI; merge PR #33 (user)"
+
+steps:
+  plan-init:            { status: done }
+  plan-review:          { status: done, verdict: PASS, round: 1 }
+  test-init:            { status: done }
+  test-review:          { status: done, verdict: PASS, round: 1 }
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T17:15:00Z
+    evidence:
+      - "commit 0c5c72e"
+      - "RefreshTokenService reuse + family revoke"
+      - "refresh_reuse_total metric"
+      - "63/63 !~Compose"
+  coding-review:
+    status: done
+    verdict: PASS
+    round: 1
+    reviewed_commit: 0c5c72e
+    evidence:
+      - "63/63 !~Compose"
+      - "dotnet format teamboard.slnx verify OK"
+  create-pr:
+    status: done
+    pr: 33
+    url: https://github.com/sowndv02/teamboard/pull/33
+
+confirm_pending: []
+
+events:
+  - { at: 2026-11-26T17:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 63/63 green" }
+  - { at: 2026-11-26T08:20:00Z, actor: "orchestrator:cursor-session", event: commit, detail: "0c5c72e feat(TB-037) reuse detection" }
+  - { at: 2026-11-26T08:35:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
+  - { at: 2026-11-26T08:50:00Z, actor: "orchestrator:cursor-session", event: pr_opened, detail: "PR #33" }

@@ -1,13 +1,13 @@
 ---
 key: TB-036
 title: Identity lát 8, refresh token xoay vòng
-status: review
+status: done
 phase: 1
 branch: feature/TB-036-identity-refresh-token
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26
-closed: null            # ngày done/dropped
+closed: 2026-11-26            # ngày done/dropped
 ---
 
 # TB-036 — Identity lát 8, refresh token xoay vòng
@@ -40,6 +40,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 - 2026-11-26: coding-start — ADR 0014, migration `refresh_token`, login/refresh + CAS; metrics; **62/62** identity `!~Compose`, board `Category!=docker` xanh.
 - 2026-11-26: commit `5a43719` feat refresh; coding-review v1 **PASS** (0 CONFIRM, 0 FIX mở).
 - 2026-11-26: [PR #32](https://github.com/sowndv02/teamboard/pull/32) (head `a97803a` after Co-author cleanup).
+- 2026-11-26: merged PR #32 → `main` `1bfb081`; lát 8 done; mở TB-037.
 
 ## Workflow
 
