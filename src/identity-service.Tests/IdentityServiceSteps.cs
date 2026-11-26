@@ -382,6 +382,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.Equal(expectedTitle, document.RootElement.GetProperty("title").GetString());
     }
 
+    [Then("the JWKS public key uses RSA for signature verification")]
+    public void ThenJwksRsaForSignature()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var key = document.RootElement.GetProperty("keys")[0];
+        Assert.Equal("RSA", key.GetProperty("kty").GetString());
+        Assert.Equal("sig", key.GetProperty("use").GetString());
+        Assert.Equal("RS256", key.GetProperty("alg").GetString());
+    }
+
     [Then("the JWKS document includes public key with kid {string}")]
     public void ThenJwksHasKid(string kid)
     {

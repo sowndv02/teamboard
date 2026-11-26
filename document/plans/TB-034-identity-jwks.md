@@ -36,7 +36,8 @@ Lát 6 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp 
 | FR-007 JWKS công khai | D2, mục 6.3 | B2 | @S01–@S03 |
 | Cache JWKS 10 phút | D2 | B2 | @S02 |
 | Không lộ khoá riêng | spec FR-007 | B2, B3 | @S01 assert body |
-| FR-006 dùng JWKS HTTP | D2, TB-033 | B4 | @S04 (board hoặc Auth.Tests) |
+| FR-006 dùng JWKS HTTP | D2, TB-033 | B4 | `JwtHttpJwksIntegrationTests` (+ board BDD coding-start) |
+| NFR-007 metric JWKS | spec | B3 | jwks @S04 |
 | NFR-001 health / sẵn sàng | D3 | – | Hồi quy `SigningKeyReadyTests` |
 
 Kịch bản dự kiến (`document/spec/features/identity-service/jwks.feature`):

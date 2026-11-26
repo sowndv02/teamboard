@@ -46,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B4; O-1..O-3 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
 | test-init | done | – | 2026-11-26 | 4 BDD + 1 Auth đỏ |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | 5 đỏ; board BDD hoãn coding-start |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -66,18 +66,29 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
 | jwks @S01–@S04 | `jwks.feature` | **x** | |
-| FR-006 HTTP JWKS @S04 | `JwtHttpJwksIntegrationTests` | **x** | |
+| FR-006 HTTP JWKS (consumer) | `JwtHttpJwksIntegrationTests` | **x** | |
 | auth-me TB-033 @S01–@S04 | `auth-me.feature` | | xanh |
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `83124ea` + review delta | Sẵn sàng code | – |
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:jwks-contract-fields | FIX | `jwks.feature` / steps | @S01 thiếu assert `kty`/`use`/`alg` | +Then RSA/sig/RS256 | plan §2 |
+| 1 | test:auth:http-jwks-assertion | FIX | `JwtHttpJwksIntegrationTests` | Đỏ do exception 404, không phải assertion | Probe `GET` JWKS 200 trước validate | consumer test |
+| 1 | test:tb-034:scenario-trace | FIX | plan §2, issue TDD | FR-006 lẫn @S04 (metric) | Tách metric @S04 vs integration | bảng truy vết |
+
+**Giới hạn đã biết:** Board BDD consumer (plan-review Confirm #3) hoãn tới `coding-start` vì xung đột `Program` khi reference chéo; `JwtHttpJwksIntegrationTests` giữ phần FR-006 HTTP.
 
 ## Fix log
 

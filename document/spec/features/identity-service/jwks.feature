@@ -14,6 +14,7 @@ Feature: identity-service JWKS publication
     When I send GET to "/.well-known/jwks.json"
     Then the status code is 200
     And the JWKS document includes public key with kid "test-active-1"
+    And the JWKS public key uses RSA for signature verification
     And the JWKS response body does not contain private key material
 
   @S02 @FR-007

@@ -1,3 +1,4 @@
+using System.Net;
 using IdentityService.Tests.Support;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -28,6 +29,9 @@ public sealed class JwtHttpJwksIntegrationTests : IAsyncDisposable
 
         var identityClient = _identityFactory.CreateClient();
         var jwksUri = new Uri(identityClient.BaseAddress!, ".well-known/jwks.json");
+
+        using var jwksProbe = await identityClient.GetAsync(jwksUri);
+        Assert.Equal(HttpStatusCode.OK, jwksProbe.StatusCode);
 
         var validator = HttpJwksTestValidatorFactory.Create(_identityFactory, jwksUri);
         var token = TestAccessTokenFactory.IssueForUser(Guid.Parse("a1111111-1111-1111-1111-111111111111"));

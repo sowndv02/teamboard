@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-review
-next_action: "test-review TB-034: reconcile @S04 board BDD (Program ambiguity) vs Auth.Tests"
+current_step: coding-start
+next_action: "coding-start TB-034: B2 JWKS endpoint + metric + Auth HTTP-first"
 
 steps:
   plan-init:
@@ -43,7 +43,17 @@ steps:
     evidence:
       - "jwks.feature @S01-S04; JwtHttpJwksIntegrationTests"
       - "ADR 0012 proposed; 5 red (404/503); identity regression 44 green"
-  test-review:          { status: pending }
+  test-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T21:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "5 red; trace table; consumer probe assert"
+      - "board BDD deferred to coding-start (known limit)"
   coding-start:         { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
