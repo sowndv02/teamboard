@@ -1,7 +1,7 @@
 ---
 title: Identity lát 13, Client Credentials và token máy
 issue: TB-041
-status: draft
+status: approved
 owner: sondv
 updated: 2026-11-26
 spec: document/spec/identity-auth.md
@@ -76,8 +76,8 @@ Kịch bản dự kiến (`document/spec/features/identity-service/client-creden
 - **File:** `client-credentials.feature`, `IdentityServiceSteps`, `IdentityMetrics`.
 - **Kiểm chứng:** `dotnet test identity-service.Tests --filter "FullyQualifiedName!~Compose"` xanh; @S05.
 
-### B5. (Tuỳ chọn Confirm #5) `Teamboard.Auth`
-- Nếu chọn mở rộng trong lát: thêm API validate `token_use=machine` (hoặc overload) + test shared; **không** đổi hành vi user API board trong lát này.
+### B5. — (bỏ qua lát này)
+- Confirm #5: không sửa `Teamboard.Auth`; JWT máy kiểm chứng qua decode trong BDD/unit identity.
 
 ## 4. Chiến lược test
 
@@ -108,30 +108,31 @@ BDD bật registry (`Identity:Clients:Enabled`) và seed confidential qua config
 
 ## 7. Câu hỏi mở và giả định
 
-| # | Điều chưa rõ | Ảnh hưởng tới | Người trả lời | Ghi chú |
-|---|---|---|---|---|
-| O-1 | Đường dẫn endpoint: `/connect/token` (design 6.3) hay tài nguyên `/api/v1/...` | B3, gateway sau | User | |
-| O-2 | Body `application/x-www-form-urlencoded` (RFC 6749) hay JSON như `/api/v1/auth/login` | B3, BDD steps | User | |
-| O-3 | `scope` thiếu/rỗng: từ chối hay cấp toàn bộ `allowed_scopes` | B2, @S01 | User | |
-| O-4 | Feature flag riêng `ClientCredentialsEnabled` hay luôn bật khi `Clients:Enabled` | B3, deploy | User | |
-| O-5 | Cập nhật `Teamboard.Auth` chấp nhận `machine` trong lát này hay defer TB-045 | B5, shared tests | User | |
-| O-6 | Lỗi OAuth `{error,error_description}` hay `problem+json` | B3, contract | User | |
-| O-7 | Rate limit `AuthPublic` như login/refresh? | B4 | User | |
+Không còn câu hỏi mở sau plan-review v1.
 
-**Giả định tạm (chưa chốt):** chỉ grant `client_credentials`; `client_secret` gửi trong body (không Basic auth) trừ khi plan-review chọn khác.
+**Giới hạn đã biết:** Resource server chưa chấp nhận `token_use=machine` (TB-045). `client_secret` trong body form, không Basic auth.
 
 ## Confirm log
 
 | # | Fingerprint | Câu hỏi | Quyết định | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-041:token-path | O-1 path | `POST /connect/token` | 1 | 2026-11-26 |
+| 2 | plan-review:TB-041:token-body | O-2 body | `application/x-www-form-urlencoded` | 1 | 2026-11-26 |
+| 3 | plan-review:TB-041:scope-required | O-3 scope | Bắt buộc scope; rỗng → invalid_scope | 1 | 2026-11-26 |
+| 4 | plan-review:TB-041:cc-flag | O-4 flag | `Identity:Features:ClientCredentialsEnabled` default false | 1 | 2026-11-26 |
+| 5 | plan-review:TB-041:teamboard-auth | O-5 shared | Defer machine acceptance → TB-045 | 1 | 2026-11-26 |
+| 6 | plan-review:TB-041:oauth-errors | O-6 errors | OAuth `{error,error_description}` | 1 | 2026-11-26 |
+| 7 | plan-review:TB-041:rate-limit | O-7 rate | Policy `AuthPublic` | 1 | 2026-11-26 |
 
 ## Review rounds
 
 | Vòng | Ngày | Phạm vi | CONFIRM mở | FIX mở | Verdict |
 |---|---|---|---|---|---|
+| 1 | 2026-11-26 | B1–B5, O-1..O-7 | 0 | 0 | PASS |
 
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi | Lý do |
 |---|---|---|
 | 2026-11-26 | Tạo bản nháp | plan-init từ `main` `93cdd46` sau TB-040 |
+| 2026-11-26 | plan-review v1 PASS | Confirm #1–#7 |

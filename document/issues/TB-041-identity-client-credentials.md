@@ -30,11 +30,12 @@ Issue khung cấp key khi duyệt bảng lát: lát 13 của `document/plans/ide
 - [ ] Hồi quy `!~Compose` xanh.
 
 ## Kế hoạch
-Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-identity-client-credentials.md) (`draft`, B1–B5; chờ plan-review O-1..O-7).
+Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-identity-client-credentials.md) (`approved`, B1–B4; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-040 merged PR #36 → `main` `93cdd46`; `plan-init` nhánh `feature/TB-041-identity-client-credentials`.
+- 2026-11-26: plan-review v1 **PASS** — Confirm #1–#7 (`/connect/token`, form body, scope bắt buộc, feature flag, defer Teamboard.Auth, OAuth errors, AuthPublic rate limit).
 
 ## Workflow
 
@@ -43,7 +44,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B1–B5; O-1..O-7 |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#7 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |

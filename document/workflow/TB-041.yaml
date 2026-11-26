@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: plan-review
-next_action: "Chốt Confirm O-1..O-7 cho plan-review TB-041"
+current_step: test-init
+next_action: "test-init TB-041 (client-credentials.feature)"
 blocked_by: null
 
 steps:
@@ -29,23 +29,23 @@ steps:
     inputs: { base: "93cdd46" }
     artifacts: [document/plans/TB-041-identity-client-credentials.md]
     evidence: ["Draft B1–B5", "O-1..O-7"]
-  plan-review:        { status: pending }
+  plan-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-26T12:45:00Z
+    evidence: ["Confirm #1–#7"]
   test-init:            { status: pending }
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
 
-confirm_pending:
-  - O-1
-  - O-2
-  - O-3
-  - O-4
-  - O-5
-  - O-6
-  - O-7
+confirm_pending: []
 
 events:
   - { at: 2026-11-26T12:15:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "plan-init TB-041 từ main 93cdd46" }
   - { at: 2026-11-26T12:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init: draft TB-041-identity-client-credentials.md" }
   - { at: 2026-11-26T12:30:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "7 câu hỏi mở O-1..O-7" }
+  - { at: 2026-11-26T12:45:00Z, actor: "orchestrator:cursor-session", event: confirm_answered, detail: "Confirm #1–#7" }
+  - { at: 2026-11-26T12:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
