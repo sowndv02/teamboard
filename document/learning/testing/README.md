@@ -88,7 +88,8 @@ Lý do các ô `–`:
 | 2 | Đã viết (2026-11-26): xUnit, builder, seam đồng hồ, Gherkin và Reqnroll, 4 lab đã chạy, 2 sự cố tái hiện thật. Còn ⚠ ở nguồn chỉ qua agent; không có case real-world riêng |
 | 3 | Đã viết (2026-11-26): WebApplicationFactory, Testcontainers, contract test (Pact và bản viết tay), 4 lab đã chạy, 3 case real-world. Còn ⚠ ở nguồn chỉ qua agent; chưa chạy Pact thật |
 | 4 | Đã viết (2026-11-26): property-based, mutation (Stryker.NET), snapshot (Verify), characterization, outside-in; 4 lab đã chạy, 2 sự cố tái hiện thật. Real-world chưa đạt (một case tự mở, một Vừa, một chưa mở được); bài QuickCheck gốc chưa đọc được |
-| 5–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
+| 5 | Đã viết (2026-11-26): phân nhóm test, coverage (coverlet) và gate, test hồi quy sự cố, flaky; 3 lab đã chạy, 2 sự cố tái hiện thật, 3 case real-world tự mở (Google, Cloudflare, Fowler). Chưa có CI thật trong repo nên chưa chạy pipeline; test bảo mật và dữ liệu test chưa có nguồn ngoài |
+| 6–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
 
 ## Tiêu chí hoàn thành lộ trình
 

@@ -280,7 +280,7 @@ dotnet test --filter "FullyQualifiedName~Snapshot"
 [ { tier: standard, units: 5, guest: 62.0, member: 60.0 }, ...
 ```
 Đổi tên `.received.txt` thành `.verified.txt` (duyệt) rồi chạy lại: `Passed: 1`. Đổi hệ số `0.85m` thành `0.80m` trong hàm: `Failed!` kèm cặp file Received/Verified; khôi phục code, xoá `.received`: `Passed`.
-**Giải thích:** snapshot cũng lộ một chi tiết lạ của hàm: `standard`, 5 đơn vị, khách lẻ cho `62` chứ không phải `62,5` làm tròn lên; ⚠ chưa xác minh nguyên nhân (nghi `Math.Round` làm tròn về số chẵn ở mức .5, hành vi mặc định của .NET).
+**Giải thích:** snapshot cũng lộ một chi tiết lạ của hàm: `standard`, 5 đơn vị, khách lẻ cho `62` chứ không phải `62,5` làm tròn lên; nguyên nhân là `Math.Round` mặc định làm tròn về số chẵn ở mức .5; đã xác minh ở [Part 5 Lab 5.2](part-5-production-security-ops.md) (test hồi quy đỏ, sửa bằng `MidpointRounding.AwayFromZero`, xanh).
 **Dọn dẹp:** xoá file `*.received.*` còn lại; `cd .. && rm -rf lh-adv` khi xong.
 
 ## L5 Troubleshooting — Test kỹ thuật cao hỏng
@@ -372,5 +372,4 @@ Stryker cần một project test **tham chiếu** project cần đột biến. S
 - Chi tiết scrubbing GUID và ngày trong Verify; bài Google Testing Blog 2021 và ICSE 2021 về mutation chưa mở; khảo sát Papadakis 2019 chưa đọc.
 - Sách GOOS (Freeman, Pryce) chưa đọc; "walking skeleton" và "hai vòng" chỉ từ tìm kiếm.
 - "Legacy code là code không có test" (Feathers): chưa tìm thấy trong nguồn nào đã mở.
-- Nguyên nhân `Math.Round` cho `62` ở Lab 4.4: chưa xác minh.
 - Chưa chạy Stryker trên code thật của TeamBoard; chưa có lab riêng cho outside-in (chỉ đọc nguồn).
