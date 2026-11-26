@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 - 2026-11-26: TB-035 merged PR #30; `plan-init` trên nhánh `feature/TB-036-identity-refresh-token` từ `main` `94dd3a2`.
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#5 (FR-010 → TB-037; client `teamboard`; OAuth refresh contract; auth-public limit; metrics).
 - 2026-11-26: test-init — `refresh-token.feature` @S01–@S05; `RefreshTokenHashTests`; stub `/refresh` 501; **6 đỏ**, hồi quy **56/56** (`!~Compose`).
+- 2026-11-26: test-review v1 PASS — FIX Background `And`, assert refresh mới ≠ cũ (@S02); **6 đỏ** đúng lý do (trừ @S03 status tạm thời, xem Giới hạn).
 
 ## Workflow
 
@@ -44,8 +45,8 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 | plan-init | done | – | 2026-11-26 | Draft B0–B6; O-1..O-5 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#5 |
 | test-init | done | – | 2026-11-26 | 6 đỏ (5 BDD + 1 unit); hồi quy 56 xanh |
-| test-review | pending | | | |
-| coding-start | pending | – | | |
+| test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 6 đỏ |
+| coding-start | pending | – | | next |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -71,11 +72,35 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `f6d8711` + delta | Sẵn sàng code | – |
+
+Đối chiếu kịch bản ↔ test (mục 6 `test-review.md`):
+
+| Kịch bản | Test thực thi | Đỏ | Xanh |
+|---|---|---|---|
+| refresh @S01–@S05 | `refresh-token.feature` | **đỏ** | |
+| hash SHA-256 | `RefreshTokenHashTests` | **đỏ** | |
+| login/access/jwks hồi quy | TB-030–035 features | | xanh |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → Failed **6**, Passed **56**; `dotnet format src/teamboard.slnx --verify-no-changes` xanh.
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:refresh-background-and | FIX P3 | `refresh-token.feature` Background | Hai `Given` liên tiếp | `And` cho bước thứ hai | feature |
+| 1 | test:identity:refresh-s02-differs | FIX P2 | @S02 + `IdentityServiceSteps` | Thiếu assert refresh mới khác token lưu | Then + step | plan @S02 |
+| 1 | test:identity:refresh-s02-multi-when | SKIP P2 | @S02 | Nhiều `When` (login→refresh→replay) | Giữ theo precedent `signing-key-rotation.feature` | rotation flow |
+| 1 | test:identity:refresh-s03-stub-status | NOTE | @S03 | Stub 501; expect 401 | Không đổi stub; xanh cùng B4 | TB-035 @S03 pattern |
+| 1 | test:identity:refresh-s03-expired | SKIP P2 | plan @S03 | Chưa kịch bản hết hạn/revoked seed | Cùng 401 chung; bổ sung B4 nếu cần | contract D4 |
+| 1 | test:identity:refresh-migration-unit | SKIP P2 | plan B1 | Chưa test migration riêng | Migration qua Given BDD docker | plan B1 |
+
+**Giới hạn đã biết:** @S03 đỏ **status 501** (stub) thay vì 401 cho tới `coding-start` B4; assertion 401 đúng sau implement. @S01/@S02/@S04/@S05 đỏ vì chưa phát refresh / rotation / concurrent. Hash unit đỏ vì stub hasher rỗng.
 
 ## Fix log
 

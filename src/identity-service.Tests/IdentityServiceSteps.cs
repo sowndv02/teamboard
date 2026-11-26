@@ -546,6 +546,15 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [Then("the refresh response includes a new access and refresh token pair")]
     public void ThenRefreshResponseIncludesPair() => RefreshBddAssertions.AssertRefreshResponsePair(_body);
 
+    [Then("the refreshed refresh token differs from the stored refresh token")]
+    public void ThenRefreshedRefreshDiffersFromStored()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var refreshed = document.RootElement.GetProperty("refresh_token").GetString();
+        var stored = _storedRefreshToken ?? throw new InvalidOperationException("No stored refresh token.");
+        Assert.False(string.Equals(refreshed, stored, StringComparison.Ordinal));
+    }
+
     [Then("the refreshed access token differs from the login access token")]
     public void ThenRefreshedAccessDiffersFromLogin()
     {

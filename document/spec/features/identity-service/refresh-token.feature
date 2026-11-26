@@ -6,7 +6,7 @@ Feature: identity-service refresh token rotation
 
   Background:
     Given identity-service rate limiting is disabled
-    Given identity-service access token issuance is configured for BDD tests
+    And identity-service access token issuance is configured for BDD tests
 
   @S01 @FR-009 @docker
   Scenario: Successful login returns an opaque refresh token
@@ -31,6 +31,7 @@ Feature: identity-service refresh token rotation
     Then the status code is 200
     And the refresh response has no id property
     And the refresh response includes a new access and refresh token pair
+    And the refreshed refresh token differs from the stored refresh token
     And the refreshed access token differs from the login access token
     When I send a refresh request with the stored refresh token
     Then the status code is 401
