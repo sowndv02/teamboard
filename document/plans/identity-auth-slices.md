@@ -20,8 +20,8 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | 3 | I1 | Khoá tạm theo (email, IP) và giới hạn tốc độ (cờ `RateLimiter`, Q-G = A) | FR-003, NFR-008 | 2 | 2–3 ngày | [TB-031](../issues/TB-031-identity-lockout-rate-limit.md) | done (PR #26) |
 | 4 | I2 | Phát access token JWT khi đăng nhập (ADR RS256 + Secrets Manager tạo trước lát này) | FR-005, BR-004 | 2, ADR thuật toán ký | 2–3 ngày | [TB-032](../issues/TB-032-identity-access-token.md) | done (PR #27) |
 | 5 | I2 | Bộ kiểm tra token dùng chung `Teamboard.Auth` (JWKS, cache) và test tấn công (ADR thư viện token) | FR-006, NFR-006 | 4, JWKS (6) | 3–4 ngày | [TB-033](../issues/TB-033-auth-token-validation-library.md) | done (PR #28) |
-| 6 | I3 | Công bố JWKS | FR-007 | 4 | 1–2 ngày | [TB-034](../issues/TB-034-identity-jwks.md) | review (PR #29) |
-| 7 | I3 | Xoay khoá ký không hỏng token còn hạn (CLI, D7) | FR-008 | 6, ADR xoay khoá | 2–3 ngày | [TB-035](../issues/TB-035-identity-signing-key-rotation.md) | todo |
+| 6 | I3 | Công bố JWKS | FR-007 | 4 | 1–2 ngày | [TB-034](../issues/TB-034-identity-jwks.md) | done (PR #29) |
+| 7 | I3 | Xoay khoá ký không hỏng token còn hạn (CLI, D7) | FR-008 | 6, ADR xoay khoá | 2–3 ngày | [TB-035](../issues/TB-035-identity-signing-key-rotation.md) | planning |
 | 8 | I4 | Refresh token xoay vòng (ADR refresh nguyên tử) | FR-009 | 4 | 2–3 ngày | [TB-036](../issues/TB-036-identity-refresh-token.md) | todo |
 | 9 | I4 | Phát hiện dùng lại refresh token, thu hồi chuỗi | FR-010 | 8 | 2 ngày | [TB-037](../issues/TB-037-identity-refresh-reuse-detection.md) | todo |
 | 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 8 | 1 ngày | [TB-038](../issues/TB-038-identity-logout.md) | todo |
@@ -51,7 +51,7 @@ Tổng khoảng 42–58 ngày công (chưa tính lát 19); mỗi lát ≤ ~3 ng�
 Theo mục "Phạm vi" của spec (chưa xác minh email, không role, không API quản trị client).
 
 ## Thứ tự và lý do
-Nền → đăng nhập → bảo vệ chống tấn công → token → hạ tầng khoá → vòng đời refresh → OAuth/OIDC → ủy quyền → tích hợp gateway, bám lộ trình I1–I9 của spec (mục 17). Lát hiện tại: **6** — TB-034 (công bố JWKS).
+Nền → đăng nhập → bảo vệ chống tấn công → token → hạ tầng khoá → vòng đời refresh → OAuth/OIDC → ủy quyền → tích hợp gateway, bám lộ trình I1–I9 của spec (mục 17). Lát hiện tại: **7** — TB-035 (xoay khoá ký).
 
 ## Confirm log
 

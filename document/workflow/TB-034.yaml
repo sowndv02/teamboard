@@ -17,7 +17,7 @@ links:
   pr: https://github.com/sowndv02/teamboard/pull/29
 
 current_step: create-pr
-next_action: "chờ review/CI PR #29; merge do người dùng"
+next_action: "done — merged PR #29"
 
 steps:
   plan-init:

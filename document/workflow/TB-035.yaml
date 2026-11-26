@@ -1,0 +1,44 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-035
+scope: issue
+title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
+updated: 2026-11-26T23:15:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-035-identity-signing-key-rotation.md
+  spec: document/spec/identity-auth.md
+  design: document/design/identity-auth.md
+  plan: document/plans/TB-035-identity-signing-key-rotation.md
+  features_dir: document/spec/features/identity-service/
+  branch: feature/TB-035-identity-signing-key-rotation
+  base: main
+  pr: null
+
+current_step: plan-review
+next_action: "plan-review TB-035 (O-1..O-4)"
+
+steps:
+  plan-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T23:15:00Z
+    evidence:
+      - "Plan draft B0-B6; base main 21ffee1 after PR #29"
+      - "Open questions O-1..O-4"
+  plan-review:            { status: pending }
+  test-init:              { status: pending }
+  test-review:            { status: pending }
+  coding-start:           { status: pending }
+  coding-review:          { status: pending }
+  create-pr:              { status: pending }
+
+confirm_pending:
+  - O-1-security-event-scope
+  - O-2-signing-key-reload
+  - O-3-time-provider-tests
+  - O-4-secrets-manager-defer
+
+events:
+  - { at: 2026-11-26T23:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-034 merged PR #29; plan-init TB-035" }

@@ -27,3 +27,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-032-identity-access-token](TB-032-identity-access-token.md) | TB-032 (lát 4 identity) | approved |
 | [TB-033-auth-token-validation-library](TB-033-auth-token-validation-library.md) | TB-033 (lát 5 identity) | approved |
 | [TB-034-identity-jwks](TB-034-identity-jwks.md) | TB-034 (lát 6 identity) | approved |
+| [TB-035-identity-signing-key-rotation](TB-035-identity-signing-key-rotation.md) | TB-035 (lát 7 identity) | draft |

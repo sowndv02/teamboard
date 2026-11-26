@@ -1,12 +1,12 @@
 ---
 key: TB-035
 title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-035-identity-signing-key-rotation
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26
 closed: null            # ngày done/dropped
 ---
 
@@ -22,13 +22,18 @@ Issue khung cấp key khi duyệt bảng lát: lát 7 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Ba lệnh CLI D7: `keys rotate start` / `activate` / `retire` trên file khoá dev với guard thời gian.
+- [ ] JWKS công bố `pending`, `active`, `retiring`; login chỉ ký bằng `active`.
+- [ ] Sau activate: token mới dùng `kid` mới; token phát trước đó còn hạn vẫn verify qua JWKS.
+- [ ] Sau retire hợp lệ: khoá cũ không còn trong JWKS (theo FR-008).
+- [ ] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035-identity-signing-key-rotation.md) (`draft`, B0–B6; chờ `plan-review` O-1..O-4).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: TB-034 merged PR #29; `plan-init` trên nhánh `feature/TB-035-identity-signing-key-rotation` từ `main` `21ffee1`.
 
 ## Workflow
 
@@ -36,7 +41,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Plan draft B0–B6; O-1..O-4 |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
