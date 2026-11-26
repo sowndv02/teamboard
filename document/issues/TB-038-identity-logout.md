@@ -22,10 +22,10 @@ Issue khung cấp key khi duyệt bảng lát: lát 10 của `document/plans/ide
 - Không làm: huỷ cookie phiên identity (FR-019 → I5), OIDC logout, đổi mật khẩu thu hồi refresh (TB-039), gateway, FE.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Login → logout với refresh hợp lệ → **204**; sau đó refresh → **401**; không `refresh_reuse_total`.
-- [ ] Logout refresh không hợp lệ / đã revoked → **401** chung; logout lặp @S03 → **401**.
-- [ ] Metric `logout_total` + structured log `event=logout` (không token).
-- [ ] Gate identity `!~Compose` xanh; hồi quy `refresh-token.feature` @S01–@S06.
+- [x] Login → logout với refresh hợp lệ → **204**; sau đó refresh → **401**; không `refresh_reuse_total`.
+- [x] Logout refresh không hợp lệ / đã revoked → **401** chung; logout lặp @S03 → **401**.
+- [x] Metric `logout_total` + structured log `event=logout` (không token).
+- [x] Gate identity `!~Compose` xanh; hồi quy `refresh-token.feature` @S01–@S06.
 
 ## Kế hoạch
 Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logout.md) (`approved`, B0–B5; plan-review PASS v1).
@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (204; 401; log+metric; @S01–@S03).
 - 2026-11-26: test-init — `logout-token.feature` @S01–@S03; stub `/logout` **501**; **3 đỏ**, **63 hồi quy** (`!~Compose`).
 - 2026-11-26: test-review v1 **PASS** — 3 đỏ đúng lý do (stub 501); sẵn sàng code.
+- 2026-11-26: coding-start — `TryLogoutAsync`, `/logout` 204/401, `logout_total`, log; **66/66** `!~Compose`.
 
 ## Workflow
 
@@ -45,7 +46,8 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 3 đỏ @S01–@S03; 63 hồi quy |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 3 đỏ |
-| coding-start | pending | – | | next |
+| coding-start | done | – | 2026-11-26 | 66/66 `!~Compose` |
+| coding-review | pending | – | | next |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -62,7 +64,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| logout @S01–@S03 | `logout-token.feature` | **đỏ** | |
+| logout @S01–@S03 | `logout-token.feature` | | **xanh** |
 | hồi quy refresh/login | các `.feature` khác | | **xanh** |
 
 **Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **3 failed, 63 passed**; format verify xanh.

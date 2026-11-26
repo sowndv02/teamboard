@@ -15,7 +15,8 @@ Access token JWT đã có (TB-032–035). FR-009 yêu cầu refresh opaque, ch�
 - **Reuse (FR-010, TB-037):** khi CAS trả 0 dòng, nếu `token_hash` có `used_at` → `UPDATE refresh_token SET revoked_at = now() WHERE family_id = @f`; metric `refresh_reuse_total`; structured log `event=refresh_reuse` (không token); vẫn **401** chung. Hết hạn / không tồn tại / `revoked_at` (không reuse) → 401, không metric reuse.
 - **Hợp đồng refresh 200:** `access_token`, `token_type`, `expires_in`, `refresh_token`, `refresh_expires_in` — **không** `id`.
 - **Cấu hình:** `Identity:RefreshToken:LifetimeSeconds` (mặc định 604800), `DefaultClientId` = `teamboard` (đến TB-040 client registry).
-- **Metric:** `refresh_tokens_issued_total` (login + mỗi refresh mới); `refresh_rotations_total` (mỗi refresh 200); `refresh_reuse_total` (mỗi lần phát hiện reuse).
+- **Logout (FR-011, TB-038):** `POST /api/v1/auth/logout` body `refresh_token`; token hợp lệ (`used_at`/`revoked_at` null, chưa hết hạn) → revoke cả `family_id`, **204**; token xấu / đã revoke → **401** chung; metric `logout_total`; log `event=logout` (không token); không tăng `refresh_reuse_total`.
+- **Metric:** `refresh_tokens_issued_total` (login + mỗi refresh mới); `refresh_rotations_total` (mỗi refresh 200); `refresh_reuse_total` (mỗi lần phát hiện reuse); `logout_total` (logout 204).
 - **Rate limit:** policy `auth-public` khi bật (giống login).
 
 ## Phương án đã cân nhắc

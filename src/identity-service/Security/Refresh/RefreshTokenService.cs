@@ -91,6 +91,51 @@ public sealed class RefreshTokenService(
         }
     }
 
+    public async Task<bool> TryLogoutAsync(string presentedToken, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(presentedToken))
+        {
+            return false;
+        }
+
+        var now = timeProvider.GetUtcNow();
+        var hash = RefreshTokenHasher.Hash(presentedToken);
+
+        var sessions = await db.Database.SqlQuery<RefreshLogoutRow>($"""
+            SELECT user_id AS "UserId", family_id AS "FamilyId"
+            FROM refresh_token
+            WHERE token_hash = {hash}
+              AND used_at IS NULL
+              AND revoked_at IS NULL
+              AND expires_at > {now}
+            """).ToListAsync(cancellationToken);
+
+        if (sessions.Count == 0)
+        {
+            return false;
+        }
+
+        var session = sessions[0];
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        await db.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+            UPDATE refresh_token
+            SET revoked_at = {now}
+            WHERE family_id = {session.FamilyId}
+              AND revoked_at IS NULL
+            """,
+            cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        metrics.RecordLogout();
+        logger.LogInformation(
+            "logout event=logout UserId={UserId} FamilyId={FamilyId}",
+            session.UserId,
+            session.FamilyId);
+
+        return true;
+    }
+
     private async Task TryHandleReuseAsync(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken)
     {
         var reuses = await db.Database.SqlQuery<RefreshReuseRow>($"""
@@ -134,6 +179,13 @@ public sealed class RefreshTokenService(
     }
 
     private sealed class RefreshReuseRow
+    {
+        public Guid UserId { get; init; }
+
+        public Guid FamilyId { get; init; }
+    }
+
+    private sealed class RefreshLogoutRow
     {
         public Guid UserId { get; init; }
 

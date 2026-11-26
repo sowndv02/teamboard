@@ -13,8 +13,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-038"
+current_step: coding-review
+next_action: "coding-review TB-038"
 
 steps:
   plan-init:            { status: done }
@@ -30,7 +30,12 @@ steps:
     verdict: PASS
     round: 1
     reviewed_commit: 69f1cfe
-  coding-start:         { status: pending }
+  coding-start:
+    status: done
+    evidence:
+      - "66/66 !~Compose"
+      - "TryLogoutAsync family revoke"
+  coding-review:        { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
 
