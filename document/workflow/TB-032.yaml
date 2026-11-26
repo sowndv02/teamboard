@@ -14,7 +14,7 @@ links:
   features_dir: document/spec/features/identity-service/
   branch: feature/TB-032-identity-access-token
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/27
 
 current_step: create-pr
 next_action: "create-pr TB-032: commit feat + docs, mở PR"
@@ -74,7 +74,11 @@ steps:
     evidence:
       - "FIX login 503 khi thiếu khoá; compose mount signing-keys.dev.json"
       - "dotnet test !~Compose: 44/44"
-  create-pr:            { status: pending }
+  create-pr:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T17:00:00Z
+    evidence: ["PR #27"]
 
 confirm_pending: []
 

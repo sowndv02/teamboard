@@ -39,6 +39,7 @@ Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identit
 - 2026-11-26: test-review v1 PASS — sửa @S04 vacuous green, Background, reconcile; **7 đỏ / 37 xanh**.
 - 2026-11-26: commit `9d96fae` test(TB-032); coding-start B0–B4 — JWT RS256 login, ready khoá ký, metric; **44/44 xanh**.
 - 2026-11-26: coding-review v1 PASS — FIX 503 thiếu khoá, compose signing keys.
+- 2026-11-26: commit `5250b45` feat + PR [#27](https://github.com/sowndv02/teamboard/pull/27).
 
 ## Workflow
 
@@ -52,7 +53,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | 7 đỏ đúng lý do |
 | coding-start | done | – | 2026-11-26 | 44/44 xanh (!~Compose) |
 | coding-review | PASS | 1 | 2026-11-26 | FIX 503 + compose keys |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | PR #27 |
 
 ## Confirm log
 
