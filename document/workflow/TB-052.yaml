@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-review
-next_action: "test-review TB-052"
+current_step: coding-start
+next_action: "coding-start TB-052"
 blocked_by: null
 
 steps:
@@ -40,7 +40,12 @@ steps:
     status: done
     finished: 2026-11-26T16:00:00Z
     evidence: ["7 fail 104 pass !~Compose", "authorize-pkce @S01-S08"]
-  test-review:            { status: pending }
+  test-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-26T16:30:00Z
+    evidence: ["7 fail 104 pass !~Compose", "FIX S05 S06"]
   coding-start:           { status: pending }
   coding-review:          { status: pending }
   create-pr:              { status: pending }
@@ -50,6 +55,7 @@ confirm_pending: []
 events:
   - { at: 2026-11-26T15:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
   - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 7 red → test-review" }
+  - { at: 2026-11-26T16:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS → coding-start" }
   - { at: 2026-11-26T14:00:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "plan-init TB-052 từ main 8652c52" }
   - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init: draft TB-052-identity-authorize-login.md" }
   - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "10 câu hỏi mở O-1..O-10" }

@@ -43,6 +43,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 - 2026-11-26: `plan-init` từ `main` `8652c52` sau merge TB-042 / PR #38.
 - 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-10.
 - 2026-11-26: test-init — `authorize-pkce.feature` @S01,@S01b,@S04–@S06,@S08 + `AuthorizationCodeGeneratorTests`; **7 fail, 104 pass** `!~Compose`.
+- 2026-11-26: test-review v1 **PASS** — FIX @S05 lockout 401; @S06 second When → And; **7 fail, 104 pass** `!~Compose`.
 
 ## Workflow
 
@@ -51,7 +52,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 | plan-init | done | – | 2026-11-26 | Draft B0–B9; O-1..O-10 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
 | test-init | done | – | 2026-11-26 | 7 đỏ 104 pass !~Compose |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | FIX @S05 @S06 |
 | coding-start | pending | | | |
 | coding-review | pending | | | |
 | create-pr | pending | | | |
@@ -78,6 +79,19 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 **Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **7 fail, 104 pass**.
 
 **Lý do đỏ:** chưa Razor `/login`, authorize vẫn 501, stub `AuthorizationCodeGenerator`.
+
+## Test review rounds
+
+| Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
+|---|---|---|---|---|
+| 1 | 2026-11-26 | `d20dc00` + FIX | Sẵn sàng code | – |
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa thế nào | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:authz-s05-lockout-status | FIX P2 | `authorize-pkce.feature` @S05 | Lockout trên login phải khớp `lockout.feature` (401 + Retry-After) | `Then 401` | đỏ đúng lý do |
+| 1 | test:identity:authz-s06-gherkin-when | FIX P2 | `authorize-pkce.feature` @S06 | Hai `When` trong một scenario | GET lặp → `And` | rule Gherkin |
 
 ## Review rounds
 

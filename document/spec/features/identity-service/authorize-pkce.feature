@@ -97,7 +97,7 @@ Feature: identity-service OAuth authorize endpoint validation
     And the email and IP pair for "authz-s05@example.com" is locked from failed logins
     When I GET the authorize endpoint for client "teamboard" with redirect_uri "http://localhost:4200/callback" state "state-lock" scope "openid" pkce challenge "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM" method "S256"
     And I submit the identity login page for the pending authorize request with email "authz-s05@example.com" and password "ValidPass123456"
-    Then the status code is 200
+    Then the status code is 401
     And the response has no Location header containing "http://localhost:4200/callback"
     And the response has a Retry-After header greater than 0
 
@@ -109,7 +109,7 @@ Feature: identity-service OAuth authorize endpoint validation
     And a user is registered with email "authz-s06@example.com" and password "ValidPass123456"
     When I GET the authorize endpoint for client "teamboard" with redirect_uri "http://localhost:4200/callback" state "state-first" scope "openid" pkce challenge "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM" method "S256"
     And I submit the identity login page for the pending authorize request with email "authz-s06@example.com" and password "ValidPass123456"
-    When I GET the authorize endpoint for client "teamboard" with redirect_uri "http://localhost:4200/callback" state "state-second" scope "openid" pkce challenge "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM" method "S256"
+    And I GET the authorize endpoint for client "teamboard" with redirect_uri "http://localhost:4200/callback" state "state-second" scope "openid" pkce challenge "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM" method "S256"
     Then the status code is 302
     And the authorize response redirects to "http://localhost:4200/callback" with state "state-second" and an authorization code
 
