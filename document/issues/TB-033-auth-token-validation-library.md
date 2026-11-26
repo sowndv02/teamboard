@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-033-auth-token-validation-library.md`](../plans/TB-033
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-032 merged PR #27; `plan-init` trên nhánh `feature/TB-033-auth-token-validation-library` từ `main` `315449c`.
 - 2026-11-26: plan-review v1 PASS — JWKS static+HTTP; board `GET /api/v1/auth/me`; issuer `http://localhost:6061`.
+- 2026-11-26: test-init — ADR 0011 (đề xuất), stub `Teamboard.Shared.Auth`, `auth-me.feature` @S01–@S04, xUnit contract/attack/JWKS; **9 đỏ** (5 Auth.Tests, 4 BDD), hồi quy board 19 xanh.
 
 ## Workflow
 
@@ -44,7 +45,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-26 | 5 Auth + 4 BDD đỏ |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -64,6 +65,12 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| auth-me @S01–@S04 | `auth-me.feature` / `AuthMeSteps` | 401/sub stub | |
+| JWT contract FR-006 | `JwtContractValidationTests` | valid token | |
+| NFR-006 attack | `JwtAttackValidationTests` | baseline valid | |
+| JWKS kid refresh | `JwksKeySetCacheTests` | refresh true | |
+
+**Lệnh:** `dotnet test src/shared/Auth.Tests` → **5 failed**; `dotnet test src/board-service.Tests --filter FullyQualifiedName~AuthProfile` → **4 failed** (stub route + no JwtBearer).
 
 ## Test review rounds
 

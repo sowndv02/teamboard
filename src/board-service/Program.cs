@@ -26,6 +26,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 
+// TB-033 stub: protected route wired in coding-start (Teamboard.Auth + real sub claim).
+app.MapGet("/api/v1/auth/me", () => Results.Json(new { sub = "not-implemented" }));
+
 app.MapControllers();
 app.MapDefaultEndpoints();
 

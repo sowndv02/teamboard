@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-033: ADR 0011, Teamboard.Auth tests, board auth/me BDD"
+current_step: test-review
+next_action: "test-review TB-033: reconcile 9 red; vacuous green check"
 blocked_by: null
 
 steps:
@@ -35,7 +35,13 @@ steps:
     open_confirm: 0
     open_fix: 0
     evidence: ["Confirm #1 static+HTTP JWKS; #2 board /api/v1/auth/me; #3 issuer localhost:6061"]
-  test-init:            { status: pending }
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T18:15:00Z
+    evidence:
+      - "ADR 0011 proposed; Teamboard.Shared.Auth stub; auth-me @S01-S04"
+      - "Auth.Tests 5 failed; board AuthProfile 4 failed; board regression 19 passed"
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
@@ -46,3 +52,4 @@ confirm_pending: []
 events:
   - { at: 2026-11-26T17:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-032 merged PR #27; plan-init TB-033; mở plan-review" }
   - { at: 2026-11-26T17:40:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review PASS v1; mở test-init" }
+  - { at: 2026-11-26T18:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: 9 red; mở test-review" }

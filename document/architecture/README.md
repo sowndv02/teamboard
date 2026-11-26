@@ -97,6 +97,7 @@ document/
 - [0008 Tạm hoãn frontend ở giai đoạn hiện tại](adr/0008-defer-frontend.md)  (bị thay bởi ADR 0009)
 - [0009 Làm lại frontend Angular, phạm vi giới hạn](adr/0009-resume-frontend-angular.md) (chấp nhận)
 - [0010 Ký access token JWT (RS256) trong identity-service](adr/0010-identity-jwt-signing.md) (chấp nhận, TB-032)
+- [0011 Kiểm access JWT qua Teamboard.Auth](adr/0011-teamboard-auth-jwt-validation.md) (đề xuất, TB-033)
 
 ## Tài liệu kiến trúc chi tiết
 
