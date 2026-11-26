@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: plan-review
-next_action: "plan-review TB-043 (O-1..O-5)"
+current_step: test-init
+next_action: "test-init TB-043"
 blocked_by: null
 
 steps:
@@ -29,21 +29,22 @@ steps:
     inputs: { base: "062c557" }
     artifacts: [document/plans/TB-043-identity-token-endpoint-code-exchange.md]
     evidence: ["Draft B1-B6", "O-1..O-5 open"]
-  plan-review:            { status: pending }
+  plan-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-26T16:30:00Z
+    evidence: ["Confirm O-1..O-5", "@S01b", "RFC7636 verifier"]
   test-init:              { status: pending }
   test-review:            { status: pending }
   coding-start:           { status: pending }
   coding-review:          { status: pending }
   create-pr:              { status: pending }
 
-confirm_pending:
-  - plan-review:TB-043:refresh-on-exchange
-  - plan-review:TB-043:token-flag
-  - plan-review:TB-043:confidential-secret
-  - plan-review:TB-043:jwt-scope-claim
-  - plan-review:TB-043:oauth-errors
+confirm_pending: []
 
 events:
   - { at: 2026-11-26T15:55:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "plan-init TB-043 từ main 062c557" }
   - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init draft → plan-review" }
   - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "O-1..O-5 plan-review" }
+  - { at: 2026-11-26T16:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }

@@ -1,7 +1,7 @@
 ---
 title: Identity lát 15, token endpoint đổi authorization code (PKCE)
 issue: TB-043
-status: draft
+status: approved
 owner: sondv
 updated: 2026-11-26
 spec: document/spec/identity-auth.md
@@ -21,10 +21,10 @@ services: [identity-service]
 
 - Mở rộng `POST /connect/token` (form-urlencoded) cho **`grant_type=authorization_code`** (FR-013, spec 8.1 bước 4, design D-I5-5/D-I5-6).
 - Tra cứu `authorization_code` theo hash của `code` plaintext; từ chối: hết hạn, đã dùng (`used_at`), sai `client_id`, sai `redirect_uri` (khớp **chính xác** BR-005), PKCE `code_verifier` không khớp `code_challenge` (S256).
-- **Public client:** không `client_secret`; **confidential client:** xác thực secret (registry) khi plan-review chốt O-3.
+- **Public client:** không `client_secret`; **confidential client:** bắt buộc `client_secret` hợp lệ (registry).
 - Phát **access token người dùng** (`token_use=user`, `sub=user_id` từ row mã) qua `IAccessTokenIssuer`; response OAuth: `access_token`, `token_type`, `expires_in` (cùng pattern TB-041).
 - Đánh dấu mã đã dùng (nguyên tử, một winner — pattern refresh CAS).
-- Metric (ví dụ `authorization_code_exchanges_total` / `authorization_code_exchange_failures_total`) — chốt plan-review.
+- Metric `authorization_code_exchanges_total` (success); `authorization_code_exchange_failures_total` (optional, không label cardinality cao).
 - BDD feature mới (ví dụ `authorization-code-token.feature`): happy path end-to-end authorize→token; lỗi verifier/reuse/expiry/redirect/client.
 - Hồi quy `client-credentials.feature`, `authorize-pkce.feature`.
 
@@ -45,6 +45,7 @@ services: [identity-service]
 | FR-012 context gắn client | TB-052 row | B6 | @S01 | BDD |
 | FR-014 client registry | registry | B5 | @S06, @S07 | BDD |
 | BR-007 không log code/verifier | BR-007 | B6 | @S08 | BDD/log |
+| NFR-007 metric | design 9 | B5,B6 | @S01 | metric counter |
 | NFR-008 rate limit | auth-public | B6 | (hồi quy) | optional |
 | FR-015 không regress | TB-041 | B6 | client-credentials | BDD |
 
@@ -56,7 +57,8 @@ Kịch bản dự kiến (`authorization-code-token.feature`):
 - **@S04** `code` hết hạn (TTL 60s hoặc clock test) → từ chối.
 - **@S05** `redirect_uri` khác row → từ chối.
 - **@S06** `client_id` khác row → từ chối.
-- **@S07** Confidential client: đúng secret (nếu O-3 bật) vs thiếu/sai secret.
+- **@S01b** Public client `teamboard`: đổi mã **không** gửi `client_secret` → 200 user JWT.
+- **@S07** Confidential client: thiếu/sai `client_secret` → `invalid_client` 401.
 - **@S08** Response/problem không chứa plaintext `code`/`code_verifier` trong log test (smoke).
 
 ## 3. Các bước
@@ -68,7 +70,7 @@ Kịch bản dự kiến (`authorization-code-token.feature`):
 ### B1. PKCE verify helper (mở rộng)
 
 - `PkceValidator.VerifyS256(codeVerifier, codeChallenge)` (so sánh challenge đã lưu).
-- Unit: verifier khớp BDD challenge `E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM` + verifier mẫu RFC.
+- Unit: challenge BDD `E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM` + verifier RFC 7636 `dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk`.
 - **Kiểm chứng:** unit xanh.
 
 ### B2. Authorization code lookup + redeem service
@@ -79,8 +81,8 @@ Kịch bản dự kiến (`authorization-code-token.feature`):
 ### B3. Token endpoint routing
 
 - `TokenEndpoints`: nhánh `authorization_code` sau khi parse `grant_type`; không phá nhánh `client_credentials`.
-- Feature flag (Confirm O-2): cùng `AuthorizationCodeEnabled` hoặc flag riêng.
-- **Kiểm chứng:** unsupported_grant vẫn 400 khi flag tắt.
+- Feature flag: **`Identity:Features:AuthorizationCodeEnabled`** (cùng authorize/login I5).
+- **Kiểm chứng:** khi flag tắt, `grant_type=authorization_code` → `unsupported_grant_type` (client_credentials không đổi).
 
 ### B4. Request validation
 
@@ -91,7 +93,7 @@ Kịch bản dự kiến (`authorization-code-token.feature`):
 ### B5. Issue user token
 
 - Thành công → `IssueForUser(user_id)`; metric success; **không** log code/verifier.
-- Refresh token (Confirm O-1): phát qua `RefreshTokenService` giống login JSON hoặc chỉ access token.
+- **Chỉ** `access_token` (+ `expires_in`); **không** `refresh_token` trong lát 15 (SPA có thể thêm slice sau nếu cần).
 - **Kiểm chứng:** BDD @S01.
 
 ### B6. BDD + hồi quy + observability
@@ -135,23 +137,29 @@ Công cụ: Reqnroll/xUnit (`config/tool-versions.yaml`).
 
 ## 7. Câu hỏi mở và giả định
 
-| # | Fingerprint (draft) | Câu hỏi | Gợi ý (không quyết) |
-|---|---|---|---|
-| O-1 | plan-review:TB-043:refresh-on-exchange | Sau đổi mã có phát **refresh_token** như JSON login không? | Chỉ `access_token` trong 15; refresh follow-up nếu SPA cần |
-| O-2 | plan-review:TB-043:token-flag | Dùng chung `Identity:Features:AuthorizationCodeEnabled` hay flag token riêng? | Cùng flag I5 |
-| O-3 | plan-review:TB-043:confidential-secret | Confidential client có bắt buộc `client_secret` tại token không? | Có secret (OAuth thường) |
-| O-4 | plan-review:TB-043:jwt-scope-claim | JWT user có claim `scope` từ row `authorization_code.scope` trong lát này? | Defer TB-045; chỉ `sub` + `token_use` |
-| O-5 | plan-review:TB-043:oauth-errors | Map lỗi: `invalid_grant` vs `invalid_client` vs `invalid_request` | invalid_grant cho code/pkce/expiry/reuse; invalid_client secret |
+Không còn mục mở sau plan-review v1 (quyết định trong Confirm log).
 
 **Giả định:** `code` presentation = plaintext từ redirect; hash SHA256 base64 (giống refresh hasher pattern).
 
+## Confirm log
+
+| # | Fingerprint | Câu hỏi | Quyết định | Vòng | Ngày |
+|---|---|---|---|---|---|
+| 1 | plan-review:TB-043:refresh-on-exchange | O-1 refresh khi đổi mã? | Chỉ `access_token` | 1 | 2026-11-26 |
+| 2 | plan-review:TB-043:token-flag | O-2 feature flag | `AuthorizationCodeEnabled` chung I5 | 1 | 2026-11-26 |
+| 3 | plan-review:TB-043:confidential-secret | O-3 secret tại token | Confidential bắt buộc secret | 1 | 2026-11-26 |
+| 4 | plan-review:TB-043:jwt-scope-claim | O-4 scope claim JWT | Defer TB-045 | 1 | 2026-11-26 |
+| 5 | plan-review:TB-043:oauth-errors | O-5 map lỗi OAuth | invalid_grant (code/PKCE/TTL/reuse); invalid_client (secret); invalid_request (form) | 1 | 2026-11-26 |
+
 ## Review rounds
 
-| Vòng | Ngày | Phạm vi | CONFIRM mở | Verdict |
-|---|---|---|---|---|
+| Vòng | Ngày | Phạm vi | CONFIRM mở | FIX mở | Verdict |
+|---|---|---|---|---|---|
+| 1 | 2026-11-26 | 15 B1–B6, O-1..O-5 | 0 | 0 | PASS |
 
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi | Lý do |
 |---|---|---|
 | 2026-11-26 | Tạo bản nháp | plan-init sau merge PR #39 |
+| 2026-11-26 | plan-review v1 PASS | Confirm O-1..O-5; @S01b, verifier RFC, NFR-007 trace |

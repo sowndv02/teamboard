@@ -31,12 +31,13 @@ Issue khung cấp key khi duyệt bảng lát: lát 15 của `document/plans/ide
 
 ## Kế hoạch
 
-Plan: [`document/plans/TB-043-identity-token-endpoint-code-exchange.md`](../plans/TB-043-identity-token-endpoint-code-exchange.md) (`draft`, O-1..O-5 mở).
+Plan: [`document/plans/TB-043-identity-token-endpoint-code-exchange.md`](../plans/TB-043-identity-token-endpoint-code-exchange.md) (`approved`, plan-review v1 PASS).
 
 ## Ghi chú / Nhật ký
 
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: plan-init từ `main` `062c557` (sau merge PR #39); nhánh `feature/TB-043-identity-token-endpoint-code-exchange`.
+- 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-5 (access only, shared flag, confidential secret, no scope claim, OAuth errors).
 
 ## Workflow
 
@@ -45,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B1–B6; O-1..O-5 |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm O-1..O-5 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -56,6 +57,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1–5 | plan-review:TB-043:O-1..O-5 | Xem plan Confirm log | PASS v1 (gợi ý plan) | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 
