@@ -26,6 +26,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string RegisterPath = "/api/v1/auth/register";
     private const string LoginPath = "/api/v1/auth/login";
     private const string RefreshPath = "/api/v1/auth/refresh";
+    private const string LogoutPath = "/api/v1/auth/logout";
     private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
     private const string RefreshDefaultClientKey = "Identity:RefreshToken:DefaultClientId";
     private const int BddRefreshLifetimeSeconds = 120;
@@ -550,6 +551,13 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [When("I send a refresh request with refresh token {string}")]
     public Task WhenRefreshWithToken(string refreshToken) => SendRefreshAsync(refreshToken);
 
+    [When("I send a logout request with the stored refresh token")]
+    public Task WhenLogoutWithStoredToken() =>
+        SendLogoutAsync(_storedRefreshToken ?? throw new InvalidOperationException("No stored refresh token."));
+
+    [When("I send a logout request with refresh token {string}")]
+    public Task WhenLogoutWithToken(string refreshToken) => SendLogoutAsync(refreshToken);
+
     [When("two refresh requests run concurrently with the stored refresh token")]
     public async Task WhenConcurrentRefreshWithStoredToken()
     {
@@ -897,6 +905,14 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         var client = _client ?? throw new InvalidOperationException("Service not started.");
         _response?.Dispose();
         _response = await client.PostAsJsonAsync(RefreshPath, new { refresh_token = refreshToken });
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    private async Task SendLogoutAsync(string refreshToken)
+    {
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        _response?.Dispose();
+        _response = await client.PostAsJsonAsync(LogoutPath, new { refresh_token = refreshToken });
         _body = await _response.Content.ReadAsStringAsync();
     }
 

@@ -1,0 +1,56 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-038
+scope: issue
+title: Identity lát 10, đăng xuất thu hồi phiên
+updated: 2026-11-26T10:45:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-038-identity-logout.md
+  plan: document/plans/TB-038-identity-logout.md
+  branch: feature/TB-038-identity-logout
+  base: main
+  pr: https://github.com/sowndv02/teamboard/pull/34
+
+current_step: done
+next_action: "Chờ review/CI; merge PR #34 (user)"
+
+steps:
+  plan-init:            { status: done }
+  plan-review:          { status: done, verdict: PASS, round: 1 }
+  test-init:
+    status: done
+    evidence:
+      - "logout-token.feature @S01-S03"
+      - "3 failed 63 passed !~Compose"
+  test-review:
+    status: done
+    verdict: PASS
+    round: 1
+    reviewed_commit: 69f1cfe
+  coding-start:
+    status: done
+    evidence:
+      - "commit 025f80f"
+      - "66/66 !~Compose"
+  coding-review:
+    status: done
+    verdict: PASS
+    round: 1
+    reviewed_commit: 025f80f
+  create-pr:
+    status: done
+    pr: 34
+    url: https://github.com/sowndv02/teamboard/pull/34
+
+confirm_pending: []
+
+events:
+  - { at: 2026-11-26T09:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init" }
+  - { at: 2026-11-26T09:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
+  - { at: 2026-11-26T10:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 3 red" }
+  - { at: 2026-11-26T10:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
+  - { at: 2026-11-26T10:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 66/66" }
+  - { at: 2026-11-26T10:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
+  - { at: 2026-11-26T11:00:00Z, actor: "orchestrator:cursor-session", event: pr_opened, detail: "PR #34" }
