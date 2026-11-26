@@ -39,7 +39,7 @@ Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-ident
 - 2026-11-26: test-review v1 **PASS** — FIX @S03c invalid scope; **9 fail, 94 pass** `!~Compose`.
 - 2026-11-26: coding-start — `GET /connect/authorize` validate PKCE/redirect/scope; **104/104** `!~Compose`.
 - 2026-11-26: coding-review v1 PASS — CONFIRM B1 migration; thêm entity `authorization_code`; **104/104** `!~Compose`.
-- 2026-11-26: [PR #38](https://github.com/sowndv02/teamboard/pull/38) mở — chờ review/CI.
+- 2026-11-26: [PR #38](https://github.com/sowndv02/teamboard/pull/38) mở — chờ review/CI (head `bcad4f1`; đã bỏ `Co-authored-by` trên nhánh).
 
 ## Workflow
 
