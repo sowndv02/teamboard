@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 - 2026-11-26: test-init — `logout-token.feature` @S01–@S03; stub `/logout` **501**; **3 đỏ**, **63 hồi quy** (`!~Compose`).
 - 2026-11-26: test-review v1 **PASS** — 3 đỏ đúng lý do (stub 501); sẵn sàng code.
 - 2026-11-26: coding-start — `TryLogoutAsync`, `/logout` 204/401, `logout_total`, log; **66/66** `!~Compose`.
+- 2026-11-26: coding-review v1 **PASS** — commit `025f80f`; 66/66; format OK; 0 CONFIRM.
 
 ## Workflow
 
@@ -47,7 +48,8 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 | test-init | done | – | 2026-11-26 | 3 đỏ @S01–@S03; 63 hồi quy |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 3 đỏ |
 | coding-start | done | – | 2026-11-26 | 66/66 `!~Compose`; `025f80f` |
-| coding-review | pending | – | | next |
+| coding-review | PASS | 1 | 2026-11-26 | `025f80f`; 66/66 |
+| create-pr | pending | – | | next |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -96,6 +98,9 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `025f80f` | Sẵn sàng merge | – |
+
+**Lăng kính (v1):** Khớp plan O-1..O-4; family revoke; refresh sau logout 401 không reuse; 204/401. Bảo mật: parameterized SQL; không token trong log. **P3:** chưa BDD `logout_total`; chưa assert reuse metric (đã ghi test-review).
 
 ## Fix log
 

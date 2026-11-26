@@ -3,7 +3,7 @@
 id: TB-038
 scope: issue
 title: Identity lát 10, đăng xuất thu hồi phiên
-updated: 2026-11-26T09:30:00Z
+updated: 2026-11-26T10:45:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -13,8 +13,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-review
-next_action: "coding-review TB-038"
+current_step: create-pr
+next_action: "create-pr TB-038"
 
 steps:
   plan-init:            { status: done }
@@ -24,7 +24,6 @@ steps:
     evidence:
       - "logout-token.feature @S01-S03"
       - "3 failed 63 passed !~Compose"
-  test-review:          { status: pending }
   test-review:
     status: done
     verdict: PASS
@@ -33,16 +32,21 @@ steps:
   coding-start:
     status: done
     evidence:
+      - "commit 025f80f"
       - "66/66 !~Compose"
-      - "TryLogoutAsync family revoke"
-  coding-review:        { status: pending }
-  coding-review:        { status: pending }
+  coding-review:
+    status: done
+    verdict: PASS
+    round: 1
+    reviewed_commit: 025f80f
   create-pr:            { status: pending }
 
 confirm_pending: []
 
 events:
-  - { at: 2026-11-26T09:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init draft B0-B5, O-1..O-4 open" }
-  - { at: 2026-11-26T09:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS confirms 1-4" }
-  - { at: 2026-11-26T10:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 3 red logout BDD" }
+  - { at: 2026-11-26T09:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init" }
+  - { at: 2026-11-26T09:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
+  - { at: 2026-11-26T10:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 3 red" }
   - { at: 2026-11-26T10:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
+  - { at: 2026-11-26T10:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 66/66" }
+  - { at: 2026-11-26T10:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
