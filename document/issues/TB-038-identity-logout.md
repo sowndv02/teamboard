@@ -46,9 +46,8 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 3 đỏ @S01–@S03; 63 hồi quy |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 3 đỏ |
-| coding-start | done | – | 2026-11-26 | 66/66 `!~Compose` |
+| coding-start | done | – | 2026-11-26 | 66/66 `!~Compose`; `025f80f` |
 | coding-review | pending | – | | next |
-| coding-review | pending | | | |
 | create-pr | pending | – | | |
 
 ## Confirm log
