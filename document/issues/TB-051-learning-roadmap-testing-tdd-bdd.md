@@ -35,7 +35,8 @@ Người dùng muốn học TDD, BDD và các chủ đề kề cận (test doubl
 ## Ghi chú / Nhật ký
 - 2026-11-26: Part 1 được điền nội dung theo yêu cầu người dùng (mở rộng phạm vi "khung" sang Part 1).
 - 2026-11-26: Part 2 được điền nội dung theo yêu cầu người dùng.
-- 2026-11-26: Part 3 được điền nội dung theo yêu cầu người dùng; Part 4–7 vẫn là khung.
+- 2026-11-26: Part 3 được điền nội dung theo yêu cầu người dùng.
+- 2026-11-26: Part 4 được điền nội dung theo yêu cầu người dùng; Part 5–7 vẫn là khung.
 - 2026-11-26: tạo từ nhánh `origin/main` trong worktree riêng vì nhánh TB-034 còn thay đổi dở.
 
 ## Bài học (lessons learned)
