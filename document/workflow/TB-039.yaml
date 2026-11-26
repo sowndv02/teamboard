@@ -3,7 +3,7 @@
 id: TB-039
 scope: issue
 title: Identity lát 11, đổi mật khẩu và thu hồi refresh
-updated: 2026-11-26T17:30:00Z
+updated: 2026-11-26T18:15:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -13,8 +13,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "Viết change-password.feature @S01-S06 + steps Bearer; stub → đỏ."
+current_step: coding-start
+next_action: "B2 Teamboard.Auth + B3/B4 change password; làm xanh 8 scenario change-password."
 
 steps:
   plan-init:            { status: done }
@@ -22,9 +22,16 @@ steps:
     status: done
     verdict: PASS
     round: 1
-    evidence: ["Confirm #1-#6"]
-  test-init:            { status: pending }
-  test-review:          { status: pending }
+  test-init:
+    status: done
+    evidence:
+      - "change-password.feature"
+      - "8 failed 66 passed !~Compose"
+  test-review:
+    status: done
+    verdict: PASS
+    round: 1
+    reviewed_commit: working-tree
   coding-start:         { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
@@ -32,5 +39,4 @@ steps:
 confirm_pending: []
 
 events:
-  - { at: 2026-11-26T17:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init TB-039" }
-  - { at: 2026-11-26T17:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS Confirm #1-#6" }
+  - { at: 2026-11-26T18:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }

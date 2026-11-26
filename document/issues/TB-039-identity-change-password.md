@@ -24,7 +24,7 @@ Issue khung cấp key khi duyệt bảng lát: lát 11 của `document/plans/ide
 ## Tiêu chí hoàn thành (kiểm chứng được)
 - [ ] @S01: hai login → đổi mật khẩu **204** → cả hai refresh **401**.
 - [ ] @S02/@S06: sai `current_password` → **401** chung; @S06 lockout + `Retry-After` (FR-003).
-- [ ] @S03: `new_password` BR-002 vi phạm → **400**; new trùng current → **400**.
+- [ ] @S03/@S03b: `new_password` BR-002 vi phạm → **400**; new trùng current → **400**.
 - [ ] @S04: thiếu/sai Bearer → **401**.
 - [ ] @S05: access JWT vẫn dùng được đến `exp` sau đổi mật khẩu (BR-006).
 - [ ] `password_change_total` + log `event=password_change` (không password).
@@ -37,6 +37,8 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-038 merged PR #34; `plan-init` trên nhánh `feature/TB-039-identity-change-password` từ `main` `b90590c`.
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#6 (Teamboard.Auth, 204, metric, auth-public, @S06, reject same password).
+- 2026-11-26: test-init — `change-password.feature` @S01–@S06; **8 failed, 66 passed** `!~Compose` (404 thiếu `/password`).
+- 2026-11-26: test-review v1 **PASS** — Sẵn sàng code; FIX tag @S03b + @S04 invalid JWT.
 
 ## Workflow
 
@@ -44,8 +46,8 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B1–B6; O-1..O-6 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#6 |
-| test-init | pending | – | | |
-| test-review | pending | | | |
+| test-init | done | – | 2026-11-26 | 8 đỏ; 66 hồi quy |
+| test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -65,11 +67,34 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 revoke two sessions | `change-password.feature` | **đỏ** | |
+| @S02 wrong current | `change-password.feature` | **đỏ** | |
+| @S03 / @S03b validation | `change-password.feature` | **đỏ** | |
+| @S04 no/invalid Bearer | `change-password.feature` | **đỏ** | |
+| @S05 BR-006 access reuse | `change-password.feature` | **đỏ** | |
+| @S06 lockout | `change-password.feature` | **đỏ** | |
+| hồi quy | login/logout/refresh/… | | xanh |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **Failed: 8, Passed: 66**; đỏ: `/password` 404 (kỳ vọng 204/401/400).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | working tree (sau test-init) | Sẵn sàng code | – |
+
+Đối chiếu kịch bản ↔ test: 8 scenario Reqnroll ↔ cùng file; mọi `Then the status code` fail vì 404.
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:duplicate-s03-tag | FIX P2 | `change-password.feature` | Hai scenario cùng `@S03` | Đổi scenario trùng mật khẩu → `@S03b` | diff feature |
+| 1 | test:identity:change-password-invalid-bearer | FIX P2 | @S04 plan | Chỉ thiếu Bearer, chưa JWT xấu | Thêm scenario + step explicit token | diff feature/steps |
+| 1 | test:identity:password-change-metric-bdd | NOTE P3 | plan B5 | Chưa BDD `password_change_total` | coding-start / coding-review | TB-038 precedent |
+| 1 | test:identity:auth-jwt-bdd-settings | NOTE P3 | plan B2 | Chưa set `Auth:Jwt:*` trong factory | wiring coding-start B2 | Confirm #1 |
+
+**Giới hạn đã biết:** metric và cấu hình Teamboard.Auth trong test host — coding-start; @S04 invalid JWT có thể 401 từ middleware trước handler (chấp nhận).
 
 ## Review rounds
 

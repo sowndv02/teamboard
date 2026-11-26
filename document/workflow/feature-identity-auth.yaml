@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "Lát hiện tại: TB-039 (11 change password) — test-init @S01-S06. Plan approved v1."
+current_step: coding-start
+next_action: "Lát hiện tại: TB-039 — coding-start (Teamboard.Auth + /password). Test-review PASS v1."
 blocked_by: null
 
 steps:
