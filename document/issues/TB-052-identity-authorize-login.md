@@ -1,7 +1,7 @@
 ---
 key: TB-052
 title: Identity lát 14b, Razor login + cookie IdP + phát code
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-052-identity-authorize-login
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -46,6 +46,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 - 2026-11-26: test-review v1 **PASS** — FIX @S05 lockout 401; @S06 second When → And; **7 fail, 104 pass** `!~Compose`.
 - 2026-11-26: coding-start **done** — Razor `/login`, cookie `Identity.Idp`, authorize flow, migration #7; **111/111** `!~Compose`.
 - 2026-11-26: coding-review v1 **PASS** — commit `81b8cfa` + FIX `tb.authz.pending` Secure/Path; **111/111** `!~Compose`.
+- 2026-11-26: [PR #39](https://github.com/sowndv02/teamboard/pull/39) (head `0b7c6ea`; không `Co-authored-by`).
 
 ## Workflow
 
@@ -57,7 +58,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 | test-review | PASS | 1 | 2026-11-26 | FIX @S05 @S06 |
 | coding-start | done | – | 2026-11-26 | 111/111 !~Compose |
 | coding-review | PASS | 1 | 2026-11-26 | FIX pending cookie Secure |
-| create-pr | pending | | | |
+| create-pr | done | – | 2026-11-26 | [PR #39](https://github.com/sowndv02/teamboard/pull/39) |
 
 ## Confirm log
 
