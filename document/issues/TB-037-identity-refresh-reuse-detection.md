@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 - 2026-11-26: TB-036 merged PR #32; `plan-init` trên nhánh `feature/TB-037-identity-refresh-reuse-detection` từ `main` `1bfb081`.
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (log only; concurrent reuse revoke; @S02+@S06; 401 chung).
 - 2026-11-26: test-init — mở rộng `refresh-token.feature` @S02 (family), @S06 (metric); **2 đỏ**, **61 xanh** (`!~Compose`).
+- 2026-11-26: test-review v1 PASS — 2 đỏ đúng lý do (family revoke + metric chưa có).
 
 ## Workflow
 
@@ -44,7 +45,8 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 | plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 2 đỏ @S02/@S06; 61 hồi quy |
-| test-review | pending | | | next |
+| test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 2 đỏ |
+| coding-start | pending | – | | next |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -70,6 +72,27 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `f199fe8` | Sẵn sàng code | – |
+
+Đối chiếu kịch bản ↔ test:
+
+| Kịch bản | Test thực thi | Đỏ | Xanh |
+|---|---|---|---|
+| @S01–@S05 | `refresh-token.feature` | | xanh |
+| @S02 FR-010 (family) | `refresh-token.feature` | **đỏ** | |
+| @S06 FR-010 (metric) | `refresh-token.feature` | **đỏ** | |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **2 failed, 61 passed**; format verify xanh.
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:s05-concurrent-family | SKIP P2 | @S05 | Chưa assert family sau concurrent | S02/@S06 replay đủ FR-010; S05 giữ FR-009 | plan B2 |
+| 1 | test:identity:s02-s06-multi-when | SKIP P2 | @S02/@S06 | Nhiều `When` | Precedent rotation/reuse flow | TB-036 |
+| 1 | test:identity:reuse-log-bdd | NOTE | B4 plan | Chưa BDD log | Structured log kiểm coding-review | plan B4 |
+
+**Giới hạn đã biết:** @S06 đỏ vì chưa có counter `refresh_reuse_total`; @S02 đỏ bước cuối (rotated token vẫn 200). Metric listener không publish instrument cho tới coding-start.
 
 ## Review rounds
 
