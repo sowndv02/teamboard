@@ -29,18 +29,20 @@ Issue khung cấp key khi duyệt bảng lát: lát 9 của `document/plans/iden
 - [ ] Gate identity `!~Compose` xanh; hồi quy `refresh-token.feature` @S01–@S05.
 
 ## Kế hoạch
-Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-037-identity-refresh-reuse-detection.md) (`draft`, B0–B5; chờ plan-review O-1..O-4).
+Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-037-identity-refresh-reuse-detection.md) (`approved`, B0–B5; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-036 merged PR #32; `plan-init` trên nhánh `feature/TB-037-identity-refresh-reuse-detection` từ `main` `1bfb081`.
+- 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (log only; concurrent reuse revoke; @S02+@S06; 401 chung).
 
 ## Workflow
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
+| test-init | pending | – | | next |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -51,10 +53,10 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
-| | plan-review:TB-037:security-event-store | O-1 | | | |
-| | plan-review:TB-037:concurrent-loser-reuse | O-2 | | | |
-| | plan-review:TB-037:s06-vs-s02 | O-3 | | | |
-| | plan-review:TB-037:revoked-refresh-response | O-4 | | | |
+| 1 | plan-review:TB-037:security-event-store | O-1 | Structured log only | 1 | 2026-11-26 |
+| 2 | plan-review:TB-037:concurrent-loser-reuse | O-2 | Loser concurrent ⇒ family revoke | 1 | 2026-11-26 |
+| 3 | plan-review:TB-037:s06-vs-s02 | O-3 | @S02 + @S06 metric | 1 | 2026-11-26 |
+| 4 | plan-review:TB-037:revoked-refresh-response | O-4 | 401 chung sau revoke | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 
