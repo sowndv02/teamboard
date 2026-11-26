@@ -5,6 +5,8 @@ using IdentityService.Features.Logout;
 using IdentityService.Features.Refresh;
 using IdentityService.Features.Register;
 using IdentityService.Features.Authorize;
+using IdentityService.Infrastructure;
+using IdentityService.Security.Authorize;
 using IdentityService.Features.Token;
 using IdentityService.Persistence;
 using IdentityService.RateLimiting;
@@ -18,6 +20,7 @@ builder.AddServiceDefaults("identity-service");
 builder.AddIdentityPersistence();
 builder.AddIdentityClientRegistry();
 builder.AddIdentitySecurity();
+builder.AddIdentityAuthorizeFlow();
 
 var rateLimitingEnabled = builder.Configuration.GetValue("Identity:RateLimiting:Enabled", true);
 if (rateLimitingEnabled)
@@ -40,6 +43,7 @@ if (rateLimitingEnabled)
     app.UseRateLimiter();
 }
 
+app.UseIdentityClickjackingProtection();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -52,6 +56,7 @@ app.MapChangePasswordEndpoints(rateLimitingEnabled);
 app.MapJwksEndpoints();
 app.MapTokenEndpoints(rateLimitingEnabled);
 app.MapAuthorizeEndpoints(rateLimitingEnabled);
+app.MapRazorPages();
 
 app.Run();
 

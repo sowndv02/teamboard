@@ -1,6 +1,8 @@
 using System.Diagnostics.Metrics;
 using System.Globalization;
+using System.Net;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IdentityService.Cli;
@@ -33,6 +35,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string ChangePasswordPath = "/api/v1/auth/password";
     private const string ConnectTokenPath = "/connect/token";
     private const string ConnectAuthorizePath = "/connect/authorize";
+    private const string IdentityLoginPath = "/login";
     private const string ClientCredentialsEnabledKey = "Identity:Features:ClientCredentialsEnabled";
     private const string AuthorizationCodeEnabledKey = "Identity:Features:AuthorizationCodeEnabled";
     private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
@@ -104,6 +107,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private (int First, int Second)? _concurrentStatuses;
     private bool? _redirectUriMatchResult;
     private readonly List<string> _confidentialClientSecrets = [];
+    private bool _preserveHttpCookies;
+    private string? _pendingAuthorizeRedirectUri;
+    private string? _pendingAuthorizeState;
 
     private PostgresDatabase Database => _database ?? throw new InvalidOperationException("No database yet.");
 
@@ -140,6 +146,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _jwksServedMeasurements = 0;
         _redirectUriMatchResult = null;
         _confidentialClientSecrets.Clear();
+        _preserveHttpCookies = false;
+        _pendingAuthorizeRedirectUri = null;
+        _pendingAuthorizeState = null;
     }
 
     [Given("identity-service is configured to use a database that is not running")]
@@ -160,6 +169,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
 
     [Given("identity-service authorization code grant is enabled for BDD tests")]
     public void GivenAuthorizationCodeEnabled() => _settings[AuthorizationCodeEnabledKey] = "true";
+
+    [Given("identity-service http client preserves cookies between requests")]
+    public void GivenHttpClientPreservesCookies() => _preserveHttpCookies = true;
 
     [Given(@"identity-service client {string} has redirect uri {string} and allowed scopes:")]
     public void GivenClientRedirectAndScopes(string clientId, string redirectUri, Table scopesTable)
@@ -218,6 +230,46 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         }
     }
 
+    [When("I GET the identity login page")]
+    public async Task WhenGetIdentityLoginPage()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, IdentityLoginPath);
+        _response = await _client!.SendAsync(request);
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    [When(@"I submit the identity login page for the pending authorize request with email {string} and password {string}")]
+    public async Task WhenSubmitIdentityLoginPageForAuthorize(string email, string password)
+    {
+        await SubmitIdentityLoginPageAsync(email, password, requireAuthorizeRedirect: true);
+    }
+
+    [Then(@"the authorize response redirects to {string} with state {string} and an authorization code")]
+    public void ThenAuthorizeRedirectWithCode(string redirectUri, string expectedState)
+    {
+        Assert.Equal(302, (int)_response!.StatusCode);
+        var location = _response.Headers.Location?.ToString();
+        Assert.False(string.IsNullOrWhiteSpace(location), "Expected Location header with authorization redirect.");
+        var absolute = Uri.TryCreate(location, UriKind.Absolute, out var abs)
+            ? abs
+            : new Uri(new Uri("http://localhost"), location);
+        Assert.StartsWith(redirectUri.TrimEnd('/'), absolute.GetLeftPart(UriPartial.Path), StringComparison.OrdinalIgnoreCase);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(absolute.Query);
+        Assert.False(string.IsNullOrWhiteSpace(query["code"].ToString()), "Expected code query parameter.");
+        Assert.Equal(expectedState, query["state"].ToString());
+    }
+
+    [Then("the response has Content-Security-Policy frame-ancestors none")]
+    public void ThenCspFrameAncestorsNone()
+    {
+        Assert.True(
+            _response!.Headers.TryGetValues("Content-Security-Policy", out var values),
+            "Content-Security-Policy header is missing.");
+        Assert.Contains(
+            values!,
+            value => value.Contains("frame-ancestors 'none'", StringComparison.OrdinalIgnoreCase));
+    }
+
     private async Task SendAuthorizeGetAsync(
         string clientId,
         string redirectUri,
@@ -248,6 +300,57 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         using var request = new HttpRequestMessage(HttpMethod.Get, ConnectAuthorizePath + path);
         _response = await _client!.SendAsync(request);
         _body = await _response.Content.ReadAsStringAsync();
+        _pendingAuthorizeRedirectUri = redirectUri;
+        _pendingAuthorizeState = state;
+    }
+
+    private async Task SubmitIdentityLoginPageAsync(string email, string password, bool requireAuthorizeRedirect)
+    {
+        if (requireAuthorizeRedirect)
+        {
+            var location = _response!.Headers.Location?.ToString();
+            Assert.False(string.IsNullOrWhiteSpace(location), "Expected redirect to login after authorize.");
+            Assert.Contains("/login", location, StringComparison.OrdinalIgnoreCase);
+        }
+
+        var loginGetPath = requireAuthorizeRedirect
+            ? (_response!.Headers.Location!.IsAbsoluteUri
+                ? _response.Headers.Location.PathAndQuery
+                : _response.Headers.Location.ToString())
+            : IdentityLoginPath;
+
+        using (var getLogin = new HttpRequestMessage(HttpMethod.Get, loginGetPath))
+        {
+            _response = await _client!.SendAsync(getLogin);
+            _body = await _response.Content.ReadAsStringAsync();
+        }
+
+        var antiforgery = ExtractAntiforgeryToken(_body);
+        var form = new List<KeyValuePair<string, string>>
+        {
+            new("Email", email),
+            new("Password", password),
+        };
+        if (!string.IsNullOrEmpty(antiforgery))
+        {
+            form.Add(new KeyValuePair<string, string>("__RequestVerificationToken", antiforgery));
+        }
+
+        using var postLogin = new HttpRequestMessage(HttpMethod.Post, IdentityLoginPath)
+        {
+            Content = new FormUrlEncodedContent(form),
+        };
+        _response = await _client.SendAsync(postLogin);
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    private static string? ExtractAntiforgeryToken(string html)
+    {
+        var match = Regex.Match(
+            html,
+            @"name=""__RequestVerificationToken""\s+(?:type=""hidden""\s+)?value=""([^""]+)""",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        return match.Success ? match.Groups[1].Value : null;
     }
 
     private int FindClientSeedIndex(string clientId)
@@ -1486,6 +1589,12 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             });
         });
         _factories.Add(factory);
+        if (_preserveHttpCookies)
+        {
+            return factory.CreateDefaultClient(
+                new CookieJarHandler(new CookieContainer(), factory.Server.CreateHandler()));
+        }
+
         return factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
     }
 
@@ -1497,6 +1606,38 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         }
 
         _factories.Clear();
+    }
+
+    private sealed class CookieJarHandler : DelegatingHandler
+    {
+        private readonly CookieContainer _cookies;
+
+        public CookieJarHandler(CookieContainer cookies, HttpMessageHandler inner)
+            : base(inner) =>
+            _cookies = cookies;
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (request.RequestUri is { } uri)
+            {
+                var header = _cookies.GetCookieHeader(uri);
+                if (!string.IsNullOrEmpty(header))
+                {
+                    request.Headers.TryAddWithoutValidation("Cookie", header);
+                }
+            }
+
+            var response = await base.SendAsync(request, cancellationToken);
+            if (request.RequestUri is { } responseUri && response.Headers.TryGetValues("Set-Cookie", out var setCookieValues))
+            {
+                foreach (var value in setCookieValues)
+                {
+                    _cookies.SetCookies(responseUri, value);
+                }
+            }
+
+            return response;
+        }
     }
 
     /// <summary>

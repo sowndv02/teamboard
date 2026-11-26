@@ -12,6 +12,10 @@ public sealed class AuthorizationCode
 
     public string CodeChallengeMethod { get; set; } = string.Empty;
 
+    public string Scope { get; set; } = string.Empty;
+
+    public string Nonce { get; set; } = string.Empty;
+
     public Guid UserId { get; set; }
 
     public DateTimeOffset ExpiresAt { get; set; }

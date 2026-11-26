@@ -6,7 +6,7 @@ updated: 2026-11-26
 parent: document/design/identity-auth.md
 spec: document/spec/identity-auth.md
 services: [identity-service]
-issues: [TB-042]
+issues: [TB-042, TB-052]
 ---
 
 # Design phụ lục I5 — Authorization Code + PKCE
@@ -39,7 +39,7 @@ Bổ sung cho `document/design/identity-auth.md` (Confirm log #1: I5 hoãn đế
 | Pha | Issue | Giao được |
 |---|---|---|
 | 14a | **TB-042** | Phụ lục I5 (bản approved), PKCE validator, bảng mã, `GET /connect/authorize` validate + lỗi an toàn, feature flag |
-| 14b | **TBD issue** | Cookie IdP, Razor login, redirect kèm `code`, BDD happy path |
+| 14b | **TB-052** | Cookie IdP, Razor login, redirect kèm `code`, BDD happy path |
 
 TB-043 vẫn phụ thuộc **14 hoàn chỉnh** (authorize + login + phát mã).
 

@@ -17,7 +17,7 @@ links:
   pr: https://github.com/sowndv02/teamboard/pull/38
 
 current_step: done
-next_action: "Chờ review/CI PR #38; merge do người dùng"
+next_action: "Lát 14b → TB-052"
 blocked_by: null
 
 steps:

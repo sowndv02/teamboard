@@ -16,6 +16,8 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 
     public DbSet<AuthorizationCode> AuthorizationCodes => Set<AuthorizationCode>();
 
+    public DbSet<AuthorizeRequest> AuthorizeRequests => Set<AuthorizeRequest>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -78,10 +80,28 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
             entity.Property(code => code.RedirectUri).HasColumnName("redirect_uri").HasMaxLength(2048).IsRequired();
             entity.Property(code => code.CodeChallenge).HasColumnName("code_challenge").HasMaxLength(128).IsRequired();
             entity.Property(code => code.CodeChallengeMethod).HasColumnName("code_challenge_method").HasMaxLength(16).IsRequired();
+            entity.Property(code => code.Scope).HasColumnName("scope").HasMaxLength(1024).IsRequired();
+            entity.Property(code => code.Nonce).HasColumnName("nonce").HasMaxLength(256).IsRequired();
             entity.Property(code => code.UserId).HasColumnName("user_id");
             entity.Property(code => code.ExpiresAt).HasColumnName("expires_at");
             entity.Property(code => code.UsedAt).HasColumnName("used_at");
             entity.Property(code => code.CreatedAt).HasColumnName("created_at");
+        });
+
+        modelBuilder.Entity<AuthorizeRequest>(entity =>
+        {
+            entity.ToTable("authorize_request");
+            entity.HasKey(request => request.Id);
+            entity.Property(request => request.ClientId).HasColumnName("client_id").HasMaxLength(64).IsRequired();
+            entity.Property(request => request.RedirectUri).HasColumnName("redirect_uri").HasMaxLength(2048).IsRequired();
+            entity.Property(request => request.Scope).HasColumnName("scope").HasMaxLength(1024).IsRequired();
+            entity.Property(request => request.State).HasColumnName("state").HasMaxLength(512).IsRequired();
+            entity.Property(request => request.CodeChallenge).HasColumnName("code_challenge").HasMaxLength(128).IsRequired();
+            entity.Property(request => request.CodeChallengeMethod).HasColumnName("code_challenge_method").HasMaxLength(16).IsRequired();
+            entity.Property(request => request.Nonce).HasColumnName("nonce").HasMaxLength(256).IsRequired();
+            entity.Property(request => request.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(request => request.CreatedAt).HasColumnName("created_at");
+            entity.HasIndex(request => request.ExpiresAt);
         });
     }
 }
