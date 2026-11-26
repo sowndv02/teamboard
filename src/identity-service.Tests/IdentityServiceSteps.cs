@@ -252,6 +252,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         JwtBddAssertions.AssertAccessTokenKid(token, expectedKid);
     }
 
+    [Then("the JWKS document does not include public key with kid {string}")]
+    public void ThenJwksMissingKid(string kid)
+    {
+        using var document = JsonDocument.Parse(_body);
+        var keys = document.RootElement.GetProperty("keys");
+        var found = keys.EnumerateArray().Any(entry =>
+            string.Equals(entry.GetProperty("kid").GetString(), kid, StringComparison.Ordinal));
+        Assert.False(found, $"Did not expect kid {kid} in JWKS.");
+    }
+
     [Then("the JWKS document includes exactly {int} public keys")]
     public void ThenJwksKeyCount(int expectedCount)
     {

@@ -33,7 +33,7 @@ Lát 7 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp 
 
 | Yêu cầu | Design | Bước | Kịch bản / test |
 |---|---|---|---|
-| FR-008 xoay không hỏng token còn hạn | D7 | B2–B5 | @S01–@S05 |
+| FR-008 xoay không hỏng token còn hạn | D7 | B2–B5 | @S01–@S06, `JwtRetiringKidTokenValidationIntegrationTests` |
 | JWKS nhiều khoá khi xoay | D7, spec 8.3 | B2 | jwks @S01 mở rộng |
 | CLI ba lệnh | D7 | B3 | @S02–@S04, unit CLI |
 | Chờ TTL JWKS 10 phút trước activate | D7 | B3 | @S03 (thời gian giả lập) |
@@ -46,8 +46,9 @@ Kịch bản dự kiến (`document/spec/features/identity-service/signing-key-r
 - **@S01** Sau `rotate start`: JWKS **200** có `kid` mới trạng thái `pending` (và khoá `active` cũ nếu còn); login **chưa** dùng `kid` mới.
 - **@S02** `rotate activate` (sau cửa sổ publish, xem O-3): login → JWT `kid` mới; token cũ (phát trước activate) vẫn validate qua JWKS.
 - **@S03** `activate` từ chối nếu chưa đủ thời gian publish (kể từ `start`).
-- **@S04** `retire` từ chối nếu `retiring` chưa ≥ 24h; sau `retire` JWKS không còn `kid` cũ; token cũ **không** còn validate (hoặc chỉ sau TTL access — làm rõ @S05).
+- **@S04** `retire` từ chối nếu `retiring` chưa ≥ 24h.
 - **@S05** Hồi quy: một khoá `active` duy nhất (không xoay) — JWKS và login như TB-034.
+- **@S06** Sau `retire` hợp lệ: JWKS không còn `kid` retiring; token cũ fail validation (FR-008) — Auth test cho token còn hạn sau activate.
 
 ## 3. Các bước
 

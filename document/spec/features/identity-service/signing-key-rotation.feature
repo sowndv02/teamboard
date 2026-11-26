@@ -19,6 +19,7 @@ Feature: identity-service signing key rotation
     And I send GET to "/.well-known/jwks.json"
     Then the status code is 200
     And the JWKS document includes public key with kid "test-rotate-pending-1"
+    And the JWKS document includes public key with kid "test-active-1"
     When I send a login request with email "rotate-s01@example.com" and password "ValidPass123456"
     Then the status code is 200
     And the access token header kid is "test-active-1"
@@ -56,6 +57,21 @@ Feature: identity-service signing key rotation
     And I run signing key rotate activate
     When I run signing key rotate retire
     Then the rotation command exit code is not 0
+
+  @S06 @FR-008
+  Scenario: Retire after minimum retiring duration removes retiring kid from JWKS
+    Given rotation fake UTC time is "2026-01-01T00:00:00Z"
+    And identity-service signing keys file points to the rotation test file
+    And identity-service is running for JWKS without a database
+    When I run signing key rotate start
+    And I advance rotation fake time by 11 minutes
+    And I run signing key rotate activate
+    And I advance rotation fake time by 25 hours
+    And I run signing key rotate retire
+    And I send GET to "/.well-known/jwks.json"
+    Then the status code is 200
+    And the JWKS document does not include public key with kid "test-active-1"
+    And the JWKS document includes public key with kid "test-rotate-active-2"
 
   @S05 @FR-008 @docker
   Scenario: Without rotation JWKS and login use a single active key

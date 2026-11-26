@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-review
-next_action: "test-review TB-035"
+current_step: coding-start
+next_action: "coding-start TB-035 (B0 ADR 0013, multi-key JWKS, CLI)"
 
 steps:
   plan-init:
@@ -46,8 +46,17 @@ steps:
       - "signing-key-rotation.feature @S01-S05"
       - "6 red (4 BDD S01-04, 1 CLI, 1 Auth); S05 green"
       - "identity 48/54 pass excl compose; Auth 8+1 fail"
-  test-review:            { status: pending }
-  test-review:            { status: pending }
+  test-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T16:00:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "@S06 retire JWKS; S01 dual kid; JwtRetiringKid probe"
+      - "identity 48/55 pass; Auth 8/10 pass (2 red)"
   coding-start:           { status: pending }
   coding-review:          { status: pending }
   create-pr:              { status: pending }

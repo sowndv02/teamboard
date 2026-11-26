@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035
 - 2026-11-26: TB-034 merged PR #29; `plan-init` trên nhánh `feature/TB-035-identity-signing-key-rotation` từ `main` `21ffee1`.
 - 2026-11-26: plan-review v1 PASS — log audit; reload file mỗi sign/JWKS; fake time CLI; file-only keys.
 - 2026-11-26: test-init — `signing-key-rotation.feature` @S01–@S05; `SigningKeyRotationCliTests`; `JwtMultiKidJwksIntegrationTests`; stub CLI; **6 đỏ** (4×rotation BDD + 1×CLI + 1×Auth), @S05 xanh; hồi quy identity 43 + jwks xanh.
+- 2026-11-26: test-review v1 PASS — @S06 retire JWKS; @S01 dual kid; `JwtRetiringKidTokenValidationIntegrationTests` (probe JWKS trước validate); **7+2 đỏ**.
 
 ## Workflow
 
@@ -46,7 +47,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B6; O-1..O-4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 6 đỏ; @S05 regression xanh |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | @S06 + consumer probe; guard @S03/@S04 hoãn tới CLI start |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -66,21 +67,34 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| rotation @S01–@S04 | `signing-key-rotation.feature` | **đỏ** (NotImplemented / JWKS thiếu kid) | |
+| rotation @S01–@S04, @S06 | `signing-key-rotation.feature` | **đỏ** (CLI/JWKS chưa đủ kid) | |
 | rotation @S05 | `signing-key-rotation.feature` | | **xanh** |
 | CLI rotate start | `SigningKeyRotationCliTests` | **đỏ** | |
 | FR-006 multi-kid JWKS | `JwtMultiKidJwksIntegrationTests` | **đỏ** | |
+| FR-008 token cũ sau activate | `JwtRetiringKidTokenValidationIntegrationTests` | **đỏ** | |
 | jwks TB-034 @S01–@S04 | `jwks.feature` | | xanh |
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `289f0f3` + delta | Sẵn sàng code | – |
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:rotation:s01-active-in-jwks | FIX | `signing-key-rotation.feature` @S01 | Plan: JWKS còn active khi pending | +Then `test-active-1` | plan §2 |
+| 1 | test:rotation:s06-retire-jwks | FIX | feature @S06 | Thiếu happy-path retire JWKS | Kịch bản @S06 + step missing kid | plan §2 |
+| 1 | test:auth:retiring-token-probe | FIX | `JwtRetiringKidTokenValidationIntegrationTests` | Pass sai do validator không ép `kid` | Probe JWKS 2 kids trước validate | FR-008 / TB-034 pattern |
+| 1 | test:rotation:guard-cli-prereq | NOTE | @S03/@S04 | Đỏ tại `rotate start` cho tới khi CLI có | Ghi giới hạn; không đổi stub | đỏ đúng lý do |
+
+**Giới hạn đã biết:** @S03/@S04 assert exit code chỉ chạy sau `rotate start` xong; tới coding-start `B3` start phải xanh trước khi guard scenarios đỏ đúng layer.
 
 ## Fix log
 
