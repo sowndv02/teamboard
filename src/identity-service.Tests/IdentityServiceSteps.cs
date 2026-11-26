@@ -184,7 +184,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     }
 
     [Given("identity-service is configured without signing keys")]
-    public void GivenWithoutSigningKeys() => _omitSigningKeys = true;
+    public void GivenWithoutSigningKeys()
+    {
+        _omitSigningKeys = true;
+        _settings.Remove(SigningKeysFileKey);
+    }
 
     [Given("identity-service metrics are being observed for issued access tokens")]
     public void GivenAccessTokenMetrics()

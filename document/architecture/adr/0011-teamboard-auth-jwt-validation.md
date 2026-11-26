@@ -14,7 +14,7 @@ Resource server phải tự kiểm access JWT (FR-006) mà không gọi identity
   - `ValidIssuer` (mặc định `http://localhost:6061` — đồng bộ `Identity:Jwt:Issuer` dev; gateway sau lát 19).
   - `ValidAudience` (`teamboard`).
   - `StaticJwksFile` (dev/CI).
-  - `JwksUri` (tùy chọn; bật khi TB-034 có endpoint).
+  - `JwksUri` (tùy chọn): khi có, **HTTP là nguồn chính**, `StaticJwksFile` là fallback (TB-034).
 - JWKS cache TTL **10 phút**; `kid` lạ → refresh tối đa **1 lần/phút**; lỗi tải giữ bản cache cũ (D2).
 - Claim kỳ vọng: `token_use=user` cho access token người (BR-008); contract với ADR 0010.
 - **Không** trong lát: policy scope (TB-045), gateway JWT, machine token.

@@ -1,6 +1,6 @@
 # ADR 0012 — Endpoint JWKS `/.well-known/jwks.json`
 
-Trạng thái: Đề xuất · Ngày: 2026-11-26
+Trạng thái: Chấp nhận · Ngày: 2026-11-26
 Nguồn: TB-034, `document/plans/TB-034-identity-jwks.md`, design D2 mục 6.3
 Nhãn: `[Chọn để học]`
 

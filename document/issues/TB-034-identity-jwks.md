@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 6 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] `GET /.well-known/jwks.json` trả JWK Set chỉ khoá công khai RS256, mỗi khoá có `kid` (FR-007).
-- [ ] `Cache-Control: public, max-age=600` (design D2).
-- [ ] Không có `privateKeyPem` / material riêng trong response.
-- [ ] Consumer: `Teamboard.Auth` ưu tiên `JwksUri` HTTP; board (hoặc Auth integration) xác nhận token qua JWKS identity.
-- [ ] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
+- [x] `GET /.well-known/jwks.json` trả JWK Set chỉ khoá công khai RS256, mỗi khoá có `kid` (FR-007).
+- [x] `Cache-Control: public, max-age=600` (design D2).
+- [x] Không có `privateKeyPem` / material riêng trong response.
+- [x] Consumer: `Teamboard.Auth` ưu tiên `JwksUri` HTTP; Auth.Tests xác nhận token qua JWKS identity.
+- [x] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
 
 ## Kế hoạch
 Plan: [`document/plans/TB-034-identity-jwks.md`](../plans/TB-034-identity-jwks.md) (`approved`, B0–B4; plan-review PASS v1).
@@ -36,6 +36,8 @@ Plan: [`document/plans/TB-034-identity-jwks.md`](../plans/TB-034-identity-jwks.m
 - 2026-11-26: TB-033 merged PR #28; `plan-init` trên nhánh `feature/TB-034-identity-jwks` từ `main` `e2a046f`.
 - 2026-11-26: plan-review v1 PASS — JWKS no-key **503**; `jwks_served_total`; @S04 board + Auth.Tests.
 - 2026-11-26: test-init — `jwks.feature` @S01–@S04; `JwtHttpJwksIntegrationTests`; ADR 0012 proposed; **5 đỏ** (4×404/503 JWKS, 1×HTTP JWKS); hồi quy identity 44 xanh.
+- 2026-11-26: coding-start — `GET /.well-known/jwks.json`, `jwks_served_total`, `Teamboard.Auth` HTTP-first; ADR 0012 chấp nhận; **Auth 8/8, identity 48, board 25**.
+- 2026-11-26: coding-review v1 PASS — gate xanh; board BDD consumer vẫn hoãn (giới hạn đã biết); sẵn `create-pr` sau commit feat.
 
 ## Workflow
 
@@ -47,8 +49,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
 | test-init | done | – | 2026-11-26 | 4 BDD + 1 Auth đỏ |
 | test-review | PASS | 1 | 2026-11-26 | 5 đỏ; board BDD hoãn coding-start |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
+| coding-start | done | – | 2026-11-26 | JWKS endpoint, metric, Auth HTTP-first |
+| coding-review | PASS | 1 | 2026-11-26 | Sẵn sàng merge; feat chưa commit |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -65,8 +67,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| jwks @S01–@S04 | `jwks.feature` | **x** | |
-| FR-006 HTTP JWKS (consumer) | `JwtHttpJwksIntegrationTests` | **x** | |
+| jwks @S01–@S04 | `jwks.feature` | | **xanh** |
+| FR-006 HTTP JWKS (consumer) | `JwtHttpJwksIntegrationTests` | | **xanh** |
 | auth-me TB-033 @S01–@S04 | `auth-me.feature` | | xanh |
 
 ## Test review rounds
@@ -79,6 +81,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `614de47` + working tree (feat JWKS) | PASS | – |
 
 ## Fix log (test-review)
 
@@ -96,6 +99,7 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | docs:adr0011:http-primary | FIX | `0011-teamboard-auth-jwt-validation.md` | ADR còn ghi JwksUri “bật khi TB-034” | Ghi HTTP primary + static fallback | Diff doc; khớp `JwksKeySetCache` |
 
 ## Bài học (lessons learned)
 

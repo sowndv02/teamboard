@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-034: B2 JWKS endpoint + metric + Auth HTTP-first"
+current_step: create-pr
+next_action: "commit feat TB-034 rồi create-pr"
 
 steps:
   plan-init:
@@ -54,8 +54,25 @@ steps:
     evidence:
       - "5 red; trace table; consumer probe assert"
       - "board BDD deferred to coding-start (known limit)"
-  coding-start:         { status: pending }
-  coding-review:        { status: pending }
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T22:00:00Z
+    evidence:
+      - "JwksEndpoints + IdentityJwksSetBuilder; jwks_served_total"
+      - "JwksKeySetCache HTTP primary; Auth 8/8; identity 48; board 25"
+  coding-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T22:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "merge-base e2a046f; feat uncommitted reviewed"
+      - "identity 48; Auth 8; board 25; build warn-aserror; format OK"
+      - "ADR 0011 HTTP-primary doc fix"
   create-pr:            { status: pending }
 
 confirm_pending: []

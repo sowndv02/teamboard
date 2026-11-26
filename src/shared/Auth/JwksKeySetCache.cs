@@ -21,14 +21,18 @@ public sealed class JwksKeySetCache
         TimeProvider timeProvider,
         IServiceProvider services)
     {
-        _primarySource = staticSource;
         _options = options.Value;
         _timeProvider = timeProvider;
 
         if (_options.JwksUri is not null)
         {
             var factory = services.GetRequiredService<IHttpClientFactory>();
-            _fallbackSource = new HttpJwksKeySetSource(factory.CreateClient(nameof(JwksKeySetCache)), options);
+            _primarySource = new HttpJwksKeySetSource(factory.CreateClient(nameof(JwksKeySetCache)), options);
+            _fallbackSource = staticSource;
+        }
+        else
+        {
+            _primarySource = staticSource;
         }
     }
 
