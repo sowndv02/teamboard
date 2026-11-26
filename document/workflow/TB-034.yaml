@@ -14,10 +14,10 @@ links:
   features_dir: document/spec/features/identity-service/
   branch: feature/TB-034-identity-jwks
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/29
 
 current_step: create-pr
-next_action: "commit feat TB-034 rồi create-pr"
+next_action: "chờ review/CI PR #29; merge do người dùng"
 
 steps:
   plan-init:
@@ -73,7 +73,13 @@ steps:
       - "merge-base e2a046f; feat uncommitted reviewed"
       - "identity 48; Auth 8; board 25; build warn-aserror; format OK"
       - "ADR 0011 HTTP-primary doc fix"
-  create-pr:            { status: pending }
+  create-pr:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T23:00:00Z
+    evidence:
+      - "https://github.com/sowndv02/teamboard/pull/29"
+      - "commit 139f287 feat; branch pushed"
 
 confirm_pending: []
 

@@ -1,7 +1,7 @@
 ---
 key: TB-034
 title: Identity lát 6, công bố JWKS
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-034-identity-jwks
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -38,6 +38,7 @@ Plan: [`document/plans/TB-034-identity-jwks.md`](../plans/TB-034-identity-jwks.m
 - 2026-11-26: test-init — `jwks.feature` @S01–@S04; `JwtHttpJwksIntegrationTests`; ADR 0012 proposed; **5 đỏ** (4×404/503 JWKS, 1×HTTP JWKS); hồi quy identity 44 xanh.
 - 2026-11-26: coding-start — `GET /.well-known/jwks.json`, `jwks_served_total`, `Teamboard.Auth` HTTP-first; ADR 0012 chấp nhận; **Auth 8/8, identity 48, board 25**.
 - 2026-11-26: coding-review v1 PASS — gate xanh; board BDD consumer vẫn hoãn (giới hạn đã biết); sẵn `create-pr` sau commit feat.
+- 2026-11-26: [PR #29](https://github.com/sowndv02/teamboard/pull/29) (`feat` `139f287`).
 
 ## Workflow
 
@@ -50,8 +51,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-26 | 4 BDD + 1 Auth đỏ |
 | test-review | PASS | 1 | 2026-11-26 | 5 đỏ; board BDD hoãn coding-start |
 | coding-start | done | – | 2026-11-26 | JWKS endpoint, metric, Auth HTTP-first |
-| coding-review | PASS | 1 | 2026-11-26 | Sẵn sàng merge; feat chưa commit |
-| create-pr | pending | – | | |
+| coding-review | PASS | 1 | 2026-11-26 | Sẵn sàng merge |
+| create-pr | done | – | 2026-11-26 | [PR #29](https://github.com/sowndv02/teamboard/pull/29) |
 
 ## Confirm log
 

@@ -20,7 +20,7 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | 3 | I1 | Khoá tạm theo (email, IP) và giới hạn tốc độ (cờ `RateLimiter`, Q-G = A) | FR-003, NFR-008 | 2 | 2–3 ngày | [TB-031](../issues/TB-031-identity-lockout-rate-limit.md) | done (PR #26) |
 | 4 | I2 | Phát access token JWT khi đăng nhập (ADR RS256 + Secrets Manager tạo trước lát này) | FR-005, BR-004 | 2, ADR thuật toán ký | 2–3 ngày | [TB-032](../issues/TB-032-identity-access-token.md) | done (PR #27) |
 | 5 | I2 | Bộ kiểm tra token dùng chung `Teamboard.Auth` (JWKS, cache) và test tấn công (ADR thư viện token) | FR-006, NFR-006 | 4, JWKS (6) | 3–4 ngày | [TB-033](../issues/TB-033-auth-token-validation-library.md) | done (PR #28) |
-| 6 | I3 | Công bố JWKS | FR-007 | 4 | 1–2 ngày | [TB-034](../issues/TB-034-identity-jwks.md) | planning |
+| 6 | I3 | Công bố JWKS | FR-007 | 4 | 1–2 ngày | [TB-034](../issues/TB-034-identity-jwks.md) | review (PR #29) |
 | 7 | I3 | Xoay khoá ký không hỏng token còn hạn (CLI, D7) | FR-008 | 6, ADR xoay khoá | 2–3 ngày | [TB-035](../issues/TB-035-identity-signing-key-rotation.md) | todo |
 | 8 | I4 | Refresh token xoay vòng (ADR refresh nguyên tử) | FR-009 | 4 | 2–3 ngày | [TB-036](../issues/TB-036-identity-refresh-token.md) | todo |
 | 9 | I4 | Phát hiện dùng lại refresh token, thu hồi chuỗi | FR-010 | 8 | 2 ngày | [TB-037](../issues/TB-037-identity-refresh-reuse-detection.md) | todo |
