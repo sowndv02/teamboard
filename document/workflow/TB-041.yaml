@@ -3,7 +3,7 @@
 id: TB-041
 scope: issue
 title: Identity lát 13, Client Credentials và token máy
-updated: 2026-11-26T12:50:00Z
+updated: 2026-11-26T13:00:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -14,10 +14,10 @@ links:
   features_dir: document/spec/features/identity-service/
   branch: feature/TB-041-identity-client-credentials
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/37
 
-current_step: create-pr
-next_action: "create-pr TB-041"
+current_step: done
+next_action: "Chờ review/CI PR #37"
 blocked_by: null
 
 steps:
@@ -55,7 +55,10 @@ steps:
     round: 1
     finished: 2026-11-26T12:50:00Z
     evidence: ["9875f12", "94/94 !~Compose", "build warnaserror"]
-  create-pr:            { status: pending }
+  create-pr:
+    status: done
+    finished: 2026-11-26T13:00:00Z
+    evidence: ["https://github.com/sowndv02/teamboard/pull/37"]
 
 confirm_pending: []
 
@@ -69,3 +72,4 @@ events:
   - { at: 2026-11-26T13:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS → coding-start" }
   - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 94/94 → coding-review" }
   - { at: 2026-11-26T12:50:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS → create-pr" }
+  - { at: 2026-11-26T13:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "create-pr: PR #37" }

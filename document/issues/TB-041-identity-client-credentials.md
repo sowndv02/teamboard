@@ -1,7 +1,7 @@
 ---
 key: TB-041
 title: Identity lát 13, Client Credentials và token máy
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-041-identity-client-credentials
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -40,6 +40,7 @@ Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-i
 - 2026-11-26: test-review v1 **PASS** — FIX missing-scope @S03b, unit asserts behavior; **10 failed, 84 passed** `!~Compose`.
 - 2026-11-26: coding-start — `/connect/token` client_credentials, JWT máy, scope validator; **94/94** `!~Compose`.
 - 2026-11-26: coding-review v1 **PASS** — commit `9875f12`; gate build `-warnaserror` + **94/94** `!~Compose`.
+- 2026-11-26: [PR #37](https://github.com/sowndv02/teamboard/pull/37) opened → chờ review/CI.
 
 ## Workflow
 
@@ -53,7 +54,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | FIX @S03b + unit đỏ behavior; 10 fail |
 | coding-start | done | – | 2026-11-26 | **94/94** `!~Compose` |
 | coding-review | PASS | 1 | 2026-11-26 | 9875f12; 0 CONFIRM/FIX mở |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #37](https://github.com/sowndv02/teamboard/pull/37) |
 
 ## Confirm log
 
