@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-032 B0-B1: accept ADR 0010, signing key loader, ready check, packages"
+current_step: create-pr
+next_action: "create-pr TB-032: commit feat + docs, mở PR"
 blocked_by: null
 
 steps:
@@ -56,8 +56,24 @@ steps:
     evidence:
       - "FIX @S04 vacuous green; Background; @S05 credential shape"
       - "dotnet test !~Compose: 7 failed, 37 passed"
-  coding-start:         { status: pending }
-  coding-review:        { status: pending }
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T16:00:00Z
+    evidence:
+      - "B0-B4: signing loader, AccessTokenIssuer, login response, metrics, ready check"
+      - "dotnet test identity-service.Tests filter !~Compose: 44/44 pass"
+  coding-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T16:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "FIX login 503 khi thiếu khoá; compose mount signing-keys.dev.json"
+      - "dotnet test !~Compose: 44/44"
   create-pr:            { status: pending }
 
 confirm_pending: []
@@ -67,3 +83,5 @@ events:
   - { at: 2026-11-26T12:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review PASS v1; mở test-init" }
   - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: ADR 0010 + access-token @S01-S06; 6 đỏ JWT/ready; mở test-review" }
   - { at: 2026-11-26T15:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review PASS v1; mở coding-start" }
+  - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start: 44/44 xanh; mở coding-review" }
+  - { at: 2026-11-26T16:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review PASS v1; mở create-pr" }

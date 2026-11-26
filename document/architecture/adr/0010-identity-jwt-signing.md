@@ -1,6 +1,6 @@
 # ADR 0010 — Ký access token JWT (RS256) trong identity-service
 
-Trạng thái: Đề xuất · Ngày: 2026-11-26
+Trạng thái: Chấp nhận · Ngày: 2026-11-26
 Nguồn: TB-032, `document/plans/TB-032-identity-access-token.md`, design D1/D2/D3
 Nhãn: `[Chọn để học]`
 

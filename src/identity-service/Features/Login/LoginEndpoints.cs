@@ -4,7 +4,9 @@ using IdentityService.Features.Register;
 using IdentityService.Persistence;
 using IdentityService.RateLimiting;
 using IdentityService.Security;
+using IdentityService.Security.Jwt;
 using IdentityService.Security.Passwords;
+using IdentityService.Security.Signing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +23,8 @@ internal static class LoginEndpoints
             .Produces<LoginResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+            .ProducesProblem(StatusCodes.Status429TooManyRequests)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable);
 
         if (enableRateLimiting)
         {
@@ -35,6 +38,8 @@ internal static class LoginEndpoints
         IPasswordHasher hasher,
         IdentityMetrics metrics,
         LoginLockoutService lockout,
+        IAccessTokenIssuer accessTokenIssuer,
+        ISigningKeyStore signingKeyStore,
         IClientIpResolver clientIpResolver,
         IOptions<PasswordOptions> passwordOptions,
         HttpContext context,
@@ -65,8 +70,15 @@ internal static class LoginEndpoints
         var credentialValid = await VerifyCredentialsAsync(password, emailNorm, db, hasher, cancellationToken);
         if (credentialValid is { } userId)
         {
+            if (!signingKeyStore.HasActiveKey)
+            {
+                return TypedResults.Problem(ProblemFactory.Create(IdentityErrorCodes.ServiceUnavailable, context));
+            }
+
             await lockout.RecordSuccessAsync(emailNorm, clientIp, cancellationToken);
-            return TypedResults.Ok(new LoginResponse(userId));
+            var issued = accessTokenIssuer.IssueForUser(userId);
+            metrics.RecordAccessTokenIssued();
+            return TypedResults.Ok(new LoginResponse(userId, issued.Token, "Bearer", issued.ExpiresInSeconds));
         }
 
         var failure = await lockout.RecordFailureAsync(emailNorm, clientIp, cancellationToken);
@@ -111,5 +123,9 @@ internal static class LoginEndpoints
         [property: JsonPropertyName("email")] string? Email,
         [property: JsonPropertyName("password")] string? Password);
 
-    private sealed record LoginResponse(Guid Id);
+    private sealed record LoginResponse(
+        [property: JsonPropertyName("id")] Guid Id,
+        [property: JsonPropertyName("access_token")] string AccessToken,
+        [property: JsonPropertyName("token_type")] string TokenType,
+        [property: JsonPropertyName("expires_in")] int ExpiresIn);
 }

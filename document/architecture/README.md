@@ -96,7 +96,7 @@ document/
 - [0007 Chính sách phụ thuộc bên thứ ba](adr/0007-dependency-policy.md)
 - [0008 Tạm hoãn frontend ở giai đoạn hiện tại](adr/0008-defer-frontend.md)  (bị thay bởi ADR 0009)
 - [0009 Làm lại frontend Angular, phạm vi giới hạn](adr/0009-resume-frontend-angular.md) (chấp nhận)
-- [0010 Ký access token JWT (RS256) trong identity-service](adr/0010-identity-jwt-signing.md) (đề xuất, TB-032)
+- [0010 Ký access token JWT (RS256) trong identity-service](adr/0010-identity-jwt-signing.md) (chấp nhận, TB-032)
 
 ## Tài liệu kiến trúc chi tiết
 

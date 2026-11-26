@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 4 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Login thành công trả access JWT RS256 + claim FR-005 (@S01–@S03)
-- [ ] TTL access ~10 phút cấu hình được (BR-004, @S02)
-- [ ] 401 không trả token (@S05)
-- [ ] Ready fail khi thiếu khoá ký active
-- [ ] ADR RS256 + loader khoá; gate xanh plan-review
+- [x] Login thành công trả access JWT RS256 + claim FR-005 (@S01–@S03)
+- [x] TTL access ~10 phút cấu hình được (BR-004, @S02)
+- [x] 401 không trả token (@S05)
+- [x] Ready fail khi thiếu khoá ký active
+- [x] ADR RS256 + loader khoá; gate xanh plan-review
 
 ## Kế hoạch
 Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identity-access-token.md) (`approved`, B0–B4; plan-review PASS v1).
@@ -37,6 +37,8 @@ Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identit
 - 2026-11-26: plan-review v1 PASS (Confirm #1–#4).
 - 2026-11-26: test-init — ADR `0010-identity-jwt-signing.md` (đề xuất), `access-token.feature` @S01–@S06, cập nhật `login.feature` @S01, `SigningKeyReadyTests`; 6 đỏ (JWT/metric/ready), 38 hồi quy xanh.
 - 2026-11-26: test-review v1 PASS — sửa @S04 vacuous green, Background, reconcile; **7 đỏ / 37 xanh**.
+- 2026-11-26: commit `9d96fae` test(TB-032); coding-start B0–B4 — JWT RS256 login, ready khoá ký, metric; **44/44 xanh**.
+- 2026-11-26: coding-review v1 PASS — FIX 503 thiếu khoá, compose signing keys.
 
 ## Workflow
 
@@ -48,8 +50,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 6 đỏ JWT + ready; 38 xanh |
 | test-review | PASS | 1 | 2026-11-26 | 7 đỏ đúng lý do |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
+| coding-start | done | – | 2026-11-26 | 44/44 xanh (!~Compose) |
+| coding-review | PASS | 1 | 2026-11-26 | FIX 503 + compose keys |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -67,20 +69,11 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| login @S01 (TB-032) | `login.feature` + steps JWT | missing `access_token` | xanh |
-| access-token @S01 | `access-token.feature` | missing token / RS256 header | xanh |
-| access-token @S02 | same | missing `access_token` (lifetime) | xanh |
-| access-token @S03 | same | missing claims | xanh |
-| access-token @S04 | same | missing `access_token` | xanh |
-| access-token @S05 | same | – | xanh (hồi quy 401) |
-| access-token @S06 | meter `access_tokens_issued_total` | counter 0 | xanh |
-| Ready thiếu khoá | `SigningKeyReadyTests` | ready 200 thay vì 503 | xanh |
+| login @S01 (TB-032) | `login.feature` + steps JWT | missing `access_token` | **xanh** |
+| access-token @S01–@S06 | `access-token.feature` | JWT/metric/ready | **xanh** |
+| Ready thiếu khoá | `SigningKeyReadyTests` | ready 503 | **xanh** |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **Failed: 7, Passed: 37** (sau test-review v1).
-
-**ADR:** plan-review ghi số 0007; trong repo 0007 là dependency-policy → draft JWT ở **ADR 0010** (test-review chốt số nếu cần).
-
-**Lý do đỏ (đúng):** login 200 chưa có `access_token`/`token_type`/`expires_in`; chưa phát JWT RS256; chưa metric; ready chưa kiểm khoá ký.
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **44/44 pass** (sau coding-start).
 
 ## Test review rounds
 
@@ -92,6 +85,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | working tree | Sẵn sàng merge | – |
 
 ## Fix log
 
@@ -104,6 +98,8 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 | 1 | test:identity-service:s05-error-shape | FIX | access-token @S05 | Thiếu assert credential error | Thêm INVALID_CREDENTIALS | feature |
 | 1 | test:identity-service:adr-number | FIX | ADR / Confirm #4 | 0007 đã là dependency-policy | ADR JWT = **0010** | adr/0010 |
 | 1 | test:identity-service:identitymodel-dep | FIX | dependencies.yaml | Package test chưa ghi danh | Thêm JsonWebTokens 8.15.0 | config |
+| 1 | identity-service:login:no-key-500 | FIX | LoginEndpoints | Login thành công thiếu khoá → 500 | 503 SERVICE_UNAVAILABLE | test 44/44 |
+| 1 | identity-service:compose:ready-keys | FIX | docker-compose.yml | Ready 503 thiếu khoá trong compose | Mount signing-keys.dev.json | config |
 
 ## Bài học (lessons learned)
 

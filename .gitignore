@@ -418,3 +418,4 @@ npm-debug.log*
 # Identity signing keys (never commit live private keys)
 config/signing-keys.json
 config/signing-keys.local.json
+# signing-keys.dev.json is committed for local compose only (rotate if exposed)
