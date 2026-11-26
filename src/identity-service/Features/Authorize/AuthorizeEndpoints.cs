@@ -16,19 +16,12 @@ internal static class AuthorizeEndpoints
         <body><p>The authorization request could not be processed.</p></body>
         </html>
         """;
-    private const string LoginPendingHtml = """
-        <!DOCTYPE html>
-        <html lang="en">
-        <head><meta charset="utf-8"><title>Sign-in pending</title></head>
-        <body><p>Sign-in for this authorization request is not available yet.</p></body>
-        </html>
-        """;
 
     public static void MapAuthorizeEndpoints(this IEndpointRouteBuilder routes, bool enableRateLimiting = true)
     {
         var endpoint = routes.MapGet(ConnectAuthorizePath, HandleConnectAuthorizeAsync)
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status501NotImplemented);
+            .Produces(StatusCodes.Status302Found)
+            .Produces(StatusCodes.Status400BadRequest);
 
         if (enableRateLimiting)
         {
@@ -36,29 +29,42 @@ internal static class AuthorizeEndpoints
         }
     }
 
-    private static Task<IResult> HandleConnectAuthorizeAsync(
+    private static async Task<IResult> HandleConnectAuthorizeAsync(
         HttpContext httpContext,
         IConfiguration configuration,
-        AuthorizeRequestValidator validator)
+        AuthorizeRequestValidator validator,
+        AuthorizeRequestService authorizeRequests,
+        AuthorizeInteractionService authorizeInteraction,
+        CancellationToken cancellationToken)
     {
         if (!configuration.GetValue(FeatureFlagKey, false))
         {
-            return Task.FromResult(Results.NotFound());
+            return Results.NotFound();
         }
 
         var query = AuthorizeQueryParser.Parse(httpContext.Request.Query);
         var result = validator.Validate(query);
         if (!result.IsValid)
         {
-            return Task.FromResult<IResult>(Results.Content(
+            return Results.Content(
                 InvalidAuthorizeHtml,
                 contentType: "text/html",
-                statusCode: StatusCodes.Status400BadRequest));
+                statusCode: StatusCodes.Status400BadRequest);
         }
 
-        return Task.FromResult<IResult>(Results.Content(
-            LoginPendingHtml,
-            contentType: "text/html",
-            statusCode: StatusCodes.Status501NotImplemented));
+        var userId = await AuthorizeInteractionService.TryGetIdpUserIdAsync(httpContext);
+        if (userId is { } authenticatedUserId)
+        {
+            var pending = await authorizeRequests.CreateAsync(query, cancellationToken);
+            var location = await authorizeInteraction.CompleteAndBuildRedirectAsync(
+                pending,
+                authenticatedUserId,
+                cancellationToken);
+            return Results.Redirect(location);
+        }
+
+        var authorizeRequest = await authorizeRequests.CreateAsync(query, cancellationToken);
+        var loginLocation = $"/login?requestId={authorizeRequest.Id}";
+        return Results.Redirect(loginLocation);
     }
 }

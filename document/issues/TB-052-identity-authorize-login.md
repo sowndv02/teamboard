@@ -25,14 +25,14 @@ Lát **14b** trong [`identity-auth-slices.md`](../plans/identity-auth-slices.md)
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
 
-- [ ] `authorize_request` migration + TTL 15 phút.
-- [ ] Cookie IdP 30 phút sliding; Data Protection keys directory.
-- [ ] Valid authorize → `/login` → code redirect (@S01, @S01b confidential).
-- [ ] Sai mật khẩu / lockout: không redirect client (@S04, @S05).
-- [ ] Cookie IdP còn hiệu lực → skip form (@S06).
-- [ ] CSP `frame-ancestors 'none'` trên login (@S08).
-- [ ] Migration `scope` trên `authorization_code`; metric `authorization_codes_issued_total`.
-- [ ] Hồi quy `!~Compose` xanh; hồi quy @S02–@S07.
+- [x] `authorize_request` migration + TTL 15 phút.
+- [x] Cookie IdP 30 phút sliding; Data Protection keys directory.
+- [x] Valid authorize → `/login` → code redirect (@S01, @S01b confidential).
+- [x] Sai mật khẩu / lockout: không redirect client (@S04, @S05).
+- [x] Cookie IdP còn hiệu lực → skip form (@S06).
+- [x] CSP `frame-ancestors 'none'` trên login (@S08).
+- [x] Migration `scope` trên `authorization_code`; metric `authorization_codes_issued_total`.
+- [x] Hồi quy `!~Compose` xanh; hồi quy @S02–@S07.
 
 ## Kế hoạch
 
@@ -44,6 +44,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 - 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-10.
 - 2026-11-26: test-init — `authorize-pkce.feature` @S01,@S01b,@S04–@S06,@S08 + `AuthorizationCodeGeneratorTests`; **7 fail, 104 pass** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX @S05 lockout 401; @S06 second When → And; **7 fail, 104 pass** `!~Compose`.
+- 2026-11-26: coding-start **done** — Razor `/login`, cookie `Identity.Idp`, authorize flow, migration #7; **111/111** `!~Compose`.
 
 ## Workflow
 
@@ -53,7 +54,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
 | test-init | done | – | 2026-11-26 | 7 đỏ 104 pass !~Compose |
 | test-review | PASS | 1 | 2026-11-26 | FIX @S05 @S06 |
-| coding-start | pending | | | |
+| coding-start | done | – | 2026-11-26 | 111/111 !~Compose |
 | coding-review | pending | | | |
 | create-pr | pending | | | |
 
@@ -67,18 +68,17 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 | `authorize-pkce.feature` | **đỏ** | |
-| @S01b | `authorize-pkce.feature` | **đỏ** | |
-| @S04 | `authorize-pkce.feature` | **đỏ** | |
-| @S05 | `authorize-pkce.feature` | **đỏ** | |
-| @S06 | `authorize-pkce.feature` | **đỏ** | |
-| @S08 | `authorize-pkce.feature` | **đỏ** | |
+| @S01 | `authorize-pkce.feature` | | **xanh** |
+| @S01b | `authorize-pkce.feature` | | **xanh** |
+| @S04 | `authorize-pkce.feature` | | **xanh** |
+| @S05 | `authorize-pkce.feature` | | **xanh** |
+| @S06 | `authorize-pkce.feature` | | **xanh** |
+| @S08 | `authorize-pkce.feature` | | **xanh** |
 | @S02–@S07 | `authorize-pkce.feature` | | **xanh** (TB-042) |
-| unit code | `AuthorizationCodeGeneratorTests` | **đỏ** | |
+| unit code | `AuthorizationCodeGeneratorTests` | | **xanh** |
+| database @S04 | `database.feature` | | **xanh** (7 migrations) |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **7 fail, 104 pass**.
-
-**Lý do đỏ:** chưa Razor `/login`, authorize vẫn 501, stub `AuthorizationCodeGenerator`.
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **111 pass**.
 
 ## Test review rounds
 

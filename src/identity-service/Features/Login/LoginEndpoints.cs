@@ -10,7 +10,6 @@ using IdentityService.Security.Refresh;
 using IdentityService.Security.Signing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Teamboard.Shared.Http;
 
@@ -64,12 +63,12 @@ internal static class LoginEndpoints
         if (lockCheck.IsLocked)
         {
             SetRetryAfter(context, lockCheck.RetryAfterSeconds);
-            await VerifyCredentialsAsync(password, emailNorm, db, hasher, cancellationToken);
+            await LoginCredentialVerifier.TryVerifyUserIdAsync(password, emailNorm, db, hasher, cancellationToken);
             metrics.RecordLockout();
             return TypedResults.Problem(ProblemFactory.Create(IdentityErrorCodes.InvalidCredentials, context));
         }
 
-        var credentialValid = await VerifyCredentialsAsync(password, emailNorm, db, hasher, cancellationToken);
+        var credentialValid = await LoginCredentialVerifier.TryVerifyUserIdAsync(password, emailNorm, db, hasher, cancellationToken);
         if (credentialValid is { } userId)
         {
             if (!signingKeyStore.HasActiveKey)
@@ -99,31 +98,6 @@ internal static class LoginEndpoints
         }
 
         return TypedResults.Problem(ProblemFactory.Create(IdentityErrorCodes.InvalidCredentials, context));
-    }
-
-    private static async Task<Guid?> VerifyCredentialsAsync(
-        string password,
-        string emailNorm,
-        IdentityDbContext db,
-        IPasswordHasher hasher,
-        CancellationToken cancellationToken)
-    {
-        var user = await db.Users.AsNoTracking()
-            .FirstOrDefaultAsync(u => u.EmailNorm == emailNorm, cancellationToken);
-
-        if (user is not null)
-        {
-            var stored = new HashedPassword(user.PasswordHash, user.PasswordSalt, user.PasswordIterations);
-            if (hasher.VerifyPassword(password, stored))
-            {
-                return user.Id;
-            }
-
-            return null;
-        }
-
-        _ = hasher.VerifyPassword(password, LoginDummyCredentials.Stored);
-        return null;
     }
 
     private static void SetRetryAfter(HttpContext context, int seconds) =>
