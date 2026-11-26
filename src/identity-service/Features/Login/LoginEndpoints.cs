@@ -6,6 +6,7 @@ using IdentityService.RateLimiting;
 using IdentityService.Security;
 using IdentityService.Security.Jwt;
 using IdentityService.Security.Passwords;
+using IdentityService.Security.Refresh;
 using IdentityService.Security.Signing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -39,6 +40,7 @@ internal static class LoginEndpoints
         IdentityMetrics metrics,
         LoginLockoutService lockout,
         IAccessTokenIssuer accessTokenIssuer,
+        RefreshTokenService refreshTokens,
         ISigningKeyStore signingKeyStore,
         IClientIpResolver clientIpResolver,
         IOptions<PasswordOptions> passwordOptions,
@@ -77,8 +79,16 @@ internal static class LoginEndpoints
 
             await lockout.RecordSuccessAsync(emailNorm, clientIp, cancellationToken);
             var issued = accessTokenIssuer.IssueForUser(userId);
+            var refresh = await refreshTokens.IssueAtLoginAsync(userId, cancellationToken);
             metrics.RecordAccessTokenIssued();
-            return TypedResults.Ok(new LoginResponse(userId, issued.Token, "Bearer", issued.ExpiresInSeconds));
+            metrics.RecordRefreshTokenIssued();
+            return TypedResults.Ok(new LoginResponse(
+                userId,
+                issued.Token,
+                "Bearer",
+                issued.ExpiresInSeconds,
+                refresh.Plaintext,
+                refresh.ExpiresInSeconds));
         }
 
         var failure = await lockout.RecordFailureAsync(emailNorm, clientIp, cancellationToken);
@@ -127,5 +137,7 @@ internal static class LoginEndpoints
         [property: JsonPropertyName("id")] Guid Id,
         [property: JsonPropertyName("access_token")] string AccessToken,
         [property: JsonPropertyName("token_type")] string TokenType,
-        [property: JsonPropertyName("expires_in")] int ExpiresIn);
+        [property: JsonPropertyName("expires_in")] int ExpiresIn,
+        [property: JsonPropertyName("refresh_token")] string RefreshToken,
+        [property: JsonPropertyName("refresh_expires_in")] int RefreshExpiresIn);
 }

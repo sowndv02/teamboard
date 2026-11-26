@@ -24,7 +24,7 @@ Feature: identity-service database
   Scenario: The baseline migration applies to an empty database and a second run changes nothing
     Given an empty PostgreSQL database is running
     When identity-service starts twice in a row against that database and applies migrations
-    Then the database migration history has exactly 3 migration records
+    Then the database migration history has exactly 4 migration records
 
   @S07 @NFR-009
   Scenario: Migrations are not applied when the auto-apply flag is off

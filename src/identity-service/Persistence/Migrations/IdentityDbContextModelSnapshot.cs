@@ -50,6 +50,46 @@ namespace IdentityService.Persistence.Migrations
                     b.ToTable("login_attempt", (string)null);
                 });
 
+            modelBuilder.Entity("IdentityService.Persistence.Entities.RefreshToken", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(88)
+                        .HasColumnType("character varying(88)")
+                        .HasColumnName("token_hash");
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("client_id");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("family_id");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("used_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("FamilyId");
+
+                    b.ToTable("refresh_token", (string)null);
+                });
+
             modelBuilder.Entity("IdentityService.Persistence.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")

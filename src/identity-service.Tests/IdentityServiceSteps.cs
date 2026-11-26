@@ -25,6 +25,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string ThrowMessage = "boom: internal detail must not leak";
     private const string RegisterPath = "/api/v1/auth/register";
     private const string LoginPath = "/api/v1/auth/login";
+    private const string RefreshPath = "/api/v1/auth/refresh";
+    private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
+    private const string RefreshDefaultClientKey = "Identity:RefreshToken:DefaultClientId";
+    private const int BddRefreshLifetimeSeconds = 120;
     private const string HashDurationInstrument = "password_hash_duration_seconds";
     private const string LoginFailuresInstrument = "login_failures_total";
     private const string LockoutsInstrument = "lockout_total";
@@ -69,6 +73,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private FakeRotationTimeProvider? _rotationTime;
     private int? _lastRotationExitCode;
     private string? _storedAccessToken;
+    private string? _storedRefreshToken;
+    private string? _storedLoginAccessToken;
+    private int _concurrentRefreshSuccess;
+    private int _concurrentRefreshFailure;
     private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
     private readonly List<int> _burstStatusCodes = [];
     private (int First, int Second)? _concurrentStatuses;
@@ -90,6 +98,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _rotationTime = null;
         _lastRotationExitCode = null;
         _storedAccessToken = null;
+        _storedRefreshToken = null;
+        _storedLoginAccessToken = null;
+        _concurrentRefreshSuccess = 0;
+        _concurrentRefreshFailure = 0;
         _loginFailureMeasurements = 0;
         _lockoutMeasurements = 0;
         _hashDurationSamples = 0;
@@ -166,6 +178,13 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _settings[JwtIssuerKey] = BddJwtIssuer;
         _settings[JwtAudienceKey] = BddJwtAudience;
         _settings[JwtLifetimeKey] = BddJwtLifetimeSeconds.ToString(CultureInfo.InvariantCulture);
+    }
+
+    [Given("identity-service refresh token issuance is configured for BDD tests")]
+    public void GivenRefreshTokenIssuanceForBdd()
+    {
+        _settings[RefreshLifetimeKey] = BddRefreshLifetimeSeconds.ToString(CultureInfo.InvariantCulture);
+        _settings[RefreshDefaultClientKey] = "teamboard";
     }
 
     [Given("identity-service JWKS signing keys are configured for BDD tests")]
@@ -470,6 +489,88 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [Then("the login response has no access_token property")]
     public void ThenLoginResponseNoAccessToken() => JwtBddAssertions.AssertNoAccessTokenProperty(_body);
 
+    [Then("the login response includes an opaque refresh token with refresh_expires_in")]
+    public void ThenLoginResponseIncludesRefresh() => RefreshBddAssertions.AssertLoginRefreshShape(_body);
+
+    [Then("the login refresh_expires_in is about {int} seconds")]
+    public void ThenLoginRefreshExpiresAbout(int expectedSeconds)
+    {
+        using var document = JsonDocument.Parse(_body);
+        var actual = document.RootElement.GetProperty("refresh_expires_in").GetInt32();
+        Assert.InRange(actual, expectedSeconds - 5, expectedSeconds + 5);
+    }
+
+    [When("I store the current login refresh token for rotation checks")]
+    public void WhenStoreLoginRefreshToken()
+    {
+        using var document = JsonDocument.Parse(_body);
+        _storedRefreshToken = document.RootElement.GetProperty("refresh_token").GetString()
+            ?? throw new InvalidOperationException("refresh_token is missing from login response.");
+        _storedLoginAccessToken = document.RootElement.GetProperty("access_token").GetString()
+            ?? throw new InvalidOperationException("access_token is missing from login response.");
+    }
+
+    [When("I send a refresh request with the stored refresh token")]
+    public Task WhenRefreshWithStoredToken() =>
+        SendRefreshAsync(_storedRefreshToken ?? throw new InvalidOperationException("No stored refresh token."));
+
+    [When("I send a refresh request with refresh token {string}")]
+    public Task WhenRefreshWithToken(string refreshToken) => SendRefreshAsync(refreshToken);
+
+    [When("two refresh requests run concurrently with the stored refresh token")]
+    public async Task WhenConcurrentRefreshWithStoredToken()
+    {
+        var refreshToken = _storedRefreshToken ?? throw new InvalidOperationException("No stored refresh token.");
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        var tasks = Enumerable.Range(0, 2)
+            .Select(_ => client.PostAsJsonAsync(RefreshPath, new { refresh_token = refreshToken }))
+            .ToArray();
+        var responses = await Task.WhenAll(tasks);
+        try
+        {
+            _concurrentRefreshSuccess = responses.Count(response => (int)response.StatusCode == 200);
+            _concurrentRefreshFailure = responses.Count(response => (int)response.StatusCode == 401);
+        }
+        finally
+        {
+            foreach (var response in responses)
+            {
+                response.Dispose();
+            }
+        }
+    }
+
+    [Then("the refresh response has no id property")]
+    public void ThenRefreshResponseHasNoId() => RefreshBddAssertions.AssertRefreshResponseHasNoId(_body);
+
+    [Then("the refresh response includes a new access and refresh token pair")]
+    public void ThenRefreshResponseIncludesPair() => RefreshBddAssertions.AssertRefreshResponsePair(_body);
+
+    [Then("the refreshed refresh token differs from the stored refresh token")]
+    public void ThenRefreshedRefreshDiffersFromStored()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var refreshed = document.RootElement.GetProperty("refresh_token").GetString();
+        var stored = _storedRefreshToken ?? throw new InvalidOperationException("No stored refresh token.");
+        Assert.False(string.Equals(refreshed, stored, StringComparison.Ordinal));
+    }
+
+    [Then("the refreshed access token differs from the login access token")]
+    public void ThenRefreshedAccessDiffersFromLogin()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var refreshed = document.RootElement.GetProperty("access_token").GetString();
+        var login = _storedLoginAccessToken ?? throw new InvalidOperationException("No stored login access token.");
+        Assert.False(string.Equals(refreshed, login, StringComparison.Ordinal));
+    }
+
+    [Then("exactly one refresh response has status {int}")]
+    public void ThenExactlyOneRefreshStatus(int statusCode)
+    {
+        var count = statusCode == 200 ? _concurrentRefreshSuccess : _concurrentRefreshFailure;
+        Assert.Equal(1, count);
+    }
+
     [Then("no login error field contains a three-part JWT")]
     public void ThenLoginErrorFieldsNotJwt() => JwtBddAssertions.AssertNoJwtLikeStringValues(_body);
 
@@ -750,6 +851,14 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private TimeProvider RequireRotationTime() => _rotationTime ?? TimeProvider.System;
 
     private void RunRotationCommand(Func<int> command) => _lastRotationExitCode = command();
+
+    private async Task SendRefreshAsync(string refreshToken)
+    {
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        _response?.Dispose();
+        _response = await client.PostAsJsonAsync(RefreshPath, new { refresh_token = refreshToken });
+        _body = await _response.Content.ReadAsStringAsync();
+    }
 
     private async Task SendLoginAsync(string email, string password, string? clientIp = null)
     {

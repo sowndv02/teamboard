@@ -15,9 +15,10 @@ links:
   branch: feature/TB-035-identity-signing-key-rotation
   base: main
   pr: https://github.com/sowndv02/teamboard/pull/30
+  merge: 94dd3a293812563d082e58aaefbca15d2e6dc7ad
 
 current_step: done
-next_action: "Chờ review người và CI xanh; merge do người dùng"
+next_action: null
 
 steps:
   plan-init:
@@ -90,3 +91,4 @@ events:
   - { at: 2026-11-26T18:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start done; all tests green" }
   - { at: 2026-11-26T19:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
   - { at: 2026-11-26T19:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "PR #30 opened" }
+  - { at: 2026-11-26T20:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "PR #30 merged to main 94dd3a2" }

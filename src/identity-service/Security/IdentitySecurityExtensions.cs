@@ -1,5 +1,6 @@
 using IdentityService.Security.Jwt;
 using IdentityService.Security.Passwords;
+using IdentityService.Security.Refresh;
 using IdentityService.Security.Signing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -32,6 +33,13 @@ public static class IdentitySecurityExtensions
             .BindConfiguration(IdentityJwtOptions.SectionName)
             .ValidateOnStart();
         builder.Services.AddSingleton<IValidateOptions<IdentityJwtOptions>, IdentityJwtOptionsValidator>();
+
+        builder.Services.AddOptions<RefreshTokenOptions>()
+            .BindConfiguration(RefreshTokenOptions.SectionName)
+            .ValidateOnStart();
+        builder.Services.AddSingleton<IValidateOptions<RefreshTokenOptions>, RefreshTokenOptionsValidator>();
+
+        builder.Services.AddScoped<RefreshTokenService>();
 
         builder.Services.AddSingleton<ISigningKeyStore, FileSigningKeyStore>();
         builder.Services.AddSingleton<IAccessTokenIssuer, AccessTokenIssuer>();
