@@ -3,8 +3,8 @@
 > [!NOTE]
 > **Mục tiêu:** hiểu TDD, BDD và các chủ đề kề cận như những kỹ thuật độc lập với công cụ, rồi tự áp dụng lên một lát của TeamBoard: viết test trước, đặc tả bằng ví dụ, giữ lưới an toàn khi refactor, biết khi nào **không** nên làm theo.
 > **Cần biết trước:** đọc được C# cơ bản, đã chạy `dotnet test` một lần. Chưa cần biết Gherkin hay mock.
-> **Thời lượng ước tính:** TODO (chốt sau khi viết xong nội dung).
-> **Loại:** khái niệm. Trạng thái: **khung**, nội dung các Part đang `TODO`.
+> **Thời lượng ước tính:** ~31 đến 44 giờ nếu làm đủ lab (cộng khoảng ước tính của bảy Part, chưa có người khác làm thử để hiệu chỉnh).
+> **Loại:** khái niệm. Trạng thái: **đã viết đủ Part 1–7** (2026-11-26); còn các điểm ⚠ ghi ở "Nguồn và độ tin cậy" của từng Part.
 
 ## Cách học lộ trình này
 
@@ -90,14 +90,18 @@ Lý do các ô `–`:
 | 4 | Đã viết (2026-11-26): property-based, mutation (Stryker.NET), snapshot (Verify), characterization, outside-in; 4 lab đã chạy, 2 sự cố tái hiện thật. Real-world chưa đạt (một case tự mở, một Vừa, một chưa mở được); bài QuickCheck gốc chưa đọc được |
 | 5 | Đã viết (2026-11-26): phân nhóm test, coverage (coverlet) và gate, test hồi quy sự cố, flaky; 3 lab đã chạy, 2 sự cố tái hiện thật, 3 case real-world tự mở (Google, Cloudflare, Fowler). Chưa có CI thật trong repo nên chưa chạy pipeline; test bảo mật và dữ liệu test chưa có nguồn ngoài |
 | 6 | Đã viết (2026-11-26): ba dự án trên `EmailAddress`/BR-001 của identity-service (TDD từ spec, kịch bản BDD lấp khoảng trống chạy với Docker, mutation 88,89% lên 100%); đã chạy thật trong bản sao ngoài repo. Dự án board-service thay bằng identity-service vì chưa có spec Board; chưa có đối chứng độc lập; không có real-world riêng |
-| 7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
+| 7 | Đã viết (2026-11-26): bảng sự cố, lab mock/fake (mock xanh trong khi code hỏng), so sánh bốn cách tiếp cận, ba case (North, Google về mock, một nhóm bỏ Cucumber), ba bài mở, bảy câu phỏng vấn. Case bỏ BDD chỉ là một cá nhân có lợi ích liên quan; hai thẻ sự cố chưa tái hiện; refactor làm mock đỏ không tái hiện được |
 
 ## Tiêu chí hoàn thành lộ trình
 
-TODO: chốt khi có nội dung (mỗi Part có "Tự kiểm tra" đạt, lab đã chạy thật, Bản đồ giải pháp ≥ 3 lựa chọn kể cả "không test tự động").
+Đã kiểm ngày 2026-11-26:
+- Bảy Part có đủ mục `## Lx` đúng ma trận, hộp `> [!NOTE]`, "Tự kiểm tra", "Nguồn và độ tin cậy"; không còn `TODO` trong các file Part.
+- Bản đồ giải pháp ở Part 1 có 6 lựa chọn, kể cả "không test tự động".
+- Lab của Part 1 đến 6 đã chạy thật (Part 7 có một lab mock/fake); các nguồn hoặc kết quả chưa kiểm được đánh dấu ⚠ ở từng Part.
+- Chưa đạt: real-world ở Part 4 (một case tự mở, một Vừa, một chưa mở được); case bỏ BDD ở Part 7 chỉ có một kinh nghiệm cá nhân; chưa có người thứ hai làm thử bài mở và lab.
 
 ## Nguồn và độ tin cậy
 
-- **Đã tự mở và đối chiếu:** `.agents/skills/learning-hub/references/lesson-model.md`, `part-template.md`.
-- **Chỉ qua nguồn thứ cấp hoặc agent (⚠):** chưa có.
-- **Chưa kiểm hoặc chưa tìm được:** toàn bộ nguồn bên ngoài về TDD/BDD (Beck, North, Fowler...), sẽ tìm ở đợt `pack`.
+- **Đã tự mở và đối chiếu:** `.agents/skills/learning-hub/references/lesson-model.md`, `part-template.md`; nguồn ngoài đã mở được liệt kê ở từng Part (ví dụ Google, Cloudflare, Fowler ở Part 5; North ở Part 7).
+- **Chỉ qua nguồn thứ cấp hoặc agent (⚠):** xem mục này trong từng Part; nhiều nguồn ở Part 1 đến 4 chỉ qua agent.
+- **Chưa kiểm hoặc chưa tìm được:** xem mục này trong từng Part (ví dụ bài QuickCheck gốc, Amazon S3 ShardStore, giấy phép Verify).
