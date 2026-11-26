@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-review
-next_action: "coding-review TB-040"
+current_step: create-pr
+next_action: "create-pr TB-040 (chờ user)"
 blocked_by: null
 
 steps:

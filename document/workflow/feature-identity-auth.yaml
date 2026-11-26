@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: done
-next_action: "Lát 12 TB-040 — coding-review."
+next_action: "Lát 12 TB-040 — create-pr."
 blocked_by: null
 
 steps:

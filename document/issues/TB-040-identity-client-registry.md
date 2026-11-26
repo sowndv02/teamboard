@@ -38,6 +38,7 @@ Plan: [`document/plans/TB-040-identity-client-registry.md`](../plans/TB-040-iden
 - 2026-11-26: test-init — `client-registry.feature` @S01–@S05; stub `Security/Clients/*`; **7 failed, 75 passed** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX secret_hash only, tách @S03b, `ClientRegistryTests`; **8 failed, 76 passed** `!~Compose`.
 - 2026-11-26: coding-start — migration `client`, seed, health ready, PBKDF2 secret; **83/83** `!~Compose`.
+- 2026-11-26: coding-review v1 **PASS** — `b10c0b6`; FIX registry API + BDD seed index; 83/83.
 
 ## Workflow
 
@@ -50,7 +51,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-26 | 7 đỏ @S01–@S04 + unit; @S05 xanh |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 8 đỏ đúng lý do |
 | coding-start | done | – | 2026-11-26 | **83/83** `!~Compose` |
-| coding-review | pending | | | |
+| coding-review | PASS | 1 | 2026-11-26 | 83/83; FIX IClientRegistry + seed index |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -96,6 +97,9 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `b10c0b6` (+ FIX review) | Sẵn sàng merge | – |
+
+**Lăng kính (v1):** Khớp plan Confirm #1–#6; bảng `client` jsonb; seed env secret; ready `registered_clients`; BR-007 log không secret; BDD tắt registry mặc định. **P3:** plan B5 chưa gọi `IClientRegistry` từ `RefreshTokenService` (health + seed đủ lát 12).
 
 ## Fix log
 
@@ -103,6 +107,8 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | code:identity:client-registry-api | FIX P2 | `IClientRegistry`, `ClientRegistry` | Thiếu `ValidateRedirectUri`/`ValidateClientSecret` theo plan B3 | Bổ sung method + delegate matcher/hasher | 83/83 |
+| 1 | test:identity:confidential-seed-index | FIX P2 | `IdentityServiceSteps` | Index seed confidential có thể trùng khi nhiều client | `NextClientSeedIndex()` | 83/83 |
 
 ## Bài học (lessons learned)
 

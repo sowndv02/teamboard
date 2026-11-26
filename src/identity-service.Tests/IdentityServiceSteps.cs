@@ -154,7 +154,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     public void GivenConfidentialOAuthClient(string clientId, string secret)
     {
         _confidentialClientSecrets.Add(secret);
-        var index = _confidentialClientSecrets.Count;
+        var index = NextClientSeedIndex();
         _settings[$"Identity:Clients:Seed:{index}:ClientId"] = clientId;
         _settings[$"Identity:Clients:Seed:{index}:ClientType"] = "Confidential";
         _settings[$"Identity:Clients:Seed:{index}:RedirectUris:0"] = "https://localhost/callback";
@@ -1215,6 +1215,28 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             }
         });
         _meterListener.Start();
+    }
+
+    private int NextClientSeedIndex()
+    {
+        var max = -1;
+        foreach (var key in _settings.Keys)
+        {
+            const string prefix = "Identity:Clients:Seed:";
+            const string suffix = ":ClientId";
+            if (!key.StartsWith(prefix, StringComparison.Ordinal) || !key.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var middle = key[prefix.Length..^suffix.Length];
+            if (int.TryParse(middle, NumberStyles.Integer, CultureInfo.InvariantCulture, out var idx))
+            {
+                max = Math.Max(max, idx);
+            }
+        }
+
+        return max + 1;
     }
 
     private HttpClient StartService(string connectionString, bool migrate, Action<IServiceCollection>? configureServices = null)
