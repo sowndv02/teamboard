@@ -1,7 +1,7 @@
 ---
 key: TB-042
 title: Identity lát 14a, Authorize + PKCE validation (I5 pha 1)
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-042-identity-authorize-pkce
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -23,6 +23,7 @@ Issue khung cấp key khi duyệt bảng lát: lát 14 của `document/plans/ide
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
 - [x] Design `identity-auth-i5.md` approved.
+- [x] Bảng `authorization_code` + migration apply (B1, `database.feature` @S04 = 6).
 - [x] `redirect_uri` / params sai → không redirect URI chưa tin cậy (@S02, @S03, @S03b, @S03c).
 - [x] PKCE + registry validation unit/BDD xanh.
 - [x] Hồi quy `!~Compose` xanh (104/104).
@@ -37,6 +38,8 @@ Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-ident
 - 2026-11-26: test-init — `authorize-pkce.feature` @S02,@S03,@S03b,@S07; stub GET `/connect/authorize` 501; **8 fail, 94 pass** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX @S03c invalid scope; **9 fail, 94 pass** `!~Compose`.
 - 2026-11-26: coding-start — `GET /connect/authorize` validate PKCE/redirect/scope; **104/104** `!~Compose`.
+- 2026-11-26: coding-review v1 PASS — CONFIRM B1 migration; thêm entity `authorization_code`; **104/104** `!~Compose`.
+- 2026-11-26: [PR #38](https://github.com/sowndv02/teamboard/pull/38) mở — chờ review/CI.
 
 ## Workflow
 
@@ -49,13 +52,14 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-26 | 8 fail 94 pass !~Compose |
 | test-review | PASS | 1 | 2026-11-26 | FIX @S03c scope; 9 fail |
 | coding-start | done | – | 2026-11-26 | **104/104** `!~Compose` |
-| coding-review | pending | | | |
-| create-pr | pending | – | | |
+| coding-review | PASS | 1 | 2026-11-26 | B1 migration |
+| create-pr | done | – | 2026-11-26 | [PR #38](https://github.com/sowndv02/teamboard/pull/38) |
 
 ## Confirm log
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | identity:plan:migration-b1-gap | B1 migration trong 14a hay defer? | **A** — bổ sung migration + entity trong TB-042 | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 
@@ -89,6 +93,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `4e1d434` | PASS | – |
 
 ## Fix log
 
@@ -96,6 +101,7 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | identity:plan:migration-b1-gap | CONFIRM #1 | `Persistence/Entities/AuthorizationCode.cs`, migration `20261126160000` | Thiếu B1 so plan/design | Entity + EF migration; `database.feature` 6 records | 104/104 `!~Compose` |
 
 ## Bài học (lessons learned)
 
