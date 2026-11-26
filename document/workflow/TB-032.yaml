@@ -16,8 +16,8 @@ links:
   base: main
   pr: https://github.com/sowndv02/teamboard/pull/27
 
-current_step: create-pr
-next_action: "create-pr TB-032: commit feat + docs, mở PR"
+current_step: done
+next_action: null
 blocked_by: null
 
 steps:
@@ -89,3 +89,4 @@ events:
   - { at: 2026-11-26T15:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review PASS v1; mở coding-start" }
   - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start: 44/44 xanh; mở coding-review" }
   - { at: 2026-11-26T16:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review PASS v1; mở create-pr" }
+  - { at: 2026-11-26T17:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "PR #27 merged main 315449c; TB-032 done" }

@@ -3,7 +3,7 @@
 id: feature-identity-auth
 scope: feature
 title: Xác thực và ủy quyền (identity-service)
-updated: 2026-11-26T02:30:00Z
+updated: 2026-11-26T17:35:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: plan-review
-next_action: "Lát hiện tại: TB-032 (4 access JWT) — plan-review. Lát 3 TB-031 done (PR #26)."
+next_action: "Lát hiện tại: TB-033 (5 Teamboard.Auth) — plan-review Confirm #1–#3. Lát 4 TB-032 done (PR #27)."
 blocked_by: null
 
 steps:
