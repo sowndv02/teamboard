@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 8 của `document/plans/iden
 - Không làm: FR-010 reuse chuỗi (TB-037), đăng xuất (TB-038), client registry (TB-040).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Login thành công trả refresh token opaque; chỉ lưu băm trong DB.
-- [ ] `POST /api/v1/auth/refresh` xoay vòng: cặp access/refresh mới; token cũ không dùng lại được.
-- [ ] Refresh hết hạn hoặc không hợp lệ → 401 chung (không lộ chi tiết).
-- [ ] Hai request đồng thời cùng refresh → tối đa một thành công (FR-009; reuse đầy đủ FR-010 ở TB-037).
-- [ ] Gate identity + hồi quy login/JWKS xanh (`!~Compose`, `Category!=docker`).
+- [x] Login thành công trả refresh token opaque; chỉ lưu băm trong DB.
+- [x] `POST /api/v1/auth/refresh` xoay vòng: cặp access/refresh mới; token cũ không dùng lại được.
+- [x] Refresh hết hạn hoặc không hợp lệ → 401 chung (không lộ chi tiết).
+- [x] Hai request đồng thời cùng refresh → tối đa một thành công (FR-009; reuse đầy đủ FR-010 ở TB-037).
+- [x] Gate identity + hồi quy login/JWKS xanh (`!~Compose`, `Category!=docker`).
 
 ## Kế hoạch
 Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identity-refresh-token.md) (`approved`, B0–B6; plan-review PASS v1).
@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#5 (FR-010 → TB-037; client `teamboard`; OAuth refresh contract; auth-public limit; metrics).
 - 2026-11-26: test-init — `refresh-token.feature` @S01–@S05; `RefreshTokenHashTests`; stub `/refresh` 501; **6 đỏ**, hồi quy **56/56** (`!~Compose`).
 - 2026-11-26: test-review v1 PASS — FIX Background `And`, assert refresh mới ≠ cũ (@S02); **6 đỏ** đúng lý do (trừ @S03 status tạm thời, xem Giới hạn).
+- 2026-11-26: coding-start — ADR 0014, migration `refresh_token`, login/refresh + CAS; metrics; **62/62** identity `!~Compose`, board `Category!=docker` xanh.
 
 ## Workflow
 
@@ -46,7 +47,8 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#5 |
 | test-init | done | – | 2026-11-26 | 6 đỏ (5 BDD + 1 unit); hồi quy 56 xanh |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 6 đỏ |
-| coding-start | pending | – | | next |
+| coding-start | done | – | 2026-11-26 | 62/62 `!~Compose`; ADR 0014 |
+| coding-review | pending | – | | next |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -64,8 +66,8 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| refresh @S01–@S05 | `refresh-token.feature` | **đỏ** (thiếu refresh login/rotation) | |
-| refresh hash unit | `RefreshTokenHashTests` | **đỏ** | |
+| refresh @S01–@S05 | `refresh-token.feature` | | **xanh** |
+| refresh hash unit | `RefreshTokenHashTests` | | **xanh** |
 | login/access/jwks hồi quy | các feature TB-030–035 | | xanh |
 
 ## Test review rounds

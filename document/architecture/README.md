@@ -100,6 +100,7 @@ document/
 - [0011 Kiểm access JWT qua Teamboard.Auth](adr/0011-teamboard-auth-jwt-validation.md) (chấp nhận, TB-033)
 - [0012 Endpoint JWKS identity](adr/0012-identity-jwks-endpoint.md) (chấp nhận, TB-034)
 - [0013 Xoay khoá ký JWT identity](adr/0013-identity-signing-key-rotation.md) (chấp nhận, TB-035)
+- [0014 Refresh token xoay vòng nguyên tử](adr/0014-identity-refresh-token-rotation.md) (chấp nhận, TB-036)
 
 ## Tài liệu kiến trúc chi tiết
 

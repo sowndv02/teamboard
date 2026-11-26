@@ -3,7 +3,7 @@
 id: TB-036
 scope: issue
 title: Identity lát 8, refresh token xoay vòng
-updated: 2026-11-26T22:30:00Z
+updated: 2026-11-26T23:45:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-036 (B0–B6 per plan)"
+current_step: coding-review
+next_action: "coding-review TB-036"
 
 steps:
   plan-init:
@@ -43,7 +43,6 @@ steps:
     evidence:
       - "refresh-token.feature @S01-S05"
       - "6 red; 56 pass !~Compose"
-      - "stub RefreshEndpoints 501"
   test-review:
     status: done
     owner: orchestrator:cursor-session
@@ -53,10 +52,15 @@ steps:
     open_confirm: 0
     open_fix: 0
     evidence:
-      - "f6d8711 + delta feature/steps"
-      - "6 red correct reason (S03 stub note)"
-      - "format verify green"
-  coding-start:         { status: pending }
+      - "d9a6c7b test-review PASS"
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T23:45:00Z
+    evidence:
+      - "ADR 0014; AddRefreshToken migration"
+      - "RefreshTokenService CAS; login+refresh endpoints"
+      - "62/62 identity !~Compose; format verify"
   coding-review:        { status: pending }
   create-pr:            { status: pending }
 
@@ -67,3 +71,4 @@ events:
   - { at: 2026-11-26T20:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
   - { at: 2026-11-26T21:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 6 red" }
   - { at: 2026-11-26T22:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
+  - { at: 2026-11-26T23:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 62/62 green" }

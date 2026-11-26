@@ -10,8 +10,24 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 
     public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("refresh_token");
+            entity.HasKey(token => token.TokenHash);
+            entity.Property(token => token.TokenHash).HasColumnName("token_hash").HasMaxLength(88);
+            entity.Property(token => token.FamilyId).HasColumnName("family_id");
+            entity.Property(token => token.UserId).HasColumnName("user_id");
+            entity.Property(token => token.ClientId).HasColumnName("client_id").HasMaxLength(64);
+            entity.Property(token => token.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(token => token.UsedAt).HasColumnName("used_at");
+            entity.Property(token => token.RevokedAt).HasColumnName("revoked_at");
+            entity.HasIndex(token => token.FamilyId);
+        });
+
         modelBuilder.Entity<LoginAttempt>(entity =>
         {
             entity.ToTable("login_attempt");
