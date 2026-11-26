@@ -1,13 +1,13 @@
 ---
 key: TB-040
 title: Identity lát 12, quản lý client đăng ký
-status: review
+status: done
 phase: 1
 branch: feature/TB-040-identity-client-registry
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: null           # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-26            # ngày done/dropped
 ---
 
 # TB-040 — Identity lát 12, quản lý client đăng ký
@@ -39,7 +39,7 @@ Plan: [`document/plans/TB-040-identity-client-registry.md`](../plans/TB-040-iden
 - 2026-11-26: test-review v1 **PASS** — FIX secret_hash only, tách @S03b, `ClientRegistryTests`; **8 failed, 76 passed** `!~Compose`.
 - 2026-11-26: coding-start — migration `client`, seed, health ready, PBKDF2 secret; **83/83** `!~Compose`.
 - 2026-11-26: coding-review v1 **PASS** — `b084853`; FIX registry API + BDD seed index; 83/83.
-- 2026-11-26: [PR #36](https://github.com/sowndv02/teamboard/pull/36) (head `4728004`; nhánh không `Co-authored-by`).
+- 2026-11-26: [PR #36](https://github.com/sowndv02/teamboard/pull/36) merged → `main` `93cdd46`.
 
 ## Workflow
 

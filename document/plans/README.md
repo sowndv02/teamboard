@@ -33,3 +33,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-038-identity-logout](TB-038-identity-logout.md) | TB-038 (lát 10 identity) | approved |
 | [TB-039-identity-change-password](TB-039-identity-change-password.md) | TB-039 (lát 11 identity) | approved |
 | [TB-040-identity-client-registry](TB-040-identity-client-registry.md) | TB-040 (lát 12 identity) | approved |
+| [TB-041-identity-client-credentials](TB-041-identity-client-credentials.md) | TB-041 (lát 13 identity) | draft |

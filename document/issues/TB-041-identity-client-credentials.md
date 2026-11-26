@@ -1,12 +1,12 @@
 ---
 key: TB-041
 title: Identity lát 13, Client Credentials và token máy
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-041-identity-client-credentials
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26           # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
@@ -18,17 +18,23 @@ Issue khung cấp key khi duyệt bảng lát: lát 13 của `document/plans/ide
 **Phụ thuộc (theo bảng lát):** 4, 12. Ước lượng của bảng lát: 2–3 ngày.
 
 ## Phạm vi
-- Làm (theo hàng lát, FR/NFR: FR-015, BR-008): Client Credentials, token máy
-- Không làm: các lát khác của bảng lát.
+- Làm (FR-015, BR-008, BR-007): grant `client_credentials` trên token endpoint; confidential client + secret qua registry; JWT máy (`token_use=machine`, `sub=client_id`, scope ⊆ allowed); metric; BDD @S01–@S06.
+- Không làm: code exchange (TB-043), authorize/PKCE (TB-042), introspection (TB-046), scope trên board API (TB-045) trừ khi plan Confirm #5 mở rộng `Teamboard.Auth` unit test only.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Confidential client đúng secret → access token máy hợp lệ (@S01, @S02).
+- [ ] Scope vượt `allowed_scopes` bị từ chối (@S03).
+- [ ] Sai secret/client không lộ chi tiết (@S04).
+- [ ] Không log client secret (@S05).
+- [ ] Public client không dùng được grant (@S06).
+- [ ] Hồi quy `!~Compose` xanh.
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-identity-client-credentials.md) (`draft`, B1–B5; chờ plan-review O-1..O-7).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: TB-040 merged PR #36 → `main` `93cdd46`; `plan-init` nhánh `feature/TB-041-identity-client-credentials`.
 
 ## Workflow
 
@@ -36,7 +42,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Draft B1–B5; O-1..O-7 |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
