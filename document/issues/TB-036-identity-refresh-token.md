@@ -1,7 +1,7 @@
 ---
 key: TB-036
 title: Identity lát 8, refresh token xoay vòng
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-036-identity-refresh-token
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -39,6 +39,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 - 2026-11-26: test-review v1 PASS — FIX Background `And`, assert refresh mới ≠ cũ (@S02); **6 đỏ** đúng lý do (trừ @S03 status tạm thời, xem Giới hạn).
 - 2026-11-26: coding-start — ADR 0014, migration `refresh_token`, login/refresh + CAS; metrics; **62/62** identity `!~Compose`, board `Category!=docker` xanh.
 - 2026-11-26: commit `5a43719` feat refresh; coding-review v1 **PASS** (0 CONFIRM, 0 FIX mở).
+- 2026-11-26: [PR #32](https://github.com/sowndv02/teamboard/pull/32) (head `a97803a` after Co-author cleanup).
 
 ## Workflow
 
@@ -50,7 +51,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 6 đỏ |
 | coding-start | done | – | 2026-11-26 | `5a43719`; 62/62 `!~Compose` |
 | coding-review | PASS | 1 | 2026-11-26 | Sẵn sàng merge |
-| create-pr | pending | – | | next |
+| create-pr | done | – | 2026-11-26 | [PR #32](https://github.com/sowndv02/teamboard/pull/32) |
 
 ## Confirm log
 
