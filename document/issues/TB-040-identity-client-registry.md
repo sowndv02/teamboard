@@ -1,7 +1,7 @@
 ---
 key: TB-040
 title: Identity lát 12, quản lý client đăng ký
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-040-identity-client-registry
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -38,7 +38,8 @@ Plan: [`document/plans/TB-040-identity-client-registry.md`](../plans/TB-040-iden
 - 2026-11-26: test-init — `client-registry.feature` @S01–@S05; stub `Security/Clients/*`; **7 failed, 75 passed** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX secret_hash only, tách @S03b, `ClientRegistryTests`; **8 failed, 76 passed** `!~Compose`.
 - 2026-11-26: coding-start — migration `client`, seed, health ready, PBKDF2 secret; **83/83** `!~Compose`.
-- 2026-11-26: coding-review v1 **PASS** — `b10c0b6`; FIX registry API + BDD seed index; 83/83.
+- 2026-11-26: coding-review v1 **PASS** — `b084853`; FIX registry API + BDD seed index; 83/83.
+- 2026-11-26: [PR #36](https://github.com/sowndv02/teamboard/pull/36) (head `4728004`; nhánh không `Co-authored-by`).
 
 ## Workflow
 
@@ -52,7 +53,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 8 đỏ đúng lý do |
 | coding-start | done | – | 2026-11-26 | **83/83** `!~Compose` |
 | coding-review | PASS | 1 | 2026-11-26 | 83/83; FIX IClientRegistry + seed index |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #36](https://github.com/sowndv02/teamboard/pull/36) |
 
 ## Confirm log
 

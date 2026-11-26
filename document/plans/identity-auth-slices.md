@@ -26,7 +26,7 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | 9 | I4 | Phát hiện dùng lại refresh token, thu hồi chuỗi | FR-010 | 8 | 2 ngày | [TB-037](../issues/TB-037-identity-refresh-reuse-detection.md) | done (PR #33) |
 | 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 9 | 1 ngày | [TB-038](../issues/TB-038-identity-logout.md) | done (PR #34) |
 | 11 | I1 | Đổi mật khẩu (thu hồi refresh) | FR-022 | 3, 8 | 1–2 ngày | [TB-039](../issues/TB-039-identity-change-password.md) | done (PR #35) |
-| 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | [TB-040](../issues/TB-040-identity-client-registry.md) | in-progress |
+| 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | [TB-040](../issues/TB-040-identity-client-registry.md) | review (PR #36) |
 | 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | [TB-041](../issues/TB-041-identity-client-credentials.md) | todo |
 | 14 | I5 | Authorization Code + PKCE: authorize và trang đăng nhập (chưa có design, chờ spec FE) | FR-012, FR-019, BR-005 | 2, 12, ADR trang đăng nhập | 4–5 ngày | [TB-042](../issues/TB-042-identity-authorize-pkce.md) | todo |
 | 15 | I5 | Endpoint token đổi mã (code_verifier) | FR-013 | 14 | 2–3 ngày | [TB-043](../issues/TB-043-identity-token-endpoint-code-exchange.md) | todo |
