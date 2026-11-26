@@ -62,4 +62,4 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-047](TB-047-identity-auth-methods-map.md) | Bản đồ phương thức xác thực (bổ sung phần còn thiếu cho lộ trình identity) | 0 | review |
 | [TB-049](TB-049-learning-roadmap-auth-standards.md) | Lộ trình học Authentication Standards (khái niệm) theo Part 0–7 × L1–L8 | 0 | review |
 | [TB-050](TB-050-identity-auth-lab-dual-provider.md) | Auth lab dual provider (settings Identity/Keycloak), ghép lab 1–4 vào dự án | 0 | todo |
-| [TB-051](TB-051-learning-roadmap-testing-tdd-bdd.md) | Khung lộ trình học Testing (TDD, BDD) theo Part 0–7 × L1–L8 | 0 | in-progress |
+| [TB-051](TB-051-learning-roadmap-testing-tdd-bdd.md) | Lộ trình học Testing (TDD, BDD) theo Part 0–7 × L1–L8 | 0 | review |
