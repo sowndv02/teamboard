@@ -1,13 +1,13 @@
 ---
 key: TB-030
 title: Identity lát 2, đăng nhập với lỗi chung không lộ email
-status: in-progress
+status: done
 phase: 1
 branch: feature/TB-030-identity-login
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-25     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-26     # ngày done/dropped
 ---
 
 # TB-030 — Identity lát 2, đăng nhập với lỗi chung không lộ email
@@ -42,6 +42,7 @@ Plan: [`document/plans/TB-030-identity-login.md`](../plans/TB-030-identity-login
 - 2026-11-25: coding-start — `POST /api/v1/auth/login`, `INVALID_CREDENTIALS` title, metric, dummy verify; `dotnet test` 27/27.
 - 2026-11-25: coding-review v1 PASS — gate targeted; dummy iterations align PasswordOptions default.
 - 2026-11-26: commit `09f755a`, PR #25 opened.
+- 2026-11-26: PR #25 merged (`916fcc7`); lát 2 done.
 
 ## Workflow
 

@@ -23,3 +23,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-027-gateway-observability-ops](TB-027-gateway-observability-ops.md) | TB-027 (lát 7 gateway) | approved |
 | [TB-029-identity-register](TB-029-identity-register.md) | TB-029 (lát 1b identity) | approved |
 | [TB-030-identity-login](TB-030-identity-login.md) | TB-030 (lát 2 identity) | approved |
+| [TB-031-identity-lockout-rate-limit](TB-031-identity-lockout-rate-limit.md) | TB-031 (lát 3 identity) | approved |
