@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-035 merged PR #30; `plan-init` trên nhánh `feature/TB-036-identity-refresh-token` từ `main` `94dd3a2`.
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#5 (FR-010 → TB-037; client `teamboard`; OAuth refresh contract; auth-public limit; metrics).
+- 2026-11-26: test-init — `refresh-token.feature` @S01–@S05; `RefreshTokenHashTests`; stub `/refresh` 501; **6 đỏ**, hồi quy **56/56** (`!~Compose`).
 
 ## Workflow
 
@@ -42,7 +43,7 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B0–B6; O-1..O-5 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#5 |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-26 | 6 đỏ (5 BDD + 1 unit); hồi quy 56 xanh |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -62,6 +63,9 @@ Plan: [`document/plans/TB-036-identity-refresh-token.md`](../plans/TB-036-identi
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| refresh @S01–@S05 | `refresh-token.feature` | **đỏ** (thiếu refresh login/rotation) | |
+| refresh hash unit | `RefreshTokenHashTests` | **đỏ** | |
+| login/access/jwks hồi quy | các feature TB-030–035 | | xanh |
 
 ## Test review rounds
 

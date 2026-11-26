@@ -1,5 +1,6 @@
 using IdentityService.Features.Jwks;
 using IdentityService.Features.Login;
+using IdentityService.Features.Refresh;
 using IdentityService.Features.Register;
 using IdentityService.Persistence;
 using IdentityService.RateLimiting;
@@ -36,6 +37,7 @@ if (rateLimitingEnabled)
 app.MapDefaultEndpoints();
 app.MapRegisterEndpoints(rateLimitingEnabled);
 app.MapLoginEndpoints(rateLimitingEnabled);
+app.MapRefreshEndpoints(rateLimitingEnabled);
 app.MapJwksEndpoints();
 
 app.Run();
