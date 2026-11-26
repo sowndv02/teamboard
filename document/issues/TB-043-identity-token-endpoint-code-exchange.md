@@ -1,13 +1,13 @@
 ---
 key: TB-043
 title: Identity lát 15, endpoint token đổi mã (code_verifier)
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-043-identity-token-endpoint-code-exchange
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+started: 2026-11-26
+closed: null
 ---
 
 # TB-043 — Identity lát 15, endpoint token đổi mã (code_verifier)
@@ -15,20 +15,28 @@ closed: null            # ngày done/dropped
 ## Bối cảnh
 Issue khung cấp key khi duyệt bảng lát: lát 15 của `document/plans/identity-auth-slices.md` (spec `document/spec/identity-auth.md`, design `document/design/identity-auth.md`). Chi tiết phạm vi, tiêu chí và plan được lập khi tới lượt lát này (`plan-init`).
 
-**Phụ thuộc (theo bảng lát):** 14. Ước lượng của bảng lát: 2–3 ngày.
+**Phụ thuộc:** lát 14 (TB-042 + TB-052 merged PR #39). Ước lượng: 2–3 ngày.
 
 ## Phạm vi
-- Làm (theo hàng lát, FR/NFR: FR-013): Endpoint token đổi mã (code_verifier)
-- Không làm: các lát khác của bảng lát.
+
+- Làm (15): `POST /connect/token` `grant_type=authorization_code`, verify PKCE, đánh dấu mã dùng, phát access token user (FR-013).
+- Không làm: `id_token` (TB-044), scope policy JWT (TB-045 defer nếu O-4), introspection (TB-046).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+
+- [ ] `authorization_code` đổi được với `code_verifier` đúng (BDD @S01).
+- [ ] Sai verifier / reuse / hết hạn / sai client hoặc `redirect_uri` → từ chối (@S02–@S06).
+- [ ] Không regress `client_credentials` + authorize BDD.
+- [ ] Metric exchange (sau plan-review); không log code/verifier.
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+
+Plan: [`document/plans/TB-043-identity-token-endpoint-code-exchange.md`](../plans/TB-043-identity-token-endpoint-code-exchange.md) (`draft`, O-1..O-5 mở).
 
 ## Ghi chú / Nhật ký
+
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: plan-init từ `main` `062c557` (sau merge PR #39); nhánh `feature/TB-043-identity-token-endpoint-code-exchange`.
 
 ## Workflow
 
@@ -36,7 +44,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Draft B1–B6; O-1..O-5 |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
