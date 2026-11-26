@@ -37,7 +37,8 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (log only; concurrent reuse revoke; @S02+@S06; 401 chung).
 - 2026-11-26: test-init — mở rộng `refresh-token.feature` @S02 (family), @S06 (metric); **2 đỏ**, **61 xanh** (`!~Compose`).
 - 2026-11-26: test-review v1 PASS — 2 đỏ đúng lý do (family revoke + metric chưa có).
-- 2026-11-26: coding-start — reuse detection, family revoke, `refresh_reuse_total`, log; **63/63** identity `!~Compose`.
+- 2026-11-26: coding-start — reuse detection, family revoke, `refresh_reuse_total`, log; **63/63** identity `!~Compose`; commit `0c5c72e`.
+- 2026-11-26: coding-review v1 **PASS** — commit `0c5c72e`; gate format + 63/63; không CONFIRM mở.
 
 ## Workflow
 
@@ -47,11 +48,9 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 2 đỏ @S02/@S06; 61 hồi quy |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 2 đỏ |
-| coding-start | done | – | 2026-11-26 | 63/63 `!~Compose` |
-| coding-review | pending | – | | next |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
-| create-pr | pending | – | | |
+| coding-start | done | – | 2026-11-26 | 63/63 `!~Compose`; `0c5c72e` |
+| coding-review | PASS | 1 | 2026-11-26 | `0c5c72e`; 63/63; format OK |
+| create-pr | pending | – | | next |
 
 ## Confirm log
 
@@ -94,12 +93,17 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 | 1 | test:identity:s02-s06-multi-when | SKIP P2 | @S02/@S06 | Nhiều `When` | Precedent rotation/reuse flow | TB-036 |
 | 1 | test:identity:reuse-log-bdd | NOTE | B4 plan | Chưa BDD log | Structured log kiểm coding-review | plan B4 |
 
-**Giới hạn đã biết:** @S06 đỏ vì chưa có counter `refresh_reuse_total`; @S02 đỏ bước cuối (rotated token vẫn 200). Metric listener không publish instrument cho tới coding-start.
+**Giới hạn đã biết:** chưa BDD assert structured log reuse (plan B4; kiểm tra coding-review). `correlationId` trên log reuse qua `CorrelationMiddleware` scope (không field riêng trong message).
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `0c5c72e` | Sẵn sàng merge | – |
+
+**Lăng kính (v1):** Đúng FR-010/plan O-1..O-4; transaction reuse tách sau rollback CAS; không token trong log/metric. Bảo mật: EF parameterized SQL; 401 chung; family revoke. Chất lượng: @S02/@S06 BDD + hồi quy @S01–@S05. Chi phí: thêm 2 query khi CAS thua (chấp nhận).
+
+**Giới hạn đã biết (review):** chưa BDD assert metric **không** tăng khi token invalid/không reuse (`identity:reuse-metric:invalid-no-increment`, P3 — đường code `reuses.Count == 0`); log reuse không assert trong BDD (plan B4).
 
 ## Fix log
 
