@@ -8,6 +8,7 @@ using IdentityService.Security.Clients;
 using IdentityService.Tests.Support;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string LogoutPath = "/api/v1/auth/logout";
     private const string ChangePasswordPath = "/api/v1/auth/password";
     private const string ConnectTokenPath = "/connect/token";
+    private const string ConnectAuthorizePath = "/connect/authorize";
     private const string ClientCredentialsEnabledKey = "Identity:Features:ClientCredentialsEnabled";
+    private const string AuthorizationCodeEnabledKey = "Identity:Features:AuthorizationCodeEnabled";
     private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
     private const string RefreshDefaultClientKey = "Identity:RefreshToken:DefaultClientId";
     private const string ClientRegistryEnabledKey = "Identity:Clients:Enabled";
@@ -154,6 +157,112 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
 
     [Given("identity-service client credentials grant is enabled for BDD tests")]
     public void GivenClientCredentialsEnabled() => _settings[ClientCredentialsEnabledKey] = "true";
+
+    [Given("identity-service authorization code grant is enabled for BDD tests")]
+    public void GivenAuthorizationCodeEnabled() => _settings[AuthorizationCodeEnabledKey] = "true";
+
+    [Given(@"identity-service client {string} has redirect uri {string} and allowed scopes:")]
+    public void GivenClientRedirectAndScopes(string clientId, string redirectUri, Table scopesTable)
+    {
+        var index = FindClientSeedIndex(clientId);
+        if (index < 0)
+        {
+            index = NextClientSeedIndex();
+            _settings[$"Identity:Clients:Seed:{index}:ClientId"] = clientId;
+            _settings[$"Identity:Clients:Seed:{index}:ClientType"] = "Public";
+        }
+
+        _settings[$"Identity:Clients:Seed:{index}:RedirectUris:0"] = redirectUri;
+        var scopeIndex = 0;
+        foreach (var row in scopesTable.Rows)
+        {
+            _settings[$"Identity:Clients:Seed:{index}:AllowedScopes:{scopeIndex}"] = row["scope"];
+            scopeIndex++;
+        }
+    }
+
+    [When(@"I GET the authorize endpoint for client {string} with redirect_uri {string} state {string} scope {string} pkce challenge {string} method {string}")]
+    public async Task WhenGetAuthorizeWithState(
+        string clientId,
+        string redirectUri,
+        string state,
+        string scope,
+        string challenge,
+        string method) =>
+        await SendAuthorizeGetAsync(clientId, redirectUri, state, scope, challenge, method);
+
+    [When(@"I GET the authorize endpoint for client {string} with redirect_uri {string} without state scope {string} pkce challenge {string} method {string}")]
+    public async Task WhenGetAuthorizeWithoutState(
+        string clientId,
+        string redirectUri,
+        string scope,
+        string challenge,
+        string method) =>
+        await SendAuthorizeGetAsync(clientId, redirectUri, state: null, scope, challenge, method);
+
+    [When(@"I GET the authorize endpoint for client {string} with redirect_uri {string} state {string} scope {string} without pkce challenge method {string}")]
+    public async Task WhenGetAuthorizeWithoutChallenge(
+        string clientId,
+        string redirectUri,
+        string state,
+        string scope,
+        string method) =>
+        await SendAuthorizeGetAsync(clientId, redirectUri, state, scope, challenge: null, method);
+
+    [Then(@"the response has no Location header containing {string}")]
+    public void ThenResponseHasNoLocationContaining(string fragment)
+    {
+        if (_response!.Headers.Location is { } location)
+        {
+            Assert.DoesNotContain(fragment, location.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private async Task SendAuthorizeGetAsync(
+        string clientId,
+        string redirectUri,
+        string? state,
+        string scope,
+        string? challenge,
+        string method)
+    {
+        var query = new List<KeyValuePair<string, string?>>
+        {
+            new("client_id", clientId),
+            new("redirect_uri", redirectUri),
+            new("response_type", "code"),
+            new("scope", scope),
+            new("code_challenge_method", method),
+        };
+        if (state is not null)
+        {
+            query.Add(new KeyValuePair<string, string?>("state", state));
+        }
+
+        if (challenge is not null)
+        {
+            query.Add(new KeyValuePair<string, string?>("code_challenge", challenge));
+        }
+
+        var path = QueryString.Create(query).ToUriComponent();
+        using var request = new HttpRequestMessage(HttpMethod.Get, ConnectAuthorizePath + path);
+        _response = await _client!.SendAsync(request);
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    private int FindClientSeedIndex(string clientId)
+    {
+        for (var idx = 0; idx < 32; idx++)
+        {
+            var key = $"Identity:Clients:Seed:{idx}:ClientId";
+            if (_settings.TryGetValue(key, out var value) && string.Equals(value, clientId, StringComparison.Ordinal))
+            {
+                return idx;
+            }
+        }
+
+        return -1;
+    }
 
     [Given("identity-service has confidential oauth client {string} with secret {string}")]
     public void GivenConfidentialOAuthClient(string clientId, string secret)
@@ -1377,7 +1486,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             });
         });
         _factories.Add(factory);
-        return factory.CreateClient();
+        return factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
     }
 
     private async Task DisposeFactoriesAsync()

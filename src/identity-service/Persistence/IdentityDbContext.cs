@@ -14,6 +14,8 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 
     public DbSet<RegisteredClient> RegisteredClients => Set<RegisteredClient>();
 
+    public DbSet<AuthorizationCode> AuthorizationCodes => Set<AuthorizationCode>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -65,6 +67,21 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
             entity.Property(client => client.RedirectUris).HasColumnName("redirect_uris").HasColumnType("jsonb");
             entity.Property(client => client.AllowedScopes).HasColumnName("allowed_scopes").HasColumnType("jsonb");
             entity.Property(client => client.UpdatedAt).HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<AuthorizationCode>(entity =>
+        {
+            entity.ToTable("authorization_code");
+            entity.HasKey(code => code.CodeHash);
+            entity.Property(code => code.CodeHash).HasColumnName("code_hash").HasMaxLength(88);
+            entity.Property(code => code.ClientId).HasColumnName("client_id").HasMaxLength(64).IsRequired();
+            entity.Property(code => code.RedirectUri).HasColumnName("redirect_uri").HasMaxLength(2048).IsRequired();
+            entity.Property(code => code.CodeChallenge).HasColumnName("code_challenge").HasMaxLength(128).IsRequired();
+            entity.Property(code => code.CodeChallengeMethod).HasColumnName("code_challenge_method").HasMaxLength(16).IsRequired();
+            entity.Property(code => code.UserId).HasColumnName("user_id");
+            entity.Property(code => code.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(code => code.UsedAt).HasColumnName("used_at");
+            entity.Property(code => code.CreatedAt).HasColumnName("created_at");
         });
     }
 }

@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: done
-next_action: "Lát 13 TB-041 — coding-start."
+next_action: "TB-042 plan-review — chốt O-1..O-11 (authorize + PKCE)."
 blocked_by: null
 
 steps:

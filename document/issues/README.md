@@ -53,8 +53,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-038](TB-038-identity-logout.md) | Identity lát 10, đăng xuất thu hồi phiên | 1 | done |
 | [TB-039](TB-039-identity-change-password.md) | Identity lát 11, đổi mật khẩu và thu hồi refresh | 1 | done |
 | [TB-040](TB-040-identity-client-registry.md) | Identity lát 12, quản lý client đăng ký | 1 | done |
-| [TB-041](TB-041-identity-client-credentials.md) | Identity lát 13, Client Credentials và token máy | 1 | review |
-| [TB-042](TB-042-identity-authorize-pkce.md) | Identity lát 14, Authorization Code + PKCE: authorize và trang đăng nhập | 1 | todo |
+| [TB-041](TB-041-identity-client-credentials.md) | Identity lát 13, Client Credentials và token máy | 1 | done |
+| [TB-042](TB-042-identity-authorize-pkce.md) | Identity lát 14a, Authorize + PKCE validation | 1 | review |
 | [TB-043](TB-043-identity-token-endpoint-code-exchange.md) | Identity lát 15, endpoint token đổi mã (code_verifier) | 1 | todo |
 | [TB-044](TB-044-identity-oidc.md) | Identity lát 16, OIDC: id_token, userinfo, discovery | 1 | todo |
 | [TB-045](TB-045-identity-scope-authorization.md) | Identity lát 17, ủy quyền theo scope | 1 | todo |
