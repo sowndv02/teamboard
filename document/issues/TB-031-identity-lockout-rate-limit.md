@@ -1,13 +1,13 @@
 ---
 key: TB-031
 title: Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập
-status: review
+status: done
 phase: 1
 branch: feature/TB-031-identity-lockout-rate-limit
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26     # ngày chuyển in-progress
-closed: null            # ngày done/dropped
+closed: 2026-11-26        # merge PR #26 (cbc8124)
 ---
 
 # TB-031 — Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập
@@ -42,6 +42,7 @@ Plan: [`document/plans/TB-031-identity-lockout-rate-limit.md`](../plans/TB-031-i
 - 2026-11-26: coding-start — B1–B4: `login_attempt`, lockout, `auth-public` rate limit; test host `RateLimiting:Enabled=false` mặc định; **37/37** pass.
 - 2026-11-26: coding-review v1 PASS — gate xanh; Giới hạn đã biết: ForwardedHeaders chưa wire (cờ off); limiter in-memory per instance; partition IP trùng logic gateway (nợ extract shared).
 - 2026-11-26: PR [#26](https://github.com/sowndv02/teamboard/pull/26) opened (`534acfd`).
+- 2026-11-26: PR #26 merged vào `main` (`cbc8124`).
 
 ## Workflow
 

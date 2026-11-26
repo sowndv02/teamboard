@@ -1,12 +1,12 @@
 ---
 key: TB-032
 title: Identity lát 4, phát access token JWT khi đăng nhập
-status: todo
+status: in-progress
 phase: 1
 branch: feature/TB-032-identity-access-token
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26
 closed: null            # ngày done/dropped
 ---
 
@@ -22,13 +22,18 @@ Issue khung cấp key khi duyệt bảng lát: lát 4 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Login thành công trả access JWT RS256 + claim FR-005 (@S01–@S03)
+- [ ] TTL access ~10 phút cấu hình được (BR-004, @S02)
+- [ ] 401 không trả token (@S05)
+- [ ] Ready fail khi thiếu khoá ký active
+- [ ] ADR RS256 + loader khoá; gate xanh plan-review
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identity-access-token.md) (`draft`, B0–B4; P-01..P-03; 4 câu hỏi mở).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: TB-031 merged PR #26 (`cbc8124`); `plan-init` trên nhánh `feature/TB-032-identity-access-token`.
 
 ## Workflow
 
@@ -36,7 +41,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Plan draft B0–B4 |
 | plan-review | pending | | | |
 | test-init | pending | – | | |
 | test-review | pending | | | |
