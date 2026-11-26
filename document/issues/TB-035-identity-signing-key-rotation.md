@@ -1,7 +1,7 @@
 ---
 key: TB-035
 title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-035-identity-signing-key-rotation
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -39,6 +39,7 @@ Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035
 - 2026-11-26: test-review v1 PASS — @S06 retire JWKS; @S01 dual kid; `JwtRetiringKidTokenValidationIntegrationTests` (probe JWKS trước validate); **7+2 đỏ**.
 - 2026-11-26: **coding-start done, xanh 55/55** identity (`!~Compose`), **10/10** Auth, **25/25** board (`Category!=docker`); ADR 0013 + cập nhật 0012; BDD fix S02 fake time + S05 step wording.
 - 2026-11-26: **coding-review v1 PASS** — 1 FIX (CLI `JsonException`); giới hạn kid cố định / không file-lock ghi trong ADR 0013 phạm vi lab.
+- 2026-11-26: [PR #30](https://github.com/sowndv02/teamboard/pull/30) (`feat` `965bf04`).
 
 ## Workflow
 
@@ -52,7 +53,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | @S06 + consumer probe; guard @S03/@S04 hoãn tới CLI start |
 | coding-start | done, xanh 55/55 | – | 2026-11-26 | ADR 0013; gate slnx build+format |
 | coding-review | PASS | 1 | 2026-11-26 | fix CLI JsonException; 0 CONFIRM mở |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #30](https://github.com/sowndv02/teamboard/pull/30) |
 
 ## Confirm log
 

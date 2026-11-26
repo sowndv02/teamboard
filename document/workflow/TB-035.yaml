@@ -3,7 +3,7 @@
 id: TB-035
 scope: issue
 title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
-updated: 2026-11-26T19:00:00Z
+updated: 2026-11-26T19:15:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -14,10 +14,10 @@ links:
   features_dir: document/spec/features/identity-service/
   branch: feature/TB-035-identity-signing-key-rotation
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/30
 
-current_step: create-pr
-next_action: "create-pr TB-035 (user confirms commit/push)"
+current_step: done
+next_action: "Chờ review người và CI xanh; merge do người dùng"
 
 steps:
   plan-init:
@@ -76,7 +76,12 @@ steps:
     evidence:
       - "Review v1; fix identity:SigningKeyRotationCommands:json-parse"
       - "identity 55/55 + Auth 10/10 gate re-run"
-  create-pr:              { status: pending }
+  create-pr:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T19:15:00Z
+    evidence:
+      - "https://github.com/sowndv02/teamboard/pull/30"
 
 confirm_pending: []
 
@@ -84,3 +89,4 @@ events:
   - { at: 2026-11-26T23:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-034 merged PR #29; plan-init TB-035" }
   - { at: 2026-11-26T18:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start done; all tests green" }
   - { at: 2026-11-26T19:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
+  - { at: 2026-11-26T19:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "PR #30 opened" }
