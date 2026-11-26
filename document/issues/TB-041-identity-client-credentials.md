@@ -22,12 +22,12 @@ Issue khung cấp key khi duyệt bảng lát: lát 13 của `document/plans/ide
 - Không làm: code exchange (TB-043), authorize/PKCE (TB-042), introspection (TB-046), scope trên board API (TB-045) trừ khi plan Confirm #5 mở rộng `Teamboard.Auth` unit test only.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Confidential client đúng secret → access token máy hợp lệ (@S01, @S02).
-- [ ] Scope vượt `allowed_scopes` bị từ chối (@S03).
-- [ ] Sai secret/client không lộ chi tiết (@S04).
-- [ ] Không log client secret (@S05).
-- [ ] Public client không dùng được grant (@S06).
-- [ ] Hồi quy `!~Compose` xanh.
+- [x] Confidential client đúng secret → access token máy hợp lệ (@S01, @S02).
+- [x] Scope vượt `allowed_scopes` bị từ chối (@S03, @S03b).
+- [x] Sai secret/client không lộ chi tiết (@S04).
+- [x] Không log client secret (@S05).
+- [x] Public client không dùng được grant (@S06).
+- [x] Hồi quy `!~Compose` xanh (94/94).
 
 ## Kế hoạch
 Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-identity-client-credentials.md) (`approved`, B1–B4; plan-review PASS v1).
@@ -38,6 +38,7 @@ Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-i
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#7 (`/connect/token`, form body, scope bắt buộc, feature flag, defer Teamboard.Auth, OAuth errors, AuthPublic rate limit).
 - 2026-11-26: test-init — `client-credentials.feature` @S01–@S06; stub `/connect/token` 501; **5 failed, 87 passed** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX missing-scope @S03b, unit asserts behavior; **10 failed, 84 passed** `!~Compose`.
+- 2026-11-26: coding-start — `/connect/token` client_credentials, JWT máy, scope validator; **94/94** `!~Compose`.
 
 ## Workflow
 
@@ -49,7 +50,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#7 |
 | test-init | done | – | 2026-11-26 | 5 đỏ @S01–S04,@S06; @S05 xanh; +2 unit |
 | test-review | PASS | 1 | 2026-11-26 | FIX @S03b + unit đỏ behavior; 10 fail |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-11-26 | **94/94** `!~Compose` |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -64,17 +65,17 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 | `client-credentials.feature` | **đỏ** (501 ≠ 200) | |
-| @S02 | `client-credentials.feature` | **đỏ** (501 ≠ 200) | |
-| @S03 | `client-credentials.feature` | **đỏ** (501 ≠ invalid_scope) | |
-| @S03b | `client-credentials.feature` | **đỏ** (501 ≠ invalid_scope) | |
-| @S04 | `client-credentials.feature` | **đỏ** (501 ≠ invalid_client) | |
-| @S05 | `client-credentials.feature` | | **xanh** (log + not 404) |
-| @S06 | `client-credentials.feature` | **đỏ** (501 ≠ unauthorized_client) | |
-| unit issuer | `AccessTokenIssuerMachineTests` | **đỏ** (NIE) | |
-| unit scope | `ScopeValidatorTests` ×3 | **đỏ** (NIE) | |
+| @S01 | `client-credentials.feature` | | **xanh** |
+| @S02 | `client-credentials.feature` | | **xanh** |
+| @S03 | `client-credentials.feature` | | **xanh** |
+| @S03b | `client-credentials.feature` | | **xanh** |
+| @S04 | `client-credentials.feature` | | **xanh** |
+| @S05 | `client-credentials.feature` | | **xanh** |
+| @S06 | `client-credentials.feature` | | **xanh** |
+| unit issuer | `AccessTokenIssuerMachineTests` | | **xanh** |
+| unit scope | `ScopeValidatorTests` ×3 | | **xanh** |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **84 pass, 10 fail** (test-review).
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **94/94** (coding-start).
 
 ## Test review rounds
 

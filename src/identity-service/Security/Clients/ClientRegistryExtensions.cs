@@ -1,3 +1,4 @@
+using IdentityService.Security.Token;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -21,6 +22,7 @@ public static class ClientRegistryExtensions
         builder.Services.AddSingleton<RedirectUriMatcher>();
         builder.Services.AddSingleton<ClientSecretHasher>();
         builder.Services.AddScoped<IClientRegistry, ClientRegistry>();
+        builder.Services.AddScoped<ClientCredentialsTokenService>();
         builder.Services.AddHostedService<ClientRegistrySeeder>();
 
         builder.Services.AddHealthChecks().AddCheck<RegisteredClientsHealthCheck>(

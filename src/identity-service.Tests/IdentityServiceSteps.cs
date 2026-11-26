@@ -929,6 +929,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     public void ThenBodyExcludesWord(string word) =>
         Assert.DoesNotContain(word, _body, StringComparison.OrdinalIgnoreCase);
 
+    [Then("the response body does not contain {string}")]
+    public void ThenBodyExcludes(string value) =>
+        Assert.DoesNotContain(value, _body, StringComparison.Ordinal);
+
     [Then("no response had status code {int}")]
     public void ThenNoBurstStatus(int forbidden)
     {

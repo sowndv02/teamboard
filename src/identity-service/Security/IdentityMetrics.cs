@@ -16,6 +16,7 @@ public sealed class IdentityMetrics
     private readonly Counter<long> _logoutTotal;
     private readonly Counter<long> _passwordChangeTotal;
     private readonly Counter<long> _jwksServedTotal;
+    private readonly Counter<long> _machineAccessTokensIssuedTotal;
 
     public IdentityMetrics(IMeterFactory meterFactory)
     {
@@ -51,6 +52,9 @@ public sealed class IdentityMetrics
         _jwksServedTotal = meter.CreateCounter<long>(
             "jwks_served_total",
             description: "JWKS documents successfully served.");
+        _machineAccessTokensIssuedTotal = meter.CreateCounter<long>(
+            "machine_access_tokens_issued_total",
+            description: "Machine access tokens issued via client credentials.");
     }
 
     public void RecordPasswordHashDuration(double seconds) => _passwordHashDurationSeconds.Record(seconds);
@@ -72,4 +76,6 @@ public sealed class IdentityMetrics
     public void RecordPasswordChange() => _passwordChangeTotal.Add(1);
 
     public void RecordJwksServed() => _jwksServedTotal.Add(1);
+
+    public void RecordMachineAccessTokenIssued() => _machineAccessTokensIssuedTotal.Add(1);
 }
