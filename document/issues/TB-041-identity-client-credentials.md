@@ -39,6 +39,7 @@ Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-i
 - 2026-11-26: test-init — `client-credentials.feature` @S01–@S06; stub `/connect/token` 501; **5 failed, 87 passed** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX missing-scope @S03b, unit asserts behavior; **10 failed, 84 passed** `!~Compose`.
 - 2026-11-26: coding-start — `/connect/token` client_credentials, JWT máy, scope validator; **94/94** `!~Compose`.
+- 2026-11-26: coding-review v1 **PASS** — commit `9875f12`; gate build `-warnaserror` + **94/94** `!~Compose`.
 
 ## Workflow
 
@@ -51,7 +52,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-init | done | – | 2026-11-26 | 5 đỏ @S01–S04,@S06; @S05 xanh; +2 unit |
 | test-review | PASS | 1 | 2026-11-26 | FIX @S03b + unit đỏ behavior; 10 fail |
 | coding-start | done | – | 2026-11-26 | **94/94** `!~Compose` |
-| coding-review | pending | | | |
+| coding-review | PASS | 1 | 2026-11-26 | 9875f12; 0 CONFIRM/FIX mở |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -89,6 +90,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `9875f12` | PASS | – |
 
 ## Fix log
 
