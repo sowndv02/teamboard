@@ -32,6 +32,14 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string RateLimitEnabledKey = "Identity:RateLimiting:Enabled";
     private const string RateLimitPermitKey = "Identity:RateLimiting:PermitLimit";
     private const string RateLimitWindowKey = "Identity:RateLimiting:WindowSeconds";
+    private const string SigningKeysFileKey = "Identity:SigningKeys:JsonFile";
+    private const string JwtIssuerKey = "Identity:Jwt:Issuer";
+    private const string JwtAudienceKey = "Identity:Jwt:Audience";
+    private const string JwtLifetimeKey = "Identity:Jwt:AccessTokenLifetimeSeconds";
+    private const string BddJwtIssuer = "https://identity.test.local";
+    private const string BddJwtAudience = "teamboard";
+    private const int BddJwtLifetimeSeconds = 120;
+    private const string AccessTokensIssuedInstrument = "access_tokens_issued_total";
 
     // Nothing listens on port 1: simulates a stopped DB without needing a container.
     private const string UnreachableConnection =
@@ -48,8 +56,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private long _hashDurationSamples;
     private long _loginFailureMeasurements;
     private long _lockoutMeasurements;
+    private long _accessTokenMeasurements;
     private bool _observeLoginFailuresOnly;
     private bool _observeLockoutsOnly;
+    private bool _observeAccessTokensOnly;
+    private bool _omitSigningKeys;
     private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
     private readonly List<int> _burstStatusCodes = [];
     private (int First, int Second)? _concurrentStatuses;
@@ -64,6 +75,8 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _burstStatusCodes.Clear();
         _observeLoginFailuresOnly = false;
         _observeLockoutsOnly = false;
+        _observeAccessTokensOnly = false;
+        _omitSigningKeys = false;
         _loginFailureMeasurements = 0;
         _lockoutMeasurements = 0;
         _hashDurationSamples = 0;
@@ -130,6 +143,28 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
 
     [Given("identity-service rate limiting is disabled")]
     public void GivenRateLimitDisabled() => _settings[RateLimitEnabledKey] = "false";
+
+    [Given("identity-service access token issuance is configured for BDD tests")]
+    public void GivenAccessTokenIssuanceForBdd()
+    {
+        _omitSigningKeys = false;
+        _settings[SigningKeysFileKey] = TestSigningKeyPaths.JsonFile;
+        _settings[JwtIssuerKey] = BddJwtIssuer;
+        _settings[JwtAudienceKey] = BddJwtAudience;
+        _settings[JwtLifetimeKey] = BddJwtLifetimeSeconds.ToString(CultureInfo.InvariantCulture);
+    }
+
+    [Given("identity-service is configured without signing keys")]
+    public void GivenWithoutSigningKeys() => _omitSigningKeys = true;
+
+    [Given("identity-service metrics are being observed for issued access tokens")]
+    public void GivenAccessTokenMetrics()
+    {
+        _observeLoginFailuresOnly = false;
+        _observeLockoutsOnly = false;
+        _observeAccessTokensOnly = true;
+        StartMeterListener();
+    }
 
     [Given("the email and IP pair for {string} is locked from failed logins")]
     public async Task GivenPairLocked(string email) =>
@@ -260,6 +295,14 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.DoesNotContain(e, _body, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Then("the login response body does not contain {string}, {string}, or {string}")]
+    public void ThenLoginBodyExcludesThree(string a, string b, string c)
+    {
+        Assert.DoesNotContain(a, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(b, _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(c, _body, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Then("the login response has a non-empty id")]
     public void ThenLoginResponseHasId()
     {
@@ -268,6 +311,40 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.False(string.IsNullOrWhiteSpace(id));
         Assert.True(Guid.TryParse(id, out _), "id should be a GUID string.");
     }
+
+    [Then("the login response includes a Bearer access token with expires_in")]
+    public void ThenLoginResponseIncludesBearerAccessToken() => JwtBddAssertions.AssertBearerAccessTokenShape(_body);
+
+    [Then("the access token header uses algorithm RS256 and includes kid")]
+    public void ThenAccessTokenHeaderRs256()
+    {
+        var token = JwtBddAssertions.ParseAccessTokenFromLoginBody(_body);
+        JwtBddAssertions.AssertRs256HeaderWithKid(token);
+    }
+
+    [Then("the access token lifetime is about {int} seconds")]
+    public void ThenAccessTokenLifetimeAbout(int expectedSeconds)
+    {
+        var token = JwtBddAssertions.ParseAccessTokenFromLoginBody(_body);
+        JwtBddAssertions.AssertLifetimeAbout(token, expectedSeconds);
+    }
+
+    [Then("the access token includes required user claims for audience {string}")]
+    public void ThenAccessTokenUserClaims(string audience)
+    {
+        var userId = JwtBddAssertions.GetUserIdFromLoginBody(_body);
+        var token = JwtBddAssertions.ParseAccessTokenFromLoginBody(_body);
+        JwtBddAssertions.AssertUserClaims(token, userId, audience);
+    }
+
+    [Then("the login response body does not contain a PEM private key")]
+    public void ThenLoginBodyNoPem() => JwtBddAssertions.AssertNoPrivateKeyPem(_body);
+
+    [Then("the login response has no access_token property")]
+    public void ThenLoginResponseNoAccessToken() => JwtBddAssertions.AssertNoAccessTokenProperty(_body);
+
+    [Then("no login error field contains a three-part JWT")]
+    public void ThenLoginErrorFieldsNotJwt() => JwtBddAssertions.AssertNoJwtLikeStringValues(_body);
 
     [Then("the error title is {string}")]
     public void ThenErrorTitle(string expectedTitle)
@@ -283,6 +360,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         {
             LoginFailuresInstrument => _loginFailureMeasurements,
             LockoutsInstrument => _lockoutMeasurements,
+            AccessTokensIssuedInstrument => _accessTokenMeasurements,
             _ => throw new ArgumentOutOfRangeException(nameof(instrumentName), instrumentName, "Unknown identity counter."),
         };
         Assert.True(
@@ -556,6 +634,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                     return;
                 }
 
+                if (_observeAccessTokensOnly)
+                {
+                    if (instrument.Name == AccessTokensIssuedInstrument)
+                    {
+                        listener.EnableMeasurementEvents(instrument);
+                    }
+
+                    return;
+                }
+
                 if (instrument.Name == HashDurationInstrument)
                 {
                     listener.EnableMeasurementEvents(instrument);
@@ -580,6 +668,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             {
                 Interlocked.Add(ref _lockoutMeasurements, measurement);
             }
+
+            if (instrument.Name == AccessTokensIssuedInstrument)
+            {
+                Interlocked.Add(ref _accessTokenMeasurements, measurement);
+            }
         });
         _meterListener.Start();
     }
@@ -596,6 +689,20 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             foreach (var (key, value) in _settings)
             {
                 builder.UseSetting(key, value);
+            }
+
+            if (!_omitSigningKeys)
+            {
+                if (!_settings.ContainsKey(SigningKeysFileKey))
+                {
+                    builder.UseSetting(SigningKeysFileKey, TestSigningKeyPaths.JsonFile);
+                }
+
+                builder.UseSetting(JwtIssuerKey, _settings.GetValueOrDefault(JwtIssuerKey, BddJwtIssuer));
+                builder.UseSetting(JwtAudienceKey, _settings.GetValueOrDefault(JwtAudienceKey, BddJwtAudience));
+                builder.UseSetting(
+                    JwtLifetimeKey,
+                    _settings.GetValueOrDefault(JwtLifetimeKey, BddJwtLifetimeSeconds.ToString(CultureInfo.InvariantCulture)));
             }
 
             if (_logs is not null)

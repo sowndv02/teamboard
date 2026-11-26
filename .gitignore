@@ -414,3 +414,7 @@ src/web/playwright-report/
 src/web/test-results/
 *.tsbuildinfo
 npm-debug.log*
+
+# Identity signing keys (never commit live private keys)
+config/signing-keys.json
+config/signing-keys.local.json

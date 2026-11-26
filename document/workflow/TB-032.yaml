@@ -3,7 +3,7 @@
 id: TB-032
 scope: issue
 title: Identity lát 4, phát access token JWT khi đăng nhập
-updated: 2026-11-26T12:00:00Z
+updated: 2026-11-26T15:00:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-032: ADR 0007 draft + access-token.feature @S01-S06"
+current_step: coding-start
+next_action: "coding-start TB-032 B0-B1: accept ADR 0010, signing key loader, ready check, packages"
 blocked_by: null
 
 steps:
@@ -35,9 +35,27 @@ steps:
     open_confirm: 0
     open_fix: 0
     evidence: ["Confirm #1–#4"]
-  test-init:            { status: pending }
-  test-init:            { status: pending }
-  test-review:          { status: pending }
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T14:30:00Z
+    evidence:
+      - document/architecture/adr/0010-identity-jwt-signing.md
+      - document/spec/features/identity-service/access-token.feature
+      - document/spec/features/identity-service/login.feature @S01
+      - src/identity-service.Tests/Health/SigningKeyReadyTests.cs
+      - "dotnet test identity-service.Tests filter !~Compose: 6 failed (JWT/ready), 38 passed"
+  test-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T15:00:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "FIX @S04 vacuous green; Background; @S05 credential shape"
+      - "dotnet test !~Compose: 7 failed, 37 passed"
   coding-start:         { status: pending }
   coding-review:        { status: pending }
   create-pr:            { status: pending }
@@ -47,3 +65,5 @@ confirm_pending: []
 events:
   - { at: 2026-11-26T12:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-031 merged; plan-init TB-032; mở plan-review" }
   - { at: 2026-11-26T12:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review PASS v1; mở test-init" }
+  - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: ADR 0010 + access-token @S01-S06; 6 đỏ JWT/ready; mở test-review" }
+  - { at: 2026-11-26T15:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review PASS v1; mở coding-start" }

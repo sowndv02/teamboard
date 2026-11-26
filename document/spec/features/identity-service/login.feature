@@ -4,15 +4,17 @@ Feature: identity-service user login
   I want to sign in with email and password
   So that failures do not reveal whether the email exists
 
-  @S01 @FR-002
-  Scenario: Valid credentials return 200 without secrets in the body
+  @S01 @FR-002 @TB-032
+  Scenario: Valid credentials return 200 with user id and access token without password material
     Given an empty PostgreSQL database is running
+    And identity-service access token issuance is configured for BDD tests
     And identity-service is configured to use that database and applies migrations on startup
     And a user is registered with email "login-s01@example.com" and password "ValidPass123456"
     When I send a login request with email "login-s01@example.com" and password "ValidPass123456"
     Then the status code is 200
-    And the login response body does not contain "password", "hash", "salt", "token", or "access"
+    And the login response body does not contain "password", "hash", or "salt"
     And the login response has a non-empty id
+    And the login response includes a Bearer access token with expires_in
 
   @S02 @FR-002 @BR-003
   Scenario: Wrong password returns 401 with a stable credential error
