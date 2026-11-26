@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IdentityService.Cli;
+using IdentityService.Security.Authorize;
 using IdentityService.Security.Clients;
 using IdentityService.Tests.Support;
 using Microsoft.AspNetCore.Builder;
@@ -62,6 +63,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string BddJwtAudience = "teamboard";
     private const int BddJwtLifetimeSeconds = 120;
     private const string AccessTokensIssuedInstrument = "access_tokens_issued_total";
+    private const string AuthorizationCodeExchangesInstrument = "authorization_code_exchanges_total";
     private const string JwksServedInstrument = "jwks_served_total";
     private const string RefreshReuseInstrument = "refresh_reuse_total";
 
@@ -81,12 +83,14 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private long _loginFailureMeasurements;
     private long _lockoutMeasurements;
     private long _accessTokenMeasurements;
+    private long _authorizationCodeExchangeMeasurements;
     private long _jwksServedMeasurements;
     private long _refreshReuseMeasurements;
     private long _refreshReuseBaseline;
     private bool _observeLoginFailuresOnly;
     private bool _observeLockoutsOnly;
     private bool _observeAccessTokensOnly;
+    private bool _observeAuthorizationCodeExchangesOnly;
     private bool _observeJwksServedOnly;
     private bool _observeRefreshReuseOnly;
     private bool _omitSigningKeys;
@@ -110,6 +114,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private bool _preserveHttpCookies;
     private string? _pendingAuthorizeRedirectUri;
     private string? _pendingAuthorizeState;
+    private string? _storedAuthorizationCode;
+    private readonly List<string> _sensitiveAuthorizationValues = [];
+    private int _logCaptureBaseline;
 
     private PostgresDatabase Database => _database ?? throw new InvalidOperationException("No database yet.");
 
@@ -123,6 +130,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _observeLoginFailuresOnly = false;
         _observeLockoutsOnly = false;
         _observeAccessTokensOnly = false;
+        _observeAuthorizationCodeExchangesOnly = false;
         _observeJwksServedOnly = false;
         _observeRefreshReuseOnly = false;
         _omitSigningKeys = false;
@@ -144,11 +152,15 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _lockoutMeasurements = 0;
         _hashDurationSamples = 0;
         _jwksServedMeasurements = 0;
+        _authorizationCodeExchangeMeasurements = 0;
         _redirectUriMatchResult = null;
         _confidentialClientSecrets.Clear();
         _preserveHttpCookies = false;
         _pendingAuthorizeRedirectUri = null;
         _pendingAuthorizeState = null;
+        _storedAuthorizationCode = null;
+        _sensitiveAuthorizationValues.Clear();
+        _logCaptureBaseline = 0;
     }
 
     [Given("identity-service is configured to use a database that is not running")]
@@ -257,6 +269,98 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(absolute.Query);
         Assert.False(string.IsNullOrWhiteSpace(query["code"].ToString()), "Expected code query parameter.");
         Assert.Equal(expectedState, query["state"].ToString());
+        StoreAuthorizationCodeFromQuery(query["code"].ToString());
+    }
+
+    [Given(@"I have obtained an authorization code for client {string} with redirect_uri {string} state {string} scope {string} pkce challenge {string} method {string} as user {string} with password {string}")]
+    public async Task GivenObtainedAuthorizationCode(
+        string clientId,
+        string redirectUri,
+        string state,
+        string scope,
+        string challenge,
+        string method,
+        string email,
+        string password)
+    {
+        await SendAuthorizeGetAsync(clientId, redirectUri, state, scope, challenge, method);
+        await SubmitIdentityLoginPageAsync(email, password, requireAuthorizeRedirect: true);
+        Assert.Equal(302, (int)_response!.StatusCode);
+        var location = _response.Headers.Location?.ToString();
+        Assert.False(string.IsNullOrWhiteSpace(location));
+        var absolute = Uri.TryCreate(location, UriKind.Absolute, out var abs)
+            ? abs
+            : new Uri(new Uri("http://localhost"), location);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(absolute.Query);
+        StoreAuthorizationCodeFromQuery(query["code"].ToString());
+    }
+
+    [Given("identity-service log capture ignores entries before the token exchange")]
+    public void GivenLogCaptureBaselineBeforeTokenExchange()
+    {
+        Assert.True(_logs is not null, "Log capture was not enabled.");
+        _logCaptureBaseline = _logs.Entries.Count;
+    }
+
+    [Given("the stored authorization code is expired in the database")]
+    public async Task GivenStoredAuthorizationCodeExpired()
+    {
+        var code = RequireStoredAuthorizationCode();
+        var hash = AuthorizationCodeHasher.Hash(code);
+        await Database.ExpireAuthorizationCodeByHashAsync(hash);
+    }
+
+    [When(@"I exchange the stored authorization code for client {string} with redirect_uri {string} and code_verifier {string} without client_secret")]
+    public Task WhenExchangeAuthorizationCodeWithoutSecret(
+        string clientId,
+        string redirectUri,
+        string codeVerifier) =>
+        SendAuthorizationCodeTokenAsync(clientId, redirectUri, codeVerifier, includeClientSecret: false);
+
+    [When(@"I exchange the stored authorization code for client {string} with redirect_uri {string} and code_verifier {string} and client_secret {string}")]
+    public Task WhenExchangeAuthorizationCodeWithSecret(
+        string clientId,
+        string redirectUri,
+        string codeVerifier,
+        string clientSecret) =>
+        SendAuthorizationCodeTokenAsync(clientId, redirectUri, codeVerifier, includeClientSecret: true, clientSecret);
+
+    [Then(@"the oauth token access token is a user token for email {string} with audience {string}")]
+    public async Task ThenOAuthTokenIsUserTokenForEmail(string email, string audience)
+    {
+        var userId = (await Database.GetUserIdByEmailAsync(email)).ToString();
+        var token = JwtBddAssertions.ParseAccessTokenFromTokenBody(_body);
+        JwtBddAssertions.AssertUserClaims(token, userId, audience);
+    }
+
+    [Then("the stored authorization code is not marked as used in the database")]
+    public async Task ThenStoredAuthorizationCodeNotUsed()
+    {
+        var code = RequireStoredAuthorizationCode();
+        var hash = AuthorizationCodeHasher.Hash(code);
+        var usedAt = await Database.GetAuthorizationCodeUsedAtByHashAsync(hash);
+        Assert.Null(usedAt);
+    }
+
+    [Then("at least one authorization code exchange metric was recorded")]
+    public void ThenAuthorizationCodeExchangeMetricRecorded()
+    {
+        Assert.True(
+            Volatile.Read(ref _authorizationCodeExchangeMeasurements) > 0,
+            $"Expected at least one measurement for {AuthorizationCodeExchangesInstrument}.");
+    }
+
+    [Then("captured logs contain no authorization code or code_verifier secrets")]
+    public void ThenCapturedLogsContainNoAuthorizationSecrets()
+    {
+        Assert.True(_logs is not null, "Log capture was not enabled.");
+        var joined = string.Join(
+            '\n',
+            _logs.Entries.Skip(_logCaptureBaseline).Select(entry => entry.Message));
+        foreach (var secret in _sensitiveAuthorizationValues)
+        {
+            Assert.DoesNotContain(secret, joined, StringComparison.Ordinal);
+        }
     }
 
     [Then("the response has Content-Security-Policy frame-ancestors none")]
@@ -353,6 +457,29 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         return match.Success ? match.Groups[1].Value : null;
     }
 
+    private void StoreAuthorizationCodeFromQuery(string code)
+    {
+        Assert.False(string.IsNullOrWhiteSpace(code));
+        _storedAuthorizationCode = code;
+        TrackSensitiveAuthorizationValue(code);
+    }
+
+    private string RequireStoredAuthorizationCode() =>
+        _storedAuthorizationCode ?? throw new InvalidOperationException("No authorization code stored from authorize redirect.");
+
+    private void TrackSensitiveAuthorizationValue(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        if (!_sensitiveAuthorizationValues.Contains(value, StringComparer.Ordinal))
+        {
+            _sensitiveAuthorizationValues.Add(value);
+        }
+    }
+
     private int FindClientSeedIndex(string clientId)
     {
         for (var idx = 0; idx < 32; idx++)
@@ -428,6 +555,49 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         };
         _response = await _client!.SendAsync(request);
         _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    private async Task SendAuthorizationCodeTokenAsync(
+        string clientId,
+        string redirectUri,
+        string codeVerifier,
+        bool includeClientSecret,
+        string? clientSecret = null)
+    {
+        var code = RequireStoredAuthorizationCode();
+        TrackSensitiveAuthorizationValue(code);
+        TrackSensitiveAuthorizationValue(codeVerifier);
+
+        var fields = new Dictionary<string, string>
+        {
+            ["grant_type"] = "authorization_code",
+            ["code"] = code,
+            ["code_verifier"] = codeVerifier,
+            ["client_id"] = clientId,
+            ["redirect_uri"] = redirectUri,
+        };
+        if (includeClientSecret)
+        {
+            fields["client_secret"] = clientSecret ?? string.Empty;
+            if (!string.IsNullOrEmpty(clientSecret))
+            {
+                _confidentialClientSecrets.Add(clientSecret);
+            }
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, ConnectTokenPath)
+        {
+            Content = new FormUrlEncodedContent(fields),
+        };
+        _response = await _client!.SendAsync(request);
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    [Then(@"the response body does not contain the stored authorization code plaintext")]
+    public void ThenResponseBodyDoesNotContainStoredAuthorizationCode()
+    {
+        var code = RequireStoredAuthorizationCode();
+        Assert.DoesNotContain(code, _body, StringComparison.Ordinal);
     }
 
     [Then("the status code is not {int}")]
@@ -707,6 +877,18 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _observeLoginFailuresOnly = false;
         _observeLockoutsOnly = false;
         _observeAccessTokensOnly = true;
+        _observeAuthorizationCodeExchangesOnly = false;
+        StartMeterListener();
+    }
+
+    [Given("identity-service metrics are being observed for authorization code exchanges")]
+    public void GivenAuthorizationCodeExchangeMetrics()
+    {
+        _observeLoginFailuresOnly = false;
+        _observeLockoutsOnly = false;
+        _observeAccessTokensOnly = false;
+        _observeAuthorizationCodeExchangesOnly = true;
+        _authorizationCodeExchangeMeasurements = 0;
         StartMeterListener();
     }
 
@@ -1457,6 +1639,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                     return;
                 }
 
+                if (_observeAuthorizationCodeExchangesOnly)
+                {
+                    if (instrument.Name == AuthorizationCodeExchangesInstrument)
+                    {
+                        listener.EnableMeasurementEvents(instrument);
+                    }
+
+                    return;
+                }
+
                 if (_observeJwksServedOnly)
                 {
                     if (instrument.Name == JwksServedInstrument)
@@ -1505,6 +1697,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             if (instrument.Name == AccessTokensIssuedInstrument)
             {
                 Interlocked.Add(ref _accessTokenMeasurements, measurement);
+            }
+
+            if (instrument.Name == AuthorizationCodeExchangesInstrument)
+            {
+                Interlocked.Add(ref _authorizationCodeExchangeMeasurements, measurement);
             }
 
             if (instrument.Name == JwksServedInstrument)

@@ -96,6 +96,52 @@ internal sealed class PostgresDatabase : IAsyncDisposable
         return await command.ExecuteScalarAsync() as string;
     }
 
+    public async Task<Guid> GetUserIdByEmailAsync(string email)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT id
+            FROM users
+            WHERE email = @email
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("email", email);
+        return (Guid)(await command.ExecuteScalarAsync())!;
+    }
+
+    public async Task<DateTimeOffset?> GetAuthorizationCodeUsedAtByHashAsync(string codeHash)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT used_at
+            FROM authorization_code
+            WHERE code_hash = @code_hash
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("code_hash", codeHash);
+        var value = await command.ExecuteScalarAsync();
+        return value is null or DBNull ? null : (DateTimeOffset)value;
+    }
+
+    public async Task ExpireAuthorizationCodeByHashAsync(string codeHash)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            UPDATE authorization_code
+            SET expires_at = @expires_at
+            WHERE code_hash = @code_hash
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("code_hash", codeHash);
+        command.Parameters.AddWithValue("expires_at", DateTimeOffset.UtcNow.AddMinutes(-5));
+        await command.ExecuteNonQueryAsync();
+    }
+
     public async Task<string?> GetOAuthClientSecretHashAsync(string clientId)
     {
         await using var connection = new NpgsqlConnection(ConnectionString);

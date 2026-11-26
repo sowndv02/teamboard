@@ -38,6 +38,8 @@ Plan: [`document/plans/TB-043-identity-token-endpoint-code-exchange.md`](../plan
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: plan-init từ `main` `062c557` (sau merge PR #39); nhánh `feature/TB-043-identity-token-endpoint-code-exchange`.
 - 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-5 (access only, shared flag, confidential secret, no scope claim, OAuth errors).
+- 2026-11-26: test-init — `authorization-code-token.feature` @S01–@S08 + @S01b; `PkceValidatorTests.VerifyS256`; **10 fail (9 BDD + 1 unit), 112 pass** `!~Compose` (BDD đỏ: `unsupported_grant_type` / status 200; unit: `NotImplementedException`).
+- 2026-11-26: test-review v1 **PASS** — FIX @S07b missing secret, @S08 assert 200 (BR-007 end-to-end), tiêu đề S05/S06; **11 fail, 111 pass** `!~Compose`.
 
 ## Workflow
 
@@ -47,8 +49,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B1–B6; O-1..O-5 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm O-1..O-5 |
-| test-init | pending | – | | |
-| test-review | pending | | | |
+| test-init | done | – | 2026-11-26 | 10 đỏ 112 pass !~Compose |
+| test-review | PASS | 1 | 2026-11-26 | FIX @S07b @S08 |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -65,11 +67,25 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | `authorization-code-token.feature` | unsupported_grant_type / 200 | |
+| @S01b | `authorization-code-token.feature` | unsupported_grant_type / 200 | |
+| @S02 | `authorization-code-token.feature` | invalid_grant (unsupported_grant_type) | |
+| @S03 | `authorization-code-token.feature` | 200 sau exchange đầu | |
+| @S04 | `authorization-code-token.feature` | invalid_grant | |
+| @S05 | `authorization-code-token.feature` | invalid_grant | |
+| @S06 | `authorization-code-token.feature` | invalid_grant | |
+| @S07 | `authorization-code-token.feature` | invalid_client | |
+| @S07b | `authorization-code-token.feature` | invalid_client (thiếu secret) | |
+| @S08 | `authorization-code-token.feature` | 200 / exchange | |
+| unit PKCE | `PkceValidatorTests.VerifyS256` | NotImplementedException | |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **11 fail, 111 pass** (sau test-review v1).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | (local) | PASS | 0 |
 
 ## Review rounds
 
@@ -82,6 +98,9 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | test-review:TB-043:S07-missing-secret | FIX | authorization-code-token.feature | Plan @S07 thiếu secret | Thêm @S07b | 11 fail |
+| 1 | test-review:TB-043:S08-vacuous-green | FIX | authorization-code-token.feature | @S08 pass trước code | Then 200 + Bearer | 11 fail |
+| 1 | test-review:TB-043:scenario-titles | FIX | authorization-code-token.feature | P3 tiêu đề | Title case S05/S06 | — |
 
 ## Bài học (lessons learned)
 

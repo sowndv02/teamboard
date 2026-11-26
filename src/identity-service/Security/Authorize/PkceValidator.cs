@@ -23,4 +23,7 @@ public static class PkceValidator
         var bytes = SHA256.HashData(Encoding.ASCII.GetBytes(codeVerifier));
         return bytes;
     }
+
+    public static bool VerifyS256(string codeVerifier, string codeChallenge) =>
+        throw new NotImplementedException("TB-043 coding-start");
 }
