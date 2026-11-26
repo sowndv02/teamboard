@@ -1,13 +1,13 @@
 ---
 key: TB-034
 title: Identity lát 6, công bố JWKS
-status: review
+status: done
 phase: 1
 branch: feature/TB-034-identity-jwks
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26
-closed: null            # ngày done/dropped
+closed: 2026-11-26            # ngày done/dropped
 ---
 
 # TB-034 — Identity lát 6, công bố JWKS
@@ -39,6 +39,7 @@ Plan: [`document/plans/TB-034-identity-jwks.md`](../plans/TB-034-identity-jwks.m
 - 2026-11-26: coding-start — `GET /.well-known/jwks.json`, `jwks_served_total`, `Teamboard.Auth` HTTP-first; ADR 0012 chấp nhận; **Auth 8/8, identity 48, board 25**.
 - 2026-11-26: coding-review v1 PASS — gate xanh; board BDD consumer vẫn hoãn (giới hạn đã biết); sẵn `create-pr` sau commit feat.
 - 2026-11-26: [PR #29](https://github.com/sowndv02/teamboard/pull/29) (`feat` `139f287`).
+- 2026-11-26: merged PR #29 vào `main` (`21ffee1`); lát 6 xong; mở TB-035.
 
 ## Workflow
 

@@ -23,8 +23,14 @@ internal static class JwksEndpoints
             return;
         }
 
-        var activeKey = signingKeyStore.GetActiveKey();
-        var body = IdentityJwksSetBuilder.SerializeActiveKey(activeKey);
+        var publishedKeys = signingKeyStore.GetPublishedKeysForJwks();
+        if (publishedKeys.Count == 0)
+        {
+            response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            return;
+        }
+
+        var body = IdentityJwksSetBuilder.SerializePublishedKeys(publishedKeys);
         metrics.RecordJwksServed();
 
         response.StatusCode = StatusCodes.Status200OK;
