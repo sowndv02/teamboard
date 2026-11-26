@@ -85,7 +85,8 @@ Lý do các ô `–`:
 | Part | Trạng thái |
 |---|---|
 | 1 | Đã viết (2026-11-26): Bản đồ giải pháp, 4 case real-world, 2 lab đã chạy. Còn ⚠ ở các nguồn chỉ qua agent |
-| 2–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
+| 2 | Đã viết (2026-11-26): xUnit, builder, seam đồng hồ, Gherkin và Reqnroll, 4 lab đã chạy, 2 sự cố tái hiện thật. Còn ⚠ ở nguồn chỉ qua agent; không có case real-world riêng |
+| 3–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
 
 ## Tiêu chí hoàn thành lộ trình
 
