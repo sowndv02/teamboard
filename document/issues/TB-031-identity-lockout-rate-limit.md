@@ -1,7 +1,7 @@
 ---
 key: TB-031
 title: Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-031-identity-lockout-rate-limit
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -41,6 +41,7 @@ Plan: [`document/plans/TB-031-identity-lockout-rate-limit.md`](../plans/TB-031-i
 - 2026-11-26: test-review v1 PASS — Docker: Failed 9, Passed 28 (hồi quy 27 + @S09); FIX vacuous green @S03–@S05.
 - 2026-11-26: coding-start — B1–B4: `login_attempt`, lockout, `auth-public` rate limit; test host `RateLimiting:Enabled=false` mặc định; **37/37** pass.
 - 2026-11-26: coding-review v1 PASS — gate xanh; Giới hạn đã biết: ForwardedHeaders chưa wire (cờ off); limiter in-memory per instance; partition IP trùng logic gateway (nợ extract shared).
+- 2026-11-26: PR [#26](https://github.com/sowndv02/teamboard/pull/26) opened (`534acfd`).
 
 ## Workflow
 
@@ -54,7 +55,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | 9 đỏ đúng lý do; @S09 xanh chủ đích |
 | coding-start | done | – | 2026-11-26 | B1–B4; 37/37 pass (!~Compose) |
 | coding-review | PASS | 1 | 2026-11-26 | 37/37; FIX Produces 429 |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #26](https://github.com/sowndv02/teamboard/pull/26) |
 
 ## Confirm log
 
