@@ -3,7 +3,7 @@
 id: TB-031
 scope: issue
 title: Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập
-updated: 2026-11-26T03:00:00Z
+updated: 2026-11-26T09:45:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,9 +16,9 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-031: lockout-rate-limit.feature @S01–@S10"
-blocked_by: null
+current_step: test-review
+next_action: "Bật Docker → chạy identity-service.Tests (không Compose); xác nhận 10 đỏ TB-031; test-review"
+blocked_by: "Docker Desktop offline; @docker tests skipped before red verification"
 
 steps:
   plan-init:
@@ -35,7 +35,14 @@ steps:
     open_confirm: 0
     open_fix: 0
     evidence: ["Confirm #1–#4; FIX validation/metric/feature file"]
-  test-init:            { status: pending }
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T09:45:00Z
+    evidence:
+      - "document/spec/features/identity-service/lockout-rate-limit.feature @S01–@S10"
+      - "IdentityServiceSteps + TestClientIpStartupFilter"
+      - "dotnet build identity-service.Tests OK; dotnet test: 4 pass 33 skip (no Docker)"
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
@@ -48,3 +55,4 @@ subtasks: []
 events:
   - { at: 2026-11-26T02:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-030 merged; plan-init TB-031; mở plan-review" }
   - { at: 2026-11-26T03:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review PASS v1; mở test-init" }
+  - { at: 2026-11-26T09:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init done; đỏ chờ Docker" }

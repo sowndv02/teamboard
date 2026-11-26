@@ -1,4 +1,5 @@
 using System.Diagnostics.Metrics;
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IdentityService.Tests.Support;
@@ -25,6 +26,12 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string LoginPath = "/api/v1/auth/login";
     private const string HashDurationInstrument = "password_hash_duration_seconds";
     private const string LoginFailuresInstrument = "login_failures_total";
+    private const string LockoutsInstrument = "lockout_total";
+    private const string LockoutMaxFailuresKey = "Identity:Lockout:MaxFailures";
+    private const string LockoutDurationSecondsKey = "Identity:Lockout:LockoutDurationSeconds";
+    private const string RateLimitEnabledKey = "Identity:RateLimiting:Enabled";
+    private const string RateLimitPermitKey = "Identity:RateLimiting:PermitLimit";
+    private const string RateLimitWindowKey = "Identity:RateLimiting:WindowSeconds";
 
     // Nothing listens on port 1: simulates a stopped DB without needing a container.
     private const string UnreachableConnection =
@@ -40,10 +47,26 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private MeterListener? _meterListener;
     private long _hashDurationSamples;
     private long _loginFailureMeasurements;
+    private long _lockoutMeasurements;
     private bool _observeLoginFailuresOnly;
+    private bool _observeLockoutsOnly;
+    private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
+    private readonly List<int> _burstStatusCodes = [];
     private (int First, int Second)? _concurrentStatuses;
 
     private PostgresDatabase Database => _database ?? throw new InvalidOperationException("No database yet.");
+
+    [BeforeScenario]
+    public void ResetScenario()
+    {
+        _settings.Clear();
+        _burstStatusCodes.Clear();
+        _observeLoginFailuresOnly = false;
+        _observeLockoutsOnly = false;
+        _loginFailureMeasurements = 0;
+        _lockoutMeasurements = 0;
+        _hashDurationSamples = 0;
+    }
 
     [Given("identity-service is configured to use a database that is not running")]
     public void GivenServiceWithUnreachableDatabase() => _client = StartService(UnreachableConnection, migrate: false);
@@ -75,9 +98,45 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     public void GivenLoginFailureMetrics()
     {
         _observeLoginFailuresOnly = true;
+        _observeLockoutsOnly = false;
         _loginFailureMeasurements = 0;
         StartMeterListener();
     }
+
+    [Given("identity-service metrics are being observed for lockouts")]
+    public void GivenLockoutMetrics()
+    {
+        _observeLoginFailuresOnly = false;
+        _observeLockoutsOnly = true;
+        _lockoutMeasurements = 0;
+        StartMeterListener();
+    }
+
+    [Given("identity-service lockout is configured with max failures {int} and lockout duration {int} seconds")]
+    public void GivenLockoutConfigured(int maxFailures, int durationSeconds)
+    {
+        _settings[LockoutMaxFailuresKey] = maxFailures.ToString(CultureInfo.InvariantCulture);
+        _settings[LockoutDurationSecondsKey] = durationSeconds.ToString(CultureInfo.InvariantCulture);
+    }
+
+    [Given("identity-service rate limiting is enabled with permit limit {int} per minute")]
+    public void GivenRateLimitEnabled(int permitLimit)
+    {
+        _settings[RateLimitEnabledKey] = "true";
+        _settings[RateLimitPermitKey] = permitLimit.ToString(CultureInfo.InvariantCulture);
+        _settings[RateLimitWindowKey] = "60";
+    }
+
+    [Given("identity-service rate limiting is disabled")]
+    public void GivenRateLimitDisabled() => _settings[RateLimitEnabledKey] = "false";
+
+    [Given("the email and IP pair for {string} is locked from failed logins")]
+    public async Task GivenPairLocked(string email) =>
+        await SendFailedLoginsUntilLockoutAsync(email, clientIp: null, count: null);
+
+    [Given("client IP {string} has locked the pair for email {string}")]
+    public async Task GivenClientIpLockedPair(string clientIp, string email) =>
+        await SendFailedLoginsUntilLockoutAsync(email, clientIp, count: null);
 
     [Given("a user is registered with email {string} and password {string}")]
     public async Task GivenRegisteredUser(string email, string password) => await SendRegisterAsync(email, password, expectedStatus: 201);
@@ -87,6 +146,59 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
 
     [When("I send a login request with email {string} and password {string}")]
     public Task WhenLogin(string email, string password) => SendLoginAsync(email, password);
+
+    [When("I send {int} login requests with email {string} and password {string}")]
+    public async Task WhenManyLogins(int count, string email, string password)
+    {
+        _burstStatusCodes.Clear();
+        for (var i = 0; i < count; i++)
+        {
+            await SendLoginAsync(email, password);
+            _burstStatusCodes.Add((int)_response!.StatusCode);
+        }
+    }
+
+    [When("I send a login request with email {string} and password {string} from client IP {string}")]
+    public Task WhenLoginFromIp(string email, string password, string clientIp) =>
+        SendLoginAsync(email, password, clientIp);
+
+    [When("I send {int} login requests with email {string} and password {string} from client IP {string}")]
+    public async Task WhenManyLoginsFromIp(int count, string email, string password, string clientIp)
+    {
+        _burstStatusCodes.Clear();
+        for (var i = 0; i < count; i++)
+        {
+            await SendLoginAsync(email, password, clientIp);
+            _burstStatusCodes.Add((int)_response!.StatusCode);
+        }
+    }
+
+    [When("I send {int} registration requests with email {string} and password {string} from client IP {string}")]
+    public async Task WhenManyRegistrationsFromIp(int count, string email, string password, string clientIp)
+    {
+        _burstStatusCodes.Clear();
+        for (var i = 0; i < count; i++)
+        {
+            await SendRegisterAsync(email, password, clientIp: clientIp);
+            _burstStatusCodes.Add((int)_response!.StatusCode);
+        }
+    }
+
+    [When("I retry login with email {string} and password {string} until success within {int} seconds")]
+    public async Task WhenRetryLoginUntilSuccess(string email, string password, int timeoutSeconds)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
+        while (DateTime.UtcNow < deadline)
+        {
+            await SendLoginAsync(email, password);
+            if ((int)_response!.StatusCode == 200)
+            {
+                return;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(250));
+        }
+    }
 
     [When("I send a registration request with email {string} and a password longer than {int} characters")]
     public Task WhenRegisterLongPassword(string email, int minAllowed) =>
@@ -164,12 +276,41 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     }
 
     [Then("the identity counter {string} increased by at least {int}")]
-    public void ThenLoginFailureCounter(string instrumentName, int minimumIncrease)
+    public void ThenIdentityCounter(string instrumentName, int minimumIncrease)
     {
-        Assert.Equal(LoginFailuresInstrument, instrumentName);
+        var observed = instrumentName switch
+        {
+            LoginFailuresInstrument => _loginFailureMeasurements,
+            LockoutsInstrument => _lockoutMeasurements,
+            _ => throw new ArgumentOutOfRangeException(nameof(instrumentName), instrumentName, "Unknown identity counter."),
+        };
         Assert.True(
-            _loginFailureMeasurements >= minimumIncrease,
-            $"Expected at least {minimumIncrease} measurement(s) for {instrumentName}, got {_loginFailureMeasurements}.");
+            observed >= minimumIncrease,
+            $"Expected at least {minimumIncrease} measurement(s) for {instrumentName}, got {observed}.");
+    }
+
+    [Then("the response has a Retry-After header greater than 0")]
+    public void ThenRetryAfterPositive()
+    {
+        Assert.NotNull(_response);
+        Assert.True(_response.Headers.TryGetValues("Retry-After", out var values), "Retry-After header is missing.");
+        var header = Assert.Single(values);
+        Assert.True(int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out var seconds));
+        Assert.True(seconds > 0, $"Retry-After should be positive, got {header}.");
+    }
+
+    [Then("the response has no Retry-After header")]
+    public void ThenNoRetryAfter() => Assert.False(_response!.Headers.Contains("Retry-After"));
+
+    [Then("the response body does not contain the word {string}")]
+    public void ThenBodyExcludesWord(string word) =>
+        Assert.DoesNotContain(word, _body, StringComparison.OrdinalIgnoreCase);
+
+    [Then("no response had status code {int}")]
+    public void ThenNoBurstStatus(int forbidden)
+    {
+        Assert.NotEmpty(_burstStatusCodes);
+        Assert.DoesNotContain(forbidden, _burstStatusCodes);
     }
 
     [Then("the database stores two different password hashes for those users")]
@@ -329,11 +470,20 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         }
     }
 
-    private async Task SendRegisterAsync(string email, string password, int? expectedStatus = null)
+    private async Task SendRegisterAsync(string email, string password, int? expectedStatus = null, string? clientIp = null)
     {
         var client = _client ?? throw new InvalidOperationException("Service not started.");
         _response?.Dispose();
-        _response = await client.PostAsJsonAsync(RegisterPath, new { email, password });
+        using var request = new HttpRequestMessage(HttpMethod.Post, RegisterPath)
+        {
+            Content = JsonContent.Create(new { email, password }),
+        };
+        if (clientIp is not null)
+        {
+            request.Headers.TryAddWithoutValidation(TestClientIpStartupFilter.HeaderName, clientIp);
+        }
+
+        _response = await client.SendAsync(request);
         _body = await _response.Content.ReadAsStringAsync();
         if (expectedStatus is not null)
         {
@@ -341,12 +491,32 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         }
     }
 
-    private async Task SendLoginAsync(string email, string password)
+    private async Task SendLoginAsync(string email, string password, string? clientIp = null)
     {
         var client = _client ?? throw new InvalidOperationException("Service not started.");
         _response?.Dispose();
-        _response = await client.PostAsJsonAsync(LoginPath, new { email, password });
+        using var request = new HttpRequestMessage(HttpMethod.Post, LoginPath)
+        {
+            Content = JsonContent.Create(new { email, password }),
+        };
+        if (clientIp is not null)
+        {
+            request.Headers.TryAddWithoutValidation(TestClientIpStartupFilter.HeaderName, clientIp);
+        }
+
+        _response = await client.SendAsync(request);
         _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    private async Task SendFailedLoginsUntilLockoutAsync(string email, string? clientIp, int? count)
+    {
+        var attempts = count ?? int.Parse(_settings.GetValueOrDefault(LockoutMaxFailuresKey, "5")!, CultureInfo.InvariantCulture);
+        _burstStatusCodes.Clear();
+        for (var i = 0; i < attempts; i++)
+        {
+            await SendLoginAsync(email, "WrongPass123456", clientIp);
+            _burstStatusCodes.Add((int)_response!.StatusCode);
+        }
     }
 
     private void StartMeterListener()
@@ -363,6 +533,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                 if (_observeLoginFailuresOnly)
                 {
                     if (instrument.Name == LoginFailuresInstrument)
+                    {
+                        listener.EnableMeasurementEvents(instrument);
+                    }
+
+                    return;
+                }
+
+                if (_observeLockoutsOnly)
+                {
+                    if (instrument.Name == LockoutsInstrument)
                     {
                         listener.EnableMeasurementEvents(instrument);
                     }
@@ -389,6 +569,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             {
                 Interlocked.Add(ref _loginFailureMeasurements, measurement);
             }
+
+            if (instrument.Name == LockoutsInstrument)
+            {
+                Interlocked.Add(ref _lockoutMeasurements, measurement);
+            }
         });
         _meterListener.Start();
     }
@@ -402,15 +587,21 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             builder.UseEnvironment("Production");
             builder.UseSetting(ConnectionKey, connectionString);
             builder.UseSetting(MigrateKey, migrate ? "true" : "false");
+            foreach (var (key, value) in _settings)
+            {
+                builder.UseSetting(key, value);
+            }
+
             if (_logs is not null)
             {
                 builder.ConfigureLogging(logging => logging.AddProvider(_logs));
             }
 
-            if (configureServices is not null)
+            builder.ConfigureServices(services =>
             {
-                builder.ConfigureServices(configureServices);
-            }
+                services.AddSingleton<IStartupFilter, TestClientIpStartupFilter>();
+                configureServices?.Invoke(services);
+            });
         });
         _factories.Add(factory);
         return factory.CreateClient();

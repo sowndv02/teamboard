@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-031-identity-lockout-rate-limit.md`](../plans/TB-031-i
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-030 merged PR #25 (`916fcc7`); `plan-init` trên nhánh `feature/TB-031-identity-lockout-rate-limit`.
 - 2026-11-26: plan-review v1 PASS (Confirm #1–#4).
+- 2026-11-26: test-init — `lockout-rate-limit.feature`, steps + `TestClientIpStartupFilter`; build xanh; chạy test đỏ **bị chặn** (Docker Desktop không chạy → 33 scenario @docker skipped).
 
 ## Workflow
 
@@ -46,7 +47,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Plan draft B1–B4, P-01..P-04 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
-| test-init | pending | – | | |
+| test-init | done | – | 2026-11-26 | 10 kịch bản @S01–@S10; đỏ chờ Docker |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
@@ -67,6 +68,18 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | Five consecutive failures lock the email and IP pair even for correct password | Retry-After (chưa lockout) | |
+| @S02 | Locked pair returns the same credential error with Retry-After | Retry-After | |
+| @S03 | Successful login resets the failure counter for the pair | Retry-After sau 4 fail | |
+| @S04 | Lockout for one IP does not block the same email from another IP | 200 từ IP .11 khi .10 khoá | |
+| @S05 | Login succeeds after the lockout duration elapses | 401 khi lock hết hạn | |
+| @S06 | Lockout response does not reveal lock state in the body | Retry-After / body | |
+| @S07 | Enabled rate limiting returns 429 when auth requests exceed the permit limit | 429 RATE_LIMIT_EXCEEDED | |
+| @S08 | Enabled rate limiting applies to registration | 429 register | |
+| @S09 | Disabled rate limiting does not return 429 for bursts | (pass nhầm nếu không có limit) | |
+| @S10 | Lockout records lockout metrics | lockout_total | |
+
+Lệnh: `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"`. Kết quả 2026-11-26: Passed 4, **Skipped 33** (Docker daemon offline); **mở Docker** rồi chạy lại → kỳ vọng **Failed 10** (TB-031), Passed 27 (hồi quy).
 
 ## Test review rounds
 
