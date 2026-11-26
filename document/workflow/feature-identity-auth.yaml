@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: plan-review
-next_action: "Lát hiện tại: TB-033 (5 Teamboard.Auth) — PR #28 review. Lát 4 TB-032 done (PR #27)."
+next_action: "Lát hiện tại: TB-034 (6 JWKS) — plan-review (O-1..O-3). Lát 5 TB-033 done (PR #28)."
 blocked_by: null
 
 steps:

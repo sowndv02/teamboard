@@ -40,6 +40,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string BddJwtAudience = "teamboard";
     private const int BddJwtLifetimeSeconds = 120;
     private const string AccessTokensIssuedInstrument = "access_tokens_issued_total";
+    private const string JwksServedInstrument = "jwks_served_total";
 
     // Nothing listens on port 1: simulates a stopped DB without needing a container.
     private const string UnreachableConnection =
@@ -57,9 +58,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private long _loginFailureMeasurements;
     private long _lockoutMeasurements;
     private long _accessTokenMeasurements;
+    private long _jwksServedMeasurements;
     private bool _observeLoginFailuresOnly;
     private bool _observeLockoutsOnly;
     private bool _observeAccessTokensOnly;
+    private bool _observeJwksServedOnly;
     private bool _omitSigningKeys;
     private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
     private readonly List<int> _burstStatusCodes = [];
@@ -76,10 +79,12 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _observeLoginFailuresOnly = false;
         _observeLockoutsOnly = false;
         _observeAccessTokensOnly = false;
+        _observeJwksServedOnly = false;
         _omitSigningKeys = false;
         _loginFailureMeasurements = 0;
         _lockoutMeasurements = 0;
         _hashDurationSamples = 0;
+        _jwksServedMeasurements = 0;
     }
 
     [Given("identity-service is configured to use a database that is not running")]
@@ -154,8 +159,36 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _settings[JwtLifetimeKey] = BddJwtLifetimeSeconds.ToString(CultureInfo.InvariantCulture);
     }
 
+    [Given("identity-service JWKS signing keys are configured for BDD tests")]
+    public void GivenJwksSigningKeysForBdd()
+    {
+        _omitSigningKeys = false;
+        _settings[SigningKeysFileKey] = TestSigningKeyPaths.JsonFile;
+        _settings[JwtIssuerKey] = "http://localhost:6061";
+        _settings[JwtAudienceKey] = BddJwtAudience;
+    }
+
+    [Given("identity-service is running for JWKS without a database")]
+    public void GivenRunningForJwksWithoutDatabase() =>
+        _client = StartService(UnreachableConnection, migrate: false);
+
+    [Given("identity-service metrics are being observed for JWKS served")]
+    public void GivenJwksServedMetrics()
+    {
+        _observeLoginFailuresOnly = false;
+        _observeLockoutsOnly = false;
+        _observeAccessTokensOnly = false;
+        _observeJwksServedOnly = true;
+        _jwksServedMeasurements = 0;
+        StartMeterListener();
+    }
+
     [Given("identity-service is configured without signing keys")]
-    public void GivenWithoutSigningKeys() => _omitSigningKeys = true;
+    public void GivenWithoutSigningKeys()
+    {
+        _omitSigningKeys = true;
+        _settings.Remove(SigningKeysFileKey);
+    }
 
     [Given("identity-service metrics are being observed for issued access tokens")]
     public void GivenAccessTokenMetrics()
@@ -353,6 +386,44 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.Equal(expectedTitle, document.RootElement.GetProperty("title").GetString());
     }
 
+    [Then("the JWKS public key uses RSA for signature verification")]
+    public void ThenJwksRsaForSignature()
+    {
+        using var document = JsonDocument.Parse(_body);
+        var key = document.RootElement.GetProperty("keys")[0];
+        Assert.Equal("RSA", key.GetProperty("kty").GetString());
+        Assert.Equal("sig", key.GetProperty("use").GetString());
+        Assert.Equal("RS256", key.GetProperty("alg").GetString());
+    }
+
+    [Then("the JWKS document includes public key with kid {string}")]
+    public void ThenJwksHasKid(string kid)
+    {
+        using var document = JsonDocument.Parse(_body);
+        var keys = document.RootElement.GetProperty("keys");
+        Assert.True(keys.GetArrayLength() > 0, "Expected at least one JWK.");
+        var found = keys.EnumerateArray().Any(entry =>
+            string.Equals(entry.GetProperty("kid").GetString(), kid, StringComparison.Ordinal));
+        Assert.True(found, $"Expected kid {kid} in JWKS.");
+    }
+
+    [Then("the JWKS response body does not contain private key material")]
+    public void ThenJwksNoPrivateMaterial()
+    {
+        Assert.DoesNotContain("BEGIN", _body, StringComparison.Ordinal);
+        Assert.DoesNotContain("privateKeyPem", _body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\"d\":", _body, StringComparison.Ordinal);
+    }
+
+    [Then("the JWKS response has cache control public max-age {int}")]
+    public void ThenJwksCacheControl(int maxAge)
+    {
+        Assert.True(_response!.Headers.TryGetValues("Cache-Control", out var values));
+        var header = values.First();
+        Assert.Contains("public", header, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains($"max-age={maxAge}", header, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Then("the identity counter {string} increased by at least {int}")]
     public void ThenIdentityCounter(string instrumentName, int minimumIncrease)
     {
@@ -361,6 +432,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             LoginFailuresInstrument => _loginFailureMeasurements,
             LockoutsInstrument => _lockoutMeasurements,
             AccessTokensIssuedInstrument => _accessTokenMeasurements,
+            JwksServedInstrument => _jwksServedMeasurements,
             _ => throw new ArgumentOutOfRangeException(nameof(instrumentName), instrumentName, "Unknown identity counter."),
         };
         Assert.True(
@@ -429,6 +501,14 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         Assert.Contains(first, statuses);
         Assert.Contains(second, statuses);
         Assert.NotEqual(statuses[0], statuses[1]);
+    }
+
+    [When("I send GET to {string}")]
+    public async Task WhenSendGet(string path)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+        _response = await _client!.SendAsync(request);
+        _body = await _response.Content.ReadAsStringAsync();
     }
 
     [When("I send {string} to {string}")]
@@ -644,6 +724,16 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                     return;
                 }
 
+                if (_observeJwksServedOnly)
+                {
+                    if (instrument.Name == JwksServedInstrument)
+                    {
+                        listener.EnableMeasurementEvents(instrument);
+                    }
+
+                    return;
+                }
+
                 if (instrument.Name == HashDurationInstrument)
                 {
                     listener.EnableMeasurementEvents(instrument);
@@ -672,6 +762,11 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             if (instrument.Name == AccessTokensIssuedInstrument)
             {
                 Interlocked.Add(ref _accessTokenMeasurements, measurement);
+            }
+
+            if (instrument.Name == JwksServedInstrument)
+            {
+                Interlocked.Add(ref _jwksServedMeasurements, measurement);
             }
         });
         _meterListener.Start();

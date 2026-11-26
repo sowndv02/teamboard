@@ -1,13 +1,13 @@
 ---
 key: TB-033
 title: Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth
-status: review
+status: done
 phase: 1
 branch: feature/TB-033-auth-token-validation-library
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26
-closed: null            # ngày done/dropped
+closed: 2026-11-26      # merge PR #28 (e2a046f)
 ---
 
 # TB-033 — Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth
@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-033-auth-token-validation-library.md`](../plans/TB-033
 - 2026-11-26: plan-review v1 PASS — JWKS static+HTTP; board `GET /api/v1/auth/me`; issuer `http://localhost:6061`.
 - 2026-11-26: test-init — ADR 0011 (đề xuất), stub `Teamboard.Shared.Auth`, `auth-me.feature` @S01–@S04, xUnit contract/attack/JWKS; **9 đỏ** (5 Auth.Tests, 4 BDD), hồi quy board 19 xanh.
 - 2026-11-26: nhánh `3633eec`..`44c0033` (rewrite bỏ Co-Authored-By); gate 7+25+44; [PR #28](https://github.com/sowndv02/teamboard/pull/28).
+- 2026-11-26: merged PR #28 vào `main` (`e2a046f`); lát 5 xong; mở TB-034.
 
 ## Workflow
 

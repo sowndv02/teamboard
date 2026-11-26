@@ -26,3 +26,4 @@ Kế hoạch triển khai cho từng issue (một lát giao được), tạo b�
 | [TB-031-identity-lockout-rate-limit](TB-031-identity-lockout-rate-limit.md) | TB-031 (lát 3 identity) | approved |
 | [TB-032-identity-access-token](TB-032-identity-access-token.md) | TB-032 (lát 4 identity) | approved |
 | [TB-033-auth-token-validation-library](TB-033-auth-token-validation-library.md) | TB-033 (lát 5 identity) | approved |
+| [TB-034-identity-jwks](TB-034-identity-jwks.md) | TB-034 (lát 6 identity) | approved |

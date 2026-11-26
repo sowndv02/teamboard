@@ -45,8 +45,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-030](TB-030-identity-login.md) | Identity lát 2, đăng nhập với lỗi chung không lộ email | 1 | done |
 | [TB-031](TB-031-identity-lockout-rate-limit.md) | Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập | 1 | done |
 | [TB-032](TB-032-identity-access-token.md) | Identity lát 4, phát access token JWT khi đăng nhập | 1 | done |
-| [TB-033](TB-033-auth-token-validation-library.md) | Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth | 1 | review |
-| [TB-034](TB-034-identity-jwks.md) | Identity lát 6, công bố JWKS | 1 | todo |
+| [TB-033](TB-033-auth-token-validation-library.md) | Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth | 1 | done |
+| [TB-034](TB-034-identity-jwks.md) | Identity lát 6, công bố JWKS | 1 | review |
 | [TB-035](TB-035-identity-signing-key-rotation.md) | Identity lát 7, xoay khoá ký không hỏng token còn hạn | 1 | todo |
 | [TB-036](TB-036-identity-refresh-token.md) | Identity lát 8, refresh token xoay vòng | 1 | todo |
 | [TB-037](TB-037-identity-refresh-reuse-detection.md) | Identity lát 9, phát hiện dùng lại refresh token | 1 | todo |

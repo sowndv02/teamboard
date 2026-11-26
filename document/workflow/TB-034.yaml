@@ -1,0 +1,87 @@
+# State file của workflow. Giao thức: .agents/skills/workflow/references/state-protocol.md
+
+id: TB-034
+scope: issue
+title: Identity lát 6, công bố JWKS
+updated: 2026-11-26T20:30:00Z
+updated_by: orchestrator:cursor-session
+
+links:
+  issue: document/issues/TB-034-identity-jwks.md
+  spec: document/spec/identity-auth.md
+  design: document/design/identity-auth.md
+  plan: document/plans/TB-034-identity-jwks.md
+  features_dir: document/spec/features/identity-service/
+  branch: feature/TB-034-identity-jwks
+  base: main
+  pr: https://github.com/sowndv02/teamboard/pull/29
+
+current_step: create-pr
+next_action: "chờ review/CI PR #29; merge do người dùng"
+
+steps:
+  plan-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T20:30:00Z
+    evidence:
+      - "Plan draft B0–B4; base main e2a046f after PR #28"
+      - "Open questions O-1..O-3 for plan-review"
+  plan-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T20:45:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence: ["503 no active key; jwks_served_total; @S04 board+Auth.Tests"]
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T21:15:00Z
+    evidence:
+      - "jwks.feature @S01-S04; JwtHttpJwksIntegrationTests"
+      - "ADR 0012 proposed; 5 red (404/503); identity regression 44 green"
+  test-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T21:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "5 red; trace table; consumer probe assert"
+      - "board BDD deferred to coding-start (known limit)"
+  coding-start:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T22:00:00Z
+    evidence:
+      - "JwksEndpoints + IdentityJwksSetBuilder; jwks_served_total"
+      - "JwksKeySetCache HTTP primary; Auth 8/8; identity 48; board 25"
+  coding-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T22:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "merge-base e2a046f; feat uncommitted reviewed"
+      - "identity 48; Auth 8; board 25; build warn-aserror; format OK"
+      - "ADR 0011 HTTP-primary doc fix"
+  create-pr:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T23:00:00Z
+    evidence:
+      - "https://github.com/sowndv02/teamboard/pull/29"
+      - "commit 139f287 feat; branch pushed"
+
+confirm_pending: []
+
+events:
+  - { at: 2026-11-26T20:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-033 merged PR #28; plan-init TB-034; mở plan-review" }
