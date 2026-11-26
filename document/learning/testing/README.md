@@ -89,7 +89,8 @@ Lý do các ô `–`:
 | 3 | Đã viết (2026-11-26): WebApplicationFactory, Testcontainers, contract test (Pact và bản viết tay), 4 lab đã chạy, 3 case real-world. Còn ⚠ ở nguồn chỉ qua agent; chưa chạy Pact thật |
 | 4 | Đã viết (2026-11-26): property-based, mutation (Stryker.NET), snapshot (Verify), characterization, outside-in; 4 lab đã chạy, 2 sự cố tái hiện thật. Real-world chưa đạt (một case tự mở, một Vừa, một chưa mở được); bài QuickCheck gốc chưa đọc được |
 | 5 | Đã viết (2026-11-26): phân nhóm test, coverage (coverlet) và gate, test hồi quy sự cố, flaky; 3 lab đã chạy, 2 sự cố tái hiện thật, 3 case real-world tự mở (Google, Cloudflare, Fowler). Chưa có CI thật trong repo nên chưa chạy pipeline; test bảo mật và dữ liệu test chưa có nguồn ngoài |
-| 6–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
+| 6 | Đã viết (2026-11-26): ba dự án trên `EmailAddress`/BR-001 của identity-service (TDD từ spec, kịch bản BDD lấp khoảng trống chạy với Docker, mutation 88,89% lên 100%); đã chạy thật trong bản sao ngoài repo. Dự án board-service thay bằng identity-service vì chưa có spec Board; chưa có đối chứng độc lập; không có real-world riêng |
+| 7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
 
 ## Tiêu chí hoàn thành lộ trình
 

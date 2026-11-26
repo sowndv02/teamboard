@@ -38,6 +38,7 @@ Người dùng muốn học TDD, BDD và các chủ đề kề cận (test doubl
 - 2026-11-26: Part 3 được điền nội dung theo yêu cầu người dùng.
 - 2026-11-26: Part 4 được điền nội dung theo yêu cầu người dùng.
 - 2026-11-26: Part 5 được điền nội dung theo yêu cầu người dùng; Part 6–7 vẫn là khung. Lab 5.2 xác minh nguyên nhân làm tròn còn ⚠ ở Part 4 nên dòng ⚠ đó đã được đóng.
+- 2026-11-26: Part 6 được điền nội dung theo yêu cầu người dùng; Part 7 vẫn là khung. Dự án chạy trong bản sao ngoài repo (`git archive`), không sửa `src/` hay spec; kịch bản S12 (BR-001 khoảng trắng) là đề xuất, chưa đưa vào repo.
 - 2026-11-26: tạo từ nhánh `origin/main` trong worktree riêng vì nhánh TB-034 còn thay đổi dở.
 
 ## Bài học (lessons learned)
