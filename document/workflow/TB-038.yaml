@@ -13,13 +13,18 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-038"
+current_step: test-review
+next_action: "test-review TB-038"
 
 steps:
   plan-init:            { status: done }
   plan-review:          { status: done, verdict: PASS, round: 1 }
-  test-init:            { status: pending }
+  test-init:
+    status: done
+    evidence:
+      - "logout-token.feature @S01-S03"
+      - "3 failed 63 passed !~Compose"
+  test-review:          { status: pending }
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
@@ -30,3 +35,4 @@ confirm_pending: []
 events:
   - { at: 2026-11-26T09:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init draft B0-B5, O-1..O-4 open" }
   - { at: 2026-11-26T09:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS confirms 1-4" }
+  - { at: 2026-11-26T10:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 3 red logout BDD" }

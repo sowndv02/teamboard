@@ -34,6 +34,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-037 merged PR #33; `plan-init` trên nhánh `feature/TB-038-identity-logout` từ `main` `895d738`.
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (204; 401; log+metric; @S01–@S03).
+- 2026-11-26: test-init — `logout-token.feature` @S01–@S03; stub `/logout` **501**; **3 đỏ**, **63 hồi quy** (`!~Compose`).
 
 ## Workflow
 
@@ -41,8 +42,8 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
-| test-init | pending | – | | next |
-| test-review | pending | | | |
+| test-init | done | – | 2026-11-26 | 3 đỏ @S01–@S03; 63 hồi quy |
+| test-review | pending | – | | next |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -60,7 +61,8 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| | | | |
+| logout @S01–@S03 | `logout-token.feature` | **đỏ** | |
+| hồi quy refresh/login | các `.feature` khác | | **xanh** |
 
 ## Test review rounds
 
