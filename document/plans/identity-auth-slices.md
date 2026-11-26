@@ -24,7 +24,7 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | 7 | I3 | Xoay khoá ký không hỏng token còn hạn (CLI, D7) | FR-008 | 6, ADR xoay khoá | 2–3 ngày | [TB-035](../issues/TB-035-identity-signing-key-rotation.md) | done (PR #30) |
 | 8 | I4 | Refresh token xoay vòng (ADR refresh nguyên tử) | FR-009 | 4 | 2–3 ngày | [TB-036](../issues/TB-036-identity-refresh-token.md) | done (PR #32) |
 | 9 | I4 | Phát hiện dùng lại refresh token, thu hồi chuỗi | FR-010 | 8 | 2 ngày | [TB-037](../issues/TB-037-identity-refresh-reuse-detection.md) | done (PR #33) |
-| 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 9 | 1 ngày | [TB-038](../issues/TB-038-identity-logout.md) | planning |
+| 10 | I4 | Đăng xuất thu hồi phiên (phần phiên cookie chờ I5) | FR-011 | 9 | 1 ngày | [TB-038](../issues/TB-038-identity-logout.md) | review (PR #34) |
 | 11 | I1 | Đổi mật khẩu (thu hồi refresh) | FR-022 | 3, 8 | 1–2 ngày | [TB-039](../issues/TB-039-identity-change-password.md) | todo |
 | 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | [TB-040](../issues/TB-040-identity-client-registry.md) | todo |
 | 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | [TB-041](../issues/TB-041-identity-client-credentials.md) | todo |

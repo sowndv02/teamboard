@@ -1,7 +1,7 @@
 ---
 key: TB-038
 title: Identity lát 10, đăng xuất thu hồi phiên
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-038-identity-logout
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -38,6 +38,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 - 2026-11-26: test-review v1 **PASS** — 3 đỏ đúng lý do (stub 501); sẵn sàng code.
 - 2026-11-26: coding-start — `TryLogoutAsync`, `/logout` 204/401, `logout_total`, log; **66/66** `!~Compose`.
 - 2026-11-26: coding-review v1 **PASS** — commit `025f80f`; 66/66; format OK; 0 CONFIRM.
+- 2026-11-26: [PR #34](https://github.com/sowndv02/teamboard/pull/34) (head `a9b7a5f`; đã bỏ `Co-authored-by` trên nhánh).
 
 ## Workflow
 
@@ -49,8 +50,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 3 đỏ |
 | coding-start | done | – | 2026-11-26 | 66/66 `!~Compose`; `025f80f` |
 | coding-review | PASS | 1 | 2026-11-26 | `025f80f`; 66/66 |
-| create-pr | pending | – | | next |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #34](https://github.com/sowndv02/teamboard/pull/34) |
 
 ## Confirm log
 

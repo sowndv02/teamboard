@@ -11,10 +11,10 @@ links:
   plan: document/plans/TB-038-identity-logout.md
   branch: feature/TB-038-identity-logout
   base: main
-  pr: null
+  pr: https://github.com/sowndv02/teamboard/pull/34
 
-current_step: create-pr
-next_action: "create-pr TB-038"
+current_step: done
+next_action: "Chờ review/CI; merge PR #34 (user)"
 
 steps:
   plan-init:            { status: done }
@@ -39,7 +39,10 @@ steps:
     verdict: PASS
     round: 1
     reviewed_commit: 025f80f
-  create-pr:            { status: pending }
+  create-pr:
+    status: done
+    pr: 34
+    url: https://github.com/sowndv02/teamboard/pull/34
 
 confirm_pending: []
 
@@ -50,3 +53,4 @@ events:
   - { at: 2026-11-26T10:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
   - { at: 2026-11-26T10:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 66/66" }
   - { at: 2026-11-26T10:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS" }
+  - { at: 2026-11-26T11:00:00Z, actor: "orchestrator:cursor-session", event: pr_opened, detail: "PR #34" }
