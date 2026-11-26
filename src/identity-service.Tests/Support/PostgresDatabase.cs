@@ -66,5 +66,56 @@ internal sealed class PostgresDatabase : IAsyncDisposable
         return results;
     }
 
+    public async Task<bool> OAuthClientExistsAsync(string clientId)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT 1
+            FROM client
+            WHERE client_id = @client_id
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("client_id", clientId);
+        return await command.ExecuteScalarAsync() is not null;
+    }
+
+    public async Task<string?> GetOAuthClientTypeAsync(string clientId)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT client_type::text
+            FROM client
+            WHERE client_id = @client_id
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("client_id", clientId);
+        return await command.ExecuteScalarAsync() as string;
+    }
+
+    public async Task<(string? Hash, string? PlaintextEcho)> GetOAuthClientSecretColumnsAsync(string clientId)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT secret_hash::text, secret_plaintext_echo::text
+            FROM client
+            WHERE client_id = @client_id
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("client_id", clientId);
+        await using var reader = await command.ExecuteReaderAsync();
+        if (!await reader.ReadAsync())
+        {
+            return (null, null);
+        }
+
+        return (reader.IsDBNull(0) ? null : reader.GetString(0), reader.IsDBNull(1) ? null : reader.GetString(1));
+    }
+
     public ValueTask DisposeAsync() => _container.DisposeAsync();
 }

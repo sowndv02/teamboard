@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IdentityService.Cli;
+using IdentityService.Security.Clients;
 using IdentityService.Tests.Support;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,8 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string ChangePasswordPath = "/api/v1/auth/password";
     private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
     private const string RefreshDefaultClientKey = "Identity:RefreshToken:DefaultClientId";
+    private const string ClientRegistryEnabledKey = "Identity:Clients:Enabled";
+    private const string ClientSecretKeyPrefix = "Identity:Clients:Secrets:";
     private const int BddRefreshLifetimeSeconds = 120;
     private const string HashDurationInstrument = "password_hash_duration_seconds";
     private const string LoginFailuresInstrument = "login_failures_total";
@@ -94,6 +97,8 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
     private readonly List<int> _burstStatusCodes = [];
     private (int First, int Second)? _concurrentStatuses;
+    private bool? _redirectUriMatchResult;
+    private readonly List<string> _confidentialClientSecrets = [];
 
     private PostgresDatabase Database => _database ?? throw new InvalidOperationException("No database yet.");
 
@@ -127,10 +132,83 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _lockoutMeasurements = 0;
         _hashDurationSamples = 0;
         _jwksServedMeasurements = 0;
+        _redirectUriMatchResult = null;
+        _confidentialClientSecrets.Clear();
     }
 
     [Given("identity-service is configured to use a database that is not running")]
     public void GivenServiceWithUnreachableDatabase() => _client = StartService(UnreachableConnection, migrate: false);
+
+    [Given("identity-service oauth client registry is configured for BDD tests")]
+    public void GivenOAuthClientRegistryForBdd()
+    {
+        _settings[ClientRegistryEnabledKey] = "true";
+        _settings["Identity:Clients:Seed:0:ClientId"] = "teamboard";
+        _settings["Identity:Clients:Seed:0:ClientType"] = "Public";
+        _settings["Identity:Clients:Seed:0:RedirectUris:0"] = "https://localhost/callback";
+        _settings["Identity:Clients:Seed:0:AllowedScopes:0"] = "openid";
+    }
+
+    [Given("identity-service has confidential oauth client {string} with secret {string}")]
+    public void GivenConfidentialOAuthClient(string clientId, string secret)
+    {
+        _confidentialClientSecrets.Add(secret);
+        var index = _confidentialClientSecrets.Count;
+        _settings[$"Identity:Clients:Seed:{index}:ClientId"] = clientId;
+        _settings[$"Identity:Clients:Seed:{index}:ClientType"] = "Confidential";
+        _settings[$"Identity:Clients:Seed:{index}:RedirectUris:0"] = "https://localhost/callback";
+        _settings[$"Identity:Clients:Seed:{index}:AllowedScopes:0"] = "api.read";
+        _settings[$"{ClientSecretKeyPrefix}{clientId}"] = secret;
+    }
+
+    [When("oauth redirect URI {string} is checked against registered URIs:")]
+    public void WhenOAuthRedirectUriChecked(string requestedUri, Table table)
+    {
+        var registered = table.Rows.Select(row => row["uri"]).ToList();
+        _redirectUriMatchResult = new RedirectUriMatcher().IsAllowed(requestedUri, registered);
+    }
+
+    [Then("oauth redirect URI match result is {word}")]
+    public void ThenOAuthRedirectUriMatchResult(string expected)
+    {
+        var want = bool.Parse(expected);
+        Assert.Equal(want, _redirectUriMatchResult);
+    }
+
+    [Then("the database contains registered oauth client {string} with type {string}")]
+    public async Task ThenDatabaseContainsOAuthClient(string clientId, string clientType)
+    {
+        Assert.True(await Database.OAuthClientExistsAsync(clientId), $"Expected oauth client '{clientId}' in database.");
+        var storedType = await Database.GetOAuthClientTypeAsync(clientId);
+        Assert.Equal(clientType, storedType, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Then("the database does not contain registered oauth client {string}")]
+    public async Task ThenDatabaseDoesNotContainOAuthClient(string clientId)
+    {
+        Assert.False(await Database.OAuthClientExistsAsync(clientId));
+    }
+
+    [Then("the database stores a hash for oauth client {string} and not the plaintext secret {string}")]
+    public async Task ThenDatabaseStoresHashNotPlaintext(string clientId, string plaintext)
+    {
+        var (hash, echo) = await Database.GetOAuthClientSecretColumnsAsync(clientId);
+        Assert.False(string.IsNullOrWhiteSpace(hash), "Expected secret_hash to be set for confidential client.");
+        Assert.NotEqual(plaintext, hash);
+        Assert.True(string.IsNullOrEmpty(echo), "Plaintext secret must not be stored in the database.");
+        Assert.DoesNotContain(plaintext, hash, StringComparison.Ordinal);
+    }
+
+    [Then("captured logs contain no oauth client secret")]
+    public void ThenCapturedLogsContainNoClientSecret()
+    {
+        Assert.True(_logs is not null, "Log capture was not enabled.");
+        var joined = string.Join('\n', _logs.Entries.Select(entry => entry.Message));
+        foreach (var secret in _confidentialClientSecrets)
+        {
+            Assert.DoesNotContain(secret, joined, StringComparison.Ordinal);
+        }
+    }
 
     [Given("an empty PostgreSQL database is running")]
     public async Task GivenDatabase() => _database = await PostgresDatabase.StartAsync();
