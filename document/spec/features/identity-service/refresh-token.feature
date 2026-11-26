@@ -1,4 +1,4 @@
-@TB-036 @identity-service
+@TB-036 @TB-037 @identity-service
 Feature: identity-service refresh token rotation
   As a client application
   I want refresh tokens issued on login and rotated on refresh
@@ -18,7 +18,7 @@ Feature: identity-service refresh token rotation
     Then the status code is 200
     And the login response includes an opaque refresh token with refresh_expires_in
 
-  @S02 @FR-009 @docker
+  @S02 @FR-009 @FR-010 @docker
   Scenario: Refresh rotates tokens and invalidates the previous refresh token
     Given an empty PostgreSQL database is running
     And identity-service refresh token issuance is configured for BDD tests
@@ -33,7 +33,10 @@ Feature: identity-service refresh token rotation
     And the refresh response includes a new access and refresh token pair
     And the refreshed refresh token differs from the stored refresh token
     And the refreshed access token differs from the login access token
+    When I store the latest refresh token from the last response
     When I send a refresh request with the stored refresh token
+    Then the status code is 401
+    When I send a refresh request with the latest rotated refresh token
     Then the status code is 401
 
   @S03 @FR-009 @docker
@@ -66,3 +69,22 @@ Feature: identity-service refresh token rotation
     When two refresh requests run concurrently with the stored refresh token
     Then exactly one refresh response has status 200
     And exactly one refresh response has status 401
+
+  @S06 @FR-010 @docker
+  Scenario: Reusing a rotated refresh token records reuse and revokes the token family
+    Given an empty PostgreSQL database is running
+    And identity-service refresh token issuance is configured for BDD tests
+    And identity-service is configured to use that database and applies migrations on startup
+    And identity-service metrics are being observed for refresh token reuse
+    And a user is registered with email "refresh-s06@example.com" and password "ValidPass123456"
+    When I send a login request with email "refresh-s06@example.com" and password "ValidPass123456"
+    Then the status code is 200
+    When I store the current login refresh token for rotation checks
+    When I send a refresh request with the stored refresh token
+    Then the status code is 200
+    When I store the latest refresh token from the last response
+    When I send a refresh request with the stored refresh token
+    Then the status code is 401
+    And the refresh token reuse total metric increased by 1
+    When I send a refresh request with the latest rotated refresh token
+    Then the status code is 401

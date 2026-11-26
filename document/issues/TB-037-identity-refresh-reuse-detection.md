@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-036 merged PR #32; `plan-init` trên nhánh `feature/TB-037-identity-refresh-reuse-detection` từ `main` `1bfb081`.
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (log only; concurrent reuse revoke; @S02+@S06; 401 chung).
+- 2026-11-26: test-init — mở rộng `refresh-token.feature` @S02 (family), @S06 (metric); **2 đỏ**, **61 xanh** (`!~Compose`).
 
 ## Workflow
 
@@ -42,9 +43,8 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
-| test-init | pending | – | | next |
-| test-init | pending | – | | |
-| test-review | pending | | | |
+| test-init | done | – | 2026-11-26 | 2 đỏ @S02/@S06; 61 hồi quy |
+| test-review | pending | | | next |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -62,8 +62,9 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| refresh @S01–@S05 (hồi quy) | `refresh-token.feature` | | |
-| reuse / family (dự kiến) | `refresh-token.feature` @S02+ / @S06 | | |
+| refresh @S01–@S05 (hồi quy) | `refresh-token.feature` | | **xanh** |
+| reuse family @S02 mở rộng | `refresh-token.feature` | **đỏ** (rotated token vẫn 200) | |
+| reuse metric @S06 | `refresh-token.feature` | **đỏ** (metric 0/1) | |
 
 ## Test review rounds
 

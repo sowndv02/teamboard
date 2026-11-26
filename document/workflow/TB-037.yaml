@@ -3,7 +3,7 @@
 id: TB-037
 scope: issue
 title: Identity lát 9, phát hiện dùng lại refresh token
-updated: 2026-11-26T15:30:00Z
+updated: 2026-11-26T16:00:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-037"
+current_step: test-review
+next_action: "test-review TB-037"
 
 steps:
   plan-init:
@@ -25,15 +25,16 @@ steps:
     finished: 2026-11-26T15:00:00Z
   plan-review:
     status: done
-    owner: orchestrator:cursor-session
-    finished: 2026-11-26T15:30:00Z
-    round: 1
     verdict: PASS
-    open_confirm: 0
-    open_fix: 0
+    round: 1
+    finished: 2026-11-26T15:30:00Z
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T16:00:00Z
     evidence:
-      - "Confirm #1-4 user form"
-  test-init:            { status: pending }
+      - "refresh @S02 FR-010 extend, @S06 reuse metric"
+      - "2 red; 61 pass !~Compose"
   test-review:          { status: pending }
   coding-start:         { status: pending }
   coding-review:        { status: pending }
@@ -42,5 +43,4 @@ steps:
 confirm_pending: []
 
 events:
-  - { at: 2026-11-26T15:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init TB-037" }
-  - { at: 2026-11-26T15:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS" }
+  - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 2 red" }
