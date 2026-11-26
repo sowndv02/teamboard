@@ -84,7 +84,8 @@ Lý do các ô `–`:
 
 | Part | Trạng thái |
 |---|---|
-| 1–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
+| 1 | Đã viết (2026-11-26): Bản đồ giải pháp, 4 case real-world, 2 lab đã chạy. Còn ⚠ ở các nguồn chỉ qua agent |
+| 2–7 | TODO: khung, chưa nghiên cứu nguồn, chưa chạy lab |
 
 ## Tiêu chí hoàn thành lộ trình
 
