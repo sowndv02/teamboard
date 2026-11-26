@@ -35,6 +35,7 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 - 2026-11-26: TB-037 merged PR #33; `plan-init` trên nhánh `feature/TB-038-identity-logout` từ `main` `895d738`.
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (204; 401; log+metric; @S01–@S03).
 - 2026-11-26: test-init — `logout-token.feature` @S01–@S03; stub `/logout` **501**; **3 đỏ**, **63 hồi quy** (`!~Compose`).
+- 2026-11-26: test-review v1 **PASS** — 3 đỏ đúng lý do (stub 501); sẵn sàng code.
 
 ## Workflow
 
@@ -43,8 +44,8 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 | plan-init | done | – | 2026-11-26 | Draft B0–B5; O-1..O-4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 3 đỏ @S01–@S03; 63 hồi quy |
-| test-review | pending | – | | next |
-| coding-start | pending | – | | |
+| test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 3 đỏ |
+| coding-start | pending | – | | next |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -64,10 +65,31 @@ Plan: [`document/plans/TB-038-identity-logout.md`](../plans/TB-038-identity-logo
 | logout @S01–@S03 | `logout-token.feature` | **đỏ** | |
 | hồi quy refresh/login | các `.feature` khác | | **xanh** |
 
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **3 failed, 63 passed**; format verify xanh.
+
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `69f1cfe` | Sẵn sàng code | – |
+
+Đối chiếu kịch bản ↔ test:
+
+| Kịch bản | Test thực thi | Đỏ | Xanh |
+|---|---|---|---|
+| @S01 logout + refresh block | `logout-token.feature` | **đỏ** | |
+| @S02 invalid logout | `logout-token.feature` | **đỏ** | |
+| @S03 second logout | `logout-token.feature` | **đỏ** | |
+| hồi quy | refresh/login features | | xanh |
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:identity:logout-metric-bdd | NOTE P3 | plan B4 | Chưa BDD `logout_total` | Kiểm coding-start/review | plan B4 |
+| 1 | test:identity:logout-no-reuse-metric | NOTE P3 | @S01 | Chưa assert `refresh_reuse_total` | FR-010 path; coding-review | TB-037 precedent |
+
+**Giới hạn đã biết:** metric `logout_total` và assert không tăng reuse — coding-start (không có @S04 metric trong plan Confirm #4).
 
 ## Review rounds
 
