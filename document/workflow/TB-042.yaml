@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-042 (14a authorize validation)"
+current_step: coding-review
+next_action: "coding-review TB-042"
 blocked_by: null
 
 steps:
@@ -45,7 +45,10 @@ steps:
     round: 1
     finished: 2026-11-26T14:30:00Z
     evidence: ["9 fail 94 pass", "FIX @S03c"]
-  coding-start:           { status: pending }
+  coding-start:
+    status: done
+    finished: 2026-11-26T15:00:00Z
+    evidence: ["104/104 !~Compose", "build warnaserror"]
   coding-review:          { status: pending }
   create-pr:              { status: pending }
 
@@ -58,3 +61,4 @@ events:
   - { at: 2026-11-26T13:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
   - { at: 2026-11-26T14:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 8 red → test-review" }
   - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS → coding-start" }
+  - { at: 2026-11-26T15:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 104/104 → coding-review" }

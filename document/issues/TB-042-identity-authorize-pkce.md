@@ -22,10 +22,10 @@ Issue khung cấp key khi duyệt bảng lát: lát 14 của `document/plans/ide
 - Không làm (14a): Razor login, cookie IdP, redirect `code` → **lát 14b** (issue TBD). Token exchange → TB-043.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Design `identity-auth-i5.md` approved.
-- [ ] `redirect_uri` / params sai → không redirect URI chưa tin cậy (@S02, @S03).
-- [ ] PKCE + registry validation unit/BDD xanh.
-- [ ] Hồi quy `!~Compose` xanh.
+- [x] Design `identity-auth-i5.md` approved.
+- [x] `redirect_uri` / params sai → không redirect URI chưa tin cậy (@S02, @S03, @S03b, @S03c).
+- [x] PKCE + registry validation unit/BDD xanh.
+- [x] Hồi quy `!~Compose` xanh (104/104).
 
 ## Kế hoạch
 Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-identity-authorize-pkce.md) (`approved`, 14a B0–B4; plan-review v1 PASS). Design: [`document/design/identity-auth-i5.md`](../design/identity-auth-i5.md).
@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-042-identity-authorize-pkce.md`](../plans/TB-042-ident
 - 2026-11-26: plan-review v1 **PASS** — Confirm O-1..O-11 (design i5, split, Razor 14b, flag, HTML errors, DB context, S256, scope, nonce, redirect BDD).
 - 2026-11-26: test-init — `authorize-pkce.feature` @S02,@S03,@S03b,@S07; stub GET `/connect/authorize` 501; **8 fail, 94 pass** `!~Compose`.
 - 2026-11-26: test-review v1 **PASS** — FIX @S03c invalid scope; **9 fail, 94 pass** `!~Compose`.
+- 2026-11-26: coding-start — `GET /connect/authorize` validate PKCE/redirect/scope; **104/104** `!~Compose`.
 
 ## Workflow
 
@@ -47,7 +48,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#10 |
 | test-init | done | – | 2026-11-26 | 8 fail 94 pass !~Compose |
 | test-review | PASS | 1 | 2026-11-26 | FIX @S03c scope; 9 fail |
-| coding-start | pending | – | | |
+| coding-start | done | – | 2026-11-26 | **104/104** `!~Compose` |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
 
@@ -62,15 +63,15 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S02 | `authorize-pkce.feature` | **đỏ** | |
-| @S03 | `authorize-pkce.feature` | **đỏ** | |
-| @S03b | `authorize-pkce.feature` | **đỏ** | |
-| @S03c | `authorize-pkce.feature` | **đỏ** | |
-| @S07 | `authorize-pkce.feature` | **đỏ** | |
-| unit PKCE | `PkceValidatorTests` ×3 | **đỏ** (NIE) | |
-| unit authorize | `AuthorizeRequestValidatorTests` | **đỏ** (NIE) | |
+| @S02 | `authorize-pkce.feature` | | **xanh** |
+| @S03 | `authorize-pkce.feature` | | **xanh** |
+| @S03b | `authorize-pkce.feature` | | **xanh** |
+| @S03c | `authorize-pkce.feature` | | **xanh** |
+| @S07 | `authorize-pkce.feature` | | **xanh** |
+| unit PKCE | `PkceValidatorTests` ×3 | | **xanh** |
+| unit authorize | `AuthorizeRequestValidatorTests` ×2 | | **xanh** |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **94 pass, 9 fail** sau FIX @S03c (stub 501; validators NIE).
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **104/104** (coding-start).
 
 ## Test review rounds
 
