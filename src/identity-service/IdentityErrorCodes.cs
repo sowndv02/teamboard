@@ -15,4 +15,9 @@ public static class IdentityErrorCodes
         401,
         "Invalid email or password.",
         "Invalid email or password.");
+
+    public static readonly ErrorDefinition RateLimitExceeded = new(
+        "RATE_LIMIT_EXCEEDED",
+        429,
+        "Too many requests.");
 }

@@ -8,6 +8,7 @@ public sealed class IdentityMetrics
 
     private readonly Histogram<double> _passwordHashDurationSeconds;
     private readonly Counter<long> _loginFailuresTotal;
+    private readonly Counter<long> _lockoutTotal;
 
     public IdentityMetrics(IMeterFactory meterFactory)
     {
@@ -19,9 +20,14 @@ public sealed class IdentityMetrics
         _loginFailuresTotal = meter.CreateCounter<long>(
             "login_failures_total",
             description: "Login attempts that failed credential validation.");
+        _lockoutTotal = meter.CreateCounter<long>(
+            "lockout_total",
+            description: "Login responses blocked by an active email and IP lockout.");
     }
 
     public void RecordPasswordHashDuration(double seconds) => _passwordHashDurationSeconds.Record(seconds);
 
     public void RecordLoginFailure() => _loginFailuresTotal.Add(1);
+
+    public void RecordLockout() => _lockoutTotal.Add(1);
 }

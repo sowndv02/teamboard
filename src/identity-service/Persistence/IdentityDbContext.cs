@@ -8,8 +8,21 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 {
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<LoginAttempt>(entity =>
+        {
+            entity.ToTable("login_attempt");
+            entity.HasKey(attempt => new { attempt.EmailNorm, attempt.Ip });
+            entity.Property(attempt => attempt.EmailNorm).HasColumnName("email_norm").HasMaxLength(320);
+            entity.Property(attempt => attempt.Ip).HasColumnName("ip").HasMaxLength(64);
+            entity.Property(attempt => attempt.Failures).HasColumnName("failures");
+            entity.Property(attempt => attempt.LockedUntil).HasColumnName("locked_until");
+            entity.Property(attempt => attempt.UpdatedAt).HasColumnName("updated_at");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("users");

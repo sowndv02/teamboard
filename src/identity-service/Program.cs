@@ -1,6 +1,7 @@
 using IdentityService.Features.Login;
 using IdentityService.Features.Register;
 using IdentityService.Persistence;
+using IdentityService.RateLimiting;
 using IdentityService.Security;
 using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
@@ -9,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults("identity-service");
 builder.AddIdentityPersistence();
 builder.AddIdentitySecurity();
+
+var rateLimitingEnabled = builder.Configuration.GetValue("Identity:RateLimiting:Enabled", true);
+if (rateLimitingEnabled)
+{
+    builder.AddIdentityRateLimiting();
+}
 
 var app = builder.Build();
 
@@ -20,9 +27,14 @@ await app.ApplyMigrationsIfEnabledAsync();
 app.UseExceptionHandler(errorApp => errorApp.Run(context =>
     Results.Problem(ProblemFactory.Create(SharedErrors.InternalError, context)).ExecuteAsync(context)));
 
+if (rateLimitingEnabled)
+{
+    app.UseRateLimiter();
+}
+
 app.MapDefaultEndpoints();
-app.MapRegisterEndpoints();
-app.MapLoginEndpoints();
+app.MapRegisterEndpoints(rateLimitingEnabled);
+app.MapLoginEndpoints(rateLimitingEnabled);
 
 app.Run();
 

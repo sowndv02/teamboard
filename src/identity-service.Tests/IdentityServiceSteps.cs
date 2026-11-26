@@ -60,6 +60,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     public void ResetScenario()
     {
         _settings.Clear();
+        _settings[RateLimitEnabledKey] = "false";
         _burstStatusCodes.Clear();
         _observeLoginFailuresOnly = false;
         _observeLockoutsOnly = false;
