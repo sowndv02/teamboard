@@ -4,6 +4,7 @@ using IdentityService.Features.Login;
 using IdentityService.Features.Logout;
 using IdentityService.Features.Refresh;
 using IdentityService.Features.Register;
+using IdentityService.Features.Token;
 using IdentityService.Persistence;
 using IdentityService.RateLimiting;
 using IdentityService.Security;
@@ -48,6 +49,7 @@ app.MapRefreshEndpoints(rateLimitingEnabled);
 app.MapLogoutEndpoints(rateLimitingEnabled);
 app.MapChangePasswordEndpoints(rateLimitingEnabled);
 app.MapJwksEndpoints();
+app.MapTokenEndpoints(rateLimitingEnabled);
 
 app.Run();
 

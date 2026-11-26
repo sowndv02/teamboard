@@ -52,4 +52,37 @@ public sealed class AccessTokenIssuer : IAccessTokenIssuer
         var token = _tokenHandler.CreateToken(descriptor);
         return new IssuedAccessToken(token, _jwtOptions.AccessTokenLifetimeSeconds);
     }
+
+    public IssuedAccessToken IssueForClient(string clientId, IReadOnlyList<string> scopes)
+    {
+        var signingKey = _signingKeyStore.GetActiveKey();
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
+        var lifetime = TimeSpan.FromSeconds(_jwtOptions.AccessTokenLifetimeSeconds);
+        var expires = now.Add(lifetime);
+        var scopeValue = string.Join(' ', scopes);
+
+        var rsaKey = new RsaSecurityKey(signingKey.Rsa) { KeyId = signingKey.Kid };
+        var credentials = new SigningCredentials(rsaKey, SecurityAlgorithms.RsaSha256);
+
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = _jwtOptions.Issuer,
+            Audience = _jwtOptions.Audience,
+            NotBefore = now,
+            IssuedAt = now,
+            Expires = expires,
+            SigningCredentials = credentials,
+            Subject = new ClaimsIdentity(
+            [
+                new Claim(JwtRegisteredClaimNames.Sub, clientId),
+                new Claim("client_id", clientId),
+                new Claim("scope", scopeValue),
+                new Claim("token_use", "machine"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            ]),
+        };
+
+        var token = _tokenHandler.CreateToken(descriptor);
+        return new IssuedAccessToken(token, _jwtOptions.AccessTokenLifetimeSeconds);
+    }
 }

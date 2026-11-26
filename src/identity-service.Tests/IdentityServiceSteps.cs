@@ -30,6 +30,8 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string RefreshPath = "/api/v1/auth/refresh";
     private const string LogoutPath = "/api/v1/auth/logout";
     private const string ChangePasswordPath = "/api/v1/auth/password";
+    private const string ConnectTokenPath = "/connect/token";
+    private const string ClientCredentialsEnabledKey = "Identity:Features:ClientCredentialsEnabled";
     private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
     private const string RefreshDefaultClientKey = "Identity:RefreshToken:DefaultClientId";
     private const string ClientRegistryEnabledKey = "Identity:Clients:Enabled";
@@ -150,6 +152,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _settings["Identity:Clients:Seed:0:AllowedScopes:0"] = "openid";
     }
 
+    [Given("identity-service client credentials grant is enabled for BDD tests")]
+    public void GivenClientCredentialsEnabled() => _settings[ClientCredentialsEnabledKey] = "true";
+
     [Given("identity-service has confidential oauth client {string} with secret {string}")]
     public void GivenConfidentialOAuthClient(string clientId, string secret)
     {
@@ -160,6 +165,88 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _settings[$"Identity:Clients:Seed:{index}:RedirectUris:0"] = "https://localhost/callback";
         _settings[$"Identity:Clients:Seed:{index}:AllowedScopes:0"] = "api.read";
         _settings[$"{ClientSecretKeyPrefix}{clientId}"] = secret;
+    }
+
+    [Given("identity-service has confidential oauth client {string} with secret {string} allows scopes:")]
+    public void GivenConfidentialOAuthClientWithScopes(string clientId, string secret, Table scopesTable)
+    {
+        _confidentialClientSecrets.Add(secret);
+        var index = NextClientSeedIndex();
+        _settings[$"Identity:Clients:Seed:{index}:ClientId"] = clientId;
+        _settings[$"Identity:Clients:Seed:{index}:ClientType"] = "Confidential";
+        _settings[$"Identity:Clients:Seed:{index}:RedirectUris:0"] = "https://localhost/callback";
+        var scopeIndex = 0;
+        foreach (var row in scopesTable.Rows)
+        {
+            _settings[$"Identity:Clients:Seed:{index}:AllowedScopes:{scopeIndex}"] = row["scope"];
+            scopeIndex++;
+        }
+
+        _settings[$"{ClientSecretKeyPrefix}{clientId}"] = secret;
+    }
+
+    [When("I request a client credentials token for client {string} with secret {string} and scope {string}")]
+    public async Task WhenRequestClientCredentialsToken(string clientId, string clientSecret, string scope) =>
+        await SendClientCredentialsTokenAsync(clientId, clientSecret, includeScope: true, scope);
+
+    [When("I request a client credentials token for client {string} with secret {string} without a scope")]
+    public async Task WhenRequestClientCredentialsTokenWithoutScope(string clientId, string clientSecret) =>
+        await SendClientCredentialsTokenAsync(clientId, clientSecret, includeScope: false, scope: string.Empty);
+
+    private async Task SendClientCredentialsTokenAsync(
+        string clientId,
+        string clientSecret,
+        bool includeScope,
+        string scope)
+    {
+        var fields = new Dictionary<string, string>
+        {
+            ["grant_type"] = "client_credentials",
+            ["client_id"] = clientId,
+            ["client_secret"] = clientSecret,
+        };
+        if (includeScope)
+        {
+            fields["scope"] = scope;
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, ConnectTokenPath)
+        {
+            Content = new FormUrlEncodedContent(fields),
+        };
+        _response = await _client!.SendAsync(request);
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
+    [Then("the status code is not {int}")]
+    public void ThenStatusCodeIsNot(int forbidden) => Assert.NotEqual(forbidden, (int)_response!.StatusCode);
+
+    [Then("the token response includes a Bearer access token with expires_in")]
+    public void ThenTokenResponseIncludesBearerAccessToken() => JwtBddAssertions.AssertBearerAccessTokenShape(_body);
+
+    [Then("the token response has no access_token")]
+    public void ThenTokenResponseHasNoAccessToken() => JwtBddAssertions.AssertNoAccessTokenProperty(_body);
+
+    [Then("the oauth token response error is {string}")]
+    public void ThenOAuthTokenError(string expectedError)
+    {
+        using var document = JsonDocument.Parse(_body);
+        var error = document.RootElement.GetProperty("error").GetString();
+        Assert.Equal(expectedError, error);
+    }
+
+    [Then("the access token is a machine token for client {string} with scope {string} and audience {string}")]
+    public void ThenAccessTokenIsMachineToken(string clientId, string scope, string audience)
+    {
+        var token = JwtBddAssertions.ParseAccessTokenFromTokenBody(_body);
+        JwtBddAssertions.AssertMachineClaims(token, clientId, scope, audience);
+    }
+
+    [Then("the access token is not a user access token")]
+    public void ThenAccessTokenIsNotUserToken()
+    {
+        var token = JwtBddAssertions.ParseAccessTokenFromTokenBody(_body);
+        JwtBddAssertions.AssertNotUserAccessToken(token);
     }
 
     [When("oauth redirect URI {string} is checked against registered URIs:")]
@@ -841,6 +928,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [Then("the response body does not contain the word {string}")]
     public void ThenBodyExcludesWord(string word) =>
         Assert.DoesNotContain(word, _body, StringComparison.OrdinalIgnoreCase);
+
+    [Then("the response body does not contain {string}")]
+    public void ThenBodyExcludes(string value) =>
+        Assert.DoesNotContain(value, _body, StringComparison.Ordinal);
 
     [Then("no response had status code {int}")]
     public void ThenNoBurstStatus(int forbidden)

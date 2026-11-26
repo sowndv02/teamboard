@@ -1,12 +1,12 @@
 ---
 key: TB-041
 title: Identity lát 13, Client Credentials và token máy
-status: todo
+status: review
 phase: 1
 branch: feature/TB-041-identity-client-credentials
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26           # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
@@ -18,17 +18,29 @@ Issue khung cấp key khi duyệt bảng lát: lát 13 của `document/plans/ide
 **Phụ thuộc (theo bảng lát):** 4, 12. Ước lượng của bảng lát: 2–3 ngày.
 
 ## Phạm vi
-- Làm (theo hàng lát, FR/NFR: FR-015, BR-008): Client Credentials, token máy
-- Không làm: các lát khác của bảng lát.
+- Làm (FR-015, BR-008, BR-007): grant `client_credentials` trên token endpoint; confidential client + secret qua registry; JWT máy (`token_use=machine`, `sub=client_id`, scope ⊆ allowed); metric; BDD @S01–@S06.
+- Không làm: code exchange (TB-043), authorize/PKCE (TB-042), introspection (TB-046), scope trên board API (TB-045) trừ khi plan Confirm #5 mở rộng `Teamboard.Auth` unit test only.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [x] Confidential client đúng secret → access token máy hợp lệ (@S01, @S02).
+- [x] Scope vượt `allowed_scopes` bị từ chối (@S03, @S03b).
+- [x] Sai secret/client không lộ chi tiết (@S04).
+- [x] Không log client secret (@S05).
+- [x] Public client không dùng được grant (@S06).
+- [x] Hồi quy `!~Compose` xanh (94/94).
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-041-identity-client-credentials.md`](../plans/TB-041-identity-client-credentials.md) (`approved`, B1–B4; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: TB-040 merged PR #36 → `main` `93cdd46`; `plan-init` nhánh `feature/TB-041-identity-client-credentials`.
+- 2026-11-26: plan-review v1 **PASS** — Confirm #1–#7 (`/connect/token`, form body, scope bắt buộc, feature flag, defer Teamboard.Auth, OAuth errors, AuthPublic rate limit).
+- 2026-11-26: test-init — `client-credentials.feature` @S01–@S06; stub `/connect/token` 501; **5 failed, 87 passed** `!~Compose`.
+- 2026-11-26: test-review v1 **PASS** — FIX missing-scope @S03b, unit asserts behavior; **10 failed, 84 passed** `!~Compose`.
+- 2026-11-26: coding-start — `/connect/token` client_credentials, JWT máy, scope validator; **94/94** `!~Compose`.
+- 2026-11-26: coding-review v1 **PASS** — commit `9875f12`; gate build `-warnaserror` + **94/94** `!~Compose`.
+- 2026-11-26: [PR #37](https://github.com/sowndv02/teamboard/pull/37) opened → chờ review/CI.
 
 ## Workflow
 
@@ -36,13 +48,13 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
-| plan-review | pending | | | |
-| test-init | pending | – | | |
-| test-review | pending | | | |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
-| create-pr | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Draft B1–B5; O-1..O-7 |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#7 |
+| test-init | done | – | 2026-11-26 | 5 đỏ @S01–S04,@S06; @S05 xanh; +2 unit |
+| test-review | PASS | 1 | 2026-11-26 | FIX @S03b + unit đỏ behavior; 10 fail |
+| coding-start | done | – | 2026-11-26 | **94/94** `!~Compose` |
+| coding-review | PASS | 1 | 2026-11-26 | 9875f12; 0 CONFIRM/FIX mở |
+| create-pr | done | – | 2026-11-26 | [PR #37](https://github.com/sowndv02/teamboard/pull/37) |
 
 ## Confirm log
 
@@ -55,16 +67,31 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01 | `client-credentials.feature` | | **xanh** |
+| @S02 | `client-credentials.feature` | | **xanh** |
+| @S03 | `client-credentials.feature` | | **xanh** |
+| @S03b | `client-credentials.feature` | | **xanh** |
+| @S04 | `client-credentials.feature` | | **xanh** |
+| @S05 | `client-credentials.feature` | | **xanh** |
+| @S06 | `client-credentials.feature` | | **xanh** |
+| unit issuer | `AccessTokenIssuerMachineTests` | | **xanh** |
+| unit scope | `ScopeValidatorTests` ×3 | | **xanh** |
+
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **94/94** (coding-start).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | test-init + FIX | Sẵn sàng code | – |
+
+**Giới hạn đã biết:** Chưa BDD metric `machine_access_tokens_issued_total` (plan B4 — kiểm unit/metric khi coding); feature flag disabled (404) chưa có kịch bản riêng.
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `9875f12` | PASS | – |
 
 ## Fix log
 
@@ -72,6 +99,10 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | test:identity:missing-scope | FIX P1 | `client-credentials.feature` | Confirm #3 scope bắt buộc thiếu kịch bản | @S03b + step without scope | 10 fail |
+| 1 | test:identity:unit-red-reason | FIX P1 | `ScopeValidatorTests`, `AccessTokenIssuerMachineTests` | Unit xanh vì assert NIE | Assert hành vi thật | NIE fail |
+| 1 | test:identity:cc-log-hit-endpoint | FIX P2 | @S05 | @S05 xanh yếu | `status not 404` | @S05 xanh |
+| 1 | test:identity:oauth-error-json | FIX P2 | `TokenEndpoints` | OAuth error shape | `error` / `error_description` | coding |
 
 ## Bài học (lessons learned)
 

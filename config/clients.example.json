@@ -11,6 +11,12 @@
           "ClientType": "Public",
           "RedirectUris": ["https://localhost/callback"],
           "AllowedScopes": ["openid"]
+        },
+        {
+          "ClientId": "svc-board",
+          "ClientType": "Confidential",
+          "RedirectUris": [],
+          "AllowedScopes": ["api.read"]
         }
       ]
     }

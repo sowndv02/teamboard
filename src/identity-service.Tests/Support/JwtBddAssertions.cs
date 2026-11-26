@@ -95,4 +95,29 @@ internal static class JwtBddAssertions
         return document.RootElement.GetProperty("id").GetString()
             ?? throw new InvalidOperationException("login id is missing.");
     }
+
+    public static JsonWebToken ParseAccessTokenFromTokenBody(string responseBody)
+    {
+        using var document = JsonDocument.Parse(responseBody);
+        var token = document.RootElement.GetProperty("access_token").GetString()
+            ?? throw new InvalidOperationException("access_token is missing.");
+        return new JsonWebTokenHandler().ReadJsonWebToken(token);
+    }
+
+    public static void AssertMachineClaims(JsonWebToken token, string clientId, string scope, string audience)
+    {
+        Assert.Equal(clientId, token.Subject);
+        Assert.Equal(clientId, token.GetPayloadValue<string>("client_id"));
+        Assert.Equal("machine", token.GetPayloadValue<string>("token_use"));
+        Assert.Equal(audience, token.GetPayloadValue<string>("aud"));
+        Assert.Equal(TestIssuer, token.Issuer);
+        Assert.Equal(scope, token.GetPayloadValue<string>("scope"));
+        Assert.False(string.IsNullOrWhiteSpace(token.Id));
+    }
+
+    public static void AssertNotUserAccessToken(JsonWebToken token)
+    {
+        Assert.Equal("machine", token.GetPayloadValue<string>("token_use"));
+        Assert.NotEqual("user", token.GetPayloadValue<string>("token_use"));
+    }
 }
