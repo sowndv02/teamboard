@@ -3,42 +3,36 @@
 id: TB-037
 scope: issue
 title: Identity lát 9, phát hiện dùng lại refresh token
-updated: 2026-11-26T16:30:00Z
+updated: 2026-11-26T17:15:00Z
 updated_by: orchestrator:cursor-session
 
 links:
   issue: document/issues/TB-037-identity-refresh-reuse-detection.md
-  spec: document/spec/identity-auth.md
-  design: document/design/identity-auth.md
   plan: document/plans/TB-037-identity-refresh-reuse-detection.md
-  features_dir: document/spec/features/identity-service/
   branch: feature/TB-037-identity-refresh-reuse-detection
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-037 (B0–B5 per plan)"
+current_step: coding-review
+next_action: "coding-review TB-037"
 
 steps:
   plan-init:            { status: done }
   plan-review:          { status: done, verdict: PASS, round: 1 }
-  test-init:            { status: done, finished: 2026-11-26T16:00:00Z }
-  test-review:
+  test-init:            { status: done }
+  test-review:          { status: done, verdict: PASS, round: 1 }
+  coding-start:
     status: done
     owner: orchestrator:cursor-session
-    finished: 2026-11-26T16:30:00Z
-    round: 1
-    verdict: PASS
-    open_confirm: 0
-    open_fix: 0
+    finished: 2026-11-26T17:15:00Z
     evidence:
-      - "f199fe8 reviewed"
-      - "2 red correct; 61 pass"
-  coding-start:         { status: pending }
+      - "RefreshTokenService reuse + family revoke"
+      - "refresh_reuse_total metric"
+      - "63/63 !~Compose"
   coding-review:        { status: pending }
   create-pr:            { status: pending }
 
 confirm_pending: []
 
 events:
-  - { at: 2026-11-26T16:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS" }
+  - { at: 2026-11-26T17:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-start 63/63 green" }

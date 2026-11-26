@@ -1,6 +1,8 @@
 using IdentityService.Persistence;
 using IdentityService.Persistence.Entities;
+using IdentityService.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace IdentityService.Security.Refresh;
@@ -8,7 +10,9 @@ namespace IdentityService.Security.Refresh;
 public sealed class RefreshTokenService(
     IdentityDbContext db,
     IOptions<RefreshTokenOptions> options,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    IdentityMetrics metrics,
+    ILogger<RefreshTokenService> logger)
 {
     public async Task<IssuedRefreshToken> IssueAtLoginAsync(Guid userId, CancellationToken cancellationToken)
     {
@@ -58,6 +62,7 @@ public sealed class RefreshTokenService(
             if (winners.Count == 0)
             {
                 await transaction.RollbackAsync(cancellationToken);
+                await TryHandleReuseAsync(hash, now, cancellationToken);
                 return null;
             }
 
@@ -86,6 +91,39 @@ public sealed class RefreshTokenService(
         }
     }
 
+    private async Task TryHandleReuseAsync(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        var reuses = await db.Database.SqlQuery<RefreshReuseRow>($"""
+            SELECT user_id AS "UserId", family_id AS "FamilyId"
+            FROM refresh_token
+            WHERE token_hash = {tokenHash}
+              AND used_at IS NOT NULL
+            """).ToListAsync(cancellationToken);
+
+        if (reuses.Count == 0)
+        {
+            return;
+        }
+
+        var reuse = reuses[0];
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        await db.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+            UPDATE refresh_token
+            SET revoked_at = {now}
+            WHERE family_id = {reuse.FamilyId}
+              AND revoked_at IS NULL
+            """,
+            cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        metrics.RecordRefreshReuse();
+        logger.LogWarning(
+            "refresh_reuse event=refresh_reuse UserId={UserId} FamilyId={FamilyId}",
+            reuse.UserId,
+            reuse.FamilyId);
+    }
+
     private sealed class RefreshRotateRow
     {
         public Guid UserId { get; init; }
@@ -93,6 +131,13 @@ public sealed class RefreshTokenService(
         public Guid FamilyId { get; init; }
 
         public string ClientId { get; init; } = string.Empty;
+    }
+
+    private sealed class RefreshReuseRow
+    {
+        public Guid UserId { get; init; }
+
+        public Guid FamilyId { get; init; }
     }
 }
 

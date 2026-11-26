@@ -12,6 +12,7 @@ public sealed class IdentityMetrics
     private readonly Counter<long> _accessTokensIssuedTotal;
     private readonly Counter<long> _refreshTokensIssuedTotal;
     private readonly Counter<long> _refreshRotationsTotal;
+    private readonly Counter<long> _refreshReuseTotal;
     private readonly Counter<long> _jwksServedTotal;
 
     public IdentityMetrics(IMeterFactory meterFactory)
@@ -36,6 +37,9 @@ public sealed class IdentityMetrics
         _refreshRotationsTotal = meter.CreateCounter<long>(
             "refresh_rotations_total",
             description: "Successful refresh token rotations.");
+        _refreshReuseTotal = meter.CreateCounter<long>(
+            "refresh_reuse_total",
+            description: "Detected refresh token reuse after rotation.");
         _jwksServedTotal = meter.CreateCounter<long>(
             "jwks_served_total",
             description: "JWKS documents successfully served.");
@@ -52,6 +56,8 @@ public sealed class IdentityMetrics
     public void RecordRefreshTokenIssued() => _refreshTokensIssuedTotal.Add(1);
 
     public void RecordRefreshRotation() => _refreshRotationsTotal.Add(1);
+
+    public void RecordRefreshReuse() => _refreshReuseTotal.Add(1);
 
     public void RecordJwksServed() => _jwksServedTotal.Add(1);
 }

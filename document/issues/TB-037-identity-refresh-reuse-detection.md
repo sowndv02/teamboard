@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 9 của `document/plans/iden
 - Không làm: bảng `security_event` DB (hoãn), đăng xuất (TB-038), thu hồi theo user/đổi mật khẩu (TB-039).
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Gửi lại refresh token đã xoay (`used_at` set) → **401** chung và **thu hồi toàn bộ family** (token mới từ lần xoay cũng không refresh được).
-- [ ] Loser đồng thời sau khi một request refresh thành công → xử lý reuse (family revoke), không chỉ 401 vô hại.
-- [ ] Token không tồn tại / hết hạn / đã `revoked_at` (không phải reuse) → 401 **không** tăng `refresh_reuse_total`.
-- [ ] Metric `refresh_reuse_total`; structured log `refresh_reuse` không chứa token.
-- [ ] Gate identity `!~Compose` xanh; hồi quy `refresh-token.feature` @S01–@S05.
+- [x] Gửi lại refresh token đã xoay (`used_at` set) → **401** chung và **thu hồi toàn bộ family** (token mới từ lần xoay cũng không refresh được).
+- [x] Loser đồng thời sau khi một request refresh thành công → xử lý reuse (family revoke), không chỉ 401 vô hại.
+- [x] Token không tồn tại / hết hạn / đã `revoked_at` (không phải reuse) → 401 **không** tăng `refresh_reuse_total`.
+- [x] Metric `refresh_reuse_total`; structured log `refresh_reuse` không chứa token.
+- [x] Gate identity `!~Compose` xanh; hồi quy `refresh-token.feature` @S01–@S06.
 
 ## Kế hoạch
 Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-037-identity-refresh-reuse-detection.md) (`approved`, B0–B5; plan-review PASS v1).
@@ -37,6 +37,7 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 - 2026-11-26: plan-review v1 PASS — Confirm #1–#4 (log only; concurrent reuse revoke; @S02+@S06; 401 chung).
 - 2026-11-26: test-init — mở rộng `refresh-token.feature` @S02 (family), @S06 (metric); **2 đỏ**, **61 xanh** (`!~Compose`).
 - 2026-11-26: test-review v1 PASS — 2 đỏ đúng lý do (family revoke + metric chưa có).
+- 2026-11-26: coding-start — reuse detection, family revoke, `refresh_reuse_total`, log; **63/63** identity `!~Compose`.
 
 ## Workflow
 
@@ -46,7 +47,8 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | done | – | 2026-11-26 | 2 đỏ @S02/@S06; 61 hồi quy |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code; 2 đỏ |
-| coding-start | pending | – | | next |
+| coding-start | done | – | 2026-11-26 | 63/63 `!~Compose` |
+| coding-review | pending | – | | next |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -65,8 +67,8 @@ Plan: [`document/plans/TB-037-identity-refresh-reuse-detection.md`](../plans/TB-
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
 | refresh @S01–@S05 (hồi quy) | `refresh-token.feature` | | **xanh** |
-| reuse family @S02 mở rộng | `refresh-token.feature` | **đỏ** (rotated token vẫn 200) | |
-| reuse metric @S06 | `refresh-token.feature` | **đỏ** (metric 0/1) | |
+| reuse family @S02 mở rộng | `refresh-token.feature` | | **xanh** |
+| reuse metric @S06 | `refresh-token.feature` | | **xanh** |
 
 ## Test review rounds
 
