@@ -6,15 +6,16 @@ internal static class AuthorizePendingRequestCookie
 {
     internal const string CookieName = "tb.authz.pending";
 
-    internal static void Set(HttpResponse response, Guid requestId) =>
-        response.Cookies.Append(
+    internal static void Set(HttpContext context, Guid requestId) =>
+        context.Response.Cookies.Append(
             CookieName,
             requestId.ToString(),
             new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
+                Secure = context.Request.IsHttps,
                 SameSite = SameSiteMode.Lax,
+                Path = "/",
                 MaxAge = AuthorizeRequestService.RequestTtl,
                 IsEssential = true,
             });
@@ -22,5 +23,6 @@ internal static class AuthorizePendingRequestCookie
     internal static Guid? TryRead(HttpRequest request) =>
         Guid.TryParse(request.Cookies[CookieName], out var id) ? id : null;
 
-    internal static void Clear(HttpResponse response) => response.Cookies.Delete(CookieName);
+    internal static void Clear(HttpContext context) =>
+        context.Response.Cookies.Delete(CookieName, new CookieOptions { Path = "/" });
 }

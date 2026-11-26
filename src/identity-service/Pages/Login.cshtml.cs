@@ -39,7 +39,7 @@ public sealed class LoginModel(
         if (requestId is { } id)
         {
             AuthorizeRequestId = id;
-            AuthorizePendingRequestCookie.Set(Response, id);
+            AuthorizePendingRequestCookie.Set(HttpContext, id);
         }
     }
 
@@ -104,7 +104,7 @@ public sealed class LoginModel(
             request,
             authenticatedUserId,
             cancellationToken);
-        AuthorizePendingRequestCookie.Clear(Response);
+        AuthorizePendingRequestCookie.Clear(HttpContext);
         return Redirect(redirect);
     }
 
