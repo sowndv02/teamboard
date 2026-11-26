@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../shared/Auth/Teamboard.Shared.Auth.csproj" />
     <ProjectReference Include="../shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj" />
   </ItemGroup>
 

@@ -8,6 +8,8 @@
   <Project Path="shared/ServiceDefaults.Tests/Teamboard.Shared.ServiceDefaults.Tests.csproj" />
   <Project Path="shared/Http/Teamboard.Shared.Http.csproj" />
   <Project Path="shared/Http.Tests/Teamboard.Shared.Http.Tests.csproj" />
+  <Project Path="shared/Auth/Teamboard.Shared.Auth.csproj" />
+  <Project Path="shared/Auth.Tests/Teamboard.Shared.Auth.Tests.csproj" />
   <Project Path="gateway/gateway.csproj" />
   <Project Path="gateway.Tests/gateway.Tests.csproj" />
   <Project Path="identity-service/identity-service.csproj" />

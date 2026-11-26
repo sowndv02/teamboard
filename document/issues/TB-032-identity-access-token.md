@@ -1,13 +1,13 @@
 ---
 key: TB-032
 title: Identity lát 4, phát access token JWT khi đăng nhập
-status: in-progress
+status: done
 phase: 1
 branch: feature/TB-032-identity-access-token
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
 started: 2026-11-26
-closed: null            # ngày done/dropped
+closed: 2026-11-26      # merge PR #27
 ---
 
 # TB-032 — Identity lát 4, phát access token JWT khi đăng nhập
@@ -40,6 +40,7 @@ Plan: [`document/plans/TB-032-identity-access-token.md`](../plans/TB-032-identit
 - 2026-11-26: commit `9d96fae` test(TB-032); coding-start B0–B4 — JWT RS256 login, ready khoá ký, metric; **44/44 xanh**.
 - 2026-11-26: coding-review v1 PASS — FIX 503 thiếu khoá, compose signing keys.
 - 2026-11-26: commit `5250b45` feat + PR [#27](https://github.com/sowndv02/teamboard/pull/27).
+- 2026-11-26: merged PR #27 vào `main` (`315449c`); lát 4 xong; mở TB-033.
 
 ## Workflow
 
