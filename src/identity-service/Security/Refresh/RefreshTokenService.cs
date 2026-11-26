@@ -136,6 +136,19 @@ public sealed class RefreshTokenService(
         return true;
     }
 
+    public async Task RevokeAllForUserAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var now = timeProvider.GetUtcNow();
+        await db.Database.ExecuteSqlInterpolatedAsync(
+            $"""
+            UPDATE refresh_token
+            SET revoked_at = {now}
+            WHERE user_id = {userId}
+              AND revoked_at IS NULL
+            """,
+            cancellationToken);
+    }
+
     private async Task TryHandleReuseAsync(string tokenHash, DateTimeOffset now, CancellationToken cancellationToken)
     {
         var reuses = await db.Database.SqlQuery<RefreshReuseRow>($"""

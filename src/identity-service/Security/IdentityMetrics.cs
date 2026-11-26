@@ -14,6 +14,7 @@ public sealed class IdentityMetrics
     private readonly Counter<long> _refreshRotationsTotal;
     private readonly Counter<long> _refreshReuseTotal;
     private readonly Counter<long> _logoutTotal;
+    private readonly Counter<long> _passwordChangeTotal;
     private readonly Counter<long> _jwksServedTotal;
 
     public IdentityMetrics(IMeterFactory meterFactory)
@@ -44,6 +45,9 @@ public sealed class IdentityMetrics
         _logoutTotal = meter.CreateCounter<long>(
             "logout_total",
             description: "Successful refresh session logouts.");
+        _passwordChangeTotal = meter.CreateCounter<long>(
+            "password_change_total",
+            description: "Successful password changes.");
         _jwksServedTotal = meter.CreateCounter<long>(
             "jwks_served_total",
             description: "JWKS documents successfully served.");
@@ -64,6 +68,8 @@ public sealed class IdentityMetrics
     public void RecordRefreshReuse() => _refreshReuseTotal.Add(1);
 
     public void RecordLogout() => _logoutTotal.Add(1);
+
+    public void RecordPasswordChange() => _passwordChangeTotal.Add(1);
 
     public void RecordJwksServed() => _jwksServedTotal.Add(1);
 }

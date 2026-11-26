@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "Lát hiện tại: TB-039 — coding-start (Teamboard.Auth + /password). Test-review PASS v1."
+current_step: create-pr
+next_action: "TB-039 coding-review v1 PASS; sẵn sàng PR."
 blocked_by: null
 
 steps:

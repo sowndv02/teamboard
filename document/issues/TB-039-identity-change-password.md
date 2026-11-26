@@ -1,7 +1,7 @@
 ---
 key: TB-039
 title: Identity lát 11, đổi mật khẩu và thu hồi refresh
-status: planning
+status: in-progress
 phase: 1
 branch: feature/TB-039-identity-change-password
 estimate: S             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -22,13 +22,13 @@ Issue khung cấp key khi duyệt bảng lát: lát 11 của `document/plans/ide
 - Không làm: quên mật khẩu, FR-019 cookie, introspection, gateway, FE.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] @S01: hai login → đổi mật khẩu **204** → cả hai refresh **401**.
-- [ ] @S02/@S06: sai `current_password` → **401** chung; @S06 lockout + `Retry-After` (FR-003).
-- [ ] @S03/@S03b: `new_password` BR-002 vi phạm → **400**; new trùng current → **400**.
-- [ ] @S04: thiếu/sai Bearer → **401**.
-- [ ] @S05: access JWT vẫn dùng được đến `exp` sau đổi mật khẩu (BR-006).
-- [ ] `password_change_total` + log `event=password_change` (không password).
-- [ ] Gate identity `!~Compose` xanh; hồi quy logout/login.
+- [x] @S01: hai login → đổi mật khẩu **204** → cả hai refresh **401**.
+- [x] @S02/@S06: sai `current_password` → **401** chung; @S06 lockout + `Retry-After` (FR-003).
+- [x] @S03/@S03b: `new_password` BR-002 vi phạm → **400**; new trùng current → **400**.
+- [x] @S04: thiếu/sai Bearer → **401**.
+- [x] @S05: access JWT vẫn dùng được đến `exp` sau đổi mật khẩu (BR-006).
+- [x] `password_change_total` + log `event=password_change` (không password).
+- [x] Gate identity `!~Compose` xanh; hồi quy logout/login.
 
 ## Kế hoạch
 Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-identity-change-password.md) (`approved`, B1–B6; plan-review PASS v1).
@@ -39,6 +39,8 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 - 2026-11-26: plan-review v1 **PASS** — Confirm #1–#6 (Teamboard.Auth, 204, metric, auth-public, @S06, reject same password).
 - 2026-11-26: test-init — `change-password.feature` @S01–@S06; **8 failed, 66 passed** `!~Compose` (404 thiếu `/password`).
 - 2026-11-26: test-review v1 **PASS** — Sẵn sàng code; FIX tag @S03b + @S04 invalid JWT.
+- 2026-11-26: coding-start — Teamboard.Auth, `/password`, revoke-by-user; **74/74** `!~Compose`; format xanh.
+- 2026-11-26: coding-review v1 **PASS** — giới hạn độ dài `current_password`; 74/74; P3 metric BDD hoãn (TB-038).
 
 ## Workflow
 
@@ -48,8 +50,8 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#6 |
 | test-init | done | – | 2026-11-26 | 8 đỏ; 66 hồi quy |
 | test-review | PASS | 1 | 2026-11-26 | Sẵn sàng code |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
+| coding-start | done | – | 2026-11-26 | 74/74 `!~Compose` |
+| coding-review | PASS | 1 | 2026-11-26 | 74/74 sau FIX max length current |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -67,15 +69,10 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| @S01 revoke two sessions | `change-password.feature` | **đỏ** | |
-| @S02 wrong current | `change-password.feature` | **đỏ** | |
-| @S03 / @S03b validation | `change-password.feature` | **đỏ** | |
-| @S04 no/invalid Bearer | `change-password.feature` | **đỏ** | |
-| @S05 BR-006 access reuse | `change-password.feature` | **đỏ** | |
-| @S06 lockout | `change-password.feature` | **đỏ** | |
-| hồi quy | login/logout/refresh/… | | xanh |
+| @S01–@S06 change-password | `change-password.feature` | | **xanh** |
+| hồi quy | login/logout/refresh/… | | **xanh** |
 
-**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **Failed: 8, Passed: 66**; đỏ: `/password` 404 (kỳ vọng 204/401/400).
+**Lệnh:** `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"` → **74/74** (coding-start).
 
 ## Test review rounds
 
@@ -100,11 +97,15 @@ Plan: [`document/plans/TB-039-identity-change-password.md`](../plans/TB-039-iden
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | working tree | Sẵn sàng merge | – |
+
+**Lăng kính (v1):** Khớp plan Confirm #1–#6; revoke `user_id`; lockout @S06; 204/401/400; BR-006 @S05. Auth chỉ `/password`. Transaction hash+revoke. **P3:** chưa BDD `password_change_total` (giống logout @ TB-038).
 
 ## Fix log
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | code:identity:change-password-current-max-length | FIX P1 | `ChangePasswordEndpoints` | Chưa giới hạn độ dài `current_password` (DoS băm) | 400 nếu `current` > MaxLength | 74/74 |
 
 ## Bài học (lessons learned)
 

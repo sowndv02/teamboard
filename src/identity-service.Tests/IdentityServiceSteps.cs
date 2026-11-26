@@ -41,6 +41,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string RateLimitPermitKey = "Identity:RateLimiting:PermitLimit";
     private const string RateLimitWindowKey = "Identity:RateLimiting:WindowSeconds";
     private const string SigningKeysFileKey = "Identity:SigningKeys:JsonFile";
+    private const string AuthJwksFileKey = "Auth:Jwt:StaticJwksFile";
+    private const string AuthJwtIssuerKey = "Auth:Jwt:ValidIssuer";
+    private const string AuthJwtAudienceKey = "Auth:Jwt:ValidAudience";
     private const string JwtIssuerKey = "Identity:Jwt:Issuer";
     private const string JwtAudienceKey = "Identity:Jwt:Audience";
     private const string JwtLifetimeKey = "Identity:Jwt:AccessTokenLifetimeSeconds";
@@ -1157,11 +1160,18 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                     builder.UseSetting(SigningKeysFileKey, TestSigningKeyPaths.JsonFile);
                 }
 
-                builder.UseSetting(JwtIssuerKey, _settings.GetValueOrDefault(JwtIssuerKey, BddJwtIssuer));
-                builder.UseSetting(JwtAudienceKey, _settings.GetValueOrDefault(JwtAudienceKey, BddJwtAudience));
+                var signingKeysPath = _settings.GetValueOrDefault(SigningKeysFileKey, TestSigningKeyPaths.JsonFile);
+                var jwtIssuer = _settings.GetValueOrDefault(JwtIssuerKey, BddJwtIssuer);
+                var jwtAudience = _settings.GetValueOrDefault(JwtAudienceKey, BddJwtAudience);
+
+                builder.UseSetting(JwtIssuerKey, jwtIssuer);
+                builder.UseSetting(JwtAudienceKey, jwtAudience);
                 builder.UseSetting(
                     JwtLifetimeKey,
                     _settings.GetValueOrDefault(JwtLifetimeKey, BddJwtLifetimeSeconds.ToString(CultureInfo.InvariantCulture)));
+                builder.UseSetting(AuthJwksFileKey, signingKeysPath);
+                builder.UseSetting(AuthJwtIssuerKey, jwtIssuer);
+                builder.UseSetting(AuthJwtAudienceKey, jwtAudience);
             }
 
             if (_logs is not null)

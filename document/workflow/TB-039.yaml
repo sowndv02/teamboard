@@ -13,8 +13,8 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "B2 Teamboard.Auth + B3/B4 change password; làm xanh 8 scenario change-password."
+current_step: create-pr
+next_action: "create-pr TB-039 (user commit/push trước)."
 
 steps:
   plan-init:            { status: done }
@@ -32,8 +32,16 @@ steps:
     verdict: PASS
     round: 1
     reviewed_commit: working-tree
-  coding-start:         { status: pending }
-  coding-review:        { status: pending }
+  coding-start:
+    status: done
+    evidence:
+      - "74/74 !~Compose"
+      - "password_change_total + revoke user"
+  coding-review:
+    status: done
+    verdict: PASS
+    round: 1
+    evidence: ["74/74", "FIX current_password max length"]
   create-pr:            { status: pending }
 
 confirm_pending: []
