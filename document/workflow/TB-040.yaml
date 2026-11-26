@@ -49,7 +49,12 @@ steps:
     status: done
     finished: 2026-11-26T19:30:00Z
     evidence: ["83/83 !~Compose", "dotnet build warnaserror"]
-  coding-review:        { status: pending }
+  coding-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-26T19:45:00Z
+    evidence: ["214005a", "83/83"]
   create-pr:            { status: pending }
 
 confirm_pending: []
@@ -63,3 +68,4 @@ events:
   - { at: 2026-11-26T18:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init: 7 red (missing client table + stubs)" }
   - { at: 2026-11-26T18:55:00Z, actor: "orchestrator:cursor-session", event: review_round, detail: "test-review v1 PASS; FIX P1/P2" }
   - { at: 2026-11-26T18:55:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review PASS → coding-start" }
+  - { at: 2026-11-26T19:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS → create-pr" }
