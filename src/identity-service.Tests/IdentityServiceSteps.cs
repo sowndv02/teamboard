@@ -1,5 +1,6 @@
 using System.Diagnostics.Metrics;
 using System.Globalization;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IdentityService.Cli;
@@ -27,6 +28,7 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string LoginPath = "/api/v1/auth/login";
     private const string RefreshPath = "/api/v1/auth/refresh";
     private const string LogoutPath = "/api/v1/auth/logout";
+    private const string ChangePasswordPath = "/api/v1/auth/password";
     private const string RefreshLifetimeKey = "Identity:RefreshToken:LifetimeSeconds";
     private const string RefreshDefaultClientKey = "Identity:RefreshToken:DefaultClientId";
     private const int BddRefreshLifetimeSeconds = 120;
@@ -39,6 +41,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private const string RateLimitPermitKey = "Identity:RateLimiting:PermitLimit";
     private const string RateLimitWindowKey = "Identity:RateLimiting:WindowSeconds";
     private const string SigningKeysFileKey = "Identity:SigningKeys:JsonFile";
+    private const string AuthJwksFileKey = "Auth:Jwt:StaticJwksFile";
+    private const string AuthJwtIssuerKey = "Auth:Jwt:ValidIssuer";
+    private const string AuthJwtAudienceKey = "Auth:Jwt:ValidAudience";
     private const string JwtIssuerKey = "Identity:Jwt:Issuer";
     private const string JwtAudienceKey = "Identity:Jwt:Audience";
     private const string JwtLifetimeKey = "Identity:Jwt:AccessTokenLifetimeSeconds";
@@ -81,6 +86,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private string? _storedRefreshToken;
     private string? _latestRotatedRefreshToken;
     private string? _storedLoginAccessToken;
+    private string? _changePasswordAccessToken;
+    private string? _firstSessionRefreshToken;
+    private string? _secondSessionRefreshToken;
     private int _concurrentRefreshSuccess;
     private int _concurrentRefreshFailure;
     private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
@@ -108,6 +116,9 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _storedRefreshToken = null;
         _latestRotatedRefreshToken = null;
         _storedLoginAccessToken = null;
+        _changePasswordAccessToken = null;
+        _firstSessionRefreshToken = null;
+        _secondSessionRefreshToken = null;
         _refreshReuseMeasurements = 0;
         _refreshReuseBaseline = 0;
         _concurrentRefreshSuccess = 0;
@@ -558,6 +569,59 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     [When("I send a logout request with refresh token {string}")]
     public Task WhenLogoutWithToken(string refreshToken) => SendLogoutAsync(refreshToken);
 
+    [When("I store the current login refresh token as the first session refresh token")]
+    public void WhenStoreFirstSessionRefreshToken()
+    {
+        using var document = JsonDocument.Parse(_body);
+        _firstSessionRefreshToken = document.RootElement.GetProperty("refresh_token").GetString()
+            ?? throw new InvalidOperationException("refresh_token is missing from login response.");
+    }
+
+    [When("I store the current login refresh token as the second session refresh token")]
+    public void WhenStoreSecondSessionRefreshToken()
+    {
+        using var document = JsonDocument.Parse(_body);
+        _secondSessionRefreshToken = document.RootElement.GetProperty("refresh_token").GetString()
+            ?? throw new InvalidOperationException("refresh_token is missing from login response.");
+    }
+
+    [When("I store the current login access token for change password requests")]
+    public void WhenStoreChangePasswordAccessToken()
+    {
+        using var document = JsonDocument.Parse(_body);
+        _changePasswordAccessToken = document.RootElement.GetProperty("access_token").GetString()
+            ?? throw new InvalidOperationException("access_token is missing from login response.");
+    }
+
+    [When("I send a change password request with current {string} and new {string} using the stored change password access token")]
+    public Task WhenChangePasswordWithStoredToken(string currentPassword, string newPassword) =>
+        SendChangePasswordAsync(currentPassword, newPassword, _changePasswordAccessToken);
+
+    [When("I send a change password request with current {string} and new {string} without an access token")]
+    public Task WhenChangePasswordWithoutToken(string currentPassword, string newPassword) =>
+        SendChangePasswordAsync(currentPassword, newPassword, bearerToken: null);
+
+    [When("I send a change password request with current {string} and new {string} using access token {string}")]
+    public Task WhenChangePasswordWithExplicitToken(string currentPassword, string newPassword, string accessToken) =>
+        SendChangePasswordAsync(currentPassword, newPassword, accessToken);
+
+    [When("I send {int} change password requests with current {string} and new {string} using the stored change password access token")]
+    public async Task WhenManyChangePasswordRequests(int count, string currentPassword, string newPassword)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            await SendChangePasswordAsync(currentPassword, newPassword, _changePasswordAccessToken);
+        }
+    }
+
+    [When("I send a refresh request with the first session refresh token")]
+    public Task WhenRefreshFirstSession() =>
+        SendRefreshAsync(_firstSessionRefreshToken ?? throw new InvalidOperationException("No first session refresh token."));
+
+    [When("I send a refresh request with the second session refresh token")]
+    public Task WhenRefreshSecondSession() =>
+        SendRefreshAsync(_secondSessionRefreshToken ?? throw new InvalidOperationException("No second session refresh token."));
+
     [When("two refresh requests run concurrently with the stored refresh token")]
     public async Task WhenConcurrentRefreshWithStoredToken()
     {
@@ -916,6 +980,28 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _body = await _response.Content.ReadAsStringAsync();
     }
 
+    private async Task SendChangePasswordAsync(string currentPassword, string newPassword, string? bearerToken, string? clientIp = null)
+    {
+        var client = _client ?? throw new InvalidOperationException("Service not started.");
+        _response?.Dispose();
+        using var request = new HttpRequestMessage(HttpMethod.Post, ChangePasswordPath)
+        {
+            Content = JsonContent.Create(new { current_password = currentPassword, new_password = newPassword }),
+        };
+        if (bearerToken is not null)
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+        }
+
+        if (clientIp is not null)
+        {
+            request.Headers.TryAddWithoutValidation(TestClientIpStartupFilter.HeaderName, clientIp);
+        }
+
+        _response = await client.SendAsync(request);
+        _body = await _response.Content.ReadAsStringAsync();
+    }
+
     private async Task SendLoginAsync(string email, string password, string? clientIp = null)
     {
         var client = _client ?? throw new InvalidOperationException("Service not started.");
@@ -1074,11 +1160,18 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
                     builder.UseSetting(SigningKeysFileKey, TestSigningKeyPaths.JsonFile);
                 }
 
-                builder.UseSetting(JwtIssuerKey, _settings.GetValueOrDefault(JwtIssuerKey, BddJwtIssuer));
-                builder.UseSetting(JwtAudienceKey, _settings.GetValueOrDefault(JwtAudienceKey, BddJwtAudience));
+                var signingKeysPath = _settings.GetValueOrDefault(SigningKeysFileKey, TestSigningKeyPaths.JsonFile);
+                var jwtIssuer = _settings.GetValueOrDefault(JwtIssuerKey, BddJwtIssuer);
+                var jwtAudience = _settings.GetValueOrDefault(JwtAudienceKey, BddJwtAudience);
+
+                builder.UseSetting(JwtIssuerKey, jwtIssuer);
+                builder.UseSetting(JwtAudienceKey, jwtAudience);
                 builder.UseSetting(
                     JwtLifetimeKey,
                     _settings.GetValueOrDefault(JwtLifetimeKey, BddJwtLifetimeSeconds.ToString(CultureInfo.InvariantCulture)));
+                builder.UseSetting(AuthJwksFileKey, signingKeysPath);
+                builder.UseSetting(AuthJwtIssuerKey, jwtIssuer);
+                builder.UseSetting(AuthJwtAudienceKey, jwtAudience);
             }
 
             if (_logs is not null)

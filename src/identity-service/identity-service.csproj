@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="identity-service.Tests" />
+    <ProjectReference Include="../shared/Auth/Teamboard.Shared.Auth.csproj" />
     <ProjectReference Include="../shared/ServiceDefaults/Teamboard.Shared.ServiceDefaults.csproj" />
     <ProjectReference Include="../shared/Http/Teamboard.Shared.Http.csproj" />
   </ItemGroup>

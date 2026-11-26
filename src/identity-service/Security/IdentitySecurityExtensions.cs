@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
+using Teamboard.Shared.Auth;
 using Teamboard.Shared.ServiceDefaults;
 
 namespace IdentityService.Security;
@@ -51,6 +52,8 @@ public static class IdentitySecurityExtensions
 
         builder.Services.AddSingleton<IdentityMetrics>();
         builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        builder.Services.AddTeamboardJwtAuthentication(builder.Configuration);
+        builder.Services.AddSingleton<IConfigureOptions<TeamboardAuthJwtOptions>, IdentityTeamboardAuthJwtConfigurer>();
         builder.Services.AddOpenTelemetry().WithMetrics(metrics => metrics.AddMeter(IdentityMetrics.MeterName));
         return builder;
     }
