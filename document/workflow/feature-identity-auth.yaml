@@ -17,7 +17,7 @@ links:
   pr: null
 
 current_step: plan-review
-next_action: "Lát hiện tại: TB-035 (7 xoay khoá) — plan-review (O-1..O-4). Lát 6 TB-034 done (PR #29)."
+next_action: "Lát hiện tại: TB-035 (7 xoay khoá) — test-init. Lát 6 TB-034 done (PR #29)."
 blocked_by: null
 
 steps:

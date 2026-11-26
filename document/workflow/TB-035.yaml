@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: plan-review
-next_action: "plan-review TB-035 (O-1..O-4)"
+current_step: test-init
+next_action: "test-init TB-035 signing-key-rotation.feature"
 
 steps:
   plan-init:
@@ -27,18 +27,24 @@ steps:
     evidence:
       - "Plan draft B0-B6; base main 21ffee1 after PR #29"
       - "Open questions O-1..O-4"
-  plan-review:            { status: pending }
+  plan-review:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T23:30:00Z
+    round: 1
+    verdict: PASS
+    open_confirm: 0
+    open_fix: 0
+    evidence:
+      - "Confirm #1-4 user form"
+      - "log audit; reload file; fake time; file-only"
   test-init:              { status: pending }
   test-review:            { status: pending }
   coding-start:           { status: pending }
   coding-review:          { status: pending }
   create-pr:              { status: pending }
 
-confirm_pending:
-  - O-1-security-event-scope
-  - O-2-signing-key-reload
-  - O-3-time-provider-tests
-  - O-4-secrets-manager-defer
+confirm_pending: []
 
 events:
   - { at: 2026-11-26T23:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "TB-034 merged PR #29; plan-init TB-035" }

@@ -29,11 +29,12 @@ Issue khung cấp key khi duyệt bảng lát: lát 7 của `document/plans/iden
 - [ ] Gate identity + Auth + board tests xanh (`!~Compose`, `Category!=docker`).
 
 ## Kế hoạch
-Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035-identity-signing-key-rotation.md) (`draft`, B0–B6; chờ `plan-review` O-1..O-4).
+Plan: [`document/plans/TB-035-identity-signing-key-rotation.md`](../plans/TB-035-identity-signing-key-rotation.md) (`approved`, B0–B6; plan-review PASS v1).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
 - 2026-11-26: TB-034 merged PR #29; `plan-init` trên nhánh `feature/TB-035-identity-signing-key-rotation` từ `main` `21ffee1`.
+- 2026-11-26: plan-review v1 PASS — log audit; reload file mỗi sign/JWKS; fake time CLI; file-only keys.
 
 ## Workflow
 
@@ -42,7 +43,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B6; O-1..O-4 |
-| plan-review | pending | | | |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
 | test-init | pending | – | | |
 | test-review | pending | | | |
 | coding-start | pending | – | | |
@@ -53,6 +54,10 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-035:audit-scope | O-1 audit | Log + `IRotationAudit`, không DB | 1 | 2026-11-26 |
+| 2 | plan-review:TB-035:reload-keys | O-2 reload | Reload file mỗi sign/JWKS | 1 | 2026-11-26 |
+| 3 | plan-review:TB-035:time-guards-test | O-3 guard test | Fake `TimeProvider` CLI | 1 | 2026-11-26 |
+| 4 | plan-review:TB-035:key-source | O-4 nguồn khoá | File-only | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 

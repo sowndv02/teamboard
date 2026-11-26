@@ -1,7 +1,7 @@
 ---
 title: Identity lát 7, xoay khoá ký không hỏng token còn hạn
 issue: TB-035
-status: draft
+status: approved
 owner: sondv
 updated: 2026-11-26
 spec: document/spec/identity-auth.md
@@ -58,7 +58,7 @@ Kịch bản dự kiến (`document/spec/features/identity-service/signing-key-r
 
 ### B1. Đa khoá + reload store
 - Mở rộng `SigningKeyFileEntry` (timestamp `publishedAt` / `retiringSince` cho guard CLI — định dạng trong ADR).
-- `ISigningKeyStore`: `GetActiveKey()`, `GetPublishedKeysForJwks()`, `Reload()` (hoặc đọc file mỗi request — O-2).
+- `ISigningKeyStore`: `GetActiveKey()`, `GetPublishedKeysForJwks()`; **reload từ file trước mỗi sign/JWKS** (Confirm #2).
 - `IdentityJwksSetBuilder`: serialize **tất cả** khoá được công bố.
 - Kiểm chứng: unit test export JWKS 2 keys; hồi quy tests TB-032/TB-034.
 
@@ -80,14 +80,14 @@ Kịch bản dự kiến (`document/spec/features/identity-service/signing-key-r
 - `Auth.Tests`: issue token với `kid` cũ/mới qua cùng JWKS URI sau activate.
 - Kiểm chứng: FR-008 end-to-end; board hồi quy.
 
-### B6. Audit (phụ thuộc O-1)
-- Ghi `security_event` hoặc structured log `key_rotation` mỗi lệnh.
+### B6. Audit (Confirm #1)
+- Structured log `key_rotation` + `IRotationAudit` (không migration DB trong lát).
 
 ## 4. Chiến lược test
 
 | Tầng | Phạm vi | Môi trường | Ghi chú |
 |---|---|---|---|
-| BDD | @S01–@S05 | `WebApplicationFactory`, file khoá tạm | `TimeProvider` fake cho guard 10m/24h |
+| BDD | @S01–@S05 | `WebApplicationFactory`, file khoá tạm | `TimeProvider` fake CLI + metadata file (Confirm #3) |
 | CLI unit | Máy trạng thái JSON | xUnit | Không RSA thật nếu có builder fake |
 | Integration | Auth multi-kid | Factory identity + Auth | Như TB-034 |
 
@@ -114,17 +114,28 @@ Công cụ: Reqnroll + xUnit (repo hiện tại).
 
 ## 7. Câu hỏi mở và giả định
 
-| ID | Câu hỏi | Phương án gợi ý | Evidence thiếu |
-|---|---|---|---|
-| O-1 | Audit `security_event` trong DB ngay hay log structured + migration sau? | Log + interface `IRotationAudit` (DB TB sau) | Chưa có bảng `security_event` trong code |
-| O-2 | Reload khoá trong API sau CLI? | **Reload từ file** trước mỗi sign/JWKS (đơn giản dev); hoặc `FileSystemWatcher` | `FileSigningKeyStore` chỉ đọc lúc startup |
-| O-3 | Thời gian guard trong test: fake `TimeProvider` toàn app vs chỉ CLI? | Fake `TimeProvider` inject CLI + store metadata | Cần CONFIRM testability |
-| O-4 | Secrets Manager trong lát hay file-only? | **File-only** (giống TB-032 defer SM) | D3 chọn SM cho prod |
+Không còn câu hỏi mở sau plan-review v1.
 
-**Giả định giữ:** Chỉ RS256; một chu kỳ xoay tại một thời điểm (một `pending`).
+**Giả định giữ:** Chỉ RS256; một chu kỳ xoay tại một thời điểm (một `pending`); nguồn khoá **file JSON** (hoãn Secrets Manager).
+
+## Confirm log
+
+| # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
+|---|---|---|---|---|---|
+| 1 | plan-review:TB-035:audit-scope | O-1 audit rotation | Structured log + `IRotationAudit`, không DB | 1 | 2026-11-26 |
+| 2 | plan-review:TB-035:reload-keys | O-2 reload sau CLI | Reload file trước mỗi sign/JWKS | 1 | 2026-11-26 |
+| 3 | plan-review:TB-035:time-guards-test | O-3 guard 10m/24h trong test | Fake `TimeProvider` CLI + metadata | 1 | 2026-11-26 |
+| 4 | plan-review:TB-035:key-source | O-4 nguồn khoá | File-only, hoãn SM | 1 | 2026-11-26 |
+
+## Review rounds
+
+| Vòng | Ngày | Phạm vi | CONFIRM mở | FIX mở | Verdict |
+|---|---|---|---|---|---|
+| 1 | 2026-11-26 | B0–B6, O-1..O-4 | 0 | 0 | PASS |
 
 ## Lịch sử thay đổi
 
 | Ngày | Thay đổi | Lý do |
 |---|---|---|
 | 2026-11-26 | Tạo bản nháp | plan-init sau merge TB-034 |
+| 2026-11-26 | plan-review v1 PASS | Confirm #1–#4 |
