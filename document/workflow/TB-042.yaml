@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-review
-next_action: "test-review TB-042"
+current_step: coding-start
+next_action: "coding-start TB-042 (14a authorize validation)"
 blocked_by: null
 
 steps:
@@ -39,7 +39,12 @@ steps:
     status: done
     finished: 2026-11-26T14:00:00Z
     evidence: ["8 fail 94 pass !~Compose", "authorize-pkce.feature"]
-  test-review:            { status: pending }
+  test-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-26T14:30:00Z
+    evidence: ["9 fail 94 pass", "FIX @S03c"]
   coding-start:           { status: pending }
   coding-review:          { status: pending }
   create-pr:              { status: pending }
@@ -52,3 +57,4 @@ events:
   - { at: 2026-11-26T13:10:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "11 câu hỏi mở O-1..O-11" }
   - { at: 2026-11-26T13:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
   - { at: 2026-11-26T14:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 8 red → test-review" }
+  - { at: 2026-11-26T14:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS → coding-start" }

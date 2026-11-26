@@ -36,6 +36,14 @@ Feature: identity-service OAuth authorize endpoint validation
     Then the status code is 400
     And the response has no Location header containing "http://localhost:4200/callback"
 
+  @S03c @FR-012 @docker
+  Scenario: Requested scope outside allowed scopes is rejected without redirect
+    Given an empty PostgreSQL database is running
+    And identity-service is configured to use that database and applies migrations on startup
+    When I GET the authorize endpoint for client "teamboard" with redirect_uri "http://localhost:4200/callback" state "state-scope" scope "admin" pkce challenge "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM" method "S256"
+    Then the status code is 400
+    And the response has no Location header containing "http://localhost:4200/callback"
+
   @S07 @FR-012 @docker
   Scenario: Unknown client_id is rejected without redirect
     Given an empty PostgreSQL database is running
