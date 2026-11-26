@@ -16,8 +16,8 @@ links:
   base: main
   pr: null
 
-current_step: test-init
-next_action: "test-init TB-035 signing-key-rotation.feature"
+current_step: test-review
+next_action: "test-review TB-035"
 
 steps:
   plan-init:
@@ -38,7 +38,15 @@ steps:
     evidence:
       - "Confirm #1-4 user form"
       - "log audit; reload file; fake time; file-only"
-  test-init:              { status: pending }
+  test-init:
+    status: done
+    owner: orchestrator:cursor-session
+    finished: 2026-11-26T23:45:00Z
+    evidence:
+      - "signing-key-rotation.feature @S01-S05"
+      - "6 red (4 BDD S01-04, 1 CLI, 1 Auth); S05 green"
+      - "identity 48/54 pass excl compose; Auth 8+1 fail"
+  test-review:            { status: pending }
   test-review:            { status: pending }
   coding-start:           { status: pending }
   coding-review:          { status: pending }

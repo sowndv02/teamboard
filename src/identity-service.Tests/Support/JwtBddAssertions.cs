@@ -62,6 +62,16 @@ internal static class JwtBddAssertions
         Assert.False(string.IsNullOrWhiteSpace(token.Kid));
     }
 
+    public static void AssertAccessTokenKid(JsonWebToken token, string expectedKid) =>
+        Assert.Equal(expectedKid, token.Kid);
+
+    public static string GetAccessTokenStringFromLoginBody(string responseBody)
+    {
+        using var document = JsonDocument.Parse(responseBody);
+        return document.RootElement.GetProperty("access_token").GetString()
+            ?? throw new InvalidOperationException("access_token is missing.");
+    }
+
     public static void AssertLifetimeAbout(JsonWebToken token, int expectedSeconds)
     {
         var issued = token.IssuedAt;

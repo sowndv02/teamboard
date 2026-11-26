@@ -2,6 +2,7 @@ using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
+using IdentityService.Cli;
 using IdentityService.Tests.Support;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -64,6 +65,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     private bool _observeAccessTokensOnly;
     private bool _observeJwksServedOnly;
     private bool _omitSigningKeys;
+    private string? _rotationKeysPath;
+    private FakeRotationTimeProvider? _rotationTime;
+    private int? _lastRotationExitCode;
+    private string? _storedAccessToken;
     private readonly Dictionary<string, string?> _settings = new(StringComparer.Ordinal);
     private readonly List<int> _burstStatusCodes = [];
     private (int First, int Second)? _concurrentStatuses;
@@ -81,6 +86,10 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
         _observeAccessTokensOnly = false;
         _observeJwksServedOnly = false;
         _omitSigningKeys = false;
+        _rotationKeysPath = null;
+        _rotationTime = null;
+        _lastRotationExitCode = null;
+        _storedAccessToken = null;
         _loginFailureMeasurements = 0;
         _lockoutMeasurements = 0;
         _hashDurationSamples = 0;
@@ -188,6 +197,74 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
     {
         _omitSigningKeys = true;
         _settings.Remove(SigningKeysFileKey);
+    }
+
+    [Given("identity-service rotation uses an isolated signing keys file")]
+    public void GivenRotationIsolatedKeysFile() => _rotationKeysPath = RotationTestKeysFile.CreateIsolatedCopy();
+
+    [Given("identity-service signing keys file points to the rotation test file")]
+    public void GivenSigningKeysRotationTestFile()
+    {
+        var path = _rotationKeysPath ?? throw new InvalidOperationException("Rotation keys file was not created.");
+        _settings[SigningKeysFileKey] = path;
+    }
+
+    [Given("rotation fake UTC time is {string}")]
+    public void GivenRotationFakeTime(string utcTimestamp) =>
+        _rotationTime = new FakeRotationTimeProvider(DateTimeOffset.Parse(utcTimestamp, CultureInfo.InvariantCulture));
+
+    [When("I advance rotation fake time by {int} minutes")]
+    public void WhenAdvanceRotationFakeTime(int minutes)
+    {
+        var time = _rotationTime ?? throw new InvalidOperationException("Rotation fake time was not set.");
+        time.Advance(TimeSpan.FromMinutes(minutes));
+    }
+
+    [When("I run signing key rotate start")]
+    public void WhenRotateStart() => RunRotationCommand(() =>
+        SigningKeyRotationCommands.Start(RequireRotationKeysPath(), RequireRotationTime()));
+
+    [When("I run signing key rotate activate")]
+    public void WhenRotateActivate() => RunRotationCommand(() =>
+        SigningKeyRotationCommands.Activate(RequireRotationKeysPath(), RequireRotationTime()));
+
+    [When("I run signing key rotate retire")]
+    public void WhenRotateRetire() => RunRotationCommand(() =>
+        SigningKeyRotationCommands.Retire(RequireRotationKeysPath(), RequireRotationTime()));
+
+    [When("I store the current login access token for rotation checks")]
+    public void WhenStoreAccessToken() =>
+        _storedAccessToken = JwtBddAssertions.GetAccessTokenStringFromLoginBody(_body);
+
+    [Then("the access token header kid is {string}")]
+    public void ThenAccessTokenKid(string expectedKid)
+    {
+        var token = JwtBddAssertions.ParseAccessTokenFromLoginBody(_body);
+        JwtBddAssertions.AssertAccessTokenKid(token, expectedKid);
+    }
+
+    [Then("the stored access token header kid is {string}")]
+    public void ThenStoredAccessTokenKid(string expectedKid)
+    {
+        var tokenString = _storedAccessToken ?? throw new InvalidOperationException("No stored access token.");
+        var handler = new Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler();
+        var token = handler.ReadJsonWebToken(tokenString);
+        JwtBddAssertions.AssertAccessTokenKid(token, expectedKid);
+    }
+
+    [Then("the JWKS document includes exactly {int} public keys")]
+    public void ThenJwksKeyCount(int expectedCount)
+    {
+        using var document = JsonDocument.Parse(_body);
+        var keys = document.RootElement.GetProperty("keys");
+        Assert.Equal(expectedCount, keys.GetArrayLength());
+    }
+
+    [Then("the rotation command exit code is not {int}")]
+    public void ThenRotationExitCodeIsNot(int forbiddenExitCode)
+    {
+        var exitCode = _lastRotationExitCode ?? throw new InvalidOperationException("No rotation command was run.");
+        Assert.NotEqual(forbiddenExitCode, exitCode);
     }
 
     [Given("identity-service metrics are being observed for issued access tokens")]
@@ -649,6 +726,13 @@ public sealed class IdentityServiceSteps : IAsyncDisposable
             Assert.Equal(expectedStatus, (int)_response.StatusCode);
         }
     }
+
+    private string RequireRotationKeysPath() =>
+        _rotationKeysPath ?? throw new InvalidOperationException("Rotation keys file was not created.");
+
+    private TimeProvider RequireRotationTime() => _rotationTime ?? TimeProvider.System;
+
+    private void RunRotationCommand(Func<int> command) => _lastRotationExitCode = command();
 
     private async Task SendLoginAsync(string email, string password, string? clientIp = null)
     {
