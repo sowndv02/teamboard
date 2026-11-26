@@ -7,12 +7,14 @@ using IdentityService.Features.Register;
 using IdentityService.Persistence;
 using IdentityService.RateLimiting;
 using IdentityService.Security;
+using IdentityService.Security.Clients;
 using Teamboard.Shared.Http;
 using Teamboard.Shared.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults("identity-service");
 builder.AddIdentityPersistence();
+builder.AddIdentityClientRegistry();
 builder.AddIdentitySecurity();
 
 var rateLimitingEnabled = builder.Configuration.GetValue("Identity:RateLimiting:Enabled", true);

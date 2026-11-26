@@ -12,6 +12,8 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    public DbSet<RegisteredClient> RegisteredClients => Set<RegisteredClient>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -49,6 +51,20 @@ public sealed class IdentityDbContext(DbContextOptions<IdentityDbContext> option
             entity.Property(user => user.PasswordSalt).HasColumnName("password_salt").IsRequired();
             entity.Property(user => user.PasswordIterations).HasColumnName("password_iterations");
             entity.Property(user => user.CreatedAt).HasColumnName("created_at");
+        });
+
+        modelBuilder.Entity<RegisteredClient>(entity =>
+        {
+            entity.ToTable("client");
+            entity.HasKey(client => client.ClientId);
+            entity.Property(client => client.ClientId).HasColumnName("client_id").HasMaxLength(64);
+            entity.Property(client => client.ClientType).HasColumnName("client_type").HasMaxLength(16).IsRequired();
+            entity.Property(client => client.SecretHash).HasColumnName("secret_hash");
+            entity.Property(client => client.SecretSalt).HasColumnName("secret_salt");
+            entity.Property(client => client.SecretIterations).HasColumnName("secret_iterations");
+            entity.Property(client => client.RedirectUris).HasColumnName("redirect_uris").HasColumnType("jsonb");
+            entity.Property(client => client.AllowedScopes).HasColumnName("allowed_scopes").HasColumnType("jsonb");
+            entity.Property(client => client.UpdatedAt).HasColumnName("updated_at");
         });
     }
 }

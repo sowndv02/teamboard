@@ -21,6 +21,50 @@ namespace IdentityService.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityService.Persistence.Entities.RegisteredClient", b =>
+                {
+                    b.Property<string>("ClientId")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("client_id");
+
+                    b.Property<List<string>>("AllowedScopes")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("allowed_scopes");
+
+                    b.Property<string>("ClientType")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("client_type");
+
+                    b.Property<List<string>>("RedirectUris")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("redirect_uris");
+
+                    b.Property<string>("SecretHash")
+                        .HasColumnType("text")
+                        .HasColumnName("secret_hash");
+
+                    b.Property<int?>("SecretIterations")
+                        .HasColumnType("integer")
+                        .HasColumnName("secret_iterations");
+
+                    b.Property<string>("SecretSalt")
+                        .HasColumnType("text")
+                        .HasColumnName("secret_salt");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("ClientId");
+
+                    b.ToTable("client", (string)null);
+                });
+
             modelBuilder.Entity("IdentityService.Persistence.Entities.LoginAttempt", b =>
                 {
                     b.Property<string>("EmailNorm")

@@ -66,5 +66,51 @@ internal sealed class PostgresDatabase : IAsyncDisposable
         return results;
     }
 
+    public async Task<bool> OAuthClientExistsAsync(string clientId)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT 1
+            FROM client
+            WHERE client_id = @client_id
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("client_id", clientId);
+        return await command.ExecuteScalarAsync() is not null;
+    }
+
+    public async Task<string?> GetOAuthClientTypeAsync(string clientId)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT client_type::text
+            FROM client
+            WHERE client_id = @client_id
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("client_id", clientId);
+        return await command.ExecuteScalarAsync() as string;
+    }
+
+    public async Task<string?> GetOAuthClientSecretHashAsync(string clientId)
+    {
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        const string sql = """
+            SELECT secret_hash::text
+            FROM client
+            WHERE client_id = @client_id
+            LIMIT 1
+            """;
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("client_id", clientId);
+        var value = await command.ExecuteScalarAsync();
+        return value is null or DBNull ? null : (string)value;
+    }
+
     public ValueTask DisposeAsync() => _container.DisposeAsync();
 }

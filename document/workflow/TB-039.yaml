@@ -3,7 +3,7 @@
 id: TB-039
 scope: issue
 title: Identity lát 11, đổi mật khẩu và thu hồi refresh
-updated: 2026-11-26T18:45:00Z
+updated: 2026-11-26T17:45:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -14,7 +14,7 @@ links:
   pr: https://github.com/sowndv02/teamboard/pull/35
 
 current_step: done
-next_action: "Chờ review/CI; merge PR #35 (user)"
+next_action: "Closed — merged PR #35; main a923cb2"
 
 steps:
   plan-init:            { status: done }
@@ -39,3 +39,4 @@ confirm_pending: []
 
 events:
   - { at: 2026-11-26T18:45:00Z, actor: "orchestrator:cursor-session", event: pr_opened, detail: "PR #35" }
+  - { at: 2026-11-26T17:45:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "merged PR #35 → main a923cb2" }
