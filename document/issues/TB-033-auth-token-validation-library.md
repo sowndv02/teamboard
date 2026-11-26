@@ -22,11 +22,11 @@ Issue khung cấp key khi duyệt bảng lát: lát 5 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] `Teamboard.Auth` + ADR 0011; JwtBearer ép RS256, `iss`/`aud`/`exp`
-- [ ] JWKS cache (TTL 10 phút); `kid` lạ refresh tối đa 1 lần/phút
-- [ ] Contract: token identity (TB-032) pass; attack suite NFR-006
-- [ ] Endpoint bảo vệ mẫu trên resource server (theo plan-review)
-- [ ] Gate solution build + tests xanh
+- [x] `Teamboard.Auth` + ADR 0011; JwtBearer ép RS256, `iss`/`aud`/`exp`
+- [x] JWKS cache (TTL 10 phút); `kid` lạ refresh tối đa 1 lần/phút
+- [x] Contract: token identity (TB-032) pass; attack suite NFR-006
+- [x] Endpoint bảo vệ mẫu trên resource server (theo plan-review)
+- [x] Gate solution build + tests xanh
 
 ## Kế hoạch
 Plan: [`document/plans/TB-033-auth-token-validation-library.md`](../plans/TB-033-auth-token-validation-library.md) (`approved`, B0–B4; plan-review PASS v1).
@@ -47,8 +47,8 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
 | test-init | done | – | 2026-11-26 | 5 Auth + 4 BDD đỏ |
 | test-review | PASS | 1 | 2026-11-26 | 7+4 đỏ; hồi quy 21 xanh |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
+| coding-start | done | – | 2026-11-26 | Auth 7/7, board auth 4/4 |
+| coding-review | PASS | 1 | 2026-11-26 | HttpClient timeout; deps 8.19.2 |
 | create-pr | pending | – | | |
 
 ## Confirm log
@@ -65,15 +65,12 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| auth-me @S01 | `auth-me.feature` @S01 | sub (stub) | |
-| auth-me @S02 | `auth-me.feature` @S02 | 401 vs 200 | |
-| auth-me @S03 | `auth-me.feature` @S03 | 401 vs 200 | |
-| auth-me @S04 | `auth-me.feature` @S04 | 401 vs 200 | |
-| JWT contract FR-006 | `JwtContractValidationTests` | valid token | |
-| NFR-006 attack | `JwtAttackValidationTests` (6) | baseline valid | |
-| JWKS kid refresh | `JwksKeySetCacheTests` | refresh true | |
+| auth-me @S01–@S04 | `auth-me.feature` | | **xanh** |
+| JWT contract FR-006 | `JwtContractValidationTests` | | **xanh** |
+| NFR-006 attack | `JwtAttackValidationTests` (6) | | **xanh** |
+| JWKS kid refresh | `JwksKeySetCacheTests` | | **xanh** |
 
-**Lệnh:** `dotnet test src/shared/Auth.Tests` → **7 failed**; `dotnet test src/board-service.Tests --filter FullyQualifiedName~AuthProfile` → **4 failed**; board `Category!=docker` → **21 passed** (hồi quy).
+**Lệnh:** `dotnet test src/shared/Auth.Tests` → **7/7**; `board-service.Tests` AuthProfile **4/4**, `Category!=docker` **25/25**; `identity-service.Tests` `!~Compose` **44/44**.
 
 ## Test review rounds
 
@@ -93,6 +90,16 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | working tree (pre-feat commit) | Sẵn sàng PR | – |
+
+**Giới hạn đã biết:** `JwksUri` hiện chỉ fallback khi static load lỗi (TB-034 sẽ nối primary HTTP); loader dev đọc `privateKeyPem` chỉ để suy public key — production nên JWKS public-only.
+
+## Fix log (coding-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | teamboard-auth:http-timeout | FIX | `TeamboardAuthServiceCollectionExtensions` | JWKS HTTP không timeout | Timeout 10s | code |
+| 1 | config:jsonwebtokens-version | FIX | dependencies + identity csproj | Lệch 8.15 vs JwtBearer 8.19.2 | Ghim 8.19.2 | build |
 
 ## Fix log
 

@@ -1,17 +1,17 @@
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Teamboard.Shared.Auth;
 using Teamboard.Shared.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults("board-service");
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddTeamboardJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -24,15 +24,19 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-// TB-033 stub: protected route wired in coding-start (Teamboard.Auth + real sub claim).
-app.MapGet("/api/v1/auth/me", () => Results.Json(new { sub = "not-implemented" }));
+app.MapGet("/api/v1/auth/me", (ClaimsPrincipal user) =>
+{
+    var sub = user.FindFirstValue(JwtRegisteredClaimNames.Sub)
+        ?? user.FindFirstValue(ClaimTypes.NameIdentifier);
+    return Results.Json(new { sub });
+}).RequireAuthorization();
 
 app.MapControllers();
 app.MapDefaultEndpoints();
 
 app.Run();
 
-// Exposed so tests can use WebApplicationFactory<Program>.
 public partial class Program;

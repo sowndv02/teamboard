@@ -20,7 +20,13 @@ public sealed class AuthMeSteps : IDisposable
     [Given("board-service JWT validation is configured for BDD tests")]
     public void GivenJwtValidationConfigured()
     {
-        _factory = new WebApplicationFactory<Program>();
+        var signingKeys = Path.Combine(AppContext.BaseDirectory, "Support", "test-signing-keys.json");
+        _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("Auth:Jwt:StaticJwksFile", signingKeys);
+            builder.UseSetting("Auth:Jwt:ValidIssuer", "http://localhost:6061");
+            builder.UseSetting("Auth:Jwt:ValidAudience", "teamboard");
+        });
         _client = _factory.CreateClient();
     }
 

@@ -1,6 +1,6 @@
 # ADR 0011 — Kiểm access JWT qua `Teamboard.Auth`
 
-Trạng thái: Đề xuất · Ngày: 2026-11-26
+Trạng thái: Chấp nhận · Ngày: 2026-11-26
 Nguồn: TB-033, `document/plans/TB-033-auth-token-validation-library.md`, design D2
 Nhãn: `[Chọn để học]`
 
