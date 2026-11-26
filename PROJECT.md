@@ -6,7 +6,7 @@ Nguồn sự thật: `document/architecture/README.md` (bản đồ service, l�
 
 ## Trạng thái hiện tại
 
-Giai đoạn 0 (xem lộ trình trong README). Có `src/board-service` (ASP.NET Core .NET 10 + EF Core + SQL Server), `src/gateway` (YARP: route `/api/v1/boards/**`, health, 404 `problem+json`; host 8080), `src/shared/ServiceDefaults` (OpenTelemetry, health), `src/shared/Http` (`problem+json`, bảng mã lỗi), `src/identity-service` (lát 1a–1b: health, PostgreSQL + `users`, đăng ký PBKDF2 `POST /api/v1/auth/register`; chưa route gateway; host 6061) và Jaeger cục bộ qua `src/docker-compose.observability.yml`. Cập nhật dòng này khi chuyển giai đoạn.
+Giai đoạn 0 (xem lộ trình trong README). Có `src/board-service` (ASP.NET Core .NET 10 + EF Core + SQL Server), `src/gateway` (YARP: route `/api/v1/boards/**`, health, 404 `problem+json`; host 8080), `src/shared/ServiceDefaults` (OpenTelemetry, health), `src/shared/Http` (`problem+json`, bảng mã lỗi), `src/identity-service` (lát 1a–2: health, PostgreSQL + `users`, `POST /api/v1/auth/register` và `POST /api/v1/auth/login` (200 `{ id }`, lỗi credential chung); chưa route gateway; host 6061) và Jaeger cục bộ qua `src/docker-compose.observability.yml`. Cập nhật dòng này khi chuyển giai đoạn.
 
 ## Service và kiến trúc BẮT BUỘC
 

@@ -1,7 +1,9 @@
 using System.Text.Json.Serialization;
 using IdentityService.Persistence;
 using IdentityService.Persistence.Entities;
+using IdentityService.RateLimiting;
 using IdentityService.Security.Passwords;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,12 +14,18 @@ namespace IdentityService.Features.Register;
 
 internal static class RegisterEndpoints
 {
-    public static void MapRegisterEndpoints(this IEndpointRouteBuilder routes)
+    public static void MapRegisterEndpoints(this IEndpointRouteBuilder routes, bool enableRateLimiting = true)
     {
-        routes.MapPost("/api/v1/auth/register", RegisterAsync)
+        var endpoint = routes.MapPost("/api/v1/auth/register", RegisterAsync)
             .Produces<RegisterResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status409Conflict);
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        if (enableRateLimiting)
+        {
+            endpoint.RequireRateLimiting(IdentityRateLimitingExtensions.AuthPublicPolicyName);
+        }
     }
 
     private static async Task<IResult> RegisterAsync(

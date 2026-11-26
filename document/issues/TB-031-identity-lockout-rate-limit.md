@@ -1,12 +1,12 @@
 ---
 key: TB-031
 title: Identity lát 3, khoá tạm và giới hạn tốc độ đăng nhập
-status: todo
+status: review
 phase: 1
 branch: feature/TB-031-identity-lockout-rate-limit
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-10-25
-started: null           # ngày chuyển in-progress
+started: 2026-11-26     # ngày chuyển in-progress
 closed: null            # ngày done/dropped
 ---
 
@@ -22,13 +22,26 @@ Issue khung cấp key khi duyệt bảng lát: lát 3 của `document/plans/iden
 - Không làm: các lát khác của bảng lát.
 
 ## Tiêu chí hoàn thành (kiểm chứng được)
-- [ ] Chưa lập: viết khi `plan-init` cho lát này, từ FR/NFR của hàng lát.
+- [ ] Sau 5 lần sai liên tiếp (email, IP): 401 chung + `Retry-After`, không đăng nhập được dù đúng mật khẩu (FR-003, A-03, @S01–@S02)
+- [ ] Đăng nhập thành công reset bộ đếm cặp (@S03)
+- [ ] IP khác không kế thừa khoá (@S04)
+- [ ] Hết thời gian khoá → đăng nhập được (@S05)
+- [ ] Cờ rate limit bật: 10 req/phút/IP login+register → 429 (NFR-008, @S07–@S08); tắt cờ không 429 (@S09)
+- [ ] `lockout_total` metric (@S10)
+- [ ] Gate xanh đầy đủ (plan-review)
 
 ## Kế hoạch
-Chưa soạn (bước plan-init, khi các lát phụ thuộc đã xong).
+Plan: [`document/plans/TB-031-identity-lockout-rate-limit.md`](../plans/TB-031-identity-lockout-rate-limit.md) (`approved`, B1–B4; Confirm #1–#4).
 
 ## Ghi chú / Nhật ký
 - 2026-10-25: tạo issue khung cùng lúc cấp key cho toàn bộ bảng lát; chưa bắt đầu.
+- 2026-11-26: TB-030 merged PR #25 (`916fcc7`); `plan-init` trên nhánh `feature/TB-031-identity-lockout-rate-limit`.
+- 2026-11-26: plan-review v1 PASS (Confirm #1–#4).
+- 2026-11-26: test-init — `lockout-rate-limit.feature`, steps + `TestClientIpStartupFilter`; build xanh; chạy test đỏ **bị chặn** (Docker Desktop không chạy → 33 scenario @docker skipped).
+- 2026-11-26: test-review v1 PASS — Docker: Failed 9, Passed 28 (hồi quy 27 + @S09); FIX vacuous green @S03–@S05.
+- 2026-11-26: coding-start — B1–B4: `login_attempt`, lockout, `auth-public` rate limit; test host `RateLimiting:Enabled=false` mặc định; **37/37** pass.
+- 2026-11-26: coding-review v1 PASS — gate xanh; Giới hạn đã biết: ForwardedHeaders chưa wire (cờ off); limiter in-memory per instance; partition IP trùng logic gateway (nợ extract shared).
+- 2026-11-26: PR [#26](https://github.com/sowndv02/teamboard/pull/26) opened (`534acfd`).
 
 ## Workflow
 
@@ -36,18 +49,22 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Bước | Trạng thái | Vòng | Ngày | Ghi chú |
 |---|---|---|---|---|
-| plan-init | pending | – | | |
-| plan-review | pending | | | |
-| test-init | pending | – | | |
-| test-review | pending | | | |
-| coding-start | pending | – | | |
-| coding-review | pending | | | |
-| create-pr | pending | – | | |
+| plan-init | done | – | 2026-11-26 | Plan draft B1–B4, P-01..P-04 |
+| plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#4 |
+| test-init | done | – | 2026-11-26 | 10 kịch bản @S01–@S10; đỏ chờ Docker |
+| test-review | PASS | 1 | 2026-11-26 | 9 đỏ đúng lý do; @S09 xanh chủ đích |
+| coding-start | done | – | 2026-11-26 | B1–B4; 37/37 pass (!~Compose) |
+| coding-review | PASS | 1 | 2026-11-26 | 37/37; FIX Produces 429 |
+| create-pr | done | – | 2026-11-26 | [PR #26](https://github.com/sowndv02/teamboard/pull/26) |
 
 ## Confirm log
 
 | # | Điểm cần chốt (fingerprint) | Câu hỏi | Quyết định của người dùng | Vòng | Ngày |
 |---|---|---|---|---|---|
+| 1 | plan-review:TB-031:client-ip-source | IP cho khoá/rate limit | `IClientIpResolver`; ForwardedHeaders cờ default off | 1 | 2026-11-26 |
+| 2 | plan-review:TB-031:rate-limit-policy | Policy rate limit | Một policy `auth-public` / IP | 1 | 2026-11-26 |
+| 3 | plan-review:TB-031:lockout-response | Retry-After | Chỉ HTTP header | 1 | 2026-11-26 |
+| 4 | plan-review:TB-031:rate-limit-scope | Endpoint rate limit | login + register only | 1 | 2026-11-26 |
 
 ## Kịch bản và TDD log
 
@@ -55,16 +72,22 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
+| @S01–@S10 | Reqnroll scenarios (lockout-rate-limit.feature) | | ✅ 2026-11-26 coding |
+| (hồi quy) | register, login, database, … | | ✅ |
+
+Lệnh: `dotnet test src/identity-service.Tests --filter "FullyQualifiedName!~Compose"`. Kết quả 2026-11-26 post-coding: **Passed 37/37**.
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `63b4627` + test-review delta | PASS | — |
 
 ## Review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | `bbd768b` + uncommitted impl | PASS | — |
 
 ## Fix log
 
@@ -72,6 +95,10 @@ Mọi thay đổi agent đã sửa trong review (xem `review-loop.md` quy tắc 
 
 | Vòng | Fingerprint | Nguồn (FIX / CONFIRM #n) | Vị trí | Vấn đề | Đã sửa thế nào | Evidence (diff, commit, test) |
 |---|---|---|---|---|---|---|
+| 1 | test:identity-service:vacuous-green-lockout | FIX | @S04 feature | Pass khi chưa khoá IP .11 | Thêm When/Then khoá .10 trước | 9 failed sau sửa |
+| 1 | test:identity-service:vacuous-green-reset | FIX | @S03 feature | Không phát hiện thiếu reset | Thêm 5 fail → Retry-After | S03 failed đúng |
+| 1 | test:identity-service:given-lock-assert | FIX | IdentityServiceSteps | Given lock không kiểm chứng | Probe login 401 + Retry-After | S05–S06 failed trong Given |
+| 1 | code-review:identity-service:openapi-429 | FIX | Login/Register map | Thiếu khai báo 429 | `.ProducesProblem(429)` | 37 pass |
 
 ## Bài học (lessons learned)
 

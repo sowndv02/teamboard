@@ -21,6 +21,35 @@ namespace IdentityService.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityService.Persistence.Entities.LoginAttempt", b =>
+                {
+                    b.Property<string>("EmailNorm")
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)")
+                        .HasColumnName("email_norm");
+
+                    b.Property<string>("Ip")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("ip");
+
+                    b.Property<int>("Failures")
+                        .HasColumnType("integer")
+                        .HasColumnName("failures");
+
+                    b.Property<DateTimeOffset?>("LockedUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("locked_until");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("EmailNorm", "Ip");
+
+                    b.ToTable("login_attempt", (string)null);
+                });
+
             modelBuilder.Entity("IdentityService.Persistence.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
