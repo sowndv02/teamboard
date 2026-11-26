@@ -60,8 +60,17 @@ internal static class TestAccessTokenFactory
             userId.ToString(),
             Guid.NewGuid().ToString(),
             StringComparison.Ordinal);
-        var tamperedPayload = Base64UrlEncoder.Encode(payload);
+        var tamperedPayloadBytes = System.Text.Encoding.UTF8.GetBytes(payload);
+        var tamperedPayload = Base64UrlEncoder.Encode(tamperedPayloadBytes);
         return string.Join('.', parts[0], tamperedPayload, parts[2]);
+    }
+
+    internal static string IssueAlgNoneToken(Guid userId)
+    {
+        var header = Base64UrlEncoder.Encode("""{"alg":"none","typ":"JWT"}""");
+        var payload = Base64UrlEncoder.Encode(
+            $$"""{"sub":"{{userId}}","aud":"teamboard","iss":"http://localhost:6061"}""");
+        return $"{header}.{payload}.";
     }
 
     private static RSA LoadActivePrivateKey()

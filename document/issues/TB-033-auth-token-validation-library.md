@@ -46,7 +46,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | plan-init | done | – | 2026-11-26 | Plan draft B0–B4 |
 | plan-review | PASS | 1 | 2026-11-26 | Confirm #1–#3 |
 | test-init | done | – | 2026-11-26 | 5 Auth + 4 BDD đỏ |
-| test-review | pending | | | |
+| test-review | PASS | 1 | 2026-11-26 | 7+4 đỏ; hồi quy 21 xanh |
 | coding-start | pending | – | | |
 | coding-review | pending | | | |
 | create-pr | pending | – | | |
@@ -65,17 +65,29 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Kịch bản | Test thực thi | Đỏ | Xanh |
 |---|---|---|---|
-| auth-me @S01–@S04 | `auth-me.feature` / `AuthMeSteps` | 401/sub stub | |
+| auth-me @S01 | `auth-me.feature` @S01 | sub (stub) | |
+| auth-me @S02 | `auth-me.feature` @S02 | 401 vs 200 | |
+| auth-me @S03 | `auth-me.feature` @S03 | 401 vs 200 | |
+| auth-me @S04 | `auth-me.feature` @S04 | 401 vs 200 | |
 | JWT contract FR-006 | `JwtContractValidationTests` | valid token | |
-| NFR-006 attack | `JwtAttackValidationTests` | baseline valid | |
+| NFR-006 attack | `JwtAttackValidationTests` (6) | baseline valid | |
 | JWKS kid refresh | `JwksKeySetCacheTests` | refresh true | |
 
-**Lệnh:** `dotnet test src/shared/Auth.Tests` → **5 failed**; `dotnet test src/board-service.Tests --filter FullyQualifiedName~AuthProfile` → **4 failed** (stub route + no JwtBearer).
+**Lệnh:** `dotnet test src/shared/Auth.Tests` → **7 failed**; `dotnet test src/board-service.Tests --filter FullyQualifiedName~AuthProfile` → **4 failed**; board `Category!=docker` → **21 passed** (hồi quy).
 
 ## Test review rounds
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
+| 1 | 2026-11-26 | f237972 | Sẵn sàng code | – |
+
+## Fix log (test-review)
+
+| Vòng | Fingerprint | Nguồn | Vị trí | Vấn đề | Đã sửa | Evidence |
+|---|---|---|---|---|---|---|
+| 1 | test:auth:tampered-base64 | FIX | `TestAccessTokenFactory` | Tamper encode string thay vì UTF-8 bytes | `Encode(tamperedPayloadBytes)` | attack test |
+| 1 | test:auth:attack-coverage | FIX | `JwtAttackValidationTests` | Thiếu `iss` / `alg=none` (NFR-006) | +2 tests | 7 đỏ |
+| 1 | test:tb-033:plan-scenario-ids | FIX | plan §2 | ID @S02–@S04 lệch feature | Khớp BDD + xUnit | plan |
 
 ## Review rounds
 

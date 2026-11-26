@@ -48,4 +48,32 @@ public sealed class JwtAttackValidationTests
 
     Assert.False(result.IsValid);
   }
+
+  [Fact]
+  public async Task ValidateAccessTokenAsync_WrongIssuer_Rejects()
+  {
+    var userId = Guid.Parse("a7777777-7777-7777-7777-777777777777");
+    var valid = await _validator.ValidateAccessTokenAsync(TestAccessTokenFactory.IssueForUser(userId));
+    Assert.True(valid.IsValid, valid.FailureReason);
+
+    var wrongIssuer = TestAccessTokenFactory.IssueForUser(
+      userId,
+      issuer: "https://evil.example");
+    var result = await _validator.ValidateAccessTokenAsync(wrongIssuer);
+
+    Assert.False(result.IsValid);
+  }
+
+  [Fact]
+  public async Task ValidateAccessTokenAsync_AlgNone_Rejects()
+  {
+    var userId = Guid.Parse("b8888888-8888-8888-8888-888888888888");
+    var valid = await _validator.ValidateAccessTokenAsync(TestAccessTokenFactory.IssueForUser(userId));
+    Assert.True(valid.IsValid, valid.FailureReason);
+
+    var algNone = TestAccessTokenFactory.IssueAlgNoneToken(userId);
+    var result = await _validator.ValidateAccessTokenAsync(algNone);
+
+    Assert.False(result.IsValid);
+  }
 }

@@ -40,11 +40,8 @@ Lát 5 trong [`identity-auth-slices.md`](identity-auth-slices.md). Ảnh chụp 
 | Cache JWKS | D2 | B1 | kid refresh behavior (unit) |
 
 Kịch bản dự kiến (`@TB-033`):
-- @S01 Token hợp lệ từ identity → 200 trên endpoint bảo vệ, có `sub`.
-- @S02 Sai `aud` → 401.
-- @S03 `alg=none` / token sửa payload → 401.
-- @S04 Expired token → 401 (clock giả).
-- @S05 Attack suite NFR-006 (bảng trong plan B3, không cần full BDD mỗi vector).
+- **BDD** `auth-me.feature` @board-service: @S01 token hợp lệ → 200 + `sub`; @S02 thiếu Bearer → 401; @S03 sai `aud` → 401; @S04 hết hạn → 401.
+- **xUnit** `Teamboard.Shared.Auth.Tests` (NFR-006): contract valid RS256; từ chối tampered payload, sai `aud`/`iss`, `alg=none`, hết hạn; JWKS `kid` lạ refresh.
 
 ## 3. Các bước
 
