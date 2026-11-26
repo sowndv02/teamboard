@@ -1,7 +1,7 @@
 ---
 key: TB-033
 title: Identity lát 5, bộ kiểm tra token dùng chung Teamboard.Auth
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-033-auth-token-validation-library
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -36,6 +36,7 @@ Plan: [`document/plans/TB-033-auth-token-validation-library.md`](../plans/TB-033
 - 2026-11-26: TB-032 merged PR #27; `plan-init` trên nhánh `feature/TB-033-auth-token-validation-library` từ `main` `315449c`.
 - 2026-11-26: plan-review v1 PASS — JWKS static+HTTP; board `GET /api/v1/auth/me`; issuer `http://localhost:6061`.
 - 2026-11-26: test-init — ADR 0011 (đề xuất), stub `Teamboard.Shared.Auth`, `auth-me.feature` @S01–@S04, xUnit contract/attack/JWKS; **9 đỏ** (5 Auth.Tests, 4 BDD), hồi quy board 19 xanh.
+- 2026-11-26: nhánh `3633eec`..`44c0033` (rewrite bỏ Co-Authored-By); gate 7+25+44; [PR #28](https://github.com/sowndv02/teamboard/pull/28).
 
 ## Workflow
 
@@ -49,7 +50,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | 7+4 đỏ; hồi quy 21 xanh |
 | coding-start | done | – | 2026-11-26 | Auth 7/7, board auth 4/4 |
 | coding-review | PASS | 1 | 2026-11-26 | HttpClient timeout; deps 8.19.2 |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-26 | [PR #28](https://github.com/sowndv02/teamboard/pull/28) |
 
 ## Confirm log
 
@@ -76,7 +77,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
-| 1 | 2026-11-26 | f237972 | Sẵn sàng code | – |
+| 1 | 2026-11-26 | `f786417` | Sẵn sàng code | – |
 
 ## Fix log (test-review)
 
@@ -90,7 +91,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 
 | Vòng | Ngày | Commit đã review | Verdict | Fingerprint mở |
 |---|---|---|---|---|
-| 1 | 2026-11-26 | working tree (pre-feat commit) | Sẵn sàng PR | – |
+| 1 | 2026-11-26 | `44c0033` | Sẵn sàng merge | – |
 
 **Giới hạn đã biết:** `JwksUri` hiện chỉ fallback khi static load lỗi (TB-034 sẽ nối primary HTTP); loader dev đọc `privateKeyPem` chỉ để suy public key — production nên JWKS public-only.
 
