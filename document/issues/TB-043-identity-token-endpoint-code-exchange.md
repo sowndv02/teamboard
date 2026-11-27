@@ -1,7 +1,7 @@
 ---
 key: TB-043
 title: Identity lát 15, endpoint token đổi mã (code_verifier)
-status: in-progress
+status: review
 phase: 1
 branch: feature/TB-043-identity-token-endpoint-code-exchange
 estimate: M             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
@@ -42,6 +42,7 @@ Plan: [`document/plans/TB-043-identity-token-endpoint-code-exchange.md`](../plan
 - 2026-11-26: test-review v1 **PASS** — FIX @S07b missing secret, @S08 assert 200 (BR-007 end-to-end), tiêu đề S05/S06; **11 fail, 111 pass** `!~Compose`.
 - 2026-11-27: coding-start — redeem service, token endpoint, metric; BDD xanh sau FIX helper DB.
 - 2026-11-27: coding-review v1 **PASS** — FIX `GetUserIdByEmailAsync` (`"Id"`, `email_norm`); **122/122** `!~Compose`.
+- 2026-11-27: [PR #40](https://github.com/sowndv02/teamboard/pull/40) opened (`23dea32`..`785ac3b`); gate 122/122 trước push.
 
 ## Workflow
 
@@ -55,7 +56,7 @@ Trạng thái các bước (skill `workflow`); cập nhật khi mỗi bước đ
 | test-review | PASS | 1 | 2026-11-26 | FIX @S07b @S08 |
 | coding-start | done | – | 2026-11-27 | 122 pass sau FIX DB |
 | coding-review | PASS | 1 | 2026-11-27 | FIX PostgresDatabase user lookup |
-| create-pr | pending | – | | |
+| create-pr | done | – | 2026-11-27 | [PR #40](https://github.com/sowndv02/teamboard/pull/40) |
 
 ## Confirm log
 
