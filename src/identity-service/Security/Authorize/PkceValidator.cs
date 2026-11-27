@@ -24,6 +24,23 @@ public static class PkceValidator
         return bytes;
     }
 
-    public static bool VerifyS256(string codeVerifier, string codeChallenge) =>
-        throw new NotImplementedException("TB-043 coding-start");
+    public static bool VerifyS256(string codeVerifier, string codeChallenge)
+    {
+        if (!IsValidS256ChallengeFormat(codeVerifier) || !IsValidS256ChallengeFormat(codeChallenge))
+        {
+            return false;
+        }
+
+        var computed = Base64UrlEncode(ComputeS256ChallengeBytes(codeVerifier));
+        var expectedBytes = Encoding.ASCII.GetBytes(codeChallenge);
+        var computedBytes = Encoding.ASCII.GetBytes(computed);
+        return expectedBytes.Length == computedBytes.Length
+            && CryptographicOperations.FixedTimeEquals(expectedBytes, computedBytes);
+    }
+
+    private static string Base64UrlEncode(ReadOnlySpan<byte> data)
+    {
+        var base64 = Convert.ToBase64String(data);
+        return base64.TrimEnd('=').Replace('+', '-').Replace('/', '_');
+    }
 }

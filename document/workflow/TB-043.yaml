@@ -3,7 +3,7 @@
 id: TB-043
 scope: issue
 title: Identity lát 15, endpoint token đổi mã (code_verifier)
-updated: 2026-11-26T16:25:00Z
+updated: 2026-11-27T12:30:00Z
 updated_by: orchestrator:cursor-session
 
 links:
@@ -16,49 +16,36 @@ links:
   base: main
   pr: null
 
-current_step: coding-start
-next_action: "coding-start TB-043"
+current_step: create-pr
+next_action: "create-pr TB-043"
 blocked_by: null
 
 steps:
   plan-init:
     status: done
-    owner: orchestrator:cursor-session
-    started: 2026-11-26T15:55:00Z
-    finished: 2026-11-26T16:00:00Z
-    inputs: { base: "062c557" }
-    artifacts: [document/plans/TB-043-identity-token-endpoint-code-exchange.md]
-    evidence: ["Draft B1-B6", "O-1..O-5 open"]
   plan-review:
     status: done
     verdict: PASS
     round: 1
-    finished: 2026-11-26T16:30:00Z
-    evidence: ["Confirm O-1..O-5", "@S01b", "RFC7636 verifier"]
   test-init:
     status: done
-    owner: orchestrator:cursor-session
-    started: 2026-11-26T16:05:00Z
-    finished: 2026-11-26T16:15:00Z
-    evidence: ["authorization-code-token.feature @S01-S08+S01b", "PkceValidatorTests.VerifyS256", "10 đỏ", "112 pass hồi quy"]
   test-review:
     status: done
     verdict: PASS
     round: 1
-    finished: 2026-11-26T16:25:00Z
-    evidence: ["FIX @S07b", "@S08 200", "11 fail 111 pass"]
-  coding-start:           { status: pending }
-  coding-review:          { status: pending }
+  coding-start:
+    status: done
+    finished: 2026-11-27T12:10:00Z
+    evidence: ["AuthorizationCodeRedemptionService", "TokenEndpoints"]
+  coding-review:
+    status: done
+    verdict: PASS
+    round: 1
+    finished: 2026-11-27T12:30:00Z
+    evidence: ["FIX GetUserIdByEmailAsync", "122/122 !~Compose"]
   create-pr:              { status: pending }
 
 confirm_pending: []
 
 events:
-  - { at: 2026-11-26T15:55:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "plan-init TB-043 từ main 062c557" }
-  - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-init draft → plan-review" }
-  - { at: 2026-11-26T16:00:00Z, actor: "orchestrator:cursor-session", event: needs_confirm, detail: "O-1..O-5 plan-review" }
-  - { at: 2026-11-26T16:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "plan-review v1 PASS → test-init" }
-  - { at: 2026-11-26T16:05:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "test-init TB-043" }
-  - { at: 2026-11-26T16:15:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-init 10 đỏ → test-review" }
-  - { at: 2026-11-26T16:20:00Z, actor: "orchestrator:cursor-session", event: step_started, detail: "test-review v1 TB-043" }
-  - { at: 2026-11-26T16:25:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "test-review v1 PASS → coding-start" }
+  - { at: 2026-11-27T12:30:00Z, actor: "orchestrator:cursor-session", event: step_done, detail: "coding-review v1 PASS → create-pr" }

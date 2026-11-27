@@ -1,3 +1,4 @@
+using IdentityService.Features.Register;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
@@ -98,17 +99,25 @@ internal sealed class PostgresDatabase : IAsyncDisposable
 
     public async Task<Guid> GetUserIdByEmailAsync(string email)
     {
+        if (!EmailAddress.TryNormalize(email, out var emailNorm))
+        {
+            throw new InvalidOperationException($"Email '{email}' could not be normalized.");
+        }
+
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
         const string sql = """
-            SELECT id
+            SELECT "Id"
             FROM users
-            WHERE email = @email
+            WHERE email_norm = @email_norm
             LIMIT 1
             """;
         await using var command = new NpgsqlCommand(sql, connection);
-        command.Parameters.AddWithValue("email", email);
-        return (Guid)(await command.ExecuteScalarAsync())!;
+        command.Parameters.AddWithValue("email_norm", emailNorm);
+        var value = await command.ExecuteScalarAsync();
+        return value is null or DBNull
+            ? throw new InvalidOperationException($"No user found for email '{email}'.")
+            : (Guid)value;
     }
 
     public async Task<DateTimeOffset?> GetAuthorizationCodeUsedAtByHashAsync(string codeHash)
