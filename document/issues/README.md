@@ -55,8 +55,8 @@ Issue được quản lý bằng file Markdown trong repo. Cấu hình: `config/
 | [TB-040](TB-040-identity-client-registry.md) | Identity lát 12, quản lý client đăng ký | 1 | done |
 | [TB-041](TB-041-identity-client-credentials.md) | Identity lát 13, Client Credentials và token máy | 1 | done |
 | [TB-042](TB-042-identity-authorize-pkce.md) | Identity lát 14a, Authorize + PKCE validation | 1 | done |
-| [TB-052](TB-052-identity-authorize-login.md) | Identity lát 14b, Razor login + cookie IdP + phát code | 1 | review |
-| [TB-043](TB-043-identity-token-endpoint-code-exchange.md) | Identity lát 15, endpoint token đổi mã (code_verifier) | 1 | todo |
+| [TB-052](TB-052-identity-authorize-login.md) | Identity lát 14b, Razor login + cookie IdP + phát code | 1 | done |
+| [TB-043](TB-043-identity-token-endpoint-code-exchange.md) | Identity lát 15, endpoint token đổi mã (code_verifier) | 1 | review |
 | [TB-044](TB-044-identity-oidc.md) | Identity lát 16, OIDC: id_token, userinfo, discovery | 1 | todo |
 | [TB-045](TB-045-identity-scope-authorization.md) | Identity lát 17, ủy quyền theo scope | 1 | todo |
 | [TB-046](TB-046-identity-revocation-introspection.md) | Identity lát 18, thu hồi token và introspection tối thiểu | 1 | todo |

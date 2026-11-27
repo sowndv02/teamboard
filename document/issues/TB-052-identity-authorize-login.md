@@ -1,13 +1,13 @@
 ---
 key: TB-052
 title: Identity lát 14b, Razor login + cookie IdP + phát code
-status: review
+status: done
 phase: 1
 branch: feature/TB-052-identity-authorize-login
 estimate: L             # S | M | L (tương đối; ghi lại thực tế để hiệu chỉnh)
 created: 2026-11-26
 started: 2026-11-26
-closed: null
+closed: 2026-11-26
 ---
 
 # TB-052 — Identity lát 14b, Razor login + cookie IdP + phát `code`
@@ -46,6 +46,7 @@ Plan: [`document/plans/TB-052-identity-authorize-login.md`](../plans/TB-052-iden
 - 2026-11-26: test-review v1 **PASS** — FIX @S05 lockout 401; @S06 second When → And; **7 fail, 104 pass** `!~Compose`.
 - 2026-11-26: coding-start **done** — Razor `/login`, cookie `Identity.Idp`, authorize flow, migration #7; **111/111** `!~Compose`.
 - 2026-11-26: coding-review v1 **PASS** — commit `81b8cfa` + FIX `tb.authz.pending` Secure/Path; **111/111** `!~Compose`.
+- 2026-11-26: [PR #39](https://github.com/sowndv02/teamboard/pull/39) merged → `main` `062c557`.
 - 2026-11-26: [PR #39](https://github.com/sowndv02/teamboard/pull/39) (head `0b7c6ea`; không `Co-authored-by`).
 
 ## Workflow

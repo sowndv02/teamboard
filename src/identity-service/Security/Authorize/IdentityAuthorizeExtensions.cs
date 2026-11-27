@@ -31,6 +31,7 @@ public static class IdentityAuthorizeExtensions
         builder.Services.AddScoped<AuthorizeRequestService>();
         builder.Services.AddScoped<AuthorizationCodeIssuer>();
         builder.Services.AddScoped<AuthorizeInteractionService>();
+        builder.Services.AddScoped<AuthorizationCodeRedemptionService>();
         builder.Services.AddRazorPages();
         return builder;
     }

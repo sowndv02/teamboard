@@ -29,8 +29,8 @@ Chia theo `.agents/skills/workflow/references/slicing.md`. Bảng nháp ban đ�
 | 12 | I5, I6 | Quản lý client đăng ký (cấu hình/migration) | FR-014 | 1b | 2 ngày | [TB-040](../issues/TB-040-identity-client-registry.md) | done (PR #36) |
 | 13 | I6 | Client Credentials, token máy | FR-015, BR-008 | 4, 12 | 2–3 ngày | [TB-041](../issues/TB-041-identity-client-credentials.md) | done (PR #37) |
 | 14a | I5 | Authorize + PKCE validation (design i5) | FR-012, BR-005 | 2, 12 | 2 ngày | [TB-042](../issues/TB-042-identity-authorize-pkce.md) | done (PR #38) |
-| 14b | I5 | Login Razor + cookie IdP + phát code (FR-019) | FR-019, NFR-010 | 14a | 2–3 ngày | [TB-052](../issues/TB-052-identity-authorize-login.md) | review (PR #39) |
-| 15 | I5 | Endpoint token đổi mã (code_verifier) | FR-013 | 14 | 2–3 ngày | [TB-043](../issues/TB-043-identity-token-endpoint-code-exchange.md) | todo |
+| 14b | I5 | Login Razor + cookie IdP + phát code (FR-019) | FR-019, NFR-010 | 14a | 2–3 ngày | [TB-052](../issues/TB-052-identity-authorize-login.md) | done (PR #39) |
+| 15 | I5 | Endpoint token đổi mã (code_verifier) | FR-013 | 14 | 2–3 ngày | [TB-043](../issues/TB-043-identity-token-endpoint-code-exchange.md) | review (PR #40) |
 | 16 | I7 | OIDC: id_token, userinfo, discovery | FR-016–018 | 15 | 3–4 ngày | [TB-044](../issues/TB-044-identity-oidc.md) | todo (Could) |
 | 17 | I8 | Ủy quyền theo scope | FR-020 | 5 | 2 ngày | [TB-045](../issues/TB-045-identity-scope-authorization.md) | todo |
 | 18 | I8 | Thu hồi token và introspection tối thiểu | FR-021, BR-006 | 13, 17 | 2–3 ngày | [TB-046](../issues/TB-046-identity-revocation-introspection.md) | todo |
